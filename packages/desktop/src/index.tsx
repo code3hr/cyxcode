@@ -13,12 +13,11 @@ import { AsyncStorage } from "@solid-primitives/storage"
 import { fetch as tauriFetch } from "@tauri-apps/plugin-http"
 import { Store } from "@tauri-apps/plugin-store"
 import { Logo } from "@opencode-ai/ui/logo"
-import { Accessor, JSX, createResource } from "solid-js"
+import { Show, createResource, type Accessor, type JSX } from "solid-js"
 
 import { UPDATER_ENABLED } from "./updater"
 import { createMenu } from "./menu"
 import pkg from "../package.json"
-import { Show } from "solid-js"
 
 const root = document.getElementById("root")
 if (import.meta.env.DEV && !(root instanceof HTMLElement)) {
@@ -31,6 +30,11 @@ let update: Update | null = null
 
 const platform: Platform = {
   platform: "desktop",
+  os: (() => {
+    const type = ostype()
+    if (type === "macos" || type === "windows" || type === "linux") return type
+    return undefined
+  })(),
   version: pkg.version,
 
   async openDirectoryPickerDialog(opts) {
@@ -278,9 +282,6 @@ root?.addEventListener("mousewheel", (e) => {
 render(() => {
   return (
     <PlatformProvider value={platform}>
-      {ostype() === "macos" && (
-        <div class="mx-px bg-background-base border-b border-border-weak-base h-8" data-tauri-drag-region />
-      )}
       <AppBaseProviders>
         <ServerGate>{(serverUrl) => <AppInterface defaultUrl={serverUrl()} />}</ServerGate>
       </AppBaseProviders>
