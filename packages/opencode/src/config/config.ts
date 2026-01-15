@@ -1003,6 +1003,54 @@ export namespace Config {
           prune: z.boolean().optional().describe("Enable pruning of old tool outputs (default: true)"),
         })
         .optional(),
+      governance: z
+        .object({
+          enabled: z.boolean().default(false).describe("Enable governance engine for scope and policy enforcement"),
+          scope: z
+            .object({
+              ip: z
+                .object({
+                  allow: z.array(z.string()).optional().describe("Allowed IP addresses or CIDR ranges"),
+                  deny: z.array(z.string()).optional().describe("Blocked IP addresses or CIDR ranges"),
+                })
+                .optional(),
+              domain: z
+                .object({
+                  allow: z.array(z.string()).optional().describe("Allowed domain patterns (glob-style, e.g., '*.example.com')"),
+                  deny: z.array(z.string()).optional().describe("Blocked domain patterns"),
+                })
+                .optional(),
+            })
+            .optional()
+            .describe("Scope restrictions for network targets"),
+          policies: z
+            .array(
+              z.object({
+                action: z.enum(["auto-approve", "require-approval", "blocked"]).describe("Policy action"),
+                tools: z.array(z.string()).optional().describe("Tool patterns (e.g., 'bash', 'webfetch', 'mcp:*')"),
+                commands: z.array(z.string()).optional().describe("Command patterns for bash tool (e.g., 'curl *', 'ssh *')"),
+                targets: z.array(z.string()).optional().describe("Target patterns (domains/IPs)"),
+                description: z.string().optional().describe("Human-readable policy description"),
+              })
+            )
+            .optional()
+            .describe("Policy rules evaluated in order, first match wins"),
+          default_action: z
+            .enum(["auto-approve", "require-approval", "blocked"])
+            .default("require-approval")
+            .describe("Default action when no policy matches"),
+          audit: z
+            .object({
+              enabled: z.boolean().default(true).describe("Enable audit logging"),
+              storage: z.enum(["file", "memory"]).default("file").describe("Audit log storage backend"),
+              retention: z.number().int().positive().optional().describe("Days to retain audit logs"),
+              include_args: z.boolean().default(false).describe("Include tool arguments in audit log"),
+            })
+            .optional()
+            .describe("Audit logging configuration"),
+        })
+        .optional()
+        .describe("Governance engine for scope enforcement, policy rules, and audit logging"),
       experimental: z
         .object({
           hook: z

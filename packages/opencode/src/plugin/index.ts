@@ -11,6 +11,7 @@ import { CodexAuthPlugin } from "./codex"
 import { Session } from "../session"
 import { NamedError } from "@opencode-ai/util/error"
 import { CopilotAuthPlugin } from "./copilot"
+import { Governance } from "../governance"
 
 export namespace Plugin {
   const log = Log.create({ service: "plugin" })
@@ -101,6 +102,35 @@ export namespace Plugin {
     Output = Parameters<Required<Hooks>[Name]>[1],
   >(name: Name, input: Input, output: Output): Promise<Output> {
     if (!name) return output
+
+    // Governance check before tool execution
+    if (name === "tool.execute.before") {
+      const config = await Config.get()
+      if (Governance.isEnabled(config.governance)) {
+        // @ts-expect-error input type varies by hook name
+        const toolInput = input as { tool: string; args: Record<string, any>; sessionID: string; callID: string }
+        const result = await Governance.check(
+          {
+            tool: toolInput.tool,
+            args: toolInput.args,
+            sessionID: toolInput.sessionID || "unknown",
+            callID: toolInput.callID || "unknown",
+          },
+          config.governance
+        )
+
+        if (!result.allowed) {
+          throw new Governance.DeniedError(result)
+        }
+
+        log.info("Governance check passed", {
+          tool: toolInput.tool,
+          outcome: result.outcome,
+          policy: result.matchedPolicy,
+        })
+      }
+    }
+
     for (const hook of await state().then((x) => x.hooks)) {
       const fn = hook[name]
       if (!fn) continue

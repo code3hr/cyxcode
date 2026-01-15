@@ -16,6 +16,7 @@ import { Bus } from "../bus"
 import { ProviderTransform } from "../provider/transform"
 import { SystemPrompt } from "./system"
 import { Plugin } from "../plugin"
+import { Governance } from "../governance"
 import PROMPT_PLAN from "../session/prompt/plan.txt"
 import BUILD_SWITCH from "../session/prompt/build-switch.txt"
 import MAX_STEPS from "../session/prompt/max-steps.txt"
@@ -692,17 +693,28 @@ export namespace SessionPrompt {
         inputSchema: jsonSchema(schema as any),
         async execute(args, options) {
           const ctx = context(args, options)
-          await Plugin.trigger(
-            "tool.execute.before",
-            {
-              tool: item.id,
-              sessionID: ctx.sessionID,
-              callID: ctx.callID,
-            },
-            {
-              args,
-            },
-          )
+          try {
+            await Plugin.trigger(
+              "tool.execute.before",
+              {
+                tool: item.id,
+                sessionID: ctx.sessionID,
+                callID: ctx.callID,
+                args,
+              },
+              {
+                args,
+              },
+            )
+          } catch (err) {
+            if (err instanceof Governance.DeniedError) {
+              return {
+                output: `[GOVERNANCE DENIED] Tool "${item.id}" was blocked by governance policy.\nReason: ${err.result.reason || "No reason provided"}\nPolicy: ${err.result.matchedPolicy || "scope violation"}`,
+                metadata: { governance: { denied: true, ...err.result } },
+              }
+            }
+            throw err
+          }
           const result = await item.execute(args, ctx)
           await Plugin.trigger(
             "tool.execute.after",
@@ -732,17 +744,32 @@ export namespace SessionPrompt {
       item.execute = async (args, opts) => {
         const ctx = context(args, opts)
 
-        await Plugin.trigger(
-          "tool.execute.before",
-          {
-            tool: key,
-            sessionID: ctx.sessionID,
-            callID: opts.toolCallId,
-          },
-          {
-            args,
-          },
-        )
+        try {
+          await Plugin.trigger(
+            "tool.execute.before",
+            {
+              tool: key,
+              sessionID: ctx.sessionID,
+              callID: opts.toolCallId,
+              args,
+            },
+            {
+              args,
+            },
+          )
+        } catch (err) {
+          if (err instanceof Governance.DeniedError) {
+            return {
+              content: [
+                {
+                  type: "text" as const,
+                  text: `[GOVERNANCE DENIED] Tool "${key}" was blocked by governance policy.\nReason: ${err.result.reason || "No reason provided"}\nPolicy: ${err.result.matchedPolicy || "scope violation"}`,
+                },
+              ],
+            }
+          }
+          throw err
+        }
 
         await ctx.ask({
           permission: key,
