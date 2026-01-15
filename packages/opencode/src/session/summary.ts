@@ -12,7 +12,7 @@ import { Log } from "@/util/log"
 import path from "path"
 import { Instance } from "@/project/instance"
 import { db } from "@/storage/db"
-import { SessionDiffTable } from "./session-aux.sql"
+import { SessionDiffTable } from "./session.sql"
 import { eq } from "drizzle-orm"
 import { Bus } from "@/bus"
 

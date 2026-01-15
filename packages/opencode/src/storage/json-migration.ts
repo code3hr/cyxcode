@@ -4,10 +4,14 @@ import { eq } from "drizzle-orm"
 import { Global } from "../global"
 import { Log } from "../util/log"
 import { ProjectTable } from "../project/project.sql"
-import { SessionTable } from "../session/session.sql"
-import { MessageTable } from "../session/message.sql"
-import { PartTable } from "../session/part.sql"
-import { SessionDiffTable, TodoTable, PermissionTable } from "../session/session-aux.sql"
+import {
+  SessionTable,
+  MessageTable,
+  PartTable,
+  SessionDiffTable,
+  TodoTable,
+  PermissionTable,
+} from "../session/session.sql"
 import { SessionShareTable, ShareTable } from "../share/share.sql"
 import path from "path"
 

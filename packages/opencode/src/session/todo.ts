@@ -2,7 +2,7 @@ import { BusEvent } from "@/bus/bus-event"
 import { Bus } from "@/bus"
 import z from "zod"
 import { db } from "../storage/db"
-import { TodoTable } from "./session-aux.sql"
+import { TodoTable } from "./session.sql"
 import { eq } from "drizzle-orm"
 
 export namespace Todo {

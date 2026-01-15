@@ -7,10 +7,14 @@ import fs from "fs/promises"
 import os from "os"
 import { migrateFromJson } from "../../src/storage/json-migration"
 import { ProjectTable } from "../../src/project/project.sql"
-import { SessionTable } from "../../src/session/session.sql"
-import { MessageTable } from "../../src/session/message.sql"
-import { PartTable } from "../../src/session/part.sql"
-import { SessionDiffTable, TodoTable, PermissionTable } from "../../src/session/session-aux.sql"
+import {
+  SessionTable,
+  MessageTable,
+  PartTable,
+  SessionDiffTable,
+  TodoTable,
+  PermissionTable,
+} from "../../src/session/session.sql"
 import { SessionShareTable, ShareTable } from "../../src/share/share.sql"
 import { migrations } from "../../src/storage/migrations.generated"
 
