@@ -1,0 +1,326 @@
+# Phase 3: Pentest Agent MVP - Implementation Report
+
+This document describes what was implemented in Phase 3 of the cyxwiz project.
+
+---
+
+## Overview
+
+Phase 3 delivered a penetration testing agent with security scanning capabilities, integrating with the governance system from Phase 2 for scope enforcement.
+
+**Goal:** Can run "scan ports on X" with governance and get explained results.
+
+**Status:** Complete
+
+---
+
+## Deliverables
+
+### 1. Pentest Agent
+
+A new built-in agent `@pentest` was added with:
+
+- Specialized system prompt for security testing
+- Pre-configured permissions for 30+ security tools
+- Integration with governance scope enforcement
+- Low temperature (0.3) for precise, technical responses
+
+**Usage:**
+```
+@pentest Scan ports on 192.168.1.1
+@pentest Check web vulnerabilities on http://example.com
+@pentest Analyze SSL configuration on example.com
+```
+
+### 2. Nmap Tool
+
+Dedicated `nmap` tool with full feature support:
+
+| Feature | Description |
+|---------|-------------|
+| XML Parsing | Automatic parsing of nmap XML output |
+| Service Detection | -sV flag support |
+| OS Detection | -O flag support |
+| Script Scanning | -sC flag support |
+| UDP Scanning | -sU flag support |
+| Timing Control | T0-T5 timing templates |
+| Findings Generation | Auto-create findings from results |
+
+**Parameters:**
+- `target` - IP, hostname, or CIDR range
+- `ports` - Port specification (e.g., "22,80,443")
+- `serviceDetection` - Enable service version detection
+- `timing` - Timing template (0-5)
+- `udpScan` - Include UDP ports
+- `osDetection` - Enable OS detection
+- `scriptScan` - Run default NSE scripts
+- `analyzeFindings` - Auto-generate findings
+
+### 3. Security Tools Wrapper (SecTools)
+
+A unified wrapper for common security tools:
+
+**Network Reconnaissance:**
+- nmap, masscan, netcat (nc), ping, traceroute
+
+**Web Scanning:**
+- nikto - Web server vulnerability scanner
+- dirb, gobuster, ffuf - Directory brute forcing
+- wpscan - WordPress security scanner
+- whatweb - Web fingerprinting
+- wafw00f - WAF detection
+
+**Vulnerability Scanning:**
+- nuclei - Template-based scanner
+- searchsploit - Exploit database search
+
+**SQL Injection:**
+- sqlmap - Automated SQL injection
+
+**SMB/Windows:**
+- enum4linux - SMB enumeration
+- smbclient - SMB client
+- crackmapexec - Network attack tool
+- rpcclient - Windows RPC client
+
+**SSL/TLS:**
+- sslscan, sslyze, testssl - SSL/TLS analysis
+
+**DNS:**
+- dnsenum, dnsrecon, fierce - DNS enumeration
+- dig, host, whois - DNS utilities
+
+**Blocked by Default (too risky):**
+- hashcat, john - Password cracking
+- hydra - Brute force attacks
+
+### 4. Findings Storage
+
+Persistent storage for security findings:
+
+| Function | Description |
+|----------|-------------|
+| `create()` | Create new finding |
+| `update()` | Update finding status/severity |
+| `get()` | Retrieve by ID |
+| `list()` | Query with filters |
+| `remove()` | Delete finding |
+| `saveScan()` | Store scan results |
+| `listScans()` | Query scan history |
+| `analyzeAndCreateFindings()` | Auto-generate from scans |
+
+**Finding Properties:**
+- ID, session ID, scan ID
+- Title, description
+- Severity (critical, high, medium, low, info)
+- Status (open, confirmed, mitigated, false_positive)
+- Target, port, protocol, service
+- Evidence, remediation
+- CVE references
+
+### 5. Nmap XML Parser
+
+Structured parsing of nmap XML output:
+
+- Host extraction (address, hostname, status)
+- Port parsing (state, service, version)
+- OS detection results
+- Timing information
+- Human-readable formatting
+- Summary generation
+
+---
+
+## Files Created
+
+```
+packages/opencode/src/pentest/
+├── index.ts           # Module exports
+├── types.ts           # Zod schemas for types
+├── nmap-parser.ts     # Nmap XML parser
+├── nmap-tool.ts       # Nmap tool implementation
+├── sectools.ts        # Security tools wrapper
+├── findings.ts        # Findings storage
+├── PENTEST.md         # Module documentation
+└── prompt/
+    └── pentest.txt    # Agent system prompt
+
+packages/opencode/test/pentest/
+└── pentest.test.ts    # Test suite (21 tests)
+
+docs/
+├── PENTEST.md         # Pentest documentation
+└── TEST.md            # Testing documentation
+```
+
+## Files Modified
+
+| File | Changes |
+|------|---------|
+| `src/agent/agent.ts` | Added pentest agent with permissions |
+| `src/tool/registry.ts` | Registered nmap and sectools tools |
+
+---
+
+## Integration Points
+
+### Governance Integration
+
+The pentest module integrates with Phase 2 governance:
+
+1. **Scope Enforcement**: All network targets validated against governance scope
+2. **Policy Evaluation**: Tool execution checked against policies
+3. **Audit Logging**: Scans recorded in governance audit trail
+
+Example governance config for pentesting:
+```json
+{
+  "governance": {
+    "enabled": true,
+    "scope": {
+      "ip": {
+        "allow": ["10.0.0.0/8", "192.168.0.0/16"],
+        "deny": ["0.0.0.0/8"]
+      }
+    },
+    "policies": [
+      {
+        "action": "auto-approve",
+        "tools": ["nmap", "sectools"],
+        "targets": ["192.168.*"]
+      }
+    ]
+  }
+}
+```
+
+### Permission System
+
+Pentest agent permissions:
+```typescript
+bash: {
+  "nmap *": "allow",
+  "nikto *": "allow",
+  "gobuster *": "allow",
+  "sqlmap *": "allow",
+  "enum4linux *": "allow",
+  "sslscan *": "allow",
+  // ... more tools
+  "hydra *": "deny",  // Too risky
+  "hashcat *": "deny", // Too risky
+  "*": "ask",
+}
+```
+
+---
+
+## Test Coverage
+
+**Test File:** `test/pentest/pentest.test.ts`
+
+**Results:**
+```
+ 21 pass
+ 0 fail
+ 72 expect() calls
+```
+
+**Test Categories:**
+
+| Category | Tests |
+|----------|-------|
+| NmapParser | 7 tests - XML parsing, formatting |
+| Findings | 11 tests - CRUD, filtering, analysis |
+| PentestTypes | 3 tests - Schema validation |
+
+---
+
+## Example Workflows
+
+### Basic Port Scan
+```
+User: @pentest scan ports on 192.168.1.1
+
+Agent:
+1. Validates target against governance scope
+2. Runs: nmap -sV -oX - 192.168.1.1
+3. Parses XML output
+4. Generates findings for open ports
+5. Returns formatted results with recommendations
+```
+
+### Web Application Assessment
+```
+User: @pentest check web vulnerabilities on http://target.com
+
+Agent:
+1. Runs whatweb for fingerprinting
+2. Runs nikto for vulnerability scanning
+3. Runs gobuster for directory enumeration
+4. Analyzes results
+5. Prioritizes findings by severity
+6. Provides remediation recommendations
+```
+
+### Infrastructure Security Check
+```
+User: @pentest full security assessment on 192.168.1.0/24
+
+Agent:
+1. Network discovery with nmap
+2. Service enumeration on discovered hosts
+3. SSL/TLS analysis on HTTPS services
+4. SMB enumeration on Windows hosts
+5. Comprehensive findings report
+```
+
+---
+
+## Limitations
+
+1. **Tool Availability**: Tools must be installed on the system (Kali/Parrot)
+2. **Root Required**: Some scans (OS detection, SYN scan) require root
+3. **Network Access**: Scans require network connectivity to targets
+4. **Governance Scope**: Only authorized targets can be scanned
+
+---
+
+## Future Enhancements
+
+Potential improvements for future phases:
+
+1. **Metasploit Integration**: Add MSF module execution
+2. **Burp Suite Integration**: Web app testing automation
+3. **Report Generation**: Export findings to PDF/HTML
+4. **Scheduling**: Scheduled recurring scans
+5. **Comparison**: Compare scan results over time
+6. **CVE Lookup**: Automatic CVE correlation
+
+---
+
+## Commit
+
+```
+08a1a86d6 Add Pentest Agent MVP with security scanning tools
+```
+
+**Stats:** 13 files changed, 3,844 insertions
+
+---
+
+## Dependencies
+
+| Dependency | Purpose |
+|------------|---------|
+| Governance Module | Scope enforcement |
+| Storage Module | Findings persistence |
+| Bus Module | Event publishing |
+| Identifier Module | Unique ID generation |
+
+---
+
+## Related Documentation
+
+- [PENTEST.md](./PENTEST.md) - Pentest module reference
+- [GOVERNANCE.md](./GOVERNANCE.md) - Governance system
+- [TEST.md](./TEST.md) - Testing guide
