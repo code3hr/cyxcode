@@ -40,7 +40,7 @@ import { lazy } from "../util/lazy"
 import { Todo } from "../session/todo"
 import { InstanceBootstrap } from "../project/bootstrap"
 import { MCP } from "../mcp"
-import { Storage } from "../storage/storage"
+import { NotFoundError } from "../storage/db"
 import type { ContentfulStatusCode } from "hono/utils/http-status"
 import { TuiEvent } from "@/cli/cmd/tui/event"
 import { Snapshot } from "@/snapshot"
@@ -85,7 +85,7 @@ export namespace Server {
           })
           if (err instanceof NamedError) {
             let status: ContentfulStatusCode
-            if (err instanceof Storage.NotFoundError) status = 404
+            if (err instanceof NotFoundError) status = 404
             else if (err instanceof Provider.ModelNotFoundError) status = 400
             else if (err.name.startsWith("Worktree")) status = 400
             else status = 500
@@ -357,7 +357,7 @@ export namespace Server {
           async (c) => {
             const info = Pty.get(c.req.valid("param").ptyID)
             if (!info) {
-              throw new Storage.NotFoundError({ message: "Session not found" })
+              throw new NotFoundError({ message: "Session not found" })
             }
             return c.json(info)
           },
