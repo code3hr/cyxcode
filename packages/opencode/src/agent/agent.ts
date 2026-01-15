@@ -11,6 +11,7 @@ import PROMPT_COMPACTION from "./prompt/compaction.txt"
 import PROMPT_EXPLORE from "./prompt/explore.txt"
 import PROMPT_SUMMARY from "./prompt/summary.txt"
 import PROMPT_TITLE from "./prompt/title.txt"
+import PROMPT_PENTEST from "../pentest/prompt/pentest.txt"
 import { PermissionNext } from "@/permission/next"
 import { mergeDeep, pipe, sortBy, values } from "remeda"
 import { Global } from "@/global"
@@ -191,6 +192,82 @@ export namespace Agent {
           user,
         ),
         prompt: PROMPT_SUMMARY,
+      },
+      pentest: {
+        name: "pentest",
+        description: `Security testing specialist for penetration testing and vulnerability assessment. Use this agent to scan networks, identify open ports and services, discover security issues, and get remediation recommendations. Supports nmap, nikto, dirb, gobuster, sqlmap, nuclei, and other security tools with governance scope enforcement.`,
+        permission: PermissionNext.merge(
+          defaults,
+          PermissionNext.fromConfig({
+            "*": "deny",
+            nmap: "allow",
+            sectools: "allow",
+            bash: {
+              // Network reconnaissance
+              "nmap *": "allow",
+              "ping *": "allow",
+              "traceroute *": "allow",
+              "host *": "allow",
+              "dig *": "allow",
+              "whois *": "allow",
+              "nc *": "allow",
+              "netcat *": "allow",
+              "ncat *": "allow",
+              "masscan *": "allow",
+              // Web scanning
+              "nikto *": "allow",
+              "dirb *": "allow",
+              "gobuster *": "allow",
+              "ffuf *": "allow",
+              "wpscan *": "allow",
+              "whatweb *": "allow",
+              "wafw00f *": "allow",
+              // Vulnerability scanning
+              "nuclei *": "allow",
+              "searchsploit *": "allow",
+              // SQL injection
+              "sqlmap *": "allow",
+              // SMB/Windows
+              "enum4linux *": "allow",
+              "smbclient *": "allow",
+              "rpcclient *": "allow",
+              "crackmapexec *": "allow",
+              "impacket-* *": "allow",
+              // SSL/TLS
+              "sslscan *": "allow",
+              "sslyze *": "allow",
+              "testssl *": "allow",
+              // DNS
+              "dnsenum *": "allow",
+              "dnsrecon *": "allow",
+              "fierce *": "allow",
+              // Other utilities
+              "curl *": "allow",
+              "wget *": "allow",
+              "hashcat *": "deny", // Password cracking - too risky
+              "john *": "deny", // Password cracking - too risky
+              "hydra *": "deny", // Brute force - too risky without explicit approval
+              "*": "ask",
+            },
+            read: "allow",
+            grep: "allow",
+            glob: "allow",
+            webfetch: "allow",
+            websearch: "allow",
+            todoread: "deny",
+            todowrite: "deny",
+            external_directory: {
+              [Truncate.DIR]: "allow",
+              [Truncate.GLOB]: "allow",
+            },
+          }),
+          user,
+        ),
+        prompt: PROMPT_PENTEST,
+        options: {},
+        mode: "subagent",
+        native: true,
+        temperature: 0.3,
       },
     }
 
