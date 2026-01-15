@@ -116,8 +116,9 @@ This is what makes Wiz different from vanilla OpenCode or ChatGPT.
 
 ## Key Files
 
-- `PROJECT.md` - Full project specification and roadmap
-- `CLAUDE.md` - This file (AI context)
+- `docs/PROJECT.md` - Full project specification and roadmap
+- `docs/CLAUDE.md` - This file (AI context)
+- `docs/USAGE.md` - Development guide
 
 ---
 
@@ -235,6 +236,11 @@ bun run --cwd packages/opencode src/index.ts
 
 ```
 /home/mrcj/Desktop/wiz/
+├── README.md                  # Wiz README
+├── docs/
+│   ├── PROJECT.md             # Full specification
+│   ├── CLAUDE.md              # This file
+│   └── USAGE.md               # Development guide
 ├── packages/
 │   ├── opencode/src/          # Core CLI/TUI
 │   │   ├── tool/              # Tool definitions
@@ -250,9 +256,7 @@ bun run --cwd packages/opencode src/index.ts
 │   ├── plugin/                # Plugin SDK
 │   │   └── src/index.ts       # Hook definitions
 │   └── sdk/                   # Client SDK
-├── CLAUDE.md                  # This file
-├── PROJECT.md                 # Full specification
-└── README.md                  # OpenCode readme (to be replaced)
+└── [OpenCode config files]
 ```
 
 ## Governance Injection Points
