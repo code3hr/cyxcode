@@ -559,7 +559,7 @@ export namespace MessageV2 {
       .select()
       .from(MessageTable)
       .where(eq(MessageTable.sessionID, sessionID))
-      .orderBy(desc(MessageTable.createdAt))
+      .orderBy(desc(MessageTable.id))
       .all()
     for (const row of rows) {
       yield await get({

@@ -13,8 +13,8 @@ import path from "path"
 
 const log = Log.create({ service: "json-migration" })
 
-export async function migrateFromJson(sqlite: Database) {
-  const storageDir = path.join(Global.Path.data, "storage")
+export async function migrateFromJson(sqlite: Database, customStorageDir?: string) {
+  const storageDir = customStorageDir ?? path.join(Global.Path.data, "storage")
   const migrationMarker = path.join(storageDir, "sqlite-migrated")
 
   if (await Bun.file(migrationMarker).exists()) {
