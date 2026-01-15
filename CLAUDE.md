@@ -203,19 +203,31 @@ Key OpenCode concepts:
 
 ## Current Status
 
-**Phase:** Phase 1 - Fork & Foundation (in progress)
+**Phase:** Phase 1 - Fork & Foundation (COMPLETE)
 
 **Completed:**
 - [x] Fork OpenCode repository (github.com/code3hr/opencode)
 - [x] Clone to /home/mrcj/Desktop/wiz
 - [x] Explore codebase structure
 - [x] Identify modification points for governance engine
+- [x] Install Bun (v1.3.6)
+- [x] Install dependencies (3585 packages)
+- [x] Build project successfully
+- [x] Verify OpenCode runs
 
-**Next steps:**
-1. Set up development environment (bun install)
-2. Build and run OpenCode locally
-3. Create governance engine module
-4. Implement tool.execute.before hook
+**Next Phase: Phase 2 - Governance Engine**
+1. Create `src/governance/` module in packages/opencode
+2. Implement `tool.execute.before` hook for scope/policy checks
+3. Implement `tool.execute.after` hook for audit logging
+4. Add scope definition system
+5. Add policy configuration
+
+**How to run OpenCode (dev mode):**
+```bash
+export PATH="$HOME/.bun/bin:$PATH"
+cd /home/mrcj/Desktop/wiz
+bun run --cwd packages/opencode src/index.ts
+```
 
 ---
 
