@@ -16,6 +16,7 @@ import { SecToolsTool } from "../pentest/sectools"
 import { ReportTool } from "../pentest/report-tool"
 import { MonitorTool } from "../pentest/monitoring/tool"
 import { ExploitTool } from "../pentest/exploits/tool"
+import { WebScanTool } from "../pentest/webscan/tool"
 import type { Agent } from "../agent/agent"
 import { Tool } from "./tool"
 import { Instance } from "../project/instance"
@@ -118,6 +119,7 @@ export namespace ToolRegistry {
       ReportTool,
       MonitorTool,
       ExploitTool,
+      WebScanTool,
       ...(Flag.OPENCODE_EXPERIMENTAL_LSP_TOOL ? [LspTool] : []),
       ...(config.experimental?.batch_tool === true ? [BatchTool] : []),
       ...(Flag.OPENCODE_EXPERIMENTAL_PLAN_MODE && Flag.OPENCODE_CLIENT === "cli" ? [PlanExitTool, PlanEnterTool] : []),
