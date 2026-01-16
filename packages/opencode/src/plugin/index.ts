@@ -107,7 +107,6 @@ export namespace Plugin {
     if (name === "tool.execute.before") {
       const config = await Config.get()
       if (Governance.isEnabled(config.governance)) {
-        // @ts-expect-error input type varies by hook name
         const toolInput = input as { tool: string; args: Record<string, any>; sessionID: string; callID: string }
         const result = await Governance.check(
           {
