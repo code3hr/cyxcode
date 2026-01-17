@@ -264,8 +264,10 @@ See [docs/TODO.md](docs/TODO.md) for the full roadmap.
 | Document | Description |
 |----------|-------------|
 | [PROJECT.md](docs/PROJECT.md) | Platform architecture and vision |
+| [COMPARISON.md](docs/COMPARISON.md) | How Wiz compares to other tools |
 | [PENTEST.md](docs/PENTEST.md) | Pentest module documentation |
 | [GOVERNANCE.md](docs/GOVERNANCE.md) | Governance engine details |
+| [DISTRIBUTION.md](docs/DISTRIBUTION.md) | Kali/Parrot distribution strategy |
 | [TODO.md](docs/TODO.md) | Development roadmap |
 
 ---
