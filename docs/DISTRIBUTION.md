@@ -26,7 +26,7 @@ Both Kali Linux and Parrot OS use Debian-based packaging (.deb). To get Wiz incl
 | Requirement | Status | Notes |
 |-------------|--------|-------|
 | `debian/` directory | DONE | Complete packaging created |
-| Tagged release | TODO | Create git tag for release |
+| Tagged release | DONE | v1.1.0 released |
 | Clear license | DONE | MIT License |
 | Homepage | DONE | GitHub repo |
 | Documentation | DONE | README, docs/ |
@@ -95,8 +95,9 @@ Wiz should be included in:
 | GitLab account | TODO | Create account |
 | Debian packaging | DONE | debian/ directory created |
 | Debian standards compliance | DONE | Follows Debian policy |
-| Fork on personal repo | TODO | Fork and package |
-| Merge request | TODO | Submit for review |
+| Email submission | DONE | Sent to team@parrotsec.org |
+| Fork on personal repo | PENDING | Awaiting team response |
+| Merge request | PENDING | Awaiting team response |
 
 ### Submission Process
 
@@ -194,22 +195,22 @@ override_dh_auto_install:
 
 - [x] Create `debian/` directory with all required files
 - [x] Write man page for wiz
-- [ ] Create tagged release (v1.1.0)
-- [ ] Test package build locally
+- [x] Create tagged release (v1.1.0)
+- [x] Test package build locally
 - [ ] Test installation on clean Kali VM
 - [ ] Test installation on clean Parrot VM
 
 ### Phase 2: Submit to Kali (Priority: High)
 
-- [ ] Create account on bugs.kali.org
-- [ ] Submit new tool request
+- [x] Create account on bugs.kali.org
+- [x] Submit new tool request (January 2026)
 - [ ] Respond to reviewer feedback
 - [ ] Iterate on packaging if needed
 
 ### Phase 3: Submit to Parrot (Priority: High)
 
 - [ ] Create GitLab account
-- [ ] Email team@parrotsec.org
+- [x] Email team@parrotsec.org (January 2026)
 - [ ] Fork and prepare package
 - [ ] Submit merge request
 - [ ] Respond to reviewer feedback
@@ -232,8 +233,8 @@ While working on official inclusion, we can also distribute via:
 Host .deb packages on GitHub releases for manual installation:
 
 ```bash
-wget https://github.com/code3hr/opencode/releases/download/v1.1.0/wiz_1.0.0_all.deb
-sudo dpkg -i wiz_1.0.0_all.deb
+wget https://github.com/code3hr/opencode/releases/download/v1.1.0/wiz_1.1.0-1_all.deb
+sudo dpkg -i wiz_1.1.0-1_all.deb
 sudo apt-get install -f  # Install dependencies
 ```
 
@@ -273,10 +274,10 @@ brew install wiz
 | Phase | Status |
 |-------|--------|
 | Debian packaging | COMPLETE |
-| Kali submission | Ready to submit |
-| Kali review process | 2-4 weeks (variable) |
-| Parrot submission | Ready to submit |
-| Parrot review | 2-4 weeks (variable) |
+| Kali submission | SUBMITTED (Jan 2026) |
+| Kali review process | PENDING (2-4 weeks) |
+| Parrot submission | SUBMITTED (Jan 2026) |
+| Parrot review | PENDING (2-4 weeks) |
 | Official inclusion | 1-3 months total |
 
 ---
