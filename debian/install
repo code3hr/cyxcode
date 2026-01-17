@@ -1,0 +1,4 @@
+packages/* usr/lib/wiz/packages
+docs/* usr/lib/wiz/docs
+package.json usr/lib/wiz
+README.md usr/share/doc/wiz

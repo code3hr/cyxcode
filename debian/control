@@ -1,0 +1,61 @@
+Source: wiz
+Section: utils
+Priority: optional
+Maintainer: code3hr <code3hr@users.noreply.github.com>
+Build-Depends: debhelper-compat (= 13)
+Standards-Version: 4.6.0
+Homepage: https://github.com/code3hr/opencode
+Vcs-Browser: https://github.com/code3hr/opencode
+Vcs-Git: https://github.com/code3hr/opencode.git
+Rules-Requires-Root: no
+
+Package: wiz
+Architecture: all
+Depends: ${misc:Depends}
+Pre-Depends: curl
+Recommends: nmap,
+            nikto,
+            nuclei,
+            gobuster,
+            ffuf,
+            sqlmap,
+            smbclient,
+            ldap-utils,
+            snmp,
+            dnsutils,
+            sslscan,
+            whatweb,
+            wfuzz,
+            hydra,
+            medusa,
+            enum4linux,
+            nbtscan,
+            onesixtyone,
+            masscan,
+            amass,
+            subfinder
+Suggests: metasploit-framework,
+          burpsuite,
+          zaproxy
+Description: AI-powered security operations platform
+ Wiz is an AI-powered operations platform for security professionals.
+ It orchestrates 30+ security tools through natural language commands,
+ with governance, scope enforcement, and audit logging.
+ .
+ Built for Kali Linux and Parrot OS, Wiz leverages the 600+ security
+ tools already installed on these distributions.
+ .
+ Features:
+  - Natural language tool orchestration
+  - Governance engine with policy-based approval
+  - Scope enforcement for authorized targets only
+  - Comprehensive audit logging
+  - Structured findings management
+  - Professional report generation
+ .
+ Supported tool categories:
+  - Reconnaissance: nmap, masscan, amass, subfinder
+  - Web Scanning: nikto, nuclei, gobuster, ffuf, sqlmap
+  - Network Analysis: SMB, SNMP, DNS, LDAP enumeration
+  - Active Directory: User/group enumeration, Kerberoasting
+  - API Security: OpenAPI parsing, JWT analysis

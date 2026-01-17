@@ -1,0 +1,39 @@
+#!/usr/bin/make -f
+
+export DH_VERBOSE = 1
+
+%:
+	dh $@
+
+override_dh_auto_clean:
+	rm -rf node_modules
+	rm -rf packages/opencode/node_modules
+	rm -rf packages/opencode/dist
+
+override_dh_auto_build:
+	# Bun is installed via postinst if not present
+	@echo "Build will be performed during package installation"
+
+override_dh_auto_install:
+	# Create directory structure
+	mkdir -p debian/wiz/usr/lib/wiz
+	mkdir -p debian/wiz/usr/bin
+	mkdir -p debian/wiz/usr/share/doc/wiz
+	mkdir -p debian/wiz/usr/share/man/man1
+
+	# Copy source files
+	cp -r packages debian/wiz/usr/lib/wiz/
+	cp -r docs debian/wiz/usr/lib/wiz/
+	cp package.json debian/wiz/usr/lib/wiz/
+	cp bun.lock debian/wiz/usr/lib/wiz/ 2>/dev/null || true
+	cp tsconfig.json debian/wiz/usr/lib/wiz/ 2>/dev/null || true
+
+	# Copy documentation
+	cp README.md debian/wiz/usr/share/doc/wiz/
+	cp LICENSE debian/wiz/usr/share/doc/wiz/ 2>/dev/null || true
+
+	# Install man page
+	cp debian/wiz.1 debian/wiz/usr/share/man/man1/
+
+override_dh_auto_test:
+	@echo "Skipping tests during package build"

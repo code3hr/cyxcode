@@ -1,0 +1,123 @@
+.TH WIZ 1 "January 2026" "wiz 1.0.0" "User Commands"
+.SH NAME
+wiz \- AI-powered security operations platform
+.SH SYNOPSIS
+.B wiz
+[\fIOPTIONS\fR]
+.SH DESCRIPTION
+.B Wiz
+is an AI-powered operations platform for security professionals.
+It orchestrates 30+ security tools through natural language commands,
+with governance, scope enforcement, and comprehensive audit logging.
+.PP
+Built for Kali Linux and Parrot OS, Wiz leverages the security tools
+already installed on these distributions. Instead of memorizing tool
+syntax and manually orchestrating workflows, describe what you want
+to accomplish in natural language.
+.SH FEATURES
+.TP
+.B Natural Language Interface
+Describe security testing tasks in plain English. Wiz translates your
+intent into the appropriate tool commands.
+.TP
+.B Governance Engine
+Every action is evaluated against policies before execution. Define
+what's allowed, what needs approval, and what's blocked.
+.TP
+.B Scope Enforcement
+Define authorized targets (IPs, domains, ports). Wiz prevents
+accidental out-of-scope scanning.
+.TP
+.B Audit Trail
+Every command, approval, and result is automatically logged for
+compliance reporting.
+.TP
+.B Findings Management
+Structured storage of all security findings with severity classification,
+OWASP/CVE categorization, and remediation tracking.
+.TP
+.B Report Generation
+Professional reports in Markdown, HTML, and JSON formats.
+.SH SUPPORTED TOOLS
+.SS Reconnaissance
+nmap, masscan, amass, subfinder
+.SS Web Scanning
+nikto, nuclei, gobuster, ffuf, sqlmap, whatweb, wfuzz
+.SS Network Analysis
+SMB enumeration, SNMP walking, DNS zone transfers, LDAP enumeration
+.SS Active Directory
+User/group enumeration, Kerberoasting, AS-REP roasting
+.SS API Security
+OpenAPI parsing, JWT analysis, BOLA/IDOR testing
+.SH EXAMPLES
+.PP
+Start Wiz:
+.RS
+.B wiz
+.RE
+.PP
+Scan a network for open ports:
+.RS
+> scan 192.168.1.0/24 for open ports
+.RE
+.PP
+Check for web vulnerabilities:
+.RS
+> scan https://target.com for OWASP Top 10
+.RE
+.PP
+Enumerate Active Directory:
+.RS
+> enumerate users in corp.local domain
+.RE
+.PP
+Generate a report:
+.RS
+> generate executive report
+.RE
+.SH ENVIRONMENT
+.TP
+.B ANTHROPIC_API_KEY
+API key for Claude AI (recommended).
+.TP
+.B OPENAI_API_KEY
+API key for OpenAI GPT models (alternative).
+.TP
+.B WIZ_CONFIG
+Path to configuration file (optional).
+.SH FILES
+.TP
+.I /usr/lib/wiz/
+Wiz installation directory.
+.TP
+.I /usr/share/doc/wiz/
+Documentation files.
+.TP
+.I ~/.wiz/
+User configuration and session data.
+.SH SECURITY
+.PP
+Wiz includes governance features specifically to prevent misuse:
+.IP \(bu 2
+Scope enforcement blocks unauthorized targets
+.IP \(bu 2
+Audit logging creates accountability
+.IP \(bu 2
+Designed for authorized testing only
+.PP
+.B WARNING:
+Only use Wiz for authorized security testing. Unauthorized scanning
+or testing is illegal and unethical.
+.SH SEE ALSO
+.BR nmap (1),
+.BR nikto (1),
+.BR sqlmap (1),
+.BR nuclei (1)
+.SH BUGS
+Report bugs at: https://github.com/code3hr/opencode/issues
+.SH AUTHOR
+Written by code3hr.
+.SH COPYRIGHT
+Copyright \(co 2024-2026 code3hr.
+.br
+License: MIT

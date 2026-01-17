@@ -1,0 +1,19 @@
+wiz (1.0.0-1) unstable; urgency=medium
+
+  * Initial release
+  * AI-powered security operations platform
+  * Natural language tool orchestration
+  * Governance engine with policy-based approval
+  * Scope enforcement for authorized targets
+  * Comprehensive audit logging
+  * Structured findings management
+  * Professional report generation
+  * Integrated security tools:
+    - Network scanning (nmap, masscan)
+    - Web scanning (nikto, nuclei, gobuster, ffuf)
+    - Active Directory enumeration
+    - SMB/SNMP/DNS/LDAP testing
+    - API security testing
+    - Credential testing
+
+ -- code3hr <code3hr@users.noreply.github.com>  Sat, 17 Jan 2026 12:00:00 +0000

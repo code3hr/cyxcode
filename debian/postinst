@@ -1,0 +1,76 @@
+#!/bin/bash
+set -e
+
+case "$1" in
+    configure)
+        # Check if Bun is installed
+        if ! command -v bun &> /dev/null; then
+            echo "Installing Bun JavaScript runtime..."
+            curl -fsSL https://bun.sh/install | bash
+
+            # Add bun to system PATH
+            if [ -f /root/.bun/bin/bun ]; then
+                ln -sf /root/.bun/bin/bun /usr/local/bin/bun
+            elif [ -f "$HOME/.bun/bin/bun" ]; then
+                ln -sf "$HOME/.bun/bin/bun" /usr/local/bin/bun
+            fi
+        fi
+
+        # Install dependencies
+        echo "Installing Wiz dependencies..."
+        cd /usr/lib/wiz
+        bun install --production 2>/dev/null || true
+
+        # Create wiz executable wrapper
+        cat > /usr/bin/wiz << 'WRAPPER'
+#!/bin/bash
+# Wiz - AI-Powered Security Operations Platform
+
+WIZ_HOME="/usr/lib/wiz"
+
+# Ensure bun is in PATH
+if [ -f "$HOME/.bun/bin/bun" ]; then
+    export PATH="$HOME/.bun/bin:$PATH"
+elif [ -f "/root/.bun/bin/bun" ]; then
+    export PATH="/root/.bun/bin:$PATH"
+fi
+
+# Check if bun is available
+if ! command -v bun &> /dev/null; then
+    echo "Error: Bun runtime not found. Please install with:"
+    echo "  curl -fsSL https://bun.sh/install | bash"
+    exit 1
+fi
+
+# Run Wiz
+exec bun run --cwd "$WIZ_HOME/packages/opencode" src/index.ts "$@"
+WRAPPER
+
+        chmod +x /usr/bin/wiz
+
+        echo ""
+        echo "=============================================="
+        echo "  Wiz installed successfully!"
+        echo "=============================================="
+        echo ""
+        echo "  Usage: wiz"
+        echo ""
+        echo "  Set your API key:"
+        echo "    export ANTHROPIC_API_KEY=sk-ant-..."
+        echo "    # or"
+        echo "    export OPENAI_API_KEY=sk-..."
+        echo ""
+        echo "  Documentation: /usr/share/doc/wiz/"
+        echo "=============================================="
+        ;;
+
+    abort-upgrade|abort-remove|abort-deconfigure)
+        ;;
+
+    *)
+        echo "postinst called with unknown argument \`$1'" >&2
+        exit 1
+        ;;
+esac
+
+exit 0
