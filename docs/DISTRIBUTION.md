@@ -194,7 +194,7 @@ override_dh_auto_install:
 
 - [x] Create `debian/` directory with all required files
 - [x] Write man page for wiz
-- [ ] Create tagged release (v1.0.0)
+- [ ] Create tagged release (v1.1.0)
 - [ ] Test package build locally
 - [ ] Test installation on clean Kali VM
 - [ ] Test installation on clean Parrot VM
@@ -232,7 +232,7 @@ While working on official inclusion, we can also distribute via:
 Host .deb packages on GitHub releases for manual installation:
 
 ```bash
-wget https://github.com/code3hr/opencode/releases/download/v1.0.0/wiz_1.0.0_all.deb
+wget https://github.com/code3hr/opencode/releases/download/v1.1.0/wiz_1.0.0_all.deb
 sudo dpkg -i wiz_1.0.0_all.deb
 sudo apt-get install -f  # Install dependencies
 ```
