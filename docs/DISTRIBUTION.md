@@ -25,16 +25,17 @@ Both Kali Linux and Parrot OS use Debian-based packaging (.deb). To get Wiz incl
 
 | Requirement | Status | Notes |
 |-------------|--------|-------|
-| `debian/` directory | TODO | Create Debian packaging |
+| `debian/` directory | DONE | Complete packaging created |
 | Tagged release | TODO | Create git tag for release |
 | Clear license | DONE | MIT License |
 | Homepage | DONE | GitHub repo |
 | Documentation | DONE | README, docs/ |
-| Dependencies listed | TODO | Bun, security tools |
+| Dependencies listed | DONE | In debian/control |
 | Installation instructions | DONE | In README |
 | Usage examples | DONE | In README |
 | Active development | DONE | Regular commits |
 | Not duplicate of existing tool | DONE | Unique AI orchestration approach |
+| Man page | DONE | debian/wiz.1 |
 
 ### Submission Information
 
@@ -92,8 +93,8 @@ Wiz should be included in:
 | Requirement | Status | Notes |
 |-------------|--------|-------|
 | GitLab account | TODO | Create account |
-| Debian packaging | TODO | Create debian/ directory |
-| Debian standards compliance | TODO | Follow Debian policy |
+| Debian packaging | DONE | debian/ directory created |
+| Debian standards compliance | DONE | Follows Debian policy |
 | Fork on personal repo | TODO | Fork and package |
 | Merge request | TODO | Submit for review |
 
@@ -115,19 +116,24 @@ Wiz should be included in:
 
 Both distributions require proper Debian packaging. Here's what we need:
 
-### Directory Structure
+### Directory Structure (Implemented)
 
 ```
 wiz/
 ├── debian/
-│   ├── changelog          # Version history
-│   ├── compat             # Debhelper compatibility
+│   ├── changelog          # Version history (1.0.0-1)
+│   ├── compat             # Debhelper compatibility (13)
 │   ├── control            # Package metadata
-│   ├── copyright          # License information
+│   ├── copyright          # MIT license information
 │   ├── rules              # Build instructions
 │   ├── install            # File installation paths
-│   └── wiz.manpages       # Man page list
-├── src/
+│   ├── postinst           # Post-install script (Bun setup)
+│   ├── prerm              # Pre-removal script
+│   ├── postrm             # Post-removal script
+│   ├── wiz.1              # Man page
+│   └── source/
+│       └── format         # Source format (3.0 native)
+├── packages/
 └── ...
 ```
 
@@ -186,8 +192,8 @@ override_dh_auto_install:
 
 ### Phase 1: Prepare Package (Priority: High)
 
-- [ ] Create `debian/` directory with all required files
-- [ ] Write man page for wiz
+- [x] Create `debian/` directory with all required files
+- [x] Write man page for wiz
 - [ ] Create tagged release (v1.0.0)
 - [ ] Test package build locally
 - [ ] Test installation on clean Kali VM
@@ -264,12 +270,12 @@ brew install wiz
 
 ## Timeline Estimate
 
-| Phase | Target |
+| Phase | Status |
 |-------|--------|
-| Debian packaging | 1-2 weeks |
-| Kali submission | After packaging |
+| Debian packaging | COMPLETE |
+| Kali submission | Ready to submit |
 | Kali review process | 2-4 weeks (variable) |
-| Parrot submission | Parallel with Kali |
+| Parrot submission | Ready to submit |
 | Parrot review | 2-4 weeks (variable) |
 | Official inclusion | 1-3 months total |
 
