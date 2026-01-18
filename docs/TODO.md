@@ -62,25 +62,34 @@ Documentation: [PHASE10.md](PHASE10.md)
 - LDAP testing (anonymous bind, password policy)
 - Credential testing (default creds, password spraying)
 
+### Phase 11: Cloud Security Scanner ✅
+Documentation: [PHASE11.md](PHASE11.md)
+
+- **cloudscan/** - Cloud infrastructure security testing
+- AWS security assessment (IAM, S3, Security Groups, EC2, Lambda)
+- Azure security assessment (RBAC, Storage, NSG, VMs, Function Apps)
+- GCP security assessment (IAM, GCS, Firewall, GCE, Cloud Functions)
+- Compliance checking (CIS, NIST, PCI-DSS, HIPAA, SOC2, GDPR, ISO27001)
+- External tool integration (Prowler, ScoutSuite)
+
+### Phase 12: Container Security Scanner + CVE Lookup ✅
+Documentation: [PHASE12.md](PHASE12.md)
+
+- **cve/** - CVE Lookup Service
+- NVD API 2.0, OSV API, CISA KEV integration
+- CVE data caching with TTL
+- Finding enrichment utilities
+- **containerscan/** - Container and orchestration security
+- Docker image vulnerability scanning (Trivy, Grype)
+- SBOM generation (Syft)
+- Kubernetes cluster security assessment
+- Pod security, RBAC, network policy analysis
+- Registry scanning (Docker Hub, ECR, ACR, GCR)
+- CIS Docker/Kubernetes compliance
+
 ---
 
 ## Pending Phases
-
-### Phase 11: Cloud Security Scanner 🔜
-- **cloudscan/** - Cloud infrastructure security testing
-- AWS security assessment (S3 buckets, IAM policies, security groups)
-- Azure security assessment (storage accounts, RBAC, network security)
-- GCP security assessment (Cloud Storage, IAM, firewall rules)
-- Multi-cloud policy compliance checking
-- Cloud-specific vulnerability detection
-
-### Phase 12: Container Security Scanner 🔜
-- **containerscan/** - Container and orchestration security
-- Docker image vulnerability scanning
-- Kubernetes cluster security assessment
-- Pod security policy analysis
-- Secret management auditing
-- Runtime security monitoring
 
 ### Phase 13: Mobile Application Scanner 🔜
 - **mobilescan/** - Mobile app security testing
@@ -134,16 +143,16 @@ Documentation: [PHASE10.md](PHASE10.md)
 
 ## Priority Matrix
 
-| Phase | Priority | Complexity | Dependencies |
-|-------|----------|------------|--------------|
-| Phase 11 (Cloud) | High | High | None |
-| Phase 12 (Container) | High | Medium | Phase 11 |
-| Phase 13 (Mobile) | Medium | High | None |
-| Phase 14 (Wireless) | Low | Medium | None |
-| Phase 15 (SocEng) | Low | Medium | None |
-| Phase 16 (PostExploit) | Medium | High | Phase 10 |
-| Phase 17 (Dashboard) | Medium | Medium | All |
-| Phase 18 (CI/CD) | High | Low | Phase 11, 12 |
+| Phase | Priority | Complexity | Dependencies | Status |
+|-------|----------|------------|--------------|--------|
+| Phase 11 (Cloud) | High | High | None | ✅ Complete |
+| Phase 12 (Container) | High | Medium | Phase 11 | ✅ Complete |
+| Phase 13 (Mobile) | Medium | High | None | 🔜 Next |
+| Phase 14 (Wireless) | Low | Medium | None | Pending |
+| Phase 15 (SocEng) | Low | Medium | None | Pending |
+| Phase 16 (PostExploit) | Medium | High | Phase 10 | Pending |
+| Phase 17 (Dashboard) | Medium | Medium | All | Pending |
+| Phase 18 (CI/CD) | High | Low | Phase 11, 12 | Pending |
 
 ---
 
@@ -161,6 +170,9 @@ All completed phases have corresponding test files:
 | WebScan | `test/pentest/webscan.test.ts` | ✅ Passing |
 | ApiScan | `test/pentest/apiscan.test.ts` | ✅ Passing |
 | NetScan | `test/pentest/netscan.test.ts` | ✅ Passing |
+| CloudScan | `test/pentest/cloudscan.test.ts` | 🔜 Pending |
+| CVE | `test/pentest/cve.test.ts` | 🔜 Pending |
+| ContainerScan | `test/pentest/containerscan.test.ts` | 🔜 Pending |
 
 Run all tests:
 ```bash
