@@ -87,17 +87,24 @@ Documentation: [PHASE12.md](PHASE12.md)
 - Registry scanning (Docker Hub, ECR, ACR, GCR)
 - CIS Docker/Kubernetes compliance
 
+### Phase 13: Mobile Application Scanner ✅
+Documentation: [PHASE13.md](PHASE13.md)
+
+- **mobilescan/** - Mobile app security testing
+- Android APK analysis (manifest, permissions, components, crypto, storage, network)
+- iOS IPA analysis (plist, entitlements, ATS, binary protections)
+- OWASP Mobile Top 10 2024 coverage (M1-M10)
+- API key/secret detection with entropy calculation
+- SSL pinning detection
+- Root/jailbreak detection
+- Code obfuscation analysis
+- URL extraction and categorization
+- External tool integration (APKTool, JADX, MobSF, Androguard)
+- Multiple scan profiles (discovery, quick, standard, thorough, compliance)
+
 ---
 
 ## Pending Phases
-
-### Phase 13: Mobile Application Scanner 🔜
-- **mobilescan/** - Mobile app security testing
-- APK/IPA static analysis
-- Insecure data storage detection
-- Certificate pinning bypass testing
-- API communication analysis
-- OWASP Mobile Top 10 categorization
 
 ### Phase 14: Wireless Network Scanner 🔜
 - **wirelessscan/** - Wireless security testing
@@ -147,8 +154,8 @@ Documentation: [PHASE12.md](PHASE12.md)
 |-------|----------|------------|--------------|--------|
 | Phase 11 (Cloud) | High | High | None | ✅ Complete |
 | Phase 12 (Container) | High | Medium | Phase 11 | ✅ Complete |
-| Phase 13 (Mobile) | Medium | High | None | 🔜 Next |
-| Phase 14 (Wireless) | Low | Medium | None | Pending |
+| Phase 13 (Mobile) | Medium | High | None | ✅ Complete |
+| Phase 14 (Wireless) | Low | Medium | None | 🔜 Next |
 | Phase 15 (SocEng) | Low | Medium | None | Pending |
 | Phase 16 (PostExploit) | Medium | High | Phase 10 | Pending |
 | Phase 17 (Dashboard) | Medium | Medium | All | Pending |
@@ -173,6 +180,7 @@ All completed phases have corresponding test files:
 | CloudScan | `test/pentest/cloudscan.test.ts` | 🔜 Pending |
 | CVE | `test/pentest/cve.test.ts` | 🔜 Pending |
 | ContainerScan | `test/pentest/containerscan.test.ts` | 🔜 Pending |
+| MobileScan | `test/pentest/mobilescan.test.ts` | 🔜 Pending |
 
 Run all tests:
 ```bash
