@@ -102,17 +102,27 @@ Documentation: [PHASE13.md](PHASE13.md)
 - External tool integration (APKTool, JADX, MobSF, Androguard)
 - Multiple scan profiles (discovery, quick, standard, thorough, compliance)
 
+### Phase 14: Wireless Network Scanner ✅
+Documentation: [PHASE14.md](PHASE14.md)
+
+- **wirelessscan/** - Wireless security testing
+- WiFi network discovery and enumeration
+- WPA/WPA2/WPA3 security assessment (KRACK, Dragonblood detection)
+- Rogue access point and evil twin detection
+- Client enumeration with OUI lookup
+- Handshake capture and analysis
+- Deauthentication attack detection
+- Bluetooth security testing (Classic and BLE)
+- BlueBorne, KNOB, BIAS, BLESA vulnerability checks
+- RFID/NFC security assessment
+- MIFARE Classic/DESFire, NTAG, HID, EM4100 support
+- Cloning vulnerability assessment
+- External tool integration (Aircrack-ng, Kismet, Bettercap, Ubertooth, Proxmark3)
+- Multiple scan profiles (discovery, quick, standard, thorough, passive, active)
+
 ---
 
 ## Pending Phases
-
-### Phase 14: Wireless Network Scanner 🔜
-- **wirelessscan/** - Wireless security testing
-- WiFi network discovery and enumeration
-- WPA/WPA2/WPA3 security assessment
-- Rogue access point detection
-- Bluetooth security testing
-- RFID/NFC security assessment
 
 ### Phase 15: Social Engineering Toolkit 🔜
 - **soceng/** - Social engineering capabilities
@@ -155,8 +165,8 @@ Documentation: [PHASE13.md](PHASE13.md)
 | Phase 11 (Cloud) | High | High | None | ✅ Complete |
 | Phase 12 (Container) | High | Medium | Phase 11 | ✅ Complete |
 | Phase 13 (Mobile) | Medium | High | None | ✅ Complete |
-| Phase 14 (Wireless) | Low | Medium | None | 🔜 Next |
-| Phase 15 (SocEng) | Low | Medium | None | Pending |
+| Phase 14 (Wireless) | Low | Medium | None | ✅ Complete |
+| Phase 15 (SocEng) | Low | Medium | None | 🔜 Next |
 | Phase 16 (PostExploit) | Medium | High | Phase 10 | Pending |
 | Phase 17 (Dashboard) | Medium | Medium | All | Pending |
 | Phase 18 (CI/CD) | High | Low | Phase 11, 12 | Pending |
@@ -181,6 +191,7 @@ All completed phases have corresponding test files:
 | CVE | `test/pentest/cve.test.ts` | 🔜 Pending |
 | ContainerScan | `test/pentest/containerscan.test.ts` | 🔜 Pending |
 | MobileScan | `test/pentest/mobilescan.test.ts` | 🔜 Pending |
+| WirelessScan | `test/pentest/wirelessscan.test.ts` | 🔜 Pending |
 
 Run all tests:
 ```bash
