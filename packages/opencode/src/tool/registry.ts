@@ -23,6 +23,7 @@ import { CloudScanTool } from "../pentest/cloudscan/tool"
 import { CVETool } from "../pentest/cve/tool"
 import { ContainerScanTool } from "../pentest/containerscan/tool"
 import { MobileScanTool } from "../pentest/mobilescan/tool"
+import { WirelessScanTool } from "../pentest/wirelessscan/tool"
 import type { Agent } from "../agent/agent"
 import { Tool } from "./tool"
 import { Instance } from "../project/instance"
@@ -132,6 +133,7 @@ export namespace ToolRegistry {
       CVETool,
       ContainerScanTool,
       MobileScanTool,
+      WirelessScanTool,
       ...(Flag.OPENCODE_EXPERIMENTAL_LSP_TOOL ? [LspTool] : []),
       ...(config.experimental?.batch_tool === true ? [BatchTool] : []),
       ...(Flag.OPENCODE_EXPERIMENTAL_PLAN_MODE && Flag.OPENCODE_CLIENT === "cli" ? [PlanExitTool, PlanEnterTool] : []),
