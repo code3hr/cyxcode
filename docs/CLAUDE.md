@@ -204,26 +204,49 @@ Key OpenCode concepts:
 
 ## Current Status
 
-**Phase:** Phase 1 - Fork & Foundation (COMPLETE)
+**Phase:** Phase 16 Complete - Post-Exploitation Framework
 
-**Completed:**
-- [x] Fork OpenCode repository (github.com/code3hr/opencode)
-- [x] Clone to /home/mrcj/Desktop/wiz
-- [x] Explore codebase structure
-- [x] Identify modification points for governance engine
-- [x] Install Bun (v1.3.6)
-- [x] Install dependencies (3585 packages)
-- [x] Build project successfully
-- [x] Verify OpenCode runs
+**Completed Phases:**
 
-**Next Phase: Phase 2 - Governance Engine**
-1. Create `src/governance/` module in packages/opencode
-2. Implement `tool.execute.before` hook for scope/policy checks
-3. Implement `tool.execute.after` hook for audit logging
-4. Add scope definition system
-5. Add policy configuration
+| Phase | Module | Status |
+|-------|--------|--------|
+| 1-5 | Core Pentest Module | ✅ Complete |
+| 6 | Parser Extensions (nikto, nuclei, gobuster, ffuf, sslscan) | ✅ Complete |
+| 7 | Report Generation | ✅ Complete |
+| 8 | Continuous Monitoring | ✅ Complete |
+| 8b | Exploit Integration | ✅ Complete |
+| 8c | Web Scanner | ✅ Complete |
+| 9 | API Security Scanner | ✅ Complete |
+| 10 | Network Infrastructure Scanner (AD, SMB, DNS, SNMP, LDAP) | ✅ Complete |
+| 11 | Cloud Security Scanner (AWS, Azure, GCP) | ✅ Complete |
+| 12 | Container Security Scanner + CVE Lookup | ✅ Complete |
+| 13 | Mobile Application Scanner (Android/iOS) | ✅ Complete |
+| 14 | Wireless Network Scanner (WiFi, Bluetooth, RFID) | ✅ Complete |
+| 15 | Social Engineering Toolkit | ✅ Complete |
+| 16 | Post-Exploitation Framework | ✅ Complete |
 
-**How to run OpenCode (dev mode):**
+**Pending Phases:**
+- Phase 17: Reporting Dashboard (web-based interface)
+- Phase 18: CI/CD Security Integration
+
+**Pentest Tools Available:**
+- `nmap` - Network scanning with XML parsing
+- `sectools` - 30+ security tool wrappers
+- `report` - Security assessment reports (MD, HTML, JSON)
+- `monitor` - Scheduled scans with diff detection
+- `exploit` - Exploit matching and execution
+- `webscan` - Web application security scanner
+- `apiscan` - API security testing (OpenAPI, GraphQL)
+- `netscan` - Network infrastructure (AD, SMB, DNS, SNMP, LDAP)
+- `cloudscan` - Cloud security (AWS, Azure, GCP, compliance)
+- `cve` - CVE lookup (NVD, OSV, CISA KEV)
+- `containerscan` - Container/K8s security (Trivy, Grype)
+- `mobilescan` - Mobile app security (Android APK, iOS IPA)
+- `wirelessscan` - Wireless security (WiFi, Bluetooth, RFID/NFC)
+- `soceng` - Social engineering toolkit
+- `postexploit` - Post-exploitation framework
+
+**How to run (dev mode):**
 ```bash
 export PATH="$HOME/.bun/bin:$PATH"
 cd /home/mrcj/Desktop/wiz
@@ -240,14 +263,36 @@ bun run --cwd packages/opencode src/index.ts
 ├── docs/
 │   ├── PROJECT.md             # Full specification
 │   ├── CLAUDE.md              # This file
-│   └── USAGE.md               # Development guide
+│   ├── TODO.md                # Development phases
+│   ├── PHASE3-16.md           # Phase documentation
+│   └── PENTEST.md             # Pentest module guide
 ├── packages/
 │   ├── opencode/src/          # Core CLI/TUI
 │   │   ├── tool/              # Tool definitions
 │   │   │   ├── tool.ts        # Base tool definition
 │   │   │   ├── bash.ts        # Bash execution
-│   │   │   ├── registry.ts    # Tool registry
+│   │   │   ├── registry.ts    # Tool registry (includes all pentest tools)
 │   │   │   └── ...
+│   │   ├── pentest/           # Pentest module (WIZ CORE)
+│   │   │   ├── types.ts       # Core type definitions
+│   │   │   ├── findings.ts    # Security findings storage
+│   │   │   ├── nmap-parser.ts # Nmap XML parsing
+│   │   │   ├── nmap-tool.ts   # Nmap tool
+│   │   │   ├── sectools.ts    # 30+ security tool wrappers
+│   │   │   ├── parsers/       # Tool output parsers
+│   │   │   ├── reports/       # Report generation
+│   │   │   ├── monitoring/    # Continuous monitoring
+│   │   │   ├── exploits/      # Exploit integration
+│   │   │   ├── webscan/       # Web application scanner
+│   │   │   ├── apiscan/       # API security scanner
+│   │   │   ├── netscan/       # Network infrastructure (AD, SMB, DNS)
+│   │   │   ├── cloudscan/     # Cloud security (AWS, Azure, GCP)
+│   │   │   ├── cve/           # CVE lookup service
+│   │   │   ├── containerscan/ # Container/K8s security
+│   │   │   ├── mobilescan/    # Mobile app security
+│   │   │   ├── wirelessscan/  # Wireless security
+│   │   │   ├── soceng/        # Social engineering toolkit
+│   │   │   └── postexploit/   # Post-exploitation framework
 │   │   ├── plugin/            # Plugin loader
 │   │   ├── permission/        # Permission system
 │   │   ├── agent/             # Agent definitions
