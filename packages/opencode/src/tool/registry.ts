@@ -25,6 +25,7 @@ import { ContainerScanTool } from "../pentest/containerscan/tool"
 import { MobileScanTool } from "../pentest/mobilescan/tool"
 import { WirelessScanTool } from "../pentest/wirelessscan/tool"
 import { SocEngTool } from "../pentest/soceng/tool"
+import { PostExploitTool } from "../pentest/postexploit/tool"
 import type { Agent } from "../agent/agent"
 import { Tool } from "./tool"
 import { Instance } from "../project/instance"
@@ -136,6 +137,7 @@ export namespace ToolRegistry {
       MobileScanTool,
       WirelessScanTool,
       SocEngTool,
+      PostExploitTool,
       ...(Flag.OPENCODE_EXPERIMENTAL_LSP_TOOL ? [LspTool] : []),
       ...(config.experimental?.batch_tool === true ? [BatchTool] : []),
       ...(Flag.OPENCODE_EXPERIMENTAL_PLAN_MODE && Flag.OPENCODE_CLIENT === "cli" ? [PlanExitTool, PlanEnterTool] : []),

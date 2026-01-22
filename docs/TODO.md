@@ -139,17 +139,25 @@ Documentation: [PHASE15.md](PHASE15.md)
 - Executive summary and campaign reporting
 - Session management for tracking assessment progress
 
+### Phase 16: Post-Exploitation Framework ✅
+Documentation: [PHASE16.md](PHASE16.md)
+
+- **postexploit/** - Guidance-based post-exploitation framework
+- Privilege escalation vectors (SUID, sudo, capabilities, kernel exploits for Linux; services, registry, tokens, UAC for Windows)
+- GTFOBins and LOLBAS references with exploitation guidance
+- Lateral movement discovery and path analysis (SMB, WMI, SSH, RDP, WinRM, pass-the-hash/ticket)
+- Credential harvesting locations (shadow, SSH keys, SAM, LSASS, NTDS, DPAPI, browser creds)
+- Persistence mechanism catalog (cron, systemd, registry, scheduled tasks, WMI subscriptions, services)
+- Data exfiltration channels (DNS, HTTP, SSH, SMB, cloud, steganography)
+- Cleanup and artifact tracking with verification checklists
+- LinPEAS and WinPEAS output parsers with automatic vector extraction
+- MITRE ATT&CK technique mapping for all operations
+- Assessment profiles (discovery, quick, standard, thorough, stealth)
+- Session management with comprehensive statistics
+
 ---
 
 ## Pending Phases
-
-### Phase 16: Post-Exploitation Framework 🔜
-- **postexploit/** - Post-exploitation capabilities
-- Privilege escalation assistance
-- Lateral movement detection
-- Persistence mechanism cataloging
-- Data exfiltration pathways
-- Cleanup and evidence removal guidance
 
 ### Phase 17: Reporting Dashboard 🔜
 - **dashboard/** - Web-based reporting interface
@@ -178,8 +186,8 @@ Documentation: [PHASE15.md](PHASE15.md)
 | Phase 13 (Mobile) | Medium | High | None | ✅ Complete |
 | Phase 14 (Wireless) | Low | Medium | None | ✅ Complete |
 | Phase 15 (SocEng) | Low | Medium | None | ✅ Complete |
-| Phase 16 (PostExploit) | Medium | High | Phase 10 | 🔜 Next |
-| Phase 17 (Dashboard) | Medium | Medium | All | Pending |
+| Phase 16 (PostExploit) | Medium | High | Phase 10 | ✅ Complete |
+| Phase 17 (Dashboard) | Medium | Medium | All | 🔜 Next |
 | Phase 18 (CI/CD) | High | Low | Phase 11, 12 | Pending |
 
 ---
@@ -204,6 +212,7 @@ All completed phases have corresponding test files:
 | MobileScan | `test/pentest/mobilescan.test.ts` | 🔜 Pending |
 | WirelessScan | `test/pentest/wirelessscan.test.ts` | 🔜 Pending |
 | SocEng | `test/pentest/soceng.test.ts` | 🔜 Pending |
+| PostExploit | `test/pentest/postexploit.test.ts` | 🔜 Pending |
 
 Run all tests:
 ```bash
