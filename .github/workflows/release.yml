@@ -1,0 +1,216 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to release (e.g., 1.2.0)'
+        required: true
+        type: string
+
+permissions:
+  contents: write
+  packages: write
+
+env:
+  BUN_VERSION: "1.1.45"
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # Linux x64
+          - os: ubuntu-latest
+            target: linux-x64
+            artifact: cyxwiz-linux-x64
+          # Linux ARM64
+          - os: ubuntu-latest
+            target: linux-arm64
+            artifact: cyxwiz-linux-arm64
+          # macOS x64
+          - os: macos-13
+            target: darwin-x64
+            artifact: cyxwiz-darwin-x64
+          # macOS ARM64
+          - os: macos-latest
+            target: darwin-arm64
+            artifact: cyxwiz-darwin-arm64
+          # Windows x64
+          - os: windows-latest
+            target: windows-x64
+            artifact: cyxwiz-windows-x64
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: ${{ env.BUN_VERSION }}
+
+      - name: Install dependencies
+        run: bun install
+
+      - name: Build CLI
+        working-directory: packages/opencode
+        run: bun run build --single
+        env:
+          OPENCODE_VERSION: ${{ inputs.version || github.ref_name }}
+
+      - name: Package Linux Binary
+        if: runner.os == 'Linux'
+        run: |
+          cd packages/opencode/dist
+          DIST_DIR=$(ls -d */ | head -1)
+          cd "$DIST_DIR/bin"
+          chmod +x opencode
+          tar -czvf ../../../${{ matrix.artifact }}.tar.gz opencode
+          cd ../../..
+
+      - name: Package macOS Binary
+        if: runner.os == 'macOS'
+        run: |
+          cd packages/opencode/dist
+          DIST_DIR=$(ls -d */ | head -1)
+          cd "$DIST_DIR/bin"
+          chmod +x opencode
+          tar -czvf ../../../${{ matrix.artifact }}.tar.gz opencode
+          cd ../../..
+
+      - name: Package Windows Binary
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          cd packages/opencode/dist
+          $distDir = Get-ChildItem -Directory | Select-Object -First 1
+          cd "$($distDir.Name)/bin"
+          Compress-Archive -Path opencode.exe -DestinationPath ../../../${{ matrix.artifact }}.zip
+          cd ../../..
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.artifact }}
+          path: |
+            packages/opencode/dist/*.tar.gz
+            packages/opencode/dist/*.zip
+          if-no-files-found: error
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: Prepare release assets
+        run: |
+          mkdir -p release
+          find artifacts -type f \( -name "*.tar.gz" -o -name "*.zip" \) -exec mv {} release/ \;
+          ls -la release/
+
+      - name: Generate checksums
+        run: |
+          cd release
+          sha256sum * > checksums.sha256
+          cat checksums.sha256
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ inputs.version && format('v{0}', inputs.version) || github.ref_name }}
+          name: ${{ inputs.version && format('Release v{0}', inputs.version) || format('Release {0}', github.ref_name) }}
+          draft: false
+          prerelease: ${{ contains(github.ref_name, 'alpha') || contains(github.ref_name, 'beta') || contains(github.ref_name, 'rc') }}
+          generate_release_notes: true
+          files: |
+            release/*
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  # Optional: Build desktop app with Tauri
+  build-desktop:
+    if: ${{ !contains(github.ref_name, 'cli-only') }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            target: x86_64-unknown-linux-gnu
+            artifact: cyxwiz-desktop-linux-x64
+          - os: macos-latest
+            target: aarch64-apple-darwin
+            artifact: cyxwiz-desktop-darwin-arm64
+          - os: macos-13
+            target: x86_64-apple-darwin
+            artifact: cyxwiz-desktop-darwin-x64
+          - os: windows-latest
+            target: x86_64-pc-windows-msvc
+            artifact: cyxwiz-desktop-windows-x64
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: ${{ env.BUN_VERSION }}
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.target }}
+
+      - name: Rust cache
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: packages/desktop/src-tauri
+
+      - name: Install Linux dependencies
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf
+
+      - name: Install dependencies
+        run: bun install
+
+      - name: Build Desktop App
+        uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          projectPath: packages/desktop
+          args: --target ${{ matrix.target }}
+
+      - name: Upload Desktop Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.artifact }}
+          path: |
+            packages/desktop/src-tauri/target/${{ matrix.target }}/release/bundle/**/*.dmg
+            packages/desktop/src-tauri/target/${{ matrix.target }}/release/bundle/**/*.app
+            packages/desktop/src-tauri/target/${{ matrix.target }}/release/bundle/**/*.deb
+            packages/desktop/src-tauri/target/${{ matrix.target }}/release/bundle/**/*.AppImage
+            packages/desktop/src-tauri/target/${{ matrix.target }}/release/bundle/**/*.msi
+            packages/desktop/src-tauri/target/${{ matrix.target }}/release/bundle/**/*.exe
+          if-no-files-found: warn
