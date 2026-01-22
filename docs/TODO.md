@@ -155,6 +155,19 @@ Documentation: [PHASE16.md](PHASE16.md)
 - Assessment profiles (discovery, quick, standard, thorough, stealth)
 - Session management with comprehensive statistics
 
+### Phase 18: CI/CD Security Integration ✅
+Documentation: [PHASE18.md](PHASE18.md)
+
+- **cicd/** - CI/CD pipeline security scanner
+- Pipeline discovery for GitHub Actions, GitLab CI, Jenkins
+- Secret detection with regex patterns and entropy analysis
+- Permission analysis for excessive/risky permissions
+- Command injection vulnerability detection
+- Supply chain security (unpinned actions, untrusted dependencies)
+- SAST integration (Semgrep, Gitleaks)
+- Security gate enforcement with configurable rules
+- Multiple scan profiles (discovery, quick, standard, thorough, compliance)
+
 ---
 
 ## Pending Phases
@@ -166,14 +179,6 @@ Documentation: [PHASE16.md](PHASE16.md)
 - Executive summary generation
 - Remediation tracking
 - Compliance mapping (PCI-DSS, HIPAA, SOC2)
-
-### Phase 18: CI/CD Security Integration 🔜
-- **cicd/** - DevSecOps integration
-- GitHub Actions integration
-- GitLab CI/CD integration
-- Jenkins pipeline integration
-- SAST/DAST automation
-- Security gate enforcement
 
 ---
 
@@ -188,7 +193,7 @@ Documentation: [PHASE16.md](PHASE16.md)
 | Phase 15 (SocEng) | Low | Medium | None | ✅ Complete |
 | Phase 16 (PostExploit) | Medium | High | Phase 10 | ✅ Complete |
 | Phase 17 (Dashboard) | Medium | Medium | All | 🔜 Next |
-| Phase 18 (CI/CD) | High | Low | Phase 11, 12 | Pending |
+| Phase 18 (CI/CD) | High | Low | Phase 11, 12 | ✅ Complete |
 
 ---
 
@@ -213,6 +218,7 @@ All completed phases have corresponding test files:
 | WirelessScan | `test/pentest/wirelessscan.test.ts` | 🔜 Pending |
 | SocEng | `test/pentest/soceng.test.ts` | 🔜 Pending |
 | PostExploit | `test/pentest/postexploit.test.ts` | 🔜 Pending |
+| CICD | `test/pentest/cicd.test.ts` | 🔜 Pending |
 
 Run all tests:
 ```bash
