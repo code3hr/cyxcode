@@ -120,17 +120,28 @@ Documentation: [PHASE14.md](PHASE14.md)
 - External tool integration (Aircrack-ng, Kismet, Bettercap, Ubertooth, Proxmark3)
 - Multiple scan profiles (discovery, quick, standard, thorough, passive, active)
 
+### Phase 15: Social Engineering Toolkit ✅
+Documentation: [PHASE15.md](PHASE15.md)
+
+- **soceng/** - Social engineering toolkit for authorized security testing
+- Email security assessment (SPF/DKIM/DMARC validation, spoofing analysis)
+- Lookalike domain generation for awareness testing
+- Phishing campaign management (credential harvest, payload delivery, awareness)
+- Pre-built phishing templates (password reset, IT support, HR, executive)
+- Landing page templates (Microsoft 365, Google, generic login)
+- Pretexting scenarios with objection handlers
+- Persona library for social engineering engagements
+- Call scripts with dialogue trees and transitions
+- Payload generation (USB drop, malicious documents, VBA macros, HTA)
+- OSINT reconnaissance (email discovery, organization profiling, social media)
+- Security awareness training modules with quizzes
+- Awareness metrics and industry benchmarking
+- Executive summary and campaign reporting
+- Session management for tracking assessment progress
+
 ---
 
 ## Pending Phases
-
-### Phase 15: Social Engineering Toolkit 🔜
-- **soceng/** - Social engineering capabilities
-- Phishing campaign management
-- Credential harvesting pages
-- Email template generation
-- USB drop payloads
-- Pretexting script generation
 
 ### Phase 16: Post-Exploitation Framework 🔜
 - **postexploit/** - Post-exploitation capabilities
@@ -166,8 +177,8 @@ Documentation: [PHASE14.md](PHASE14.md)
 | Phase 12 (Container) | High | Medium | Phase 11 | ✅ Complete |
 | Phase 13 (Mobile) | Medium | High | None | ✅ Complete |
 | Phase 14 (Wireless) | Low | Medium | None | ✅ Complete |
-| Phase 15 (SocEng) | Low | Medium | None | 🔜 Next |
-| Phase 16 (PostExploit) | Medium | High | Phase 10 | Pending |
+| Phase 15 (SocEng) | Low | Medium | None | ✅ Complete |
+| Phase 16 (PostExploit) | Medium | High | Phase 10 | 🔜 Next |
 | Phase 17 (Dashboard) | Medium | Medium | All | Pending |
 | Phase 18 (CI/CD) | High | Low | Phase 11, 12 | Pending |
 
@@ -192,6 +203,7 @@ All completed phases have corresponding test files:
 | ContainerScan | `test/pentest/containerscan.test.ts` | 🔜 Pending |
 | MobileScan | `test/pentest/mobilescan.test.ts` | 🔜 Pending |
 | WirelessScan | `test/pentest/wirelessscan.test.ts` | 🔜 Pending |
+| SocEng | `test/pentest/soceng.test.ts` | 🔜 Pending |
 
 Run all tests:
 ```bash
