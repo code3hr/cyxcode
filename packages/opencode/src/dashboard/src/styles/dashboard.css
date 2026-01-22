@@ -1,0 +1,133 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    @apply antialiased;
+  }
+
+  body {
+    @apply min-h-screen;
+  }
+
+  ::-webkit-scrollbar {
+    @apply w-2 h-2;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-gray-800;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-gray-600 rounded;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-gray-500;
+  }
+}
+
+@layer components {
+  .card {
+    @apply bg-gray-800 rounded-lg border border-gray-700 p-4;
+  }
+
+  .card-header {
+    @apply text-lg font-semibold text-gray-100 mb-4;
+  }
+
+  .btn {
+    @apply px-4 py-2 rounded-lg font-medium transition-colors duration-200;
+  }
+
+  .btn-primary {
+    @apply bg-blue-600 hover:bg-blue-700 text-white;
+  }
+
+  .btn-secondary {
+    @apply bg-gray-700 hover:bg-gray-600 text-gray-100;
+  }
+
+  .btn-danger {
+    @apply bg-red-600 hover:bg-red-700 text-white;
+  }
+
+  .btn-success {
+    @apply bg-green-600 hover:bg-green-700 text-white;
+  }
+
+  .input {
+    @apply bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent;
+  }
+
+  .select {
+    @apply bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent;
+  }
+
+  .badge {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+  }
+
+  .badge-critical {
+    @apply bg-red-900 text-red-200;
+  }
+
+  .badge-high {
+    @apply bg-orange-900 text-orange-200;
+  }
+
+  .badge-medium {
+    @apply bg-yellow-900 text-yellow-200;
+  }
+
+  .badge-low {
+    @apply bg-blue-900 text-blue-200;
+  }
+
+  .badge-info {
+    @apply bg-gray-700 text-gray-300;
+  }
+
+  .table {
+    @apply w-full text-left;
+  }
+
+  .table th {
+    @apply px-4 py-3 text-xs font-medium text-gray-400 uppercase tracking-wider border-b border-gray-700;
+  }
+
+  .table td {
+    @apply px-4 py-3 text-sm text-gray-300 border-b border-gray-700;
+  }
+
+  .table tr:hover td {
+    @apply bg-gray-750;
+  }
+
+  .nav-link {
+    @apply flex items-center gap-3 px-3 py-2 text-gray-400 hover:text-gray-100 hover:bg-gray-800 rounded-lg transition-colors;
+  }
+
+  .nav-link-active {
+    @apply text-blue-400 bg-gray-800;
+  }
+
+  .stat-card {
+    @apply bg-gray-800 rounded-lg p-4 border border-gray-700;
+  }
+
+  .stat-value {
+    @apply text-2xl font-bold text-gray-100;
+  }
+
+  .stat-label {
+    @apply text-sm text-gray-400;
+  }
+}
+
+@layer utilities {
+  .bg-gray-750 {
+    background-color: rgb(38 42 51);
+  }
+}
