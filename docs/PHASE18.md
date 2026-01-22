@@ -238,6 +238,216 @@ Features:
 - Git history scanning (optional)
 - Custom configuration support
 
+## Code Examples
+
+### Basic Pipeline Discovery
+
+```typescript
+import { CICDOrchestrator } from "./pentest/cicd"
+
+// Discover all CI/CD pipelines in a repository
+const discovery = await CICDOrchestrator.discover("/path/to/repo")
+
+console.log(`Found ${discovery.pipelines.length} pipelines:`)
+for (const pipeline of discovery.pipelines) {
+  console.log(`  - ${pipeline.provider}: ${pipeline.path}`)
+}
+```
+
+### Full Security Scan
+
+```typescript
+import { CICDOrchestrator } from "./pentest/cicd"
+
+// Run a comprehensive security scan
+const result = await CICDOrchestrator.scan({
+  target: "/path/to/repo",
+  profile: "standard",
+})
+
+console.log(`Scan completed: ${result.status}`)
+console.log(`Findings: ${result.findings.length}`)
+console.log(`  Critical: ${result.stats.bySeverity.critical}`)
+console.log(`  High: ${result.stats.bySeverity.high}`)
+
+// Check gate result
+if (result.gateResult) {
+  console.log(`Gate: ${result.gateResult.status}`)
+  if (!result.gateResult.passed) {
+    console.log(`Blocked by: ${result.gateResult.failedRules.join(", ")}`)
+  }
+}
+```
+
+### Secret Detection Only
+
+```typescript
+import { SecretsCheck } from "./pentest/cicd/checks/secrets"
+import { promises as fs } from "fs"
+
+const content = await fs.readFile(".github/workflows/ci.yml", "utf-8")
+const result = SecretsCheck.detect(content, ".github/workflows/ci.yml")
+
+for (const finding of result.findings) {
+  console.log(`[${finding.severity}] ${finding.patternName}`)
+  console.log(`  File: ${finding.file}:${finding.line}`)
+  console.log(`  Value: ${finding.redacted}`)
+}
+```
+
+### Check for Injection Vulnerabilities
+
+```typescript
+import { InjectionCheck } from "./pentest/cicd/checks/injection"
+import { GitHubProvider } from "./pentest/cicd/providers/github"
+
+const content = `
+name: PR Check
+on: pull_request
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "PR Title: \${{ github.event.pull_request.title }}"
+`
+
+const parseResult = GitHubProvider.parse(content, ".github/workflows/pr.yml")
+if (parseResult.success && parseResult.pipeline) {
+  const injection = InjectionCheck.detect(parseResult.pipeline)
+
+  for (const finding of injection.findings) {
+    console.log(`[${finding.severity}] ${finding.title}`)
+    console.log(`  ${finding.description}`)
+    console.log(`  Remediation: ${finding.remediation}`)
+  }
+}
+```
+
+### Supply Chain Analysis
+
+```typescript
+import { SupplyChainCheck } from "./pentest/cicd/checks/supply-chain"
+
+const result = SupplyChainCheck.check(pipeline, {
+  requirePinning: true,
+  trustedPrefixes: ["actions/", "github/", "my-org/"],
+})
+
+console.log(`Actions analyzed: ${result.actionsAnalyzed}`)
+console.log(`Unpinned: ${result.unpinnedActions}`)
+console.log(`Untrusted: ${result.untrustedActions}`)
+
+for (const finding of result.findings) {
+  if (finding.severity === "high") {
+    console.log(`⚠️  ${finding.title}`)
+    console.log(`   ${finding.remediation}`)
+  }
+}
+```
+
+### SAST Integration
+
+```typescript
+import { SASTOrchestrator } from "./pentest/cicd/sast"
+
+// Check tool availability
+const available = await SASTOrchestrator.checkAvailability()
+console.log("Available tools:", Object.entries(available)
+  .filter(([_, v]) => v).map(([k]) => k))
+
+// Run SAST scan
+const result = await SASTOrchestrator.run({
+  tools: ["semgrep", "gitleaks"],
+  target: "/path/to/repo",
+  gitleaks: {
+    history: true,
+    depth: 50,
+  },
+})
+
+console.log(`SAST completed in ${result.stats.duration}ms`)
+console.log(`Total findings: ${result.stats.totalFindings}`)
+```
+
+### Custom Security Gate
+
+```typescript
+import { SecurityGates } from "./pentest/cicd/gates"
+
+const gateConfig = {
+  enabled: true,
+  blockOnCritical: true,
+  blockOnHigh: true,
+  maxCritical: 0,
+  maxHigh: 0,
+  maxMedium: 10,
+  rules: [
+    { id: "no-secrets", category: "secrets", action: "fail" },
+    { id: "no-injection", category: "injection", action: "fail" },
+    { id: "pin-actions", category: "supply-chain", action: "fail" },
+    { id: "check-permissions", category: "permissions", action: "warn" },
+  ],
+}
+
+const gateResult = SecurityGates.evaluate(scanResult.findings, gateConfig)
+
+if (gateResult.passed) {
+  console.log("✅ Security gate PASSED")
+} else {
+  console.log("❌ Security gate FAILED")
+  console.log(`  Failed rules: ${gateResult.failedRules.length}`)
+  console.log(`  Warnings: ${gateResult.warnedRules.length}`)
+}
+```
+
+### Event Subscription
+
+```typescript
+import { Bus } from "./bus"
+import { CICDEvents } from "./pentest/cicd/events"
+
+// Subscribe to findings in real-time
+Bus.subscribe(CICDEvents.SecretDetected, (event) => {
+  console.log(`🔐 Secret found: ${event.patternName}`)
+  console.log(`   File: ${event.file}:${event.line}`)
+})
+
+Bus.subscribe(CICDEvents.InjectionRisk, (event) => {
+  console.log(`💉 Injection risk: ${event.type}`)
+  console.log(`   Source: ${event.source}`)
+})
+
+Bus.subscribe(CICDEvents.GateEvaluated, (event) => {
+  const icon = event.passed ? "✅" : "❌"
+  console.log(`${icon} Gate ${event.status}: ${event.message}`)
+})
+```
+
+### Parsing Different Providers
+
+```typescript
+import { GitHubProvider, GitLabProvider, JenkinsProvider } from "./pentest/cicd/providers"
+
+// GitHub Actions
+const ghResult = GitHubProvider.parse(workflowYaml, ".github/workflows/ci.yml")
+
+// GitLab CI
+const glResult = GitLabProvider.parse(gitlabCiYaml, ".gitlab-ci.yml")
+
+// Jenkins
+const jkResult = JenkinsProvider.parse(jenkinsfile, "Jenkinsfile")
+
+// All providers implement the same interface
+for (const result of [ghResult, glResult, jkResult]) {
+  if (result.success && result.pipeline) {
+    console.log(`Provider: ${result.pipeline.provider}`)
+    console.log(`Jobs: ${result.pipeline.jobs.length}`)
+    console.log(`Secrets referenced: ${result.pipeline.secrets.length}`)
+  }
+}
+```
+
 ## Future Enhancements
 
 - Azure DevOps pipeline support
