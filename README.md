@@ -98,71 +98,141 @@ Wiz understands context too. After scanning a network, you can say *"check that 
 
 ---
 
-## Why Wiz? Why Not Just Use an LLM Directly?
+## Why Wiz? Why Not Claude CLI or Other LLM Tools?
 
-You could ask ChatGPT or Claude: *"How do I scan for vulnerabilities?"* and get a great answer. So why use Wiz?
+Yes, Claude CLI, Cursor, and other LLM tools can run commands too. So what makes Wiz different?
+
+### The Foundation: OpenCode Agent
+
+Wiz is built on [OpenCode](https://github.com/sst/opencode), which provides a superior agent architecture compared to generic LLM CLIs:
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────────┐
-│                        LLM Alone vs Wiz                                      │
+│                    Generic LLM CLI vs Wiz (OpenCode-based)                   │
 ├─────────────────────────────────┬───────────────────────────────────────────┤
-│         LLM Alone               │              Wiz                           │
+│       Generic LLM CLI           │              Wiz                           │
 ├─────────────────────────────────┼───────────────────────────────────────────┤
-│ Tells you what to run           │ Actually runs the tools                   │
-│ You copy-paste commands         │ Executes directly, no copy-paste          │
-│ You read raw output             │ Parses output, extracts findings          │
-│ Forgets between sessions        │ Remembers scope, findings, history        │
-│ Can't verify what happened      │ Full audit trail of every action          │
-│ No scope enforcement            │ Prevents out-of-scope accidents           │
-│ You manually track findings     │ Structured findings database              │
-│ You write the report            │ Generates professional reports            │
+│ General-purpose agent           │ Security-focused agent                    │
+│ Raw command output              │ Parsed, structured findings               │
+│ No domain knowledge             │ Security tool expertise built-in          │
+│ Basic bash execution            │ Specialized tool integrations             │
+│ Chat history only               │ Findings database + audit trail           │
+│ No scope awareness              │ Governance & scope enforcement            │
+│ Export chat transcript          │ Professional pentest reports              │
 └─────────────────────────────────┴───────────────────────────────────────────┘
 ```
 
-### The Real Difference
+### What OpenCode Gives Us (That Others Don't)
 
-**LLM alone:**
+1. **Better Agent Control** - OpenCode's architecture gives finer control over LLM behavior, tool execution, and context management than Claude CLI's generic approach
+
+2. **Extensible Tool Framework** - Not just "run bash commands" but structured tool definitions with typed inputs/outputs
+
+3. **Session Persistence** - Real session management, not just chat history
+
+4. **Multi-LLM Support** - Claude, GPT-4, Gemini, local models - your choice
+
+### What Wiz Adds on Top
+
 ```
-You: "How do I scan 192.168.1.0/24 for web vulnerabilities?"
-
-LLM: "You can use nmap to find web servers, then nikto for vulnerabilities:
-      nmap -p 80,443 192.168.1.0/24
-      nikto -h <target>
-      ..."
-
-You: *copy command, open terminal, paste, run, read output, repeat*
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                         Wiz Security Layer                                   │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                              │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐    │
+│  │   Security   │  │   Output     │  │   Findings   │  │   Report     │    │
+│  │    Tools     │  │   Parsers    │  │   Database   │  │   Engine     │    │
+│  │              │  │              │  │              │  │              │    │
+│  │ nmap, nikto  │  │ Extract CVEs │  │ Severity     │  │ Executive    │    │
+│  │ nuclei, etc  │  │ Parse JSON   │  │ OWASP cats   │  │ Technical    │    │
+│  │ 30+ tools    │  │ Structure    │  │ Evidence     │  │ HTML/PDF/MD  │    │
+│  └──────────────┘  └──────────────┘  └──────────────┘  └──────────────┘    │
+│                                                                              │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐                      │
+│  │  Governance  │  │    Scope     │  │    Audit     │                      │
+│  │   Engine     │  │ Enforcement  │  │    Trail     │                      │
+│  │              │  │              │  │              │                      │
+│  │ Policy-based │  │ Authorized   │  │ Compliance   │                      │
+│  │ approval     │  │ targets only │  │ logging      │                      │
+│  └──────────────┘  └──────────────┘  └──────────────┘                      │
+│                                                                              │
+└─────────────────────────────────────────────────────────────────────────────┘
 ```
 
-**With Wiz:**
+### Real Example: The Difference
+
+**Claude CLI:**
 ```
-You: "scan 192.168.1.0/24 for web vulnerabilities"
+You: "scan 192.168.1.10 for vulnerabilities"
 
-Wiz: [Actually runs nmap]
-     Found 5 web servers.
+Claude: *runs nmap*
+        Here's the raw output:
+        PORT   STATE SERVICE VERSION
+        80/tcp open  http    Apache 2.4.41
+        443/tcp open  ssl/http Apache 2.4.41
+        ...
 
-     [Runs nikto on each]
-     [Runs nuclei for CVEs]
+You: "what vulnerabilities does it have?"
 
-     Results:
-     - 192.168.1.10: 2 critical vulns (CVE-2021-44228, CVE-2023-1234)
-     - 192.168.1.15: SSL certificate expired
-     - 192.168.1.20: Directory listing enabled
+Claude: *runs nikto*
+        Here's what nikto found:
+        + Server: Apache/2.4.41
+        + /: The anti-clickjacking X-Frame-Options header is not present
+        ...
 
-     All findings saved. Want me to generate a report?
+        [You manually track these, decide severity, write report]
 ```
 
-### In Short
+**Wiz:**
+```
+You: "scan 192.168.1.10 for vulnerabilities"
 
-| Aspect | LLM Alone | Wiz |
-|--------|-----------|-----|
-| **Execution** | Advice only | Advice + Action |
-| **Memory** | Stateless | Persistent findings |
-| **Output** | Raw text | Structured data |
-| **Workflow** | Manual | Automated |
-| **Audit** | None | Complete trail |
-| **Reports** | DIY | Generated |
+Wiz: [Runs nmap → parses services]
+     [Runs nikto → extracts findings]
+     [Runs nuclei → matches CVEs]
+     [Classifies by severity]
+     [Stores in findings database]
 
-**Wiz = LLM intelligence + Tool execution + Findings management + Reporting**
+     Scan complete. Found:
+
+     CRITICAL (1):
+     - CVE-2021-41773: Apache path traversal → RCE possible
+
+     HIGH (2):
+     - Missing security headers (X-Frame-Options, CSP)
+     - SSL certificate expires in 7 days
+
+     MEDIUM (3):
+     - Directory listing enabled on /uploads
+     - Server version disclosed
+     - Outdated Apache version
+
+     All 6 findings saved with evidence.
+
+You: "generate report"
+
+Wiz: [Creates executive summary]
+     [Includes technical details]
+     [Adds remediation steps]
+     [Exports to HTML]
+
+     Report ready: http://localhost:4096/reports/192.168.1.10-assessment.html
+```
+
+### Summary
+
+| Feature | Claude CLI | Wiz |
+|---------|------------|-----|
+| **Agent Architecture** | Generic | OpenCode (superior control) |
+| **Tool Integration** | Bash only | 30+ security tools with parsers |
+| **Output Handling** | Raw text | Structured findings |
+| **Severity Classification** | Manual | Automatic (Critical→Info) |
+| **CVE Matching** | Manual lookup | Automatic detection |
+| **Scope Control** | None | Governance engine |
+| **Audit Trail** | Chat history | Compliance-ready logs |
+| **Reports** | Copy-paste chat | Professional HTML/PDF |
+
+**Wiz = OpenCode's superior agent + Security expertise + Findings management + Governance + Reporting**
 
 ---
 
