@@ -1,286 +1,358 @@
-# Wiz
+# Wiz (cyxwiz)
 
-> **AI-Powered Security Operations Platform** - Speak your intent, tools execute with governance, results explained.
+> **Your AI Security Partner** - Just describe what you need. No commands to memorize. No syntax to learn.
 
+[![Release](https://img.shields.io/github/v/release/code3hr/opencode?label=Download&color=green)](https://github.com/code3hr/opencode/releases/latest)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-[![Built with Bun](https://img.shields.io/badge/Built%20with-Bun-orange)](https://bun.sh)
-[![Powered by Claude](https://img.shields.io/badge/Powered%20by-Claude-purple)](https://anthropic.com)
-[![Platform: Kali](https://img.shields.io/badge/Platform-Kali%20Linux-557C94)](https://kali.org)
-[![Platform: Parrot](https://img.shields.io/badge/Platform-Parrot%20OS-00D9FF)](https://parrotsec.org)
+[![Platform: Linux](https://img.shields.io/badge/Platform-Linux-FCC624)](https://www.linux.org/)
+[![Platform: macOS](https://img.shields.io/badge/Platform-macOS-000000)](https://www.apple.com/macos/)
+[![Platform: Windows](https://img.shields.io/badge/Platform-Windows-0078D6)](https://www.microsoft.com/windows)
 
 ---
 
-## Problem Statement
+## Why Wiz Exists
 
-Security professionals spend countless hours on repetitive tasks:
+Security testing shouldn't require memorizing hundreds of tool flags and command syntaxes.
 
-- **Manual Tool Orchestration** - Running nmap, then nikto, then sqlmap, copying outputs between tools
-- **Context Switching** - Remembering flags, syntax, and output formats for dozens of tools
-- **Documentation Overhead** - Manually logging every command and result for compliance
-- **Scope Creep Risk** - Accidentally scanning out-of-scope targets during engagements
-- **Knowledge Silos** - Junior team members can't leverage senior expertise embedded in workflows
+Think about it: **nmap** has 130+ options. **Nuclei** has dozens of flags. **SQLMap** has over 100 parameters. Now multiply that by the 30+ tools a typical assessment requires. That's not security work - that's a memorization exercise.
 
-**The result?** Slower assessments, inconsistent quality, audit gaps, and burned-out professionals.
-
----
-
-## About
-
-**Wiz** is an AI-powered operations platform that transforms how security professionals work. Built for **Kali Linux** and **Parrot OS**, it leverages the 600+ security tools already installed on these distributions. Instead of memorizing tool syntax and manually orchestrating workflows, you describe what you want to accomplish in natural language - and Wiz handles the rest.
+**Wiz takes a different approach.** Instead of learning tool syntax, you simply describe what you want to accomplish. The AI understands your intent and figures out which tools to use, how to chain them, and how to interpret the results.
 
 ```
-$ wiz
+You: "check if this server is vulnerable to log4j"
 
-> scan 192.168.1.0/24 for web vulnerabilities
+Wiz: Checking 192.168.1.10 for Log4Shell vulnerability...
+     [Running nuclei with CVE-2021-44228 templates]
 
-[GOVERNANCE] Target within authorized scope. Proceeding.
-[EXECUTING] nmap -sV -sC -p 80,443,8080,8443 192.168.1.0/24
+     Found: CRITICAL - Log4Shell (CVE-2021-44228) confirmed
+     The server is vulnerable to remote code execution via JNDI injection.
 
-Found 5 hosts with web services:
-- 192.168.1.10: Apache 2.4.41 (HTTP/80, HTTPS/443)
-- 192.168.1.15: nginx 1.18.0 (HTTP/80)
-- 192.168.1.20: IIS 10.0 (HTTP/80, HTTPS/443)
-...
-
-[FINDING] Apache 2.4.41 on .10 has known CVEs. Recommend deeper scan.
-
-> check .10 for CVE-2021-41773
-
-[EXECUTING] nuclei -t cves/2021/CVE-2021-41773.yaml -u http://192.168.1.10
-
-[CRITICAL] CVE-2021-41773 CONFIRMED - Path traversal vulnerability
-           Impact: Remote code execution possible
-           Remediation: Upgrade Apache to 2.4.51+
-
-> generate report
-
-[GENERATING] Executive summary with 3 critical, 5 high findings...
+     Recommendation: Upgrade log4j to 2.17.1+ or apply mitigations immediately.
 ```
 
-### Built on OpenCode
-
-Wiz is a purpose-built fork of [OpenCode](https://github.com/sst/opencode) (MIT licensed), inheriting its excellent foundation:
-
-- Multi-LLM support (Claude, GPT-4, Gemini, local models)
-- Terminal UI with rich formatting
-- Session management and context preservation
-- Extensible tool framework
-
-**What Wiz adds:**
-
-- Governance engine with policy-based approval
-- Scope enforcement for authorized targets only
-- Comprehensive audit logging
-- Security-focused tools with output parsers
-- Structured findings management
-- Professional report generation
+No flags to remember. No syntax to look up. Just describe what you need.
 
 ---
 
-## Key Features
+## What Wiz Does
 
-### Governance Engine
-Every action is evaluated against policies before execution. Define what's allowed, what needs approval, and what's blocked.
+Wiz is an AI-powered security operations assistant. You talk to it in plain English, and it:
 
-### Scope Enforcement
-Define authorized targets (IPs, domains, ports). Wiz prevents accidental out-of-scope scanning - critical for compliance.
+1. **Understands your intent** - Whether you say "scan for open ports" or "what services are running" - same result
+2. **Selects the right tools** - Picks nmap, nuclei, nikto, or whatever fits the task
+3. **Chains operations intelligently** - Finds a web server? Automatically suggests vulnerability checks
+4. **Explains results clearly** - No raw output dumps, just actionable insights
+5. **Tracks everything** - Every finding, every command, ready for your report
 
-### Audit Trail
-Every command, approval, and result is automatically logged. Export audit logs for compliance reporting.
+### Talk, Don't Type Commands
 
-### Security Tools Integration
-Leverages 30+ security tools from Kali/Parrot with intelligent output parsing:
+Here's how a real conversation with Wiz looks:
 
-| Category | Tools |
-|----------|-------|
-| **Reconnaissance** | nmap, masscan, amass, subfinder |
-| **Web Scanning** | nikto, nuclei, gobuster, ffuf, sqlmap |
-| **Network Analysis** | SMB enumeration, SNMP walking, DNS zone transfers |
-| **Active Directory** | User/group enumeration, Kerberoasting, AS-REP roasting |
-| **API Security** | OpenAPI parsing, JWT analysis, BOLA/IDOR testing |
-| **Exploitation** | searchsploit, msfconsole integration |
+```
+You: "I need to test this web application at https://target.com"
 
-### Findings Management
-Structured storage of all security findings with:
-- Severity classification (Critical/High/Medium/Low/Info)
-- OWASP/CVE categorization
-- Evidence preservation
-- Remediation tracking
+Wiz: I'll start with reconnaissance. Let me:
+     1. Check what technologies it's running
+     2. Look for common vulnerabilities
+     3. Test the authentication mechanisms
 
-### Report Generation
-Professional reports in multiple formats:
-- Executive Summary (PDF/HTML)
-- Technical Details (Markdown)
-- Raw Data (JSON)
+     Starting now...
+
+     [After scanning]
+
+     Here's what I found:
+     - Running WordPress 5.8.1 (outdated - current is 6.4)
+     - 3 plugins with known vulnerabilities
+     - Admin login page exposed at /wp-admin
+     - No rate limiting on login attempts
+
+     Want me to dig deeper into any of these?
+
+You: "yes, check those plugin vulnerabilities"
+
+Wiz: Looking at the vulnerable plugins...
+
+     CRITICAL: Contact Form 7 < 5.3.2 - Unrestricted file upload
+     HIGH: Elementor < 3.1.2 - Authenticated XSS
+     MEDIUM: WooCommerce < 5.2.0 - Information disclosure
+
+     The file upload vulnerability is serious. With a valid form submission,
+     an attacker could upload malicious PHP files.
+
+     Should I generate a detailed report with remediation steps?
+```
+
+### What You Can Ask
+
+Just describe what you need in your own words:
+
+- *"find all the web servers on this network"*
+- *"is this site vulnerable to SQL injection?"*
+- *"check the SSL configuration on our servers"*
+- *"what users exist in this Active Directory domain?"*
+- *"test if this API has authentication issues"*
+- *"show me everything you've found so far"*
+- *"write up a report for the client"*
+
+Wiz understands context too. After scanning a network, you can say *"check that Apache server for vulnerabilities"* - it knows which one you mean.
+
+---
+
+## What Wiz Is NOT
+
+Let's be clear about boundaries:
+
+### Not a Replacement for Your Judgment
+
+Wiz is a tool, not a security expert replacement. It doesn't:
+- Make risk decisions for your organization
+- Determine what's in scope for your engagement
+- Replace the need to understand what you're doing
+- Guarantee finding every vulnerability
+
+**You** are the security professional. Wiz handles the tedious parts so you can focus on analysis and decisions.
+
+### Not for Malicious Use
+
+Wiz is built for:
+- Authorized penetration testing
+- Security assessments with written permission
+- CTF competitions and security research
+- Learning and education
+
+It is NOT for:
+- Unauthorized access to systems
+- Attacking systems you don't own or have permission to test
+- Any illegal activity
+
+**The tools Wiz uses are powerful. Use them responsibly and legally.**
+
+### Not a Magic Button
+
+Wiz won't:
+- Automatically hack anything
+- Replace proper methodology
+- Skip the need for authorization
+- Make you compliant just by running it
+
+It's an assistant that makes security work more efficient - not a shortcut around doing things properly.
 
 ---
 
 ## Installation
 
-### Target Platforms
+### Download Pre-built Binaries
 
-Wiz is designed for security-focused Linux distributions with pre-installed tools:
+The easiest way to get started. Download for your platform:
 
-- **Kali Linux** (recommended) - All tools pre-installed
-- **Parrot OS** - All tools pre-installed
-- **Any Linux** - Install tools manually via package manager
-
-### Prerequisites
-
-- **Bun** (JavaScript runtime)
-- **Security tools** (nmap, nikto, nuclei, etc.) - pre-installed on Kali/Parrot
+| Platform | Download |
+|----------|----------|
+| Linux (x64) | [cyxwiz-linux-x64.tar.gz](https://github.com/code3hr/opencode/releases/latest/download/cyxwiz-linux-x64.tar.gz) |
+| Linux (ARM64) | [cyxwiz-linux-arm64.tar.gz](https://github.com/code3hr/opencode/releases/latest/download/cyxwiz-linux-arm64.tar.gz) |
+| macOS (Intel) | [cyxwiz-darwin-x64.tar.gz](https://github.com/code3hr/opencode/releases/latest/download/cyxwiz-darwin-x64.tar.gz) |
+| macOS (Apple Silicon) | [cyxwiz-darwin-arm64.tar.gz](https://github.com/code3hr/opencode/releases/latest/download/cyxwiz-darwin-arm64.tar.gz) |
+| Windows (x64) | [cyxwiz-windows-x64.zip](https://github.com/code3hr/opencode/releases/latest/download/cyxwiz-windows-x64.zip) |
 
 ```bash
-# Install Bun
-curl -fsSL https://bun.sh/install | bash
-export PATH="$HOME/.bun/bin:$PATH"
+# Linux/macOS
+tar -xzf cyxwiz-*.tar.gz
+chmod +x cyxwiz
+./cyxwiz
 
-# Clone Wiz
+# Windows
+# Extract the zip and run cyxwiz.exe
+```
+
+### Build from Source
+
+```bash
+# Install Bun (JavaScript runtime)
+curl -fsSL https://bun.sh/install | bash
+
+# Clone and build
 git clone https://github.com/code3hr/opencode.git wiz
 cd wiz
-
-# Install dependencies
 bun install
-
-# Run Wiz
 bun run --cwd packages/opencode src/index.ts
 ```
 
-### Environment Setup
+### Required: API Key
 
-Create a `.env` file with your LLM API key:
+Wiz needs an AI provider to work. Set one of these:
 
 ```bash
-ANTHROPIC_API_KEY=sk-ant-...
+export ANTHROPIC_API_KEY=sk-ant-...    # Claude (recommended)
 # or
-OPENAI_API_KEY=sk-...
+export OPENAI_API_KEY=sk-...           # GPT-4
+```
+
+### Recommended: Security Tools
+
+For full functionality, have these tools installed (pre-installed on Kali/Parrot):
+
+- **nmap** - Network scanning
+- **nuclei** - Vulnerability scanning
+- **nikto** - Web server scanning
+- **gobuster** - Directory enumeration
+- **sqlmap** - SQL injection testing
+
+Don't have them? Wiz will tell you when it needs something.
+
+---
+
+## How It Works
+
+### 1. You Describe, Wiz Executes
+
+```
+You: "find subdomains for example.com"
+
+Wiz: I'll enumerate subdomains using multiple methods...
+
+     Found 47 subdomains:
+     - api.example.com (192.168.1.10)
+     - mail.example.com (192.168.1.11)
+     - dev.example.com (192.168.1.12)
+     - staging.example.com (192.168.1.13)
+     [... and 43 more]
+
+     Notable: dev and staging are exposed to the internet.
+     Want me to scan these for vulnerabilities?
+```
+
+### 2. Wiz Remembers Context
+
+```
+You: "scan the staging server"
+
+Wiz: Scanning staging.example.com (192.168.1.13)...
+
+     [Wiz remembers this from the previous subdomain scan]
+```
+
+### 3. Findings Are Tracked
+
+```
+You: "what have we found so far?"
+
+Wiz: Current findings for example.com assessment:
+
+     CRITICAL (2):
+     - SQL injection on api.example.com/users
+     - Exposed admin panel on staging.example.com
+
+     HIGH (5):
+     - Outdated TLS on mail.example.com
+     - Missing security headers (4 instances)
+
+     MEDIUM (8):
+     [...]
+
+     Total: 2 critical, 5 high, 8 medium, 12 low findings
+```
+
+### 4. Reports When You're Ready
+
+```
+You: "generate a report for the client"
+
+Wiz: Generating executive report...
+
+     Created: example-com-assessment-2024-01-15.html
+
+     Includes:
+     - Executive summary
+     - Risk ratings
+     - All findings with evidence
+     - Remediation recommendations
+     - Technical appendix
 ```
 
 ---
 
-## Usage
+## Capabilities
 
-### Starting a Session
+### Network Security
+- Port scanning and service detection
+- Network mapping and host discovery
+- Protocol-specific testing (SMB, SNMP, DNS, LDAP)
+- Credential testing and password auditing
 
-```bash
-# Start Wiz
-bun run --cwd packages/opencode src/index.ts
+### Web Application Security
+- Vulnerability scanning (OWASP Top 10)
+- Directory and file enumeration
+- SSL/TLS configuration analysis
+- CMS vulnerability detection (WordPress, Drupal, etc.)
 
-# Or with alias
-alias wiz="bun run --cwd /path/to/wiz/packages/opencode src/index.ts"
-wiz
-```
+### API Security
+- OpenAPI/Swagger discovery and parsing
+- Authentication bypass testing
+- Injection testing (SQL, NoSQL, Command)
+- JWT analysis and manipulation
 
-### Common Operations
+### Active Directory
+- User and group enumeration
+- Kerberoasting and AS-REP roasting
+- Trust relationship mapping
+- Privilege escalation path finding
 
-```bash
-# Network scanning
-> scan 10.0.0.0/24 for open ports
-> check 10.0.0.15 for vulnerabilities
-
-# Web application testing
-> enumerate subdomains for example.com
-> scan https://target.com for OWASP Top 10
-
-# Active Directory assessment
-> enumerate users in corp.local domain
-> find kerberoastable accounts
-
-# API security testing
-> discover APIs at https://api.target.com
-> test authentication on the API
-
-# Reporting
-> show all critical findings
-> generate executive report
-```
-
-### Governance Commands
-
-```bash
-> show scope           # Display authorized targets
-> show audit log       # View recent actions
-> show findings        # List all findings
-```
+### Reporting
+- Executive summaries (HTML/PDF)
+- Technical reports (Markdown)
+- Raw data export (JSON)
+- Evidence preservation
 
 ---
 
-## Project Structure
+## Platform Support
 
-```
-wiz/
-├── README.md                    # This file
-├── docs/
-│   ├── PROJECT.md               # Platform architecture
-│   ├── PENTEST.md               # Pentest module documentation
-│   ├── GOVERNANCE.md            # Governance engine details
-│   ├── PHASE[3-10].md           # Development phase docs
-│   └── TODO.md                  # Roadmap
-├── packages/
-│   └── opencode/
-│       └── src/
-│           ├── pentest/         # Security testing modules
-│           │   ├── nmap-tool.ts
-│           │   ├── sectools.ts
-│           │   ├── findings.ts
-│           │   ├── webscan/
-│           │   ├── apiscan/
-│           │   ├── netscan/
-│           │   ├── reports/
-│           │   └── monitoring/
-│           ├── governance/      # Governance engine
-│           └── tool/            # Tool framework
-└── test/                        # Test suites
-```
+| Distribution | Status | Notes |
+|--------------|--------|-------|
+| **Kali Linux** | Fully Supported | All tools pre-installed |
+| **Parrot OS** | Fully Supported | All tools pre-installed |
+| **Ubuntu/Debian** | Supported | Install tools via apt |
+| **Arch Linux** | Supported | Install tools via pacman |
+| **macOS** | Supported | Install tools via homebrew |
+| **Windows** | Supported | Install tools via chocolatey/manual |
 
 ---
 
-## Current Status
+## Project Status
 
-### Completed
+Wiz is under active development. Current capabilities:
 
-- **Core Framework** - Fork setup, build system, basic operations
-- **Governance Engine** - Policy evaluation, scope enforcement, audit logging
-- **Pentest Module** - Nmap integration, security tools wrapper, findings management
-- **Parser Extensions** - Nikto, Nuclei, Gobuster, Ffuf, SSLScan output parsing
-- **Report Generation** - Markdown, HTML, JSON report formats
-- **Continuous Monitoring** - Scheduled scans with diff detection
-- **Web Scanner** - Crawling, vulnerability detection, OWASP categorization
-- **API Scanner** - OpenAPI/GraphQL discovery, JWT analysis, injection testing
-- **Network Scanner** - AD enumeration, SMB/SNMP/DNS/LDAP testing, credential attacks
-
-### In Progress
-
-- Cloud security scanning (AWS, Azure, GCP)
-- Container security (Docker, Kubernetes)
-- CI/CD integration
-
-See [docs/TODO.md](docs/TODO.md) for the full roadmap.
+| Module | Status | Description |
+|--------|--------|-------------|
+| Core Framework | Complete | AI interaction, session management |
+| Network Scanning | Complete | Nmap integration, service detection |
+| Web Scanning | Complete | Nikto, Nuclei, Gobuster, SQLMap |
+| API Security | Complete | OpenAPI, GraphQL, JWT analysis |
+| Active Directory | Complete | User enum, Kerberoasting |
+| Reporting | Complete | Multiple formats, evidence |
+| Cloud Security | In Progress | AWS, Azure, GCP scanning |
+| CI/CD Security | In Progress | Pipeline security analysis |
+| Container Security | Planned | Docker, Kubernetes |
 
 ---
 
 ## Documentation
 
-| Document | Description |
-|----------|-------------|
-| [PROJECT.md](docs/PROJECT.md) | Platform architecture and vision |
-| [COMPARISON.md](docs/COMPARISON.md) | How Wiz compares to other tools |
-| [PENTEST.md](docs/PENTEST.md) | Pentest module documentation |
-| [GOVERNANCE.md](docs/GOVERNANCE.md) | Governance engine details |
-| [DISTRIBUTION.md](docs/DISTRIBUTION.md) | Kali/Parrot distribution strategy |
-| [TODO.md](docs/TODO.md) | Development roadmap |
+- [Project Architecture](docs/PROJECT.md) - How Wiz is built
+- [Pentest Module](docs/PENTEST.md) - Security testing details
+- [Governance](docs/GOVERNANCE.md) - Policy and scope enforcement
+- [Development Roadmap](docs/TODO.md) - What's coming next
 
 ---
 
 ## Contributing
 
-Contributions are welcome! Please read [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+Contributions welcome! See [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ---
 
 ## Security
 
-For security issues, please see [SECURITY.md](SECURITY.md).
+Found a security issue? See [SECURITY.md](SECURITY.md).
 
 ---
 
@@ -294,8 +366,8 @@ MIT License - See [LICENSE](LICENSE)
 
 - [OpenCode](https://github.com/sst/opencode) - The foundation we built upon
 - [Anthropic](https://anthropic.com) - Claude AI
-- The security community for tool development
+- The security community for the amazing open-source tools
 
 ---
 
-**Wiz** - *Security operations, intelligently orchestrated.*
+**Wiz** - *Security testing should be about security, not syntax.*
