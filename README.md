@@ -132,7 +132,9 @@ Wiz is built on [OpenCode](https://github.com/sst/opencode), which provides a su
 
 4. **Multi-LLM Support** - Claude, GPT-4, Gemini, local models - your choice
 
-### What Wiz Adds on Top
+### What Wiz Adds on Top of OpenCode
+
+Wiz extends OpenCode with a complete security operations layer:
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────────┐
@@ -158,6 +160,94 @@ Wiz is built on [OpenCode](https://github.com/sst/opencode), which provides a su
 │                                                                              │
 └─────────────────────────────────────────────────────────────────────────────┘
 ```
+
+#### 1. Security Tool Integrations (30+ tools)
+
+| Category | Tools | What Wiz Adds |
+|----------|-------|---------------|
+| **Network** | nmap, masscan | Service detection, port classification |
+| **Web** | nikto, nuclei, gobuster, ffuf | Vuln detection, directory enumeration |
+| **Exploitation** | searchsploit, msfconsole | Exploit matching, payload generation |
+| **AD/LDAP** | ldapsearch, smbclient | User enum, share discovery |
+| **API** | Custom scanners | OpenAPI parsing, JWT analysis |
+| **Wireless** | aircrack-ng, reaver | WiFi assessment |
+| **Cloud** | aws-cli, az, gcloud | Misconfig detection |
+
+#### 2. Intelligent Output Parsers
+
+OpenCode gives raw output. Wiz parses it:
+
+```
+Raw nmap output:                    Wiz parsed output:
+───────────────────                 ──────────────────
+PORT   STATE SERVICE                {
+80/tcp open  http     ──────►        "port": 80,
+                                     "service": "http",
+                                     "product": "Apache",
+                                     "version": "2.4.41",
+                                     "cves": ["CVE-2021-41773"]
+                                   }
+```
+
+#### 3. Findings Database
+
+Not just command history - structured security findings:
+
+- **Severity Classification**: Critical, High, Medium, Low, Info
+- **OWASP Categorization**: A01-A10 mapping
+- **CVE Tracking**: Automatic CVE detection and linking
+- **Evidence Storage**: Screenshots, request/response pairs
+- **Remediation Tracking**: Fix status, verification
+
+#### 4. Governance Engine
+
+What OpenCode doesn't have:
+
+- **Scope Definition**: Define authorized targets (IPs, domains, ports)
+- **Scope Enforcement**: Block scans against unauthorized targets
+- **Policy Rules**: Require approval for destructive actions
+- **Engagement Profiles**: Different rules for different assessments
+
+#### 5. Audit Trail
+
+Compliance-ready logging:
+
+```
+[2024-01-15 10:23:45] SCAN_START target=192.168.1.0/24 user=analyst1
+[2024-01-15 10:23:46] SCOPE_CHECK target=192.168.1.0/24 result=AUTHORIZED
+[2024-01-15 10:23:47] TOOL_EXEC tool=nmap args="-sV -sC 192.168.1.0/24"
+[2024-01-15 10:25:12] FINDING_NEW id=F001 severity=CRITICAL cve=CVE-2021-41773
+[2024-01-15 10:30:00] REPORT_GEN format=HTML findings=15
+```
+
+#### 6. Report Generation
+
+Professional deliverables, not chat exports:
+
+| Report Type | Contents | Format |
+|-------------|----------|--------|
+| **Executive** | Risk summary, business impact | HTML, PDF |
+| **Technical** | Full findings, evidence, remediation | Markdown, HTML |
+| **Compliance** | Audit trail, scope verification | JSON, PDF |
+| **Raw Data** | Machine-readable findings | JSON |
+
+#### 7. Continuous Monitoring
+
+Schedule recurring scans with diff detection:
+
+- Baseline establishment
+- Change detection (new ports, services, vulns)
+- Alert on critical changes
+- Trend tracking over time
+
+#### 8. Web Dashboard
+
+Visual interface for findings management:
+
+- Real-time scan progress
+- Interactive findings table
+- Severity charts and statistics
+- Report generation UI
 
 ### Real Example: The Difference
 
