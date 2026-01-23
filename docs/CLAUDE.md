@@ -1,12 +1,12 @@
-# CLAUDE.md - Wiz Project Context
+# CLAUDE.md - Cyxwiz Project Context
 
-> This file contains essential context for AI assistants working on the Wiz project.
+> This file contains essential context for AI assistants working on the Cyxwiz project.
 
 ---
 
-## What is Wiz?
+## What is Cyxwiz?
 
-Wiz is a **multi-domain AI operations platform** for professionals who use command-line tools. It's being built by forking [OpenCode](https://github.com/anomalyco/opencode) (MIT licensed).
+Cyxwiz is a **multi-domain AI operations platform** for professionals who use command-line tools. It's being built by forking [OpenCode](https://github.com/anomalyco/opencode) (MIT licensed).
 
 **One-liner:** Speak intent, tools execute with governance, AI explains results - all auditable.
 
@@ -14,7 +14,7 @@ Wiz is a **multi-domain AI operations platform** for professionals who use comma
 
 ## Core Concept
 
-Wiz is NOT just another AI coding assistant. It's a **governed orchestration layer** for domain-specific tools.
+Cyxwiz is NOT just another AI coding assistant. It's a **governed orchestration layer** for domain-specific tools.
 
 ```
 Human Intent → LLM Translation → Governance Check → Tool Execution → Parsed Results → LLM Explanation
@@ -40,12 +40,12 @@ Human Intent → LLM Translation → Governance Check → Tool Execution → Par
 
 ```
 ┌─────────────────────────────────────────────────────────┐
-│                    WIZ PLATFORM                          │
+│                   CYXWIZ PLATFORM                        │
 ├─────────────────────────────────────────────────────────┤
 │  INHERITED (OpenCode):                                  │
 │  CLI/TUI │ Multi-LLM │ Sessions │ Tool Exec │ Plugins  │
 ├─────────────────────────────────────────────────────────┤
-│  WIZ CORE (we build):                                   │
+│  CYXWIZ CORE (we build):                                │
 │  Governance │ Scope Enforce │ Audit │ Findings │ Reports│
 ├─────────────────────────────────────────────────────────┤
 │  DOMAIN AGENTS:                                         │
@@ -67,7 +67,7 @@ Human Intent → LLM Translation → Governance Check → Tool Execution → Par
 
 ## Governance Engine (Core Feature)
 
-This is what makes Wiz different from vanilla OpenCode or ChatGPT.
+This is what makes Cyxwiz different from vanilla OpenCode or ChatGPT.
 
 **Before any command executes:**
 1. **Scope Check** - Is target in allowed scope?
@@ -126,23 +126,23 @@ This is what makes Wiz different from vanilla OpenCode or ChatGPT.
 
 **Primary target:** Kali Linux / Parrot OS
 
-These distros have 600+ security tools pre-installed. Wiz becomes the intelligent orchestration layer:
+These distros have 600+ security tools pre-installed. Cyxwiz becomes the intelligent orchestration layer:
 
 ```bash
 # On Kali, all tools ready
-wiz setup
-> 47 tools detected. Wiz is ready.
+cyxwiz setup
+> 47 tools detected. Cyxwiz is ready.
 
-wiz pentest start --scope 10.0.0.0/24
+cyxwiz pentest start --scope 10.0.0.0/24
 > scan for open ports
 [APPROVED] Executing nmap...
 ```
 
-**Goal:** Get Wiz pre-installed in Kali/Parrot eventually.
+**Goal:** Get Cyxwiz pre-installed in Kali/Parrot eventually.
 
 ---
 
-## What Wiz Is NOT
+## What Cyxwiz Is NOT
 
 - Not building security tools (orchestrates existing ones)
 - Not autonomous (human-in-the-loop always)
@@ -153,7 +153,7 @@ wiz pentest start --scope 10.0.0.0/24
 
 ## Code Style & Principles
 
-When contributing to Wiz:
+When contributing to Cyxwiz:
 
 1. **Governance is core** - Never bypass scope/policy checks
 2. **Audit everything** - Every command attempt gets logged
@@ -167,7 +167,7 @@ When contributing to Wiz:
 
 ```bash
 # Start pentest engagement
-wiz pentest start --scope 10.0.0.0/24 --exclude 10.0.0.1
+cyxwiz pentest start --scope 10.0.0.0/24 --exclude 10.0.0.1
 
 # Natural language interaction
 > scan for open ports
@@ -175,18 +175,18 @@ wiz pentest start --scope 10.0.0.0/24 --exclude 10.0.0.1
 > generate report
 
 # View findings
-wiz findings list
-wiz findings export --format markdown
+cyxwiz findings list
+cyxwiz findings export --format markdown
 
 # Check audit log
-wiz audit show
+cyxwiz audit show
 ```
 
 ---
 
 ## OpenCode References
 
-Since Wiz forks OpenCode, understand these:
+Since Cyxwiz forks OpenCode, understand these:
 
 - [OpenCode GitHub](https://github.com/anomalyco/opencode)
 - [OpenCode Docs](https://opencode.ai/docs/)
@@ -259,7 +259,7 @@ bun run --cwd packages/opencode src/index.ts
 
 ```
 /home/mrcj/Desktop/wiz/
-├── README.md                  # Wiz README
+├── README.md                  # Cyxwiz README
 ├── docs/
 │   ├── PROJECT.md             # Full specification
 │   ├── CLAUDE.md              # This file
@@ -273,7 +273,7 @@ bun run --cwd packages/opencode src/index.ts
 │   │   │   ├── bash.ts        # Bash execution
 │   │   │   ├── registry.ts    # Tool registry (includes all pentest tools)
 │   │   │   └── ...
-│   │   ├── pentest/           # Pentest module (WIZ CORE)
+│   │   ├── pentest/           # Pentest module (CYXWIZ CORE)
 │   │   │   ├── types.ts       # Core type definitions
 │   │   │   ├── findings.ts    # Security findings storage
 │   │   │   ├── nmap-parser.ts # Nmap XML parsing

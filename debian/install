@@ -1,4 +1,4 @@
-packages/* usr/lib/wiz/packages
-docs/* usr/lib/wiz/docs
-package.json usr/lib/wiz
-README.md usr/share/doc/wiz
+packages/* usr/lib/cyxwiz/packages
+docs/* usr/lib/cyxwiz/docs
+package.json usr/lib/cyxwiz
+README.md usr/share/doc/cyxwiz

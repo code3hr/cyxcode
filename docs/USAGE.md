@@ -1,4 +1,4 @@
-# Wiz - Usage Guide
+# Cyxwiz - Usage Guide
 
 Quick reference for development and running the project.
 
@@ -87,7 +87,7 @@ bun run --cwd packages/opencode src/index.ts web
 
 ---
 
-## Key Files for Wiz Development
+## Key Files for Cyxwiz Development
 
 | File | Purpose |
 |------|---------|

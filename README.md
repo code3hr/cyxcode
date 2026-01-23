@@ -1,4 +1,4 @@
-# Wiz (cyxwiz)
+# Cyxwiz
 
 > **Your AI Security Partner** - Just describe what you need. No commands to memorize. No syntax to learn.
 
@@ -10,18 +10,18 @@
 
 ---
 
-## Why Wiz Exists
+## Why Cyxwiz Exists
 
 Security testing shouldn't require memorizing hundreds of tool flags and command syntaxes.
 
 Think about it: **nmap** has 130+ options. **Nuclei** has dozens of flags. **SQLMap** has over 100 parameters. Now multiply that by the 30+ tools a typical assessment requires. That's not security work - that's a memorization exercise.
 
-**Wiz takes a different approach.** Instead of learning tool syntax, you simply describe what you want to accomplish. The AI understands your intent and figures out which tools to use, how to chain them, and how to interpret the results.
+**Cyxwiz takes a different approach.** Instead of learning tool syntax, you simply describe what you want to accomplish. The AI understands your intent and figures out which tools to use, how to chain them, and how to interpret the results.
 
 ```
 You: "check if this server is vulnerable to log4j"
 
-Wiz: Checking 192.168.1.10 for Log4Shell vulnerability...
+Cyxwiz: Checking 192.168.1.10 for Log4Shell vulnerability...
      [Running nuclei with CVE-2021-44228 templates]
 
      Found: CRITICAL - Log4Shell (CVE-2021-44228) confirmed
@@ -34,9 +34,9 @@ No flags to remember. No syntax to look up. Just describe what you need.
 
 ---
 
-## What Wiz Does
+## What Cyxwiz Does
 
-Wiz is an AI-powered security operations assistant. You talk to it in plain English, and it:
+Cyxwiz is an AI-powered security operations assistant. You talk to it in plain English, and it:
 
 1. **Understands your intent** - Whether you say "scan for open ports" or "what services are running" - same result
 2. **Selects the right tools** - Picks nmap, nuclei, nikto, or whatever fits the task
@@ -46,12 +46,12 @@ Wiz is an AI-powered security operations assistant. You talk to it in plain Engl
 
 ### Talk, Don't Type Commands
 
-Here's how a real conversation with Wiz looks:
+Here's how a real conversation with Cyxwiz looks:
 
 ```
 You: "I need to test this web application at https://target.com"
 
-Wiz: I'll start with reconnaissance. Let me:
+Cyxwiz: I'll start with reconnaissance. Let me:
      1. Check what technologies it's running
      2. Look for common vulnerabilities
      3. Test the authentication mechanisms
@@ -70,7 +70,7 @@ Wiz: I'll start with reconnaissance. Let me:
 
 You: "yes, check those plugin vulnerabilities"
 
-Wiz: Looking at the vulnerable plugins...
+Cyxwiz: Looking at the vulnerable plugins...
 
      CRITICAL: Contact Form 7 < 5.3.2 - Unrestricted file upload
      HIGH: Elementor < 3.1.2 - Authenticated XSS
@@ -94,23 +94,23 @@ Just describe what you need in your own words:
 - *"show me everything you've found so far"*
 - *"write up a report for the client"*
 
-Wiz understands context too. After scanning a network, you can say *"check that Apache server for vulnerabilities"* - it knows which one you mean.
+Cyxwiz understands context too. After scanning a network, you can say *"check that Apache server for vulnerabilities"* - it knows which one you mean.
 
 ---
 
-## Why Wiz? Why Not Claude CLI or Other LLM Tools?
+## Why Cyxwiz? Why Not Claude CLI or Other LLM Tools?
 
-Yes, Claude CLI, Cursor, and other LLM tools can run commands too. So what makes Wiz different?
+Yes, Claude CLI, Cursor, and other LLM tools can run commands too. So what makes Cyxwiz different?
 
 ### The Foundation: OpenCode Agent
 
-Wiz is built on [OpenCode](https://github.com/sst/opencode), which provides a superior agent architecture compared to generic LLM CLIs:
+Cyxwiz is built on [OpenCode](https://github.com/sst/opencode), which provides a superior agent architecture compared to generic LLM CLIs:
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────────┐
-│                    Generic LLM CLI vs Wiz (OpenCode-based)                   │
+│                    Generic LLM CLI vs Cyxwiz (OpenCode-based)                   │
 ├─────────────────────────────────┬───────────────────────────────────────────┤
-│       Generic LLM CLI           │              Wiz                           │
+│       Generic LLM CLI           │              Cyxwiz                           │
 ├─────────────────────────────────┼───────────────────────────────────────────┤
 │ General-purpose agent           │ Security-focused agent                    │
 │ Raw command output              │ Parsed, structured findings               │
@@ -132,13 +132,13 @@ Wiz is built on [OpenCode](https://github.com/sst/opencode), which provides a su
 
 4. **Multi-LLM Support** - Claude, GPT-4, Gemini, local models - your choice
 
-### What Wiz Adds on Top of OpenCode
+### What Cyxwiz Adds on Top of OpenCode
 
-Wiz extends OpenCode with a complete security operations layer:
+Cyxwiz extends OpenCode with a complete security operations layer:
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────────┐
-│                         Wiz Security Layer                                   │
+│                         Cyxwiz Security Layer                                   │
 ├─────────────────────────────────────────────────────────────────────────────┤
 │                                                                              │
 │  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐    │
@@ -163,7 +163,7 @@ Wiz extends OpenCode with a complete security operations layer:
 
 #### 1. Security Tool Integrations (30+ tools)
 
-| Category | Tools | What Wiz Adds |
+| Category | Tools | What Cyxwiz Adds |
 |----------|-------|---------------|
 | **Network** | nmap, masscan | Service detection, port classification |
 | **Web** | nikto, nuclei, gobuster, ffuf | Vuln detection, directory enumeration |
@@ -175,10 +175,10 @@ Wiz extends OpenCode with a complete security operations layer:
 
 #### 2. Intelligent Output Parsers
 
-OpenCode gives raw output. Wiz parses it:
+OpenCode gives raw output. Cyxwiz parses it:
 
 ```
-Raw nmap output:                    Wiz parsed output:
+Raw nmap output:                    Cyxwiz parsed output:
 ───────────────────                 ──────────────────
 PORT   STATE SERVICE                {
 80/tcp open  http     ──────►        "port": 80,
@@ -273,11 +273,11 @@ Claude: *runs nikto*
         [You manually track these, decide severity, write report]
 ```
 
-**Wiz:**
+**Cyxwiz:**
 ```
 You: "scan 192.168.1.10 for vulnerabilities"
 
-Wiz: [Runs nmap → parses services]
+Cyxwiz: [Runs nmap → parses services]
      [Runs nikto → extracts findings]
      [Runs nuclei → matches CVEs]
      [Classifies by severity]
@@ -301,7 +301,7 @@ Wiz: [Runs nmap → parses services]
 
 You: "generate report"
 
-Wiz: [Creates executive summary]
+Cyxwiz: [Creates executive summary]
      [Includes technical details]
      [Adds remediation steps]
      [Exports to HTML]
@@ -311,7 +311,7 @@ Wiz: [Creates executive summary]
 
 ### Summary
 
-| Feature | Claude CLI | Wiz |
+| Feature | Claude CLI | Cyxwiz |
 |---------|------------|-----|
 | **Agent Architecture** | Generic | OpenCode (superior control) |
 | **Tool Integration** | Bash only | 30+ security tools with parsers |
@@ -322,27 +322,27 @@ Wiz: [Creates executive summary]
 | **Audit Trail** | Chat history | Compliance-ready logs |
 | **Reports** | Copy-paste chat | Professional HTML/PDF |
 
-**Wiz = OpenCode's superior agent + Security expertise + Findings management + Governance + Reporting**
+**Cyxwiz = OpenCode's superior agent + Security expertise + Findings management + Governance + Reporting**
 
 ---
 
-## What Wiz Is NOT
+## What Cyxwiz Is NOT
 
 Let's be clear about boundaries:
 
 ### Not a Replacement for Your Judgment
 
-Wiz is a tool, not a security expert replacement. It doesn't:
+Cyxwiz is a tool, not a security expert replacement. It doesn't:
 - Make risk decisions for your organization
 - Determine what's in scope for your engagement
 - Replace the need to understand what you're doing
 - Guarantee finding every vulnerability
 
-**You** are the security professional. Wiz handles the tedious parts so you can focus on analysis and decisions.
+**You** are the security professional. Cyxwiz handles the tedious parts so you can focus on analysis and decisions.
 
 ### Not for Malicious Use
 
-Wiz is built for:
+Cyxwiz is built for:
 - Authorized penetration testing
 - Security assessments with written permission
 - CTF competitions and security research
@@ -353,11 +353,11 @@ It is NOT for:
 - Attacking systems you don't own or have permission to test
 - Any illegal activity
 
-**The tools Wiz uses are powerful. Use them responsibly and legally.**
+**The tools Cyxwiz uses are powerful. Use them responsibly and legally.**
 
 ### Not a Magic Button
 
-Wiz won't:
+Cyxwiz won't:
 - Automatically hack anything
 - Replace proper methodology
 - Skip the need for authorization
@@ -406,7 +406,7 @@ bun run --cwd packages/opencode src/index.ts
 
 ### Required: API Key
 
-Wiz needs an AI provider to work. Set one of these:
+Cyxwiz needs an AI provider to work. Set one of these:
 
 ```bash
 export ANTHROPIC_API_KEY=sk-ant-...    # Claude (recommended)
@@ -424,7 +424,7 @@ For full functionality, have these tools installed (pre-installed on Kali/Parrot
 - **gobuster** - Directory enumeration
 - **sqlmap** - SQL injection testing
 
-Don't have them? Wiz will tell you when it needs something.
+Don't have them? Cyxwiz will tell you when it needs something.
 
 ---
 
@@ -498,7 +498,7 @@ Don't have them? Wiz will tell you when it needs something.
 
 ## Running Modes
 
-Wiz offers multiple interfaces to fit your workflow:
+Cyxwiz offers multiple interfaces to fit your workflow:
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
@@ -545,7 +545,7 @@ cd packages/opencode/src/dashboard
 bun run dev
 ```
 
-Development dashboard at **http://localhost:5173**. For contributors extending Wiz.
+Development dashboard at **http://localhost:5173**. For contributors extending Cyxwiz.
 
 ### Web Reports
 
@@ -554,7 +554,7 @@ Reports are served through the web interface:
 ```
 You: "generate a report"
 
-Wiz: Report generated!
+Cyxwiz: Report generated!
      View at: http://localhost:4096/reports/assessment-2024-01-15.html
 ```
 
@@ -568,12 +568,12 @@ Features:
 
 ## How It Works
 
-### 1. You Describe, Wiz Executes
+### 1. You Describe, Cyxwiz Executes
 
 ```
 You: "find subdomains for example.com"
 
-Wiz: I'll enumerate subdomains using multiple methods...
+Cyxwiz: I'll enumerate subdomains using multiple methods...
 
      Found 47 subdomains:
      - api.example.com (192.168.1.10)
@@ -586,14 +586,14 @@ Wiz: I'll enumerate subdomains using multiple methods...
      Want me to scan these for vulnerabilities?
 ```
 
-### 2. Wiz Remembers Context
+### 2. Cyxwiz Remembers Context
 
 ```
 You: "scan the staging server"
 
-Wiz: Scanning staging.example.com (192.168.1.13)...
+Cyxwiz: Scanning staging.example.com (192.168.1.13)...
 
-     [Wiz remembers this from the previous subdomain scan]
+     [Cyxwiz remembers this from the previous subdomain scan]
 ```
 
 ### 3. Findings Are Tracked
@@ -601,7 +601,7 @@ Wiz: Scanning staging.example.com (192.168.1.13)...
 ```
 You: "what have we found so far?"
 
-Wiz: Current findings for example.com assessment:
+Cyxwiz: Current findings for example.com assessment:
 
      CRITICAL (2):
      - SQL injection on api.example.com/users
@@ -622,7 +622,7 @@ Wiz: Current findings for example.com assessment:
 ```
 You: "generate a report for the client"
 
-Wiz: Generating executive report...
+Cyxwiz: Generating executive report...
 
      Created: example-com-assessment-2024-01-15.html
 
@@ -685,7 +685,7 @@ Wiz: Generating executive report...
 
 ## Project Status
 
-Wiz is under active development. Current capabilities:
+Cyxwiz is under active development. Current capabilities:
 
 | Module | Status | Description |
 |--------|--------|-------------|
@@ -710,7 +710,7 @@ Wiz is under active development. Current capabilities:
 | [PENTEST.md](docs/PENTEST.md) | Pentest module overview |
 | [GOVERNANCE.md](docs/GOVERNANCE.md) | Policy and scope enforcement |
 | [TODO.md](docs/TODO.md) | Development roadmap |
-| [COMPARISON.md](docs/COMPARISON.md) | How Wiz compares to other tools |
+| [COMPARISON.md](docs/COMPARISON.md) | How Cyxwiz compares to other tools |
 
 ### Module Documentation (Phases)
 | Phase | Module | Description |
@@ -760,4 +760,4 @@ MIT License - See [LICENSE](LICENSE)
 
 ---
 
-**Wiz** - *Security testing should be about security, not syntax.*
+**Cyxwiz** - *Security testing should be about security, not syntax.*

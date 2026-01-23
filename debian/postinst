@@ -17,16 +17,16 @@ case "$1" in
         fi
 
         # Install dependencies
-        echo "Installing Wiz dependencies..."
-        cd /usr/lib/wiz
+        echo "Installing Cyxwiz dependencies..."
+        cd /usr/lib/cyxwiz
         bun install --production 2>/dev/null || true
 
-        # Create wiz executable wrapper
-        cat > /usr/bin/wiz << 'WRAPPER'
+        # Create cyxwiz executable wrapper
+        cat > /usr/bin/cyxwiz << 'WRAPPER'
 #!/bin/bash
-# Wiz - AI-Powered Security Operations Platform
+# Cyxwiz - AI-Powered Security Operations Platform
 
-WIZ_HOME="/usr/lib/wiz"
+CYXWIZ_HOME="/usr/lib/cyxwiz"
 
 # Ensure bun is in PATH
 if [ -f "$HOME/.bun/bin/bun" ]; then
@@ -42,25 +42,25 @@ if ! command -v bun &> /dev/null; then
     exit 1
 fi
 
-# Run Wiz
-exec bun run --cwd "$WIZ_HOME/packages/opencode" src/index.ts "$@"
+# Run Cyxwiz
+exec bun run --cwd "$CYXWIZ_HOME/packages/opencode" src/index.ts "$@"
 WRAPPER
 
-        chmod +x /usr/bin/wiz
+        chmod +x /usr/bin/cyxwiz
 
         echo ""
         echo "=============================================="
-        echo "  Wiz installed successfully!"
+        echo "  Cyxwiz installed successfully!"
         echo "=============================================="
         echo ""
-        echo "  Usage: wiz"
+        echo "  Usage: cyxwiz"
         echo ""
         echo "  Set your API key:"
         echo "    export ANTHROPIC_API_KEY=sk-ant-..."
         echo "    # or"
         echo "    export OPENAI_API_KEY=sk-..."
         echo ""
-        echo "  Documentation: /usr/share/doc/wiz/"
+        echo "  Documentation: /usr/share/doc/cyxwiz/"
         echo "=============================================="
         ;;
 

@@ -257,7 +257,7 @@ async function getShellConfigFile(): Promise<string | null> {
     const content = await Bun.file(file)
       .text()
       .catch(() => "")
-    if (content.includes("# opencode") || content.includes(".cyxwiz/bin")) {
+    if (content.includes("# cyxwiz") || content.includes(".cyxwiz/bin")) {
       return file
     }
   }
@@ -275,7 +275,7 @@ async function cleanShellConfig(file: string) {
   for (const line of lines) {
     const trimmed = line.trim()
 
-    if (trimmed === "# opencode") {
+    if (trimmed === "# cyxwiz") {
       skip = true
       continue
     }

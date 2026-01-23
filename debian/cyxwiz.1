@@ -1,23 +1,23 @@
-.TH WIZ 1 "January 2026" "wiz 1.0.0" "User Commands"
+.TH CYXWIZ 1 "January 2026" "cyxwiz 1.0.0" "User Commands"
 .SH NAME
-wiz \- AI-powered security operations platform
+cyxwiz \- AI-powered security operations platform
 .SH SYNOPSIS
-.B wiz
+.B cyxwiz
 [\fIOPTIONS\fR]
 .SH DESCRIPTION
-.B Wiz
+.B Cyxwiz
 is an AI-powered operations platform for security professionals.
 It orchestrates 30+ security tools through natural language commands,
 with governance, scope enforcement, and comprehensive audit logging.
 .PP
-Built for Kali Linux and Parrot OS, Wiz leverages the security tools
+Built for Kali Linux and Parrot OS, Cyxwiz leverages the security tools
 already installed on these distributions. Instead of memorizing tool
 syntax and manually orchestrating workflows, describe what you want
 to accomplish in natural language.
 .SH FEATURES
 .TP
 .B Natural Language Interface
-Describe security testing tasks in plain English. Wiz translates your
+Describe security testing tasks in plain English. Cyxwiz translates your
 intent into the appropriate tool commands.
 .TP
 .B Governance Engine
@@ -25,7 +25,7 @@ Every action is evaluated against policies before execution. Define
 what's allowed, what needs approval, and what's blocked.
 .TP
 .B Scope Enforcement
-Define authorized targets (IPs, domains, ports). Wiz prevents
+Define authorized targets (IPs, domains, ports). Cyxwiz prevents
 accidental out-of-scope scanning.
 .TP
 .B Audit Trail
@@ -51,9 +51,9 @@ User/group enumeration, Kerberoasting, AS-REP roasting
 OpenAPI parsing, JWT analysis, BOLA/IDOR testing
 .SH EXAMPLES
 .PP
-Start Wiz:
+Start Cyxwiz:
 .RS
-.B wiz
+.B cyxwiz
 .RE
 .PP
 Scan a network for open ports:
@@ -83,21 +83,21 @@ API key for Claude AI (recommended).
 .B OPENAI_API_KEY
 API key for OpenAI GPT models (alternative).
 .TP
-.B WIZ_CONFIG
+.B CYXWIZ_CONFIG
 Path to configuration file (optional).
 .SH FILES
 .TP
-.I /usr/lib/wiz/
-Wiz installation directory.
+.I /usr/lib/cyxwiz/
+Cyxwiz installation directory.
 .TP
-.I /usr/share/doc/wiz/
+.I /usr/share/doc/cyxwiz/
 Documentation files.
 .TP
-.I ~/.wiz/
+.I ~/.cyxwiz/
 User configuration and session data.
 .SH SECURITY
 .PP
-Wiz includes governance features specifically to prevent misuse:
+Cyxwiz includes governance features specifically to prevent misuse:
 .IP \(bu 2
 Scope enforcement blocks unauthorized targets
 .IP \(bu 2
@@ -106,7 +106,7 @@ Audit logging creates accountability
 Designed for authorized testing only
 .PP
 .B WARNING:
-Only use Wiz for authorized security testing. Unauthorized scanning
+Only use Cyxwiz for authorized security testing. Unauthorized scanning
 or testing is illegal and unethical.
 .SH SEE ALSO
 .BR nmap (1),

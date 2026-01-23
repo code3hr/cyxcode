@@ -1,4 +1,4 @@
-Source: wiz
+Source: cyxwiz
 Section: utils
 Priority: optional
 Maintainer: code3hr <code3hr@users.noreply.github.com>
@@ -9,7 +9,7 @@ Vcs-Browser: https://github.com/code3hr/opencode
 Vcs-Git: https://github.com/code3hr/opencode.git
 Rules-Requires-Root: no
 
-Package: wiz
+Package: cyxwiz
 Architecture: all
 Depends: ${misc:Depends}
 Pre-Depends: curl
@@ -38,11 +38,11 @@ Suggests: metasploit-framework,
           burpsuite,
           zaproxy
 Description: AI-powered security operations platform
- Wiz is an AI-powered operations platform for security professionals.
+ Cyxwiz is an AI-powered operations platform for security professionals.
  It orchestrates 30+ security tools through natural language commands,
  with governance, scope enforcement, and audit logging.
  .
- Built for Kali Linux and Parrot OS, Wiz leverages the 600+ security
+ Built for Kali Linux and Parrot OS, Cyxwiz leverages the 600+ security
  tools already installed on these distributions.
  .
  Features:

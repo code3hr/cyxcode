@@ -1,4 +1,4 @@
-# Wiz - AI Operations Platform
+# Cyxwiz - AI Operations Platform
 
 > A multi-domain AI operations platform for professionals who use command-line tools. Speak intent, tools execute with governance, AI explains results - all auditable.
 
@@ -6,7 +6,7 @@
 
 ## Vision
 
-Wiz is not a tool. **Wiz is a platform.**
+Cyxwiz is not a tool. **Cyxwiz is a platform.**
 
 Starting with security (pentest), expanding to SOC, DevOps, Network Engineering, and beyond. One platform, many domains, governed AI orchestration for all.
 
@@ -16,7 +16,7 @@ Starting with security (pentest), expanding to SOC, DevOps, Network Engineering,
 
 ### Fork, Don't Build From Scratch
 
-Wiz is built by forking [OpenCode](https://github.com/anomalyco/opencode) (MIT licensed).
+Cyxwiz is built by forking [OpenCode](https://github.com/anomalyco/opencode) (MIT licensed).
 
 **What OpenCode gives us:**
 - CLI/TUI framework (Bubble Tea)
@@ -43,7 +43,7 @@ Wiz is built by forking [OpenCode](https://github.com/anomalyco/opencode) (MIT l
 |-----------|-------------------|
 | Limited by OpenCode's roadmap | Full control |
 | Can't modify core UX | Customize everything |
-| "Wiz for OpenCode" | "Wiz" |
+| "Cyxwiz for OpenCode" | "Cyxwiz" |
 | Tenant | Owner |
 | Single product ceiling | Platform potential |
 
@@ -53,7 +53,7 @@ Wiz is built by forking [OpenCode](https://github.com/anomalyco/opencode) (MIT l
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│                        WIZ PLATFORM                              │
+│                       CYXWIZ PLATFORM                            │
 │                  (Forked from OpenCode, MIT)                     │
 ├─────────────────────────────────────────────────────────────────┤
 │                                                                  │
@@ -62,7 +62,7 @@ Wiz is built by forking [OpenCode](https://github.com/anomalyco/opencode) (MIT l
 │  │ CLI/TUI │ Multi-LLM │ Sessions │ Tool Exec │ Plugin System │ │
 │  └────────────────────────────────────────────────────────────┘ │
 │                                                                  │
-│  WIZ CORE (our additions - NOT plugins):                        │
+│  CYXWIZ CORE (our additions - NOT plugins):                     │
 │  ┌────────────────────────────────────────────────────────────┐ │
 │  │                                                            │ │
 │  │  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐    │ │
@@ -136,7 +136,7 @@ OpenCode is TypeScript. We stay TypeScript.
 
 ## Governance Engine (Core Feature)
 
-This is what differentiates Wiz from vanilla OpenCode.
+This is what differentiates Cyxwiz from vanilla OpenCode.
 
 ### How It Works
 
@@ -222,7 +222,7 @@ This is what differentiates Wiz from vanilla OpenCode.
 
 **Workflow:**
 ```
-wiz pentest start --scope 10.0.0.0/24 --exclude 10.0.0.1
+cyxwiz pentest start --scope 10.0.0.0/24 --exclude 10.0.0.1
 
 > "scan for open ports"
 [nmap executes, findings stored]
@@ -275,9 +275,9 @@ wiz pentest start --scope 10.0.0.0/24 --exclude 10.0.0.1
 - [ ] Set up development environment
 - [ ] Understand codebase structure
 - [ ] Identify modification points for governance
-- [ ] Create Wiz branding/naming
+- [ ] Create Cyxwiz branding/naming
 
-**Deliverable:** Building Wiz from source, understanding the codebase.
+**Deliverable:** Building Cyxwiz from source, understanding the codebase.
 
 ### Phase 2: Governance Engine
 - [ ] Implement `tool.execute.before` hook for governance
@@ -319,7 +319,7 @@ wiz pentest start --scope 10.0.0.0/24 --exclude 10.0.0.1
 - [ ] Documentation
 - [ ] Distribution (npm, binary, docker)
 
-**Deliverable:** Wiz v1.0 - platform ready for public use.
+**Deliverable:** Cyxwiz v1.0 - platform ready for public use.
 
 ### Phase 7+: Multi-Domain Expansion
 - [ ] SOC agent
@@ -331,14 +331,14 @@ wiz pentest start --scope 10.0.0.0/24 --exclude 10.0.0.1
 
 ## UI Evolution
 
-Inherited from OpenCode, enhanced for Wiz:
+Inherited from OpenCode, enhanced for Cyxwiz:
 
 ### CLI (Default)
 ```
-$ wiz pentest start --scope 10.0.0.0/24
+$ cyxwiz pentest start --scope 10.0.0.0/24
 Starting engagement: external-pentest
 Scope: 10.0.0.0/24
-Audit log: ~/.wiz/audits/2024-01-15-001.log
+Audit log: ~/.cyxwiz/audits/2024-01-15-001.log
 
 > scan for open ports on the entire scope
 [Governance: APPROVED - nmap is auto-approved]
@@ -350,7 +350,7 @@ Found 12 hosts with open ports...
 ### TUI (Inherited from OpenCode)
 ```
 ┌─────────────────────────────────────────────────────────┐
-│ Wiz Pentest │ Scope: 10.0.0.0/24 │ Findings: 23        │
+│ Cyxwiz Pentest │ Scope: 10.0.0.0/24 │ Findings: 23        │
 ├─────────────┬───────────────────┬───────────────────────┤
 │ TARGETS     │ FINDINGS          │ AUDIT LOG             │
 │             │                   │                       │
@@ -373,7 +373,7 @@ Found 12 hosts with open ports...
 
 ### Phase 3 (MVP):
 ```
-$ wiz pentest start --scope scanme.nmap.org
+$ cyxwiz pentest start --scope scanme.nmap.org
 
 > scan for open ports
 [APPROVED] Executing nmap...
@@ -392,16 +392,16 @@ Recommendation: Investigate port 80 for web vulnerabilities.
 
 ### Phase 6 (v1.0):
 ```
-$ wiz
+$ cyxwiz
 
 Available domains:
   pentest  - Security testing and assessment
   soc      - Security operations and monitoring (coming soon)
   devops   - Infrastructure and deployment (coming soon)
 
-$ wiz pentest
-$ wiz soc
-$ wiz devops
+$ cyxwiz pentest
+$ cyxwiz soc
+$ cyxwiz devops
 ```
 
 ---
@@ -430,11 +430,11 @@ $ wiz devops
 
 ### The Kali/Parrot Advantage
 
-Security-focused Linux distributions like Kali and Parrot OS come with 600+ pre-installed security tools. Wiz becomes the intelligent orchestration layer on top.
+Security-focused Linux distributions like Kali and Parrot OS come with 600+ pre-installed security tools. Cyxwiz becomes the intelligent orchestration layer on top.
 
 ```
 ┌─────────────────────────────────────────────────────────┐
-│              KALI/PARROT + WIZ                           │
+│              KALI/PARROT + CYXWIZ                         │
 │                                                          │
 │  Pre-installed (600+ tools):                            │
 │  ├─ nmap, nikto, metasploit, sqlmap, ffuf, nuclei      │
@@ -443,7 +443,7 @@ Security-focused Linux distributions like Kali and Parrot OS come with 600+ pre-
 │  └─ ... hundreds more                                   │
 │                                                          │
 │  What's missing:                                        │
-│  └─ Intelligent orchestration ← WIZ fills this gap     │
+│  └─ Intelligent orchestration ← CYXWIZ fills this gap  │
 │                                                          │
 │  Result:                                                │
 │  └─ Junior analyst can use pro tools safely            │
@@ -457,28 +457,28 @@ Security-focused Linux distributions like Kali and Parrot OS come with 600+ pre-
 **Level 1: Manual Install (Day 1)**
 ```bash
 # Works on any Kali/Parrot box
-curl -fsSL https://wiz.dev/install | bash
-wiz setup  # Auto-detects available tools
+curl -fsSL https://cyxwiz.dev/install | bash
+cyxwiz setup  # Auto-detects available tools
 ```
 
 **Level 2: Package Repository (Phase 6)**
 ```bash
 # Submit to Kali repos
 sudo apt update
-sudo apt install wiz
+sudo apt install cyxwiz
 ```
 
 **Level 3: Pre-installed (Long-term Goal)**
 - Partner with Offensive Security (Kali maintainers)
-- Get Wiz included in default installation
-- Every Kali download = potential Wiz user
+- Get Cyxwiz included in default installation
+- Every Kali download = potential Cyxwiz user
 
 ### Auto-Detection System
 
-Wiz adapts to available tools:
+Cyxwiz adapts to available tools:
 
 ```typescript
-// On first run or `wiz setup`
+// On first run or `cyxwiz setup`
 const detectTools = async () => {
   const detected = [];
 
@@ -493,7 +493,7 @@ const detectTools = async () => {
     }
   }
 
-  // Wiz works with whatever is installed
+  // Cyxwiz works with whatever is installed
   // Full power on Kali, limited on vanilla Ubuntu
   return detected;
 };
@@ -501,7 +501,7 @@ const detectTools = async () => {
 
 **Output example:**
 ```
-$ wiz setup
+$ cyxwiz setup
 
 Detecting available tools...
 
@@ -521,7 +521,7 @@ EXPLOITATION
   ✓ metasploit 6.3 Exploitation framework
   ✓ hydra 9.4      Password cracking
 
-47 tools available. Wiz is ready.
+47 tools available. Cyxwiz is ready.
 ```
 
 ### Distribution Channels
@@ -531,23 +531,23 @@ EXPLOITATION
 | Any Linux | curl script | Low | Phase 3 |
 | Kali/Parrot | apt package | Very low | Phase 6 |
 | Kali/Parrot | Pre-installed | Zero | Phase 7+ |
-| Docker | `docker run wiz` | Low | Phase 5 |
-| macOS | `brew install wiz` | Low | Phase 6 |
+| Docker | `docker run cyxwiz` | Low | Phase 5 |
+| macOS | `brew install cyxwiz` | Low | Phase 6 |
 | Windows/WSL | curl script | Medium | Phase 6 |
 
-### Why Kali/Parrot Teams Would Accept Wiz
+### Why Kali/Parrot Teams Would Accept Cyxwiz
 
-| Their Priority | How Wiz Helps |
+| Their Priority | How Cyxwiz Helps |
 |----------------|---------------|
 | Beginner accessibility | Natural language interface |
-| Tool discoverability | Wiz suggests relevant tools |
+| Tool discoverability | Cyxwiz suggests relevant tools |
 | Professional use | Governance + audit trails |
 | Community value | Open source (MIT) |
 | Distro differentiation | No competitor has this |
 
 ### The Pitch (When Ready)
 
-> "Wiz is the missing brain for Kali Linux. Your 600+ tools, now accessible through natural language. Junior analysts work safely with built-in governance. Senior analysts work faster with intelligent orchestration. Every action audited for compliance. The AI layer your toolkit has been waiting for."
+> "Cyxwiz is the missing brain for Kali Linux. Your 600+ tools, now accessible through natural language. Junior analysts work safely with built-in governance. Senior analysts work faster with intelligent orchestration. Every action audited for compliance. The AI layer your toolkit has been waiting for."
 
 ---
 
@@ -566,7 +566,7 @@ EXPLOITATION
 
 ## Open Questions
 
-- [ ] Wiz branding (name, logo, domain)
+- [ ] Cyxwiz branding (name, logo, domain)
 - [ ] Open source model (MIT? Apache? AGPL for enterprise?)
 - [ ] Community building strategy
 - [ ] When to diverge significantly from OpenCode upstream

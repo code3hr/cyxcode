@@ -3,8 +3,8 @@ set -e
 
 case "$1" in
     remove|upgrade|deconfigure)
-        # Remove wiz executable
-        rm -f /usr/bin/wiz
+        # Remove cyxwiz executable
+        rm -f /usr/bin/cyxwiz
         ;;
 
     failed-upgrade)
