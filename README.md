@@ -200,6 +200,40 @@ Don't have them? Wiz will tell you when it needs something.
 
 ---
 
+## Running Modes
+
+### Terminal (Default)
+
+Just run the binary - you get a terminal interface:
+
+```bash
+./cyxwiz
+```
+
+### Web Interface (Server Mode)
+
+Prefer a browser? Run as a web server:
+
+```bash
+./cyxwiz --server
+```
+
+Then open http://localhost:4096 in your browser. Same AI assistant, graphical interface.
+
+### Web Reports
+
+After generating reports, view them in your browser:
+
+```
+You: "generate a report"
+
+Wiz: Report generated. View at: http://localhost:4096/reports/assessment-2024-01-15.html
+```
+
+Reports include interactive charts, sortable finding tables, and export options.
+
+---
+
 ## How It Works
 
 ### 1. You Describe, Wiz Executes
