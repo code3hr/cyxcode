@@ -98,6 +98,74 @@ Wiz understands context too. After scanning a network, you can say *"check that 
 
 ---
 
+## Why Wiz? Why Not Just Use an LLM Directly?
+
+You could ask ChatGPT or Claude: *"How do I scan for vulnerabilities?"* and get a great answer. So why use Wiz?
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                        LLM Alone vs Wiz                                      │
+├─────────────────────────────────┬───────────────────────────────────────────┤
+│         LLM Alone               │              Wiz                           │
+├─────────────────────────────────┼───────────────────────────────────────────┤
+│ Tells you what to run           │ Actually runs the tools                   │
+│ You copy-paste commands         │ Executes directly, no copy-paste          │
+│ You read raw output             │ Parses output, extracts findings          │
+│ Forgets between sessions        │ Remembers scope, findings, history        │
+│ Can't verify what happened      │ Full audit trail of every action          │
+│ No scope enforcement            │ Prevents out-of-scope accidents           │
+│ You manually track findings     │ Structured findings database              │
+│ You write the report            │ Generates professional reports            │
+└─────────────────────────────────┴───────────────────────────────────────────┘
+```
+
+### The Real Difference
+
+**LLM alone:**
+```
+You: "How do I scan 192.168.1.0/24 for web vulnerabilities?"
+
+LLM: "You can use nmap to find web servers, then nikto for vulnerabilities:
+      nmap -p 80,443 192.168.1.0/24
+      nikto -h <target>
+      ..."
+
+You: *copy command, open terminal, paste, run, read output, repeat*
+```
+
+**With Wiz:**
+```
+You: "scan 192.168.1.0/24 for web vulnerabilities"
+
+Wiz: [Actually runs nmap]
+     Found 5 web servers.
+
+     [Runs nikto on each]
+     [Runs nuclei for CVEs]
+
+     Results:
+     - 192.168.1.10: 2 critical vulns (CVE-2021-44228, CVE-2023-1234)
+     - 192.168.1.15: SSL certificate expired
+     - 192.168.1.20: Directory listing enabled
+
+     All findings saved. Want me to generate a report?
+```
+
+### In Short
+
+| Aspect | LLM Alone | Wiz |
+|--------|-----------|-----|
+| **Execution** | Advice only | Advice + Action |
+| **Memory** | Stateless | Persistent findings |
+| **Output** | Raw text | Structured data |
+| **Workflow** | Manual | Automated |
+| **Audit** | None | Complete trail |
+| **Reports** | DIY | Generated |
+
+**Wiz = LLM intelligence + Tool execution + Findings management + Reporting**
+
+---
+
 ## What Wiz Is NOT
 
 Let's be clear about boundaries:
