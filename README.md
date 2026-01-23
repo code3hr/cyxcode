@@ -475,10 +475,34 @@ Wiz is under active development. Current capabilities:
 
 ## Documentation
 
-- [Project Architecture](docs/PROJECT.md) - How Wiz is built
-- [Pentest Module](docs/PENTEST.md) - Security testing details
-- [Governance](docs/GOVERNANCE.md) - Policy and scope enforcement
-- [Development Roadmap](docs/TODO.md) - What's coming next
+### Core Docs
+| Document | Description |
+|----------|-------------|
+| [PROJECT.md](docs/PROJECT.md) | Platform architecture and vision |
+| [PENTEST.md](docs/PENTEST.md) | Pentest module overview |
+| [GOVERNANCE.md](docs/GOVERNANCE.md) | Policy and scope enforcement |
+| [TODO.md](docs/TODO.md) | Development roadmap |
+| [COMPARISON.md](docs/COMPARISON.md) | How Wiz compares to other tools |
+
+### Module Documentation (Phases)
+| Phase | Module | Description |
+|-------|--------|-------------|
+| [03](docs/PHASE03-pentest-agent-mvp.md) | Pentest Agent MVP | Core scanning foundation |
+| [04](docs/PHASE04-multi-tool-parsers.md) | Multi-Tool Parsers | Nikto, Nuclei, Gobuster parsers |
+| [05](docs/PHASE05-report-generation.md) | Report Generation | HTML, PDF, Markdown reports |
+| [06](docs/PHASE06-continuous-monitoring.md) | Continuous Monitoring | Scheduled scans, diff detection |
+| [07](docs/PHASE07-exploit-framework.md) | Exploit Framework | Metasploit, Searchsploit integration |
+| [08](docs/PHASE08-web-app-scanner.md) | Web App Scanner | OWASP Top 10, crawling |
+| [09](docs/PHASE09-api-security-scanner.md) | API Security | OpenAPI, GraphQL, JWT testing |
+| [10](docs/PHASE10-network-infrastructure.md) | Network Infrastructure | SMB, SNMP, DNS, LDAP |
+| [11](docs/PHASE11-cloud-security.md) | Cloud Security | AWS, Azure, GCP scanning |
+| [12](docs/PHASE12-container-security.md) | Container Security | Docker, Kubernetes, CVE lookup |
+| [13](docs/PHASE13-mobile-app-scanner.md) | Mobile App Scanner | Android/iOS analysis |
+| [14](docs/PHASE14-wireless-scanner.md) | Wireless Scanner | WiFi security testing |
+| [15](docs/PHASE15-social-engineering.md) | Social Engineering | Phishing, pretexting toolkit |
+| [16](docs/PHASE16-post-exploitation.md) | Post-Exploitation | Privilege escalation, persistence |
+| [17](docs/PHASE17-reporting-dashboard.md) | Reporting Dashboard | Web UI for findings |
+| [18](docs/PHASE18-cicd-security.md) | CI/CD Security | Pipeline security analysis |
 
 ---
 
