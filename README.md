@@ -324,6 +324,30 @@ Cyxwiz: [Creates executive summary]
 
 **Cyxwiz = OpenCode's superior agent + Security expertise + Findings management + Governance + Reporting**
 
+### Why Fork OpenCode? Why Not Build a Plugin?
+
+| As Plugin | As Fork (Platform) |
+|-----------|-------------------|
+| Limited by OpenCode's roadmap | Full control |
+| Can't modify core UX | Customize everything |
+| "Cyxwiz for OpenCode" | "Cyxwiz" |
+| Tenant | Owner |
+| Single product ceiling | Platform potential |
+
+**Key reasons we forked:**
+
+1. **Governance is core, not optional** - Cyxwiz needs scope enforcement and audit logging baked into every command execution. As a plugin, we'd be bolting security onto someone else's foundation. As a fork, governance IS the foundation.
+
+2. **We need to modify core UX** - Security workflows require approval prompts, findings panels, and audit trails integrated into the interface. Plugins can't touch core UI.
+
+3. **Platform potential** - Cyxwiz isn't just a pentest tool. It's designed to expand to SOC, DevOps, NetEng domains. A plugin would forever be "Cyxwiz for OpenCode." A fork becomes "Cyxwiz" - its own platform.
+
+4. **Independence** - OpenCode could change direction, deprecate plugin APIs, or make decisions that conflict with security use cases. Fork = we control our destiny.
+
+**What we inherited (for free):** CLI/TUI framework, Multi-LLM support (Claude, GPT, Gemini), Session management, Tool execution framework, Plugin system
+
+**What we added:** Governance engine, Scope enforcement, Audit logging, Security tool parsers (30+), Findings management, Report generation
+
 ---
 
 ## What Cyxwiz Is NOT
