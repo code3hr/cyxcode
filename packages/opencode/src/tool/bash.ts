@@ -16,6 +16,7 @@ import { Shell } from "@/shell/shell"
 
 import { BashArity } from "@/permission/arity"
 import { Truncate } from "./truncation"
+import { SkillRouter } from "@/cyxcode/router"
 
 const MAX_METADATA_LENGTH = 30_000
 const DEFAULT_TIMEOUT = Flag.OPENCODE_EXPERIMENTAL_BASH_DEFAULT_TIMEOUT_MS || 2 * 60 * 1000
@@ -243,6 +244,33 @@ export const BashTool = Tool.define("bash", async () => {
       if (resultMetadata.length > 0) {
         output += "\n\n<bash_metadata>\n" + resultMetadata.join("\n") + "\n</bash_metadata>"
       }
+
+      // CyxCode: Pattern-based error recovery
+      if (proc.exitCode !== 0 && proc.exitCode !== null) {
+        const matches = SkillRouter.findMatching(output)
+        if (matches.length > 0) {
+          const best = matches[0]
+          const fixes = best.match.pattern.fixes
+          const fixLines = fixes.map((f, i) => {
+            const cmd = f.command ? "  " + f.command : "  (manual)"
+            return (i + 1) + ". " + f.description + "\n" + cmd
+          }).join("\n")
+          
+          output += "\n\n<cyxcode_recovery pattern=\"" + best.match.pattern.id + "\">\n"
+          output += "Matched: " + best.match.pattern.description + "\n"
+          output += "Suggested fixes:\n" + fixLines + "\n"
+          output += "</cyxcode_recovery>"
+          
+          SkillRouter.recordMatch(best.skill.name)
+          log.info("cyxcode pattern matched", { 
+            pattern: best.match.pattern.id, 
+            fixes: fixes.length 
+          })
+        } else {
+          SkillRouter.recordMiss()
+        }
+      }
+
 
       return {
         title: params.description,

@@ -1,10 +1,10 @@
 {
   "$schema": "https://json.schemastore.org/package.json",
-  "name": "cyxwiz",
-  "description": "AI-powered development tool",
+  "name": "cyxcode",
+  "description": "Skill-based AI agent for developers",
   "private": true,
   "type": "module",
-  "packageManager": "bun@1.3.6",
+  "packageManager": "bun@1.3.9",
   "scripts": {
     "dev": "bun run --cwd packages/opencode --conditions=browser src/index.ts",
     "typecheck": "bun turbo typecheck",
@@ -21,7 +21,7 @@
       "packages/slack"
     ],
     "catalog": {
-      "@types/bun": "1.3.6",
+      "@types/bun": "1.3.9",
       "@octokit/rest": "22.0.0",
       "@hono/zod-validator": "0.4.2",
       "ulid": "3.0.1",
@@ -77,7 +77,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/code3hr/opencode"
+    "url": "https://github.com/code3hr/cyxcode"
   },
   "license": "MIT",
   "prettier": {

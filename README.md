@@ -1,8 +1,7 @@
-# Cyxwiz
+# CyxCode
 
-> **Your AI Security Partner** - Just describe what you need. No commands to memorize. No syntax to learn.
+**Deep skills, not 700 shallow ones.** Pattern-first AI agent for developers.
 
-[![Release](https://img.shields.io/github/v/release/code3hr/opencode?label=Download&color=green)](https://github.com/code3hr/opencode/releases/latest)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Platform: Linux](https://img.shields.io/badge/Platform-Linux-FCC624)](https://www.linux.org/)
 [![Platform: macOS](https://img.shields.io/badge/Platform-macOS-000000)](https://www.apple.com/macos/)
@@ -10,427 +9,155 @@
 
 ---
 
-## Why Cyxwiz Exists
+## Why CyxCode?
 
-Security testing shouldn't require memorizing hundreds of tool flags and command syntaxes.
+OpenClaw has 700+ skills. We have 3-5. **Thats the point.**
 
-Think about it: **nmap** has 130+ options. **Nuclei** has dozens of flags. **SQLMap** has over 100 parameters. Now multiply that by the 30+ tools a typical assessment requires. That's not security work - that's a memorization exercise.
+OpenClaw:  700+ thin skills, LLM decides everything, burns tokens
+CyxCode:   Few deep skills, patterns handle 80%, LLM handles 20%
 
-**Cyxwiz takes a different approach.** Instead of learning tool syntax, you simply describe what you want to accomplish. The AI understands your intent and figures out which tools to use, how to chain them, and how to interpret the results.
+Most developer errors are **known patterns**. Why ask an LLM to figure out "module not found" for the 10,000th time?
 
 ```
-You: "check if this server is vulnerable to log4j"
+You: "my build is failing"
 
-Cyxwiz: Checking 192.168.1.10 for Log4Shell vulnerability...
-     [Running nuclei with CVE-2021-44228 templates]
+CyxCode: [Recovery Skill]
+         Pattern matched: "Cannot find module express"
+         Category: Node/npm (1 of 104 patterns)
+         Fix: npm install express
 
-     Found: CRITICAL - Log4Shell (CVE-2021-44228) confirmed
-     The server is vulnerable to remote code execution via JNDI injection.
-
-     Recommendation: Upgrade log4j to 2.17.1+ or apply mitigations immediately.
+         [No LLM tokens burned]
+         Apply fix? [Y/n]
 ```
-
-No flags to remember. No syntax to look up. Just describe what you need.
 
 ---
 
-## What Cyxwiz Does
+## The Philosophy
 
-Cyxwiz is an AI-powered security operations assistant. You talk to it in plain English, and it:
+### OpenClaw vs CyxCode
 
-1. **Understands your intent** - Whether you say "scan for open ports" or "what services are running" - same result
-2. **Selects the right tools** - Picks nmap, nuclei, nikto, or whatever fits the task
-3. **Chains operations intelligently** - Finds a web server? Automatically suggests vulnerability checks
-4. **Explains results clearly** - No raw output dumps, just actionable insights
-5. **Tracks everything** - Every finding, every command, ready for your report
+| | OpenClaw | CyxCode |
+|--|----------|---------|
+| **Skills** | 700+ (Gmail, Spotify, smart home...) | 3-5 (Recovery, Security, DevOps) |
+| **Depth** | Thin wrappers | Deep domain expertise |
+| **Decision** | LLM for everything | Patterns first, LLM fallback |
+| **Audience** | General consumers | Developers |
+| **Cost** | Token-heavy | Token-efficient |
 
-### Talk, Don't Type Commands
+### Why Patterns First?
 
-Here's how a real conversation with Cyxwiz looks:
+Developer errors breakdown:
+- 80% Known patterns (CMake errors, npm issues, git conflicts) -> CyxCode: FREE
+- 20% Novel problems -> CyxCode: LLM fallback
 
-```
-You: "I need to test this web application at https://target.com"
-
-Cyxwiz: I'll start with reconnaissance. Let me:
-     1. Check what technologies it's running
-     2. Look for common vulnerabilities
-     3. Test the authentication mechanisms
-
-     Starting now...
-
-     [After scanning]
-
-     Here's what I found:
-     - Running WordPress 5.8.1 (outdated - current is 6.4)
-     - 3 plugins with known vulnerabilities
-     - Admin login page exposed at /wp-admin
-     - No rate limiting on login attempts
-
-     Want me to dig deeper into any of these?
-
-You: "yes, check those plugin vulnerabilities"
-
-Cyxwiz: Looking at the vulnerable plugins...
-
-     CRITICAL: Contact Form 7 < 5.3.2 - Unrestricted file upload
-     HIGH: Elementor < 3.1.2 - Authenticated XSS
-     MEDIUM: WooCommerce < 5.2.0 - Information disclosure
-
-     The file upload vulnerability is serious. With a valid form submission,
-     an attacker could upload malicious PHP files.
-
-     Should I generate a detailed report with remediation steps?
-```
-
-### What You Can Ask
-
-Just describe what you need in your own words:
-
-- *"find all the web servers on this network"*
-- *"is this site vulnerable to SQL injection?"*
-- *"check the SSL configuration on our servers"*
-- *"what users exist in this Active Directory domain?"*
-- *"test if this API has authentication issues"*
-- *"show me everything you've found so far"*
-- *"write up a report for the client"*
-
-Cyxwiz understands context too. After scanning a network, you can say *"check that Apache server for vulnerabilities"* - it knows which one you mean.
+**Result:** Same capability, fraction of the cost.
 
 ---
 
-## Why Cyxwiz? Why Not Claude CLI or Other LLM Tools?
-
-Yes, Claude CLI, Cursor, and other LLM tools can run commands too. So what makes Cyxwiz different?
-
-### The Foundation: OpenCode Agent
-
-Cyxwiz is built on [OpenCode](https://github.com/sst/opencode), which provides a superior agent architecture compared to generic LLM CLIs:
+## Core Architecture
 
 ```
-┌─────────────────────────────────────────────────────────────────────────────┐
-│                    Generic LLM CLI vs Cyxwiz (OpenCode-based)                   │
-├─────────────────────────────────┬───────────────────────────────────────────┤
-│       Generic LLM CLI           │              Cyxwiz                           │
-├─────────────────────────────────┼───────────────────────────────────────────┤
-│ General-purpose agent           │ Security-focused agent                    │
-│ Raw command output              │ Parsed, structured findings               │
-│ No domain knowledge             │ Security tool expertise built-in          │
-│ Basic bash execution            │ Specialized tool integrations             │
-│ Chat history only               │ Findings database + audit trail           │
-│ No scope awareness              │ Governance & scope enforcement            │
-│ Export chat transcript          │ Professional pentest reports              │
-└─────────────────────────────────┴───────────────────────────────────────────┘
+                        CYXCODE CORE
+    +-------------------------------------------------------+
+    |                    Skill Router                        |
+    |  1. Detect intent from natural language                |
+    |  2. Route to skill with matching patterns              |
+    |  3. Pattern match BEFORE calling LLM                   |
+    +-------------------------------------------------------+
+                            |
+        +-------------------+-------------------+
+        v                   v                   v
+  +-----------+       +-----------+       +-----------+
+  |  SKILL:   |       |  SKILL:   |       |  SKILL:   |
+  | Recovery  |       | Security  |       |  DevOps   |
+  |           |       |           |       |           |
+  | 104 error |       | 30+ tools |       | k8s, tf,  |
+  | patterns  |       | parsers   |       | cloud     |
+  | 10 pkgmgr |       | findings  |       |           |
+  +-----------+       +-----------+       +-----------+
+      DEEP                DEEP                DEEP
 ```
-
-### What OpenCode Gives Us (That Others Don't)
-
-1. **Better Agent Control** - OpenCode's architecture gives finer control over LLM behavior, tool execution, and context management than Claude CLI's generic approach
-
-2. **Extensible Tool Framework** - Not just "run bash commands" but structured tool definitions with typed inputs/outputs
-
-3. **Session Persistence** - Real session management, not just chat history
-
-4. **Multi-LLM Support** - Claude, GPT-4, Gemini, local models - your choice
-
-### What Cyxwiz Adds on Top of OpenCode
-
-Cyxwiz extends OpenCode with a complete security operations layer:
-
-```
-┌─────────────────────────────────────────────────────────────────────────────┐
-│                         Cyxwiz Security Layer                                   │
-├─────────────────────────────────────────────────────────────────────────────┤
-│                                                                              │
-│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐    │
-│  │   Security   │  │   Output     │  │   Findings   │  │   Report     │    │
-│  │    Tools     │  │   Parsers    │  │   Database   │  │   Engine     │    │
-│  │              │  │              │  │              │  │              │    │
-│  │ nmap, nikto  │  │ Extract CVEs │  │ Severity     │  │ Executive    │    │
-│  │ nuclei, etc  │  │ Parse JSON   │  │ OWASP cats   │  │ Technical    │    │
-│  │ 30+ tools    │  │ Structure    │  │ Evidence     │  │ HTML/PDF/MD  │    │
-│  └──────────────┘  └──────────────┘  └──────────────┘  └──────────────┘    │
-│                                                                              │
-│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐                      │
-│  │  Governance  │  │    Scope     │  │    Audit     │                      │
-│  │   Engine     │  │ Enforcement  │  │    Trail     │                      │
-│  │              │  │              │  │              │                      │
-│  │ Policy-based │  │ Authorized   │  │ Compliance   │                      │
-│  │ approval     │  │ targets only │  │ logging      │                      │
-│  └──────────────┘  └──────────────┘  └──────────────┘                      │
-│                                                                              │
-└─────────────────────────────────────────────────────────────────────────────┘
-```
-
-#### 1. Security Tool Integrations (30+ tools)
-
-| Category | Tools | What Cyxwiz Adds |
-|----------|-------|---------------|
-| **Network** | nmap, masscan | Service detection, port classification |
-| **Web** | nikto, nuclei, gobuster, ffuf | Vuln detection, directory enumeration |
-| **Exploitation** | searchsploit, msfconsole | Exploit matching, payload generation |
-| **AD/LDAP** | ldapsearch, smbclient | User enum, share discovery |
-| **API** | Custom scanners | OpenAPI parsing, JWT analysis |
-| **Wireless** | aircrack-ng, reaver | WiFi assessment |
-| **Cloud** | aws-cli, az, gcloud | Misconfig detection |
-
-#### 2. Intelligent Output Parsers
-
-OpenCode gives raw output. Cyxwiz parses it:
-
-```
-Raw nmap output:                    Cyxwiz parsed output:
-───────────────────                 ──────────────────
-PORT   STATE SERVICE                {
-80/tcp open  http     ──────►        "port": 80,
-                                     "service": "http",
-                                     "product": "Apache",
-                                     "version": "2.4.41",
-                                     "cves": ["CVE-2021-41773"]
-                                   }
-```
-
-#### 3. Findings Database
-
-Not just command history - structured security findings:
-
-- **Severity Classification**: Critical, High, Medium, Low, Info
-- **OWASP Categorization**: A01-A10 mapping
-- **CVE Tracking**: Automatic CVE detection and linking
-- **Evidence Storage**: Screenshots, request/response pairs
-- **Remediation Tracking**: Fix status, verification
-
-#### 4. Governance Engine
-
-What OpenCode doesn't have:
-
-- **Scope Definition**: Define authorized targets (IPs, domains, ports)
-- **Scope Enforcement**: Block scans against unauthorized targets
-- **Policy Rules**: Require approval for destructive actions
-- **Engagement Profiles**: Different rules for different assessments
-
-#### 5. Audit Trail
-
-Compliance-ready logging:
-
-```
-[2024-01-15 10:23:45] SCAN_START target=192.168.1.0/24 user=analyst1
-[2024-01-15 10:23:46] SCOPE_CHECK target=192.168.1.0/24 result=AUTHORIZED
-[2024-01-15 10:23:47] TOOL_EXEC tool=nmap args="-sV -sC 192.168.1.0/24"
-[2024-01-15 10:25:12] FINDING_NEW id=F001 severity=CRITICAL cve=CVE-2021-41773
-[2024-01-15 10:30:00] REPORT_GEN format=HTML findings=15
-```
-
-#### 6. Report Generation
-
-Professional deliverables, not chat exports:
-
-| Report Type | Contents | Format |
-|-------------|----------|--------|
-| **Executive** | Risk summary, business impact | HTML, PDF |
-| **Technical** | Full findings, evidence, remediation | Markdown, HTML |
-| **Compliance** | Audit trail, scope verification | JSON, PDF |
-| **Raw Data** | Machine-readable findings | JSON |
-
-#### 7. Continuous Monitoring
-
-Schedule recurring scans with diff detection:
-
-- Baseline establishment
-- Change detection (new ports, services, vulns)
-- Alert on critical changes
-- Trend tracking over time
-
-#### 8. Web Dashboard
-
-Visual interface for findings management:
-
-- Real-time scan progress
-- Interactive findings table
-- Severity charts and statistics
-- Report generation UI
-
-### Real Example: The Difference
-
-**Claude CLI:**
-```
-You: "scan 192.168.1.10 for vulnerabilities"
-
-Claude: *runs nmap*
-        Here's the raw output:
-        PORT   STATE SERVICE VERSION
-        80/tcp open  http    Apache 2.4.41
-        443/tcp open  ssl/http Apache 2.4.41
-        ...
-
-You: "what vulnerabilities does it have?"
-
-Claude: *runs nikto*
-        Here's what nikto found:
-        + Server: Apache/2.4.41
-        + /: The anti-clickjacking X-Frame-Options header is not present
-        ...
-
-        [You manually track these, decide severity, write report]
-```
-
-**Cyxwiz:**
-```
-You: "scan 192.168.1.10 for vulnerabilities"
-
-Cyxwiz: [Runs nmap → parses services]
-     [Runs nikto → extracts findings]
-     [Runs nuclei → matches CVEs]
-     [Classifies by severity]
-     [Stores in findings database]
-
-     Scan complete. Found:
-
-     CRITICAL (1):
-     - CVE-2021-41773: Apache path traversal → RCE possible
-
-     HIGH (2):
-     - Missing security headers (X-Frame-Options, CSP)
-     - SSL certificate expires in 7 days
-
-     MEDIUM (3):
-     - Directory listing enabled on /uploads
-     - Server version disclosed
-     - Outdated Apache version
-
-     All 6 findings saved with evidence.
-
-You: "generate report"
-
-Cyxwiz: [Creates executive summary]
-     [Includes technical details]
-     [Adds remediation steps]
-     [Exports to HTML]
-
-     Report ready: http://localhost:4096/reports/192.168.1.10-assessment.html
-```
-
-### Summary
-
-| Feature | Claude CLI | Cyxwiz |
-|---------|------------|-----|
-| **Agent Architecture** | Generic | OpenCode (superior control) |
-| **Tool Integration** | Bash only | 30+ security tools with parsers |
-| **Output Handling** | Raw text | Structured findings |
-| **Severity Classification** | Manual | Automatic (Critical→Info) |
-| **CVE Matching** | Manual lookup | Automatic detection |
-| **Scope Control** | None | Governance engine |
-| **Audit Trail** | Chat history | Compliance-ready logs |
-| **Reports** | Copy-paste chat | Professional HTML/PDF |
-
-**Cyxwiz = OpenCode's superior agent + Security expertise + Findings management + Governance + Reporting**
-
-### Why Fork OpenCode? Why Not Build a Plugin?
-
-| As Plugin | As Fork (Platform) |
-|-----------|-------------------|
-| Limited by OpenCode's roadmap | Full control |
-| Can't modify core UX | Customize everything |
-| "Cyxwiz for OpenCode" | "Cyxwiz" |
-| Tenant | Owner |
-| Single product ceiling | Platform potential |
-
-**Key reasons we forked:**
-
-1. **Governance is core, not optional** - Cyxwiz needs scope enforcement and audit logging baked into every command execution. As a plugin, we'd be bolting security onto someone else's foundation. As a fork, governance IS the foundation.
-
-2. **We need to modify core UX** - Security workflows require approval prompts, findings panels, and audit trails integrated into the interface. Plugins can't touch core UI.
-
-3. **Platform potential** - Cyxwiz isn't just a pentest tool. It's designed to expand to SOC, DevOps, NetEng domains. A plugin would forever be "Cyxwiz for OpenCode." A fork becomes "Cyxwiz" - its own platform.
-
-4. **Independence** - OpenCode could change direction, deprecate plugin APIs, or make decisions that conflict with security use cases. Fork = we control our destiny.
-
-**What we inherited (for free):** CLI/TUI framework, Multi-LLM support (Claude, GPT, Gemini), Session management, Tool execution framework, Plugin system
-
-**What we added:** Governance engine, Scope enforcement, Audit logging, Security tool parsers (30+), Findings management, Report generation
 
 ---
 
-## What Cyxwiz Is NOT
+## Skills (Deep, Not Wide)
 
-Let's be clear about boundaries:
+### Recovery Skill - MVP
 
-### Not a Replacement for Your Judgment
+**104 patterns** from CyxMake. Zero LLM tokens for known errors.
 
-Cyxwiz is a tool, not a security expert replacement. It doesn't:
-- Make risk decisions for your organization
-- Determine what's in scope for your engagement
-- Replace the need to understand what you're doing
-- Guarantee finding every vulnerability
+| Category | Patterns | Examples |
+|----------|----------|----------|
+| **Build** | 12 | CMake package not found, linker errors |
+| **Git** | 9 | Merge conflicts, push rejected, auth failures |
+| **Docker** | 8 | Daemon not running, port conflicts |
+| **Node/npm** | 9 | Module not found, peer deps, EACCES |
+| **Python/pip** | 8 | Import errors, venv issues |
+| **System** | 9 | Permissions, disk space, OOM |
+| **CI** | 6 | Workflow failures, secrets |
 
-**You** are the security professional. Cyxwiz handles the tedious parts so you can focus on analysis and decisions.
+**10 package managers:** apt, brew, npm, pip, cargo, vcpkg, winget, choco, pacman, dnf
 
-### Not for Malicious Use
+### Security Skill - Planned
 
-Cyxwiz is built for:
-- Authorized penetration testing
-- Security assessments with written permission
-- CTF competitions and security research
-- Learning and education
+Deep security expertise, not shallow wrappers:
+- 30+ tools with **structured parsers** (not raw output)
+- Findings database with severity classification
+- Report generation (HTML, PDF, Markdown)
+- Scope enforcement and audit trail
 
-It is NOT for:
-- Unauthorized access to systems
-- Attacking systems you don't own or have permission to test
-- Any illegal activity
+### DevOps Skill - Future
 
-**The tools Cyxwiz uses are powerful. Use them responsibly and legally.**
+- Kubernetes (kubectl, helm)
+- Infrastructure (terraform, pulumi)
+- Cloud CLIs (aws, az, gcloud)
 
-### Not a Magic Button
+### Community Skills
 
-Cyxwiz won't:
-- Automatically hack anything
-- Replace proper methodology
-- Skip the need for authorization
-- Make you compliant just by running it
+We build the interface. Community builds domain skills.
 
-It's an assistant that makes security work more efficient - not a shortcut around doing things properly.
+---
+
+## How It Works
+
+```
+Error occurs
+     |
+     v
++------------------+
+| Pattern Match    |---- Match found ----> Apply fix (FREE)
+| (104 patterns)   |                              |
++--------+---------+                              |
+         |                                        |
+    No match                                      |
+         |                                        |
+         v                                        |
++------------------+                              |
+| LLM Fallback     |---- Novel solution ----------+
+| (costs tokens)   |                              |
++------------------+                              |
+                                                  v
+                                           +----------+
+                                           |  Retry   |
+                                           +----------+
+```
 
 ---
 
 ## Installation
 
-### Download Pre-built Binaries
-
-The easiest way to get started. Download for your platform:
-
-| Platform | Download |
-|----------|----------|
-| Linux (x64) | [cyxwiz-linux-x64.tar.gz](https://github.com/code3hr/opencode/releases/latest/download/cyxwiz-linux-x64.tar.gz) |
-| Linux (ARM64) | [cyxwiz-linux-arm64.tar.gz](https://github.com/code3hr/opencode/releases/latest/download/cyxwiz-linux-arm64.tar.gz) |
-| macOS (Intel) | [cyxwiz-darwin-x64.tar.gz](https://github.com/code3hr/opencode/releases/latest/download/cyxwiz-darwin-x64.tar.gz) |
-| macOS (Apple Silicon) | [cyxwiz-darwin-arm64.tar.gz](https://github.com/code3hr/opencode/releases/latest/download/cyxwiz-darwin-arm64.tar.gz) |
-| Windows (x64) | [cyxwiz-windows-x64.zip](https://github.com/code3hr/opencode/releases/latest/download/cyxwiz-windows-x64.zip) |
-
 ```bash
-# Linux/macOS
-tar -xzf cyxwiz-*.tar.gz
-chmod +x cyxwiz
-./cyxwiz
-
-# Windows
-# Extract the zip and run cyxwiz.exe
-```
-
-### Build from Source
-
-```bash
-# Install Bun (JavaScript runtime)
+# Install Bun
 curl -fsSL https://bun.sh/install | bash
 
-# Clone and build
-git clone https://github.com/code3hr/opencode.git wiz
-cd wiz
+# Clone and run
+git clone https://github.com/code3hr/cyxcode.git
+cd cyxcode
 bun install
-bun run --cwd packages/opencode src/index.ts
+bun run dev
 ```
 
 ### Required: API Key
-
-Cyxwiz needs an AI provider to work. Set one of these:
 
 ```bash
 export ANTHROPIC_API_KEY=sk-ant-...    # Claude (recommended)
@@ -438,335 +165,117 @@ export ANTHROPIC_API_KEY=sk-ant-...    # Claude (recommended)
 export OPENAI_API_KEY=sk-...           # GPT-4
 ```
 
-### Recommended: Security Tools
+---
 
-For full functionality, have these tools installed (pre-installed on Kali/Parrot):
+## Usage
 
-- **nmap** - Network scanning
-- **nuclei** - Vulnerability scanning
-- **nikto** - Web server scanning
-- **gobuster** - Directory enumeration
-- **sqlmap** - SQL injection testing
+```bash
+# Start CyxCode
+bun run dev
 
-Don't have them? Cyxwiz will tell you when it needs something.
+# Talk naturally
+> fix my build errors
+> why is npm install failing
+> scan this for vulnerabilities
+```
+
+### Commands
+
+| Command | Description |
+|---------|-------------|
+| /skills | List available skills |
+| /patterns | Show pattern match stats |
+| /fix | Analyze last error |
 
 ---
 
-## Architecture
+## Skill Interface
 
-```
-┌─────────────────────────────────────────────────────────────────────────────┐
-│                              YOU (Security Professional)                     │
-│                                                                              │
-│   "scan this network"    "check for vulnerabilities"    "generate report"   │
-└──────────────────────────────────┬───────────────────────────────────────────┘
-                                   │
-                                   ▼
-┌─────────────────────────────────────────────────────────────────────────────┐
-│                               CYXWIZ                                         │
-│  ┌─────────────────────────────────────────────────────────────────────┐    │
-│  │                         AI Engine (Claude/GPT)                       │    │
-│  │                                                                      │    │
-│  │   • Understands natural language intent                              │    │
-│  │   • Plans tool sequences                                             │    │
-│  │   • Interprets results                                               │    │
-│  │   • Explains findings                                                │    │
-│  └─────────────────────────────────────────────────────────────────────┘    │
-│                                   │                                          │
-│                                   ▼                                          │
-│  ┌─────────────────────────────────────────────────────────────────────┐    │
-│  │                        Tool Orchestration                            │    │
-│  │                                                                      │    │
-│  │   Network    Web        API        AD          Reporting             │    │
-│  │   Scanner    Scanner    Scanner    Scanner     Engine                │    │
-│  └─────────────────────────────────────────────────────────────────────┘    │
-│                                   │                                          │
-└───────────────────────────────────┼──────────────────────────────────────────┘
-                                    │
-                                    ▼
-┌─────────────────────────────────────────────────────────────────────────────┐
-│                         Security Tools (Kali/Parrot)                         │
-│                                                                              │
-│   nmap    nuclei    nikto    gobuster    sqlmap    smbclient    ldapsearch  │
-│                                                                              │
-└─────────────────────────────────────────────────────────────────────────────┘
-                                    │
-                                    ▼
-┌─────────────────────────────────────────────────────────────────────────────┐
-│                              TARGET SYSTEMS                                  │
-│                         (With your authorization)                            │
-└─────────────────────────────────────────────────────────────────────────────┘
-```
+```typescript
+interface Skill {
+  name: string
+  description: string
+  triggers: string[]
 
-### Data Flow
+  // Pattern matching (FREE)
+  patterns: Pattern[]
+  match(error: string): PatternMatch | null
 
-```
-┌──────────┐     ┌──────────┐     ┌──────────┐     ┌──────────┐
-│  Intent  │ ──▶ │   Plan   │ ──▶ │ Execute  │ ──▶ │ Findings │
-│          │     │          │     │          │     │          │
-│ "scan    │     │ 1. nmap  │     │ Run each │     │ Store &  │
-│  for web │     │ 2. nikto │     │ tool in  │     │ classify │
-│  vulns"  │     │ 3. nuclei│     │ sequence │     │ results  │
-└──────────┘     └──────────┘     └──────────┘     └──────────┘
-                                                        │
-                                                        ▼
-                                                  ┌──────────┐
-                                                  │  Report  │
-                                                  │          │
-                                                  │ Generate │
-                                                  │ HTML/PDF │
-                                                  └──────────┘
+  // LLM fallback (costs tokens)
+  analyze(context: Context): Promise<Analysis>
+
+  // Execution
+  execute(fix: Fix): Promise<Result>
+}
+
+interface Pattern {
+  id: string
+  regex: RegExp
+  category: string
+  fixes: Fix[]          // Prioritized fixes
+  successRate?: number  // Learned from history
+}
 ```
 
 ---
 
-## Running Modes
+## Comparison
 
-Cyxwiz offers multiple interfaces to fit your workflow:
+### vs OpenClaw
 
-```
-┌─────────────────────────────────────────────────────────────────┐
-│                         INTERFACES                               │
-├─────────────────┬───────────────────┬───────────────────────────┤
-│    Terminal     │   Web Server      │      Dashboard            │
-│    (Default)    │   (--server)      │      (Development)        │
-├─────────────────┼───────────────────┼───────────────────────────┤
-│  ./cyxwiz       │  ./cyxwiz --server│  bun run dashboard        │
-│                 │                   │                           │
-│  Interactive    │  http://localhost │  http://localhost:5173    │
-│  CLI prompt     │  :4096            │  (proxies to :4096)       │
-│                 │                   │                           │
-│  Best for:      │  Best for:        │  Best for:                │
-│  Quick tasks,   │  Team access,     │  Development,             │
-│  scripting      │  remote work      │  customization            │
-└─────────────────┴───────────────────┴───────────────────────────┘
-```
+| | OpenClaw | CyxCode |
+|--|----------|---------|
+| Skills | 700+ | 3-5 deep |
+| Focus | Everything | Developers |
+| Decision | LLM always | Patterns first |
+| Token cost | High | Low |
 
-### Terminal (Default)
+### vs Claude Code / Cursor
 
-```bash
-./cyxwiz
-```
+| | Claude Code | CyxCode |
+|--|-------------|---------|
+| Architecture | General agent | Skill-based |
+| Error handling | LLM every time | Pattern library |
+| Domain knowledge | None built-in | 104+ patterns |
+| Extensibility | Plugins | Skills |
 
-Interactive command-line interface. Type naturally and see results directly.
+---
 
-### Web Server (Port 4096)
+## Project Lineage
 
-```bash
-./cyxwiz --server
-```
+| Project | Role |
+|---------|------|
+| **OpenCode** | Upstream - AI agent infrastructure |
+| **CyxMake** | Pattern source - 104 error patterns (C) |
+| **CyxCode** | This - pattern-first skill agent |
 
-Opens a web interface at **http://localhost:4096**. Features:
-- Same AI assistant in a browser
-- Real-time scan progress
-- Interactive findings table
-- Report viewing and export
+---
 
-### Dashboard (Port 5173 - Development)
+## Development
 
 ```bash
-cd packages/opencode/src/dashboard
+bun install
 bun run dev
 ```
 
-Development dashboard at **http://localhost:5173**. For contributors extending Cyxwiz.
+### Adding a Skill
 
-### Web Reports
-
-Reports are served through the web interface:
-
-```
-You: "generate a report"
-
-Cyxwiz: Report generated!
-     View at: http://localhost:4096/reports/assessment-2024-01-15.html
-```
-
-Features:
-- Interactive severity charts
-- Sortable findings table
-- Evidence screenshots
-- Export to PDF/HTML/Markdown
+1. Create packages/opencode/src/skills/<name>/
+2. Implement Skill interface
+3. Add patterns (the deep knowledge)
+4. Register in router
 
 ---
 
-## How It Works
+## Roadmap
 
-### 1. You Describe, Cyxwiz Executes
-
-```
-You: "find subdomains for example.com"
-
-Cyxwiz: I'll enumerate subdomains using multiple methods...
-
-     Found 47 subdomains:
-     - api.example.com (192.168.1.10)
-     - mail.example.com (192.168.1.11)
-     - dev.example.com (192.168.1.12)
-     - staging.example.com (192.168.1.13)
-     [... and 43 more]
-
-     Notable: dev and staging are exposed to the internet.
-     Want me to scan these for vulnerabilities?
-```
-
-### 2. Cyxwiz Remembers Context
-
-```
-You: "scan the staging server"
-
-Cyxwiz: Scanning staging.example.com (192.168.1.13)...
-
-     [Cyxwiz remembers this from the previous subdomain scan]
-```
-
-### 3. Findings Are Tracked
-
-```
-You: "what have we found so far?"
-
-Cyxwiz: Current findings for example.com assessment:
-
-     CRITICAL (2):
-     - SQL injection on api.example.com/users
-     - Exposed admin panel on staging.example.com
-
-     HIGH (5):
-     - Outdated TLS on mail.example.com
-     - Missing security headers (4 instances)
-
-     MEDIUM (8):
-     [...]
-
-     Total: 2 critical, 5 high, 8 medium, 12 low findings
-```
-
-### 4. Reports When You're Ready
-
-```
-You: "generate a report for the client"
-
-Cyxwiz: Generating executive report...
-
-     Created: example-com-assessment-2024-01-15.html
-
-     Includes:
-     - Executive summary
-     - Risk ratings
-     - All findings with evidence
-     - Remediation recommendations
-     - Technical appendix
-```
-
----
-
-## Capabilities
-
-### Network Security
-- Port scanning and service detection
-- Network mapping and host discovery
-- Protocol-specific testing (SMB, SNMP, DNS, LDAP)
-- Credential testing and password auditing
-
-### Web Application Security
-- Vulnerability scanning (OWASP Top 10)
-- Directory and file enumeration
-- SSL/TLS configuration analysis
-- CMS vulnerability detection (WordPress, Drupal, etc.)
-
-### API Security
-- OpenAPI/Swagger discovery and parsing
-- Authentication bypass testing
-- Injection testing (SQL, NoSQL, Command)
-- JWT analysis and manipulation
-
-### Active Directory
-- User and group enumeration
-- Kerberoasting and AS-REP roasting
-- Trust relationship mapping
-- Privilege escalation path finding
-
-### Reporting
-- Executive summaries (HTML/PDF)
-- Technical reports (Markdown)
-- Raw data export (JSON)
-- Evidence preservation
-
----
-
-## Platform Support
-
-| Distribution | Status | Notes |
-|--------------|--------|-------|
-| **Kali Linux** | Fully Supported | All tools pre-installed |
-| **Parrot OS** | Fully Supported | All tools pre-installed |
-| **Ubuntu/Debian** | Supported | Install tools via apt |
-| **Arch Linux** | Supported | Install tools via pacman |
-| **macOS** | Supported | Install tools via homebrew |
-| **Windows** | Supported | Install tools via chocolatey/manual |
-
----
-
-## Project Status
-
-Cyxwiz is under active development. Current capabilities:
-
-| Module | Status | Description |
-|--------|--------|-------------|
-| Core Framework | Complete | AI interaction, session management |
-| Network Scanning | Complete | Nmap integration, service detection |
-| Web Scanning | Complete | Nikto, Nuclei, Gobuster, SQLMap |
-| API Security | Complete | OpenAPI, GraphQL, JWT analysis |
-| Active Directory | Complete | User enum, Kerberoasting |
-| Reporting | Complete | Multiple formats, evidence |
-| Cloud Security | In Progress | AWS, Azure, GCP scanning |
-| CI/CD Security | In Progress | Pipeline security analysis |
-| Container Security | Planned | Docker, Kubernetes |
-
----
-
-## Documentation
-
-### Core Docs
-| Document | Description |
-|----------|-------------|
-| [PROJECT.md](docs/PROJECT.md) | Platform architecture and vision |
-| [PENTEST.md](docs/PENTEST.md) | Pentest module overview |
-| [GOVERNANCE.md](docs/GOVERNANCE.md) | Policy and scope enforcement |
-| [TODO.md](docs/TODO.md) | Development roadmap |
-| [COMPARISON.md](docs/COMPARISON.md) | How Cyxwiz compares to other tools |
-
-### Module Documentation (Phases)
-| Phase | Module | Description |
-|-------|--------|-------------|
-| [03](docs/PHASE03-pentest-agent-mvp.md) | Pentest Agent MVP | Core scanning foundation |
-| [04](docs/PHASE04-multi-tool-parsers.md) | Multi-Tool Parsers | Nikto, Nuclei, Gobuster parsers |
-| [05](docs/PHASE05-report-generation.md) | Report Generation | HTML, PDF, Markdown reports |
-| [06](docs/PHASE06-continuous-monitoring.md) | Continuous Monitoring | Scheduled scans, diff detection |
-| [07](docs/PHASE07-exploit-framework.md) | Exploit Framework | Metasploit, Searchsploit integration |
-| [08](docs/PHASE08-web-app-scanner.md) | Web App Scanner | OWASP Top 10, crawling |
-| [09](docs/PHASE09-api-security-scanner.md) | API Security | OpenAPI, GraphQL, JWT testing |
-| [10](docs/PHASE10-network-infrastructure.md) | Network Infrastructure | SMB, SNMP, DNS, LDAP |
-| [11](docs/PHASE11-cloud-security.md) | Cloud Security | AWS, Azure, GCP scanning |
-| [12](docs/PHASE12-container-security.md) | Container Security | Docker, Kubernetes, CVE lookup |
-| [13](docs/PHASE13-mobile-app-scanner.md) | Mobile App Scanner | Android/iOS analysis |
-| [14](docs/PHASE14-wireless-scanner.md) | Wireless Scanner | WiFi security testing |
-| [15](docs/PHASE15-social-engineering.md) | Social Engineering | Phishing, pretexting toolkit |
-| [16](docs/PHASE16-post-exploitation.md) | Post-Exploitation | Privilege escalation, persistence |
-| [17](docs/PHASE17-reporting-dashboard.md) | Reporting Dashboard | Web UI for findings |
-| [18](docs/PHASE18-cicd-security.md) | CI/CD Security | Pipeline security analysis |
-
----
-
-## Contributing
-
-Contributions welcome! See [CONTRIBUTING.md](CONTRIBUTING.md).
-
----
-
-## Security
-
-Found a security issue? See [SECURITY.md](SECURITY.md).
+| Phase | Focus | Status |
+|-------|-------|--------|
+| 1 | Skill interface + router | Planned |
+| 2 | Recovery skill (104 patterns) | Planned |
+| 3 | Validate token savings | - |
+| 4 | Security skill | - |
+| 5 | Community skill format | - |
 
 ---
 
@@ -776,12 +285,12 @@ MIT License - See [LICENSE](LICENSE)
 
 ---
 
-## Acknowledgments
+## Credits
 
-- [OpenCode](https://github.com/sst/opencode) - The foundation we built upon
-- [Anthropic](https://anthropic.com) - Claude AI
-- The security community for the amazing open-source tools
+- **OpenCode** - Agent infrastructure
+- **CyxMake** - Error patterns
+- **OpenClaw** - Inspiration (we went the other way)
 
 ---
 
-**Cyxwiz** - *Security testing should be about security, not syntax.*
+**CyxCode** - *Depth over breadth. Patterns over tokens.*
