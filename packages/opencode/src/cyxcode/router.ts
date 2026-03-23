@@ -1,6 +1,6 @@
 /**
  * Skill Router - Routes errors to matching pattern skills
- * 
+ *
  * This is the core of CyxCode's pattern-first approach:
  * 1. Error occurs
  * 2. Router checks all skills for pattern match
@@ -15,7 +15,7 @@ const log = Log.create({ service: "cyxcode-router" })
 
 class SkillRouterImpl implements SkillRegistry {
   private skills: Map<string, PatternSkill> = new Map()
-  
+
   // Stats tracking
   private matchCount = 0
   private missCount = 0
@@ -29,8 +29,8 @@ class SkillRouterImpl implements SkillRegistry {
       log.warn("Overwriting existing skill", { name: skill.name })
     }
     this.skills.set(skill.name, skill)
-    log.info("Registered skill", { 
-      name: skill.name, 
+    log.info("Registered skill", {
+      name: skill.name,
       patterns: skill.patterns.length,
       triggers: skill.triggers,
     })
@@ -55,14 +55,14 @@ class SkillRouterImpl implements SkillRegistry {
    */
   findMatching(error: string): Array<{ skill: PatternSkill; match: PatternMatch }> {
     const matches: Array<{ skill: PatternSkill; match: PatternMatch }> = []
-    
+
     for (const skill of this.skills.values()) {
       const match = skill.match(error)
       if (match) {
         matches.push({ skill, match })
       }
     }
-    
+
     return matches
   }
 
@@ -71,10 +71,10 @@ class SkillRouterImpl implements SkillRegistry {
    */
   async route(ctx: SkillContext): Promise<SkillResult | null> {
     const matches = this.findMatching(ctx.errorOutput)
-    
+
     if (matches.length === 0) {
       this.missCount++
-      log.debug("No pattern match", { 
+      log.debug("No pattern match", {
         errorLength: ctx.errorOutput.length,
         totalPatterns: this.totalPatterns(),
       })
@@ -82,10 +82,10 @@ class SkillRouterImpl implements SkillRegistry {
     }
 
     this.matchCount++
-    
+
     // Use first match (could rank by confidence later)
     const { skill, match } = matches[0]
-    
+
     log.info("Pattern matched", {
       skill: skill.name,
       pattern: match.pattern.id,
@@ -94,12 +94,28 @@ class SkillRouterImpl implements SkillRegistry {
     })
 
     const result = await skill.execute(ctx, match)
-    
+
     if (result.success && result.tokensSaved) {
       this.tokensSaved += result.tokensSaved
     }
 
     return result
+  }
+
+  /**
+   * Record a pattern match (for stats tracking from bash tool)
+   */
+  recordMatch(skillName: string): void {
+    this.matchCount++
+    log.debug("Recorded match", { skill: skillName, total: this.matchCount })
+  }
+
+  /**
+   * Record a pattern miss (for stats tracking from bash tool)
+   */
+  recordMiss(): void {
+    this.missCount++
+    log.debug("Recorded miss", { total: this.missCount })
   }
 
   /**
@@ -112,14 +128,14 @@ class SkillRouterImpl implements SkillRegistry {
   } {
     const byCategory: Record<string, number> = {}
     let totalPatterns = 0
-    
+
     for (const skill of this.skills.values()) {
       for (const pattern of skill.patterns) {
         totalPatterns++
         byCategory[pattern.category] = (byCategory[pattern.category] || 0) + 1
       }
     }
-    
+
     return {
       totalSkills: this.skills.size,
       totalPatterns,

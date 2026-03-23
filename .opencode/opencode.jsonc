@@ -20,4 +20,7 @@
     "github-triage": false,
     "github-pr-search": false,
   },
+  "tui": {
+    "scrollbar_visible": true,
+  },
 }
