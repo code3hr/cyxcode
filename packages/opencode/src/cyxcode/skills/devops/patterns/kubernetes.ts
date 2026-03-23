@@ -20,7 +20,7 @@ export const kubernetesPatterns: Pattern[] = [
   // CONNECTION REFUSED
   {
     id: "k8s-connection-refused",
-    regex: /connection.*refused.*6443|Unable to connect to the server|dial tcp.*refused/i,
+    regex: /connection.*refused.*6443|Unable to connect to the server|dial tcp.*refused|must be logged in.*Unauthorized/i,
     category: "kubernetes",
     description: "Cannot connect to Kubernetes cluster",
     fixes: [
