@@ -261,6 +261,7 @@ export const BashTool = Tool.define("bash", async () => {
       }
 
       // CyxCode: Pattern-based error recovery
+      let cyxMatched = false
       if (proc.exitCode !== 0 && proc.exitCode !== null) {
         const router = getRouter()
         if (Flag.CYXCODE_DEBUG) console.error("[CYXCODE] Router skills count:", router.all().length, "globalThis set:", !!(globalThis as any).__cyxcode_router)
@@ -268,8 +269,14 @@ export const BashTool = Tool.define("bash", async () => {
         if (matches.length > 0) {
           const best = matches[0]
           const fixes = best.match.pattern.fixes
+          const captures = best.match.captures
+          const sub = (s: string) => {
+            let r = s
+            for (let j = 0; j < captures.length; j++) r = r.replace(new RegExp("\\$" + (j + 1), "g"), captures[j])
+            return r
+          }
           const fixLines = fixes.map((f, i) => {
-            const cmd = f.command ? "  " + f.command : "  (manual)"
+            const cmd = f.command ? "  " + sub(f.command) : "  (manual)"
             return (i + 1) + ". " + f.description + "\n" + cmd
           }).join("\n")
 
@@ -278,6 +285,7 @@ export const BashTool = Tool.define("bash", async () => {
           output += "[CyxCode] Suggested fixes:\n" + fixLines + "\n"
           output += "[CyxCode] Tokens saved by pattern match (no LLM needed for diagnosis)\n"
 
+          cyxMatched = true
           getRouter().recordMatch(best.skill.name)
           log.info("cyxcode pattern matched", {
             pattern: best.match.pattern.id,
@@ -295,6 +303,7 @@ export const BashTool = Tool.define("bash", async () => {
           output: output.length > MAX_METADATA_LENGTH ? output.slice(0, MAX_METADATA_LENGTH) + "\n\n..." : output,
           exit: proc.exitCode,
           description: params.description,
+          cyxcodeMatched: cyxMatched,
         },
         output,
       }

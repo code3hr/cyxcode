@@ -41,6 +41,7 @@ export namespace Flag {
   export const CYXCODE_SERVER_USERNAME = process.env["CYXCODE_SERVER_USERNAME"]
   export const CYXCODE_ENABLE_QUESTION_TOOL = truthy("CYXCODE_ENABLE_QUESTION_TOOL")
   export const CYXCODE_DEBUG = truthy("CYXCODE_DEBUG")
+  export const CYXCODE_SHORT_CIRCUIT = !falsy("CYXCODE_SHORT_CIRCUIT")
 
   // Experimental
   export const CYXCODE_EXPERIMENTAL = truthy("CYXCODE_EXPERIMENTAL")

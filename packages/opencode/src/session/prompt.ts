@@ -38,6 +38,7 @@ import { pathToFileURL, fileURLToPath } from "url"
 import { ConfigMarkdown } from "../config/markdown"
 import { SessionSummary } from "./summary"
 import { NamedError } from "@cyxcode/util/error"
+import { getRouter, initCyxCode } from "../cyxcode"
 import { fn } from "@/util/fn"
 import { SessionProcessor } from "./processor"
 import { TaskTool } from "@/tool/task"
@@ -742,6 +743,36 @@ export namespace SessionPrompt {
           overflow: !processor.message.finish,
         })
       }
+
+      // CyxCode short-circuit: skip LLM when pattern matched
+      if (Flag.CYXCODE_SHORT_CIRCUIT && result === "continue") {
+        const parts = await MessageV2.parts(processor.message.id)
+        const cyxPart = parts.find(
+          (p) => p.type === "tool"
+              && p.state.status === "completed"
+              && p.state.metadata?.cyxcodeMatched
+        )
+        if (cyxPart && cyxPart.type === "tool" && cyxPart.state.status === "completed") {
+          const output = cyxPart.state.output
+          const idx = output.indexOf("[CyxCode]")
+          const text = idx >= 0 ? output.slice(idx) : "Error diagnosed by CyxCode."
+
+          await Session.updatePart({
+            id: PartID.ascending(),
+            messageID: processor.message.id,
+            sessionID,
+            type: "text",
+            text,
+            synthetic: true,
+            time: { start: Date.now(), end: Date.now() },
+          })
+          processor.message.finish = "stop"
+          processor.message.time.completed = Date.now()
+          await Session.updateMessage(processor.message)
+          break
+        }
+      }
+
       continue
     }
     SessionCompaction.prune({ sessionID })
@@ -1792,6 +1823,37 @@ NOTE: At any point in time through this workflow you should feel free to ask the
     if (aborted) {
       output += "\n\n" + ["<metadata>", "User aborted the command", "</metadata>"].join("\n")
     }
+
+    // CyxCode: Pattern-based error recovery for shell commands (zero AI tokens)
+    let cyxMatched = false
+    if (proc.exitCode !== 0 && proc.exitCode !== null && !aborted) {
+      initCyxCode()
+      const router = getRouter()
+      const matches = router.findMatching(output)
+      if (matches.length > 0) {
+        const best = matches[0]
+        const fixes = best.match.pattern.fixes
+        const captures = best.match.captures
+        const sub = (s: string) => {
+          let r = s
+          for (let j = 0; j < captures.length; j++) r = r.replace(new RegExp("\\$" + (j + 1), "g"), captures[j])
+          return r
+        }
+        const fixLines = fixes.map((f, i) => {
+          const cmd = f.command ? "  " + sub(f.command) : "  (manual)"
+          return (i + 1) + ". " + f.description + "\n" + cmd
+        }).join("\n")
+
+        output += "\n\n[CyxCode] Pattern matched: " + best.match.pattern.id + " (" + best.skill.name + ")\n"
+        output += "[CyxCode] " + best.match.pattern.description + "\n"
+        output += "[CyxCode] Suggested fixes:\n" + fixLines + "\n"
+        output += "[CyxCode] Tokens saved by pattern match (no LLM needed for diagnosis)\n"
+
+        cyxMatched = true
+        router.recordMatch(best.skill.name)
+      }
+    }
+
     msg.time.completed = Date.now()
     await Session.updateMessage(msg)
     if (part.state.status === "running") {
@@ -1806,6 +1868,7 @@ NOTE: At any point in time through this workflow you should feel free to ask the
         metadata: {
           output,
           description: "",
+          cyxcodeMatched: cyxMatched,
         },
         output,
       }

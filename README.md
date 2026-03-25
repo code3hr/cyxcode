@@ -41,9 +41,34 @@ CyxCode:                      Every error -> Pattern check -> match? -> FREE fix
                                                            -> no match? -> LLM fallback
 ```
 
+### Two Modes: Zero Tokens or Reduced Tokens
+
+**Shell mode (`!` prefix) — Pattern first, zero tokens:**
+
+![CyxCode Shell Mode - Zero Tokens](packages/web/src/assets/lander/screenshot-cyxcode-shell.png)
+
+```
+!python3 -c 'import flask'
+  -> Command runs directly (no AI involved)
+  -> CyxCode pattern matches
+  -> Fix displayed instantly
+  -> Total tokens: ZERO
+```
+
+**Normal mode — AI decides, pattern short-circuits:**
+```
+python3 -c 'import flask'
+  -> AI thinks "let me run this" (LLM Call #1, unavoidable)
+  -> Command runs, CyxCode matches
+  -> LLM Call #2 SKIPPED (short-circuit)
+  -> Tokens saved: ~800-1600 per error
+```
+
+Use `!` prefix when you know you're running a command. The AI is bypassed entirely and CyxCode handles errors at zero cost.
+
 ### Screenshot: Pattern Matching in Action
 
-The screenshot above shows CyxCode matching a Python `ModuleNotFoundError` in real time. Notice the `[CyxCode]` block in the output — that's the pattern match providing an instant fix (`pip install flask`) before the AI even needs to analyze the error. The AI then simply relays the suggestion instead of burning tokens to diagnose it.
+The screenshot above shows CyxCode's short-circuit in action. A `python3 -c 'import flask'` command fails with `ModuleNotFoundError`. CyxCode matches the `python-module-not-found` pattern and displays the fix (`pip install flask`, `pip3 install flask`, `pipx install flask`) **directly** — the LLM is completely skipped on the return trip. Notice: no second "Thinking:" block, cost stays at **$0.00**, and the response appears instantly.
 
 ### Agents
 
@@ -135,27 +160,27 @@ This is a conservative estimate. In practice, the LLM often needs multiple turns
 
 ## How to Tell Pattern Match vs AI
 
-When a command fails in CyxCode, look for the `[CyxCode]` prefix in the output. This is how you know a pattern matched instead of the AI doing the work.
+When a command fails in CyxCode, look for the `[CyxCode]` prefix in the response. This means a pattern matched and the **LLM was completely skipped** — zero tokens burned on the return trip.
 
-### Pattern matched (free, zero tokens):
+### Pattern matched (free, LLM skipped):
 
 ```
-$ node -e "require('fakemodule')"
-Error: Cannot find module 'fakemodule'
+$ python3 -c 'import flask'
+ModuleNotFoundError: No module named 'flask'
 
-[CyxCode] Pattern matched: node-module-not-found (recovery)
-[CyxCode] Node.js module not found
+[CyxCode] Pattern matched: python-module-not-found (recovery)
+[CyxCode] Python module not found
 [CyxCode] Suggested fixes:
-  1. Install missing module with npm
-     npm install fakemodule
-  2. Install missing module with yarn
-     yarn add fakemodule
-  3. Install missing module with pnpm
-     pnpm add fakemodule
-  4. Install missing module with bun
-     bun add fakemodule
+1. Install with pip
+  pip install flask
+2. Install with pip3
+  pip3 install flask
+3. Install with pipx (for CLI tools)
+  pipx install flask
 [CyxCode] Tokens saved by pattern match (no LLM needed for diagnosis)
 ```
+
+No "Thinking:" block on the response. No AI analysis. Cost: **$0.00**.
 
 ### No pattern match (AI handles it, costs tokens):
 
@@ -166,7 +191,7 @@ Error: unexpected configuration in /etc/something.conf
 (no [CyxCode] lines — the AI analyzes this and responds normally)
 ```
 
-**Rule of thumb**: `[CyxCode]` visible = free fix. No `[CyxCode]` = AI handled it.
+**Rule of thumb**: `[CyxCode]` visible = free fix, LLM skipped. No `[CyxCode]` = AI handled it.
 
 ---
 
@@ -175,45 +200,57 @@ Error: unexpected configuration in /etc/something.conf
 Here's the full lifecycle of an error in CyxCode:
 
 ```
-1. User types a command in the TUI
+1. User types a command (e.g. python3 -c 'import flask')
                 |
                 v
-2. Bash tool executes the command
+2. LLM CALL #1 (unavoidable)
+   AI thinks: "Let me run this command for them"
+   AI calls the bash tool
+   (This is the "Thinking:" you see in the screenshot)
+                |
+                v
+3. Bash tool executes the command
    (src/tool/bash.ts)
                 |
                 v
-3. Command exits with non-zero code?
-   - No  -> return output normally
-   - Yes -> continue to step 4
+4. Command exits with non-zero code?
+   - No  -> return output normally to LLM
+   - Yes -> continue to step 5
                 |
                 v
-4. SkillRouter.findMatching(output) called
+5. CYXCODE INTERCEPTS (before AI sees the error)
+   SkillRouter.findMatching(output) called
    (src/cyxcode/router.ts)
                 |
                 v
-5. Router iterates all 3 skills:
+6. Router checks all 136 patterns across 3 skills:
    - Recovery (51 patterns: node, git, build, docker, python, system)
    - Security (39 patterns: ssl, auth, ssh, network, scan)
    - DevOps   (46 patterns: kubernetes, terraform, cicd, cloud, ansible)
                 |
                 v
-6. Each skill runs BaseSkill.match(error)
-   (src/cyxcode/base-skill.ts)
-   - Tests each pattern's regex against the error output
-   - If match: extracts captures ($1, $2, etc.)
-   - Returns PatternMatch with pattern, captures, extracted vars
+7. Pattern matched?
                 |
-                v
-7. Match found?
-   - Yes -> Append [CyxCode] lines with fix suggestions to output
-            SkillRouter.recordMatch() for stats
-   - No  -> SkillRouter.recordMiss(), output passes through unchanged
-                |
-                v
-8. Output returned to the LLM
-   - With [CyxCode]: LLM sees pre-diagnosed fix, minimal token use
-   - Without: LLM analyzes error normally (full token cost)
+       +--------+--------+
+       |                  |
+      YES                 NO
+       |                  |
+       v                  v
+8a. SHORT-CIRCUIT       8b. FALL THROUGH
+    - Append [CyxCode]     - Output passes to LLM
+      fix to output         - LLM CALL #2 happens
+    - Set cyxcodeMatched    - AI analyzes the error
+      = true                - AI burns tokens
+    - prompt.ts detects     - Normal response
+      the flag
+    - Inject fix text
+      directly as response
+    - SKIP LLM CALL #2
+    - Zero tokens burned
+    - $0.00 cost
 ```
+
+**Key insight**: The first "Thinking:" you see in the screenshot is LLM Call #1 (the AI deciding to run the command). This is unavoidable. What CyxCode eliminates is **LLM Call #2** — where the AI would normally read the error output, think about it, and generate a diagnosis. For matched patterns, that second call never happens.
 
 ### Architecture
 

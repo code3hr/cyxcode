@@ -4,6 +4,13 @@
 - Local `main` ref may not exist; use `dev` or `origin/dev` for diffs.
 - Prefer automation: execute requested actions without confirmation unless blocked by missing info or safety/irreversibility.
 
+## Error Response Guidelines
+
+- When a bash command fails, state the problem and fix in 1-2 lines
+- Do NOT repeat the error output back to the user
+- Do NOT explain what the command was supposed to do
+- If `[CyxCode]` is in the tool output, just relay the fix — do not re-analyze the error
+
 ## Style Guide
 
 ### General Principles
