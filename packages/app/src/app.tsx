@@ -1,12 +1,12 @@
 import "@/index.css"
-import { I18nProvider } from "@opencode-ai/ui/context"
-import { DialogProvider } from "@opencode-ai/ui/context/dialog"
-import { FileComponentProvider } from "@opencode-ai/ui/context/file"
-import { MarkedProvider } from "@opencode-ai/ui/context/marked"
-import { File } from "@opencode-ai/ui/file"
-import { Font } from "@opencode-ai/ui/font"
-import { Splash } from "@opencode-ai/ui/logo"
-import { ThemeProvider } from "@opencode-ai/ui/theme"
+import { I18nProvider } from "@cyxcode/ui/context"
+import { DialogProvider } from "@cyxcode/ui/context/dialog"
+import { FileComponentProvider } from "@cyxcode/ui/context/file"
+import { MarkedProvider } from "@cyxcode/ui/context/marked"
+import { File } from "@cyxcode/ui/file"
+import { Font } from "@cyxcode/ui/font"
+import { Splash } from "@cyxcode/ui/logo"
+import { ThemeProvider } from "@cyxcode/ui/theme"
 import { MetaProvider } from "@solidjs/meta"
 import { type BaseRouterProps, Navigate, Route, Router } from "@solidjs/router"
 import { QueryClient, QueryClientProvider } from "@tanstack/solid-query"
@@ -66,7 +66,7 @@ function UiI18nBridge(props: ParentProps) {
 
 declare global {
   interface Window {
-    __OPENCODE__?: {
+    __CYXCODE__?: {
       updaterEnabled?: boolean
       deepLinks?: string[]
       wsl?: boolean

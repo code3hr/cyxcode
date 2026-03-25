@@ -1,19 +1,19 @@
 import type { APIEvent } from "@solidjs/start/server"
-import { and, Database, eq, isNull, lt, or, sql } from "@opencode-ai/console-core/drizzle/index.js"
-import { KeyTable } from "@opencode-ai/console-core/schema/key.sql.js"
-import { BillingTable, LiteTable, SubscriptionTable, UsageTable } from "@opencode-ai/console-core/schema/billing.sql.js"
-import { centsToMicroCents } from "@opencode-ai/console-core/util/price.js"
-import { getMonthlyBounds, getWeekBounds } from "@opencode-ai/console-core/util/date.js"
-import { Identifier } from "@opencode-ai/console-core/identifier.js"
-import { Billing } from "@opencode-ai/console-core/billing.js"
-import { Actor } from "@opencode-ai/console-core/actor.js"
-import { WorkspaceTable } from "@opencode-ai/console-core/schema/workspace.sql.js"
-import { ZenData } from "@opencode-ai/console-core/model.js"
-import { Subscription } from "@opencode-ai/console-core/subscription.js"
-import { BlackData } from "@opencode-ai/console-core/black.js"
-import { UserTable } from "@opencode-ai/console-core/schema/user.sql.js"
-import { ModelTable } from "@opencode-ai/console-core/schema/model.sql.js"
-import { ProviderTable } from "@opencode-ai/console-core/schema/provider.sql.js"
+import { and, Database, eq, isNull, lt, or, sql } from "@cyxcode/console-core/drizzle/index.js"
+import { KeyTable } from "@cyxcode/console-core/schema/key.sql.js"
+import { BillingTable, LiteTable, SubscriptionTable, UsageTable } from "@cyxcode/console-core/schema/billing.sql.js"
+import { centsToMicroCents } from "@cyxcode/console-core/util/price.js"
+import { getMonthlyBounds, getWeekBounds } from "@cyxcode/console-core/util/date.js"
+import { Identifier } from "@cyxcode/console-core/identifier.js"
+import { Billing } from "@cyxcode/console-core/billing.js"
+import { Actor } from "@cyxcode/console-core/actor.js"
+import { WorkspaceTable } from "@cyxcode/console-core/schema/workspace.sql.js"
+import { ZenData } from "@cyxcode/console-core/model.js"
+import { Subscription } from "@cyxcode/console-core/subscription.js"
+import { BlackData } from "@cyxcode/console-core/black.js"
+import { UserTable } from "@cyxcode/console-core/schema/user.sql.js"
+import { ModelTable } from "@cyxcode/console-core/schema/model.sql.js"
+import { ProviderTable } from "@cyxcode/console-core/schema/provider.sql.js"
 import { logger } from "./logger"
 import {
   AuthError,
@@ -39,8 +39,8 @@ import { createRateLimiter } from "./rateLimiter"
 import { createDataDumper } from "./dataDumper"
 import { createTrialLimiter } from "./trialLimiter"
 import { createStickyTracker } from "./stickyProviderTracker"
-import { LiteData } from "@opencode-ai/console-core/lite.js"
-import { Resource } from "@opencode-ai/console-resource"
+import { LiteData } from "@cyxcode/console-core/lite.js"
+import { Resource } from "@cyxcode/console-resource"
 import { i18n, type Key } from "~/i18n"
 import { localeFromRequest } from "~/lib/language"
 
@@ -727,8 +727,8 @@ export async function handler(
 
     // Validate pay as you go billing
     const billing = authInfo.billing
-    const billingUrl = `https://opencode.ai/workspace/${authInfo.workspaceID}/billing`
-    const membersUrl = `https://opencode.ai/workspace/${authInfo.workspaceID}/members`
+    const billingUrl = `https://cyxcode.ai/workspace/${authInfo.workspaceID}/billing`
+    const membersUrl = `https://cyxcode.ai/workspace/${authInfo.workspaceID}/members`
     if (!billing.paymentMethodID) throw new CreditsError(t("zen.api.error.noPaymentMethod", { billingUrl }))
     if (billing.balance <= 0) throw new CreditsError(t("zen.api.error.insufficientBalance", { billingUrl }))
 

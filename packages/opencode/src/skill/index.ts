@@ -3,7 +3,7 @@ import path from "path"
 import { pathToFileURL } from "url"
 import z from "zod"
 import { Effect, Layer, ServiceMap } from "effect"
-import { NamedError } from "@opencode-ai/util/error"
+import { NamedError } from "@cyxcode/util/error"
 import type { Agent } from "@/agent/agent"
 import { Bus } from "@/bus"
 import { InstanceState } from "@/effect/instance-state"
@@ -22,7 +22,7 @@ export namespace Skill {
   const log = Log.create({ service: "skill" })
   const EXTERNAL_DIRS = [".claude", ".agents"]
   const EXTERNAL_SKILL_PATTERN = "skills/**/SKILL.md"
-  const OPENCODE_SKILL_PATTERN = "{skill,skills}/**/SKILL.md"
+  const CYXCODE_SKILL_PATTERN = "{skill,skills}/**/SKILL.md"
   const SKILL_PATTERN = "**/SKILL.md"
 
   export const Info = z.object({
@@ -124,7 +124,7 @@ export namespace Skill {
     }
 
     const load = async () => {
-      if (!Flag.OPENCODE_DISABLE_EXTERNAL_SKILLS) {
+      if (!Flag.CYXCODE_DISABLE_EXTERNAL_SKILLS) {
         for (const dir of EXTERNAL_DIRS) {
           const root = path.join(Global.Path.home, dir)
           if (!(await Filesystem.isDir(root))) continue
@@ -141,7 +141,7 @@ export namespace Skill {
       }
 
       for (const dir of await Config.directories()) {
-        await scan(state, dir, OPENCODE_SKILL_PATTERN)
+        await scan(state, dir, CYXCODE_SKILL_PATTERN)
       }
 
       const cfg = await Config.get()

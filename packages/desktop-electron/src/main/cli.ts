@@ -123,8 +123,8 @@ export function syncCli() {
 export function serve(hostname: string, port: number, password: string) {
   const args = `--print-logs --log-level WARN serve --hostname ${hostname} --port ${port}`
   const env = {
-    OPENCODE_SERVER_USERNAME: "opencode",
-    OPENCODE_SERVER_PASSWORD: password,
+    CYXCODE_SERVER_USERNAME: "opencode",
+    CYXCODE_SERVER_PASSWORD: password,
   }
 
   return spawnCommand(args, env)
@@ -137,9 +137,9 @@ export function spawnCommand(args: string, extraEnv: Record<string, string>) {
   )
   const envs = {
     ...base,
-    OPENCODE_EXPERIMENTAL_ICON_DISCOVERY: "true",
-    OPENCODE_EXPERIMENTAL_FILEWATCHER: "true",
-    OPENCODE_CLIENT: "desktop",
+    CYXCODE_EXPERIMENTAL_ICON_DISCOVERY: "true",
+    CYXCODE_EXPERIMENTAL_FILEWATCHER: "true",
+    CYXCODE_CLIENT: "desktop",
     XDG_STATE_HOME: app.getPath("userData"),
     ...extraEnv,
   }
@@ -218,7 +218,7 @@ function buildCommand(args: string, env: Record<string, string>) {
       "set -e",
       'BIN="$HOME/.opencode/bin/opencode"',
       'if [ ! -x "$BIN" ]; then',
-      `  curl -fsSL https://opencode.ai/install | bash -s -- --version ${shellEscape(version)} --no-modify-path`,
+      `  curl -fsSL https://cyxcode.ai/install | bash -s -- --version ${shellEscape(version)} --no-modify-path`,
       "fi",
       `${envPrefix(env)} exec "$BIN" ${args}`,
     ].join("\n")

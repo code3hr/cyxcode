@@ -1,6 +1,6 @@
 {
   "$schema": "https://json.schemastore.org/package.json",
-  "name": "@opencode-ai/console-core",
+  "name": "@cyxcode/console-core",
   "version": "1.3.2",
   "private": true,
   "type": "module",

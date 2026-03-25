@@ -1,4 +1,4 @@
-import { base64Decode, base64Encode } from "@opencode-ai/util/encode"
+import { base64Decode, base64Encode } from "@cyxcode/util/encode"
 import { expect, type Locator, type Page } from "@playwright/test"
 import fs from "node:fs/promises"
 import os from "node:os"

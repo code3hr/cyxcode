@@ -7,8 +7,8 @@ export DH_VERBOSE = 1
 
 override_dh_auto_clean:
 	rm -rf node_modules
-	rm -rf packages/opencode/node_modules
-	rm -rf packages/opencode/dist
+	rm -rf packages/cyxcode/node_modules
+	rm -rf packages/cyxcode/dist
 
 override_dh_auto_build:
 	# Bun is installed via postinst if not present

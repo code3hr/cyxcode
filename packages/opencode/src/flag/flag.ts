@@ -11,69 +11,69 @@ function falsy(key: string) {
 }
 
 export namespace Flag {
-  export const OPENCODE_AUTO_SHARE = truthy("OPENCODE_AUTO_SHARE")
-  export const OPENCODE_GIT_BASH_PATH = process.env["OPENCODE_GIT_BASH_PATH"]
-  export const OPENCODE_CONFIG = process.env["OPENCODE_CONFIG"]
-  export declare const OPENCODE_TUI_CONFIG: string | undefined
-  export declare const OPENCODE_CONFIG_DIR: string | undefined
-  export const OPENCODE_CONFIG_CONTENT = process.env["OPENCODE_CONFIG_CONTENT"]
-  export const OPENCODE_DISABLE_AUTOUPDATE = truthy("OPENCODE_DISABLE_AUTOUPDATE")
-  export const OPENCODE_ALWAYS_NOTIFY_UPDATE = truthy("OPENCODE_ALWAYS_NOTIFY_UPDATE")
-  export const OPENCODE_DISABLE_PRUNE = truthy("OPENCODE_DISABLE_PRUNE")
-  export const OPENCODE_DISABLE_TERMINAL_TITLE = truthy("OPENCODE_DISABLE_TERMINAL_TITLE")
-  export const OPENCODE_PERMISSION = process.env["OPENCODE_PERMISSION"]
-  export const OPENCODE_DISABLE_DEFAULT_PLUGINS = truthy("OPENCODE_DISABLE_DEFAULT_PLUGINS")
-  export const OPENCODE_DISABLE_LSP_DOWNLOAD = truthy("OPENCODE_DISABLE_LSP_DOWNLOAD")
-  export const OPENCODE_ENABLE_EXPERIMENTAL_MODELS = truthy("OPENCODE_ENABLE_EXPERIMENTAL_MODELS")
-  export const OPENCODE_DISABLE_AUTOCOMPACT = truthy("OPENCODE_DISABLE_AUTOCOMPACT")
-  export const OPENCODE_DISABLE_MODELS_FETCH = truthy("OPENCODE_DISABLE_MODELS_FETCH")
-  export const OPENCODE_DISABLE_CLAUDE_CODE = truthy("OPENCODE_DISABLE_CLAUDE_CODE")
-  export const OPENCODE_DISABLE_CLAUDE_CODE_PROMPT =
-    OPENCODE_DISABLE_CLAUDE_CODE || truthy("OPENCODE_DISABLE_CLAUDE_CODE_PROMPT")
-  export const OPENCODE_DISABLE_CLAUDE_CODE_SKILLS =
-    OPENCODE_DISABLE_CLAUDE_CODE || truthy("OPENCODE_DISABLE_CLAUDE_CODE_SKILLS")
-  export const OPENCODE_DISABLE_EXTERNAL_SKILLS =
-    OPENCODE_DISABLE_CLAUDE_CODE_SKILLS || truthy("OPENCODE_DISABLE_EXTERNAL_SKILLS")
-  export declare const OPENCODE_DISABLE_PROJECT_CONFIG: boolean
-  export const OPENCODE_FAKE_VCS = process.env["OPENCODE_FAKE_VCS"]
-  export declare const OPENCODE_CLIENT: string
-  export const OPENCODE_SERVER_PASSWORD = process.env["OPENCODE_SERVER_PASSWORD"]
-  export const OPENCODE_SERVER_USERNAME = process.env["OPENCODE_SERVER_USERNAME"]
-  export const OPENCODE_ENABLE_QUESTION_TOOL = truthy("OPENCODE_ENABLE_QUESTION_TOOL")
+  export const CYXCODE_AUTO_SHARE = truthy("CYXCODE_AUTO_SHARE")
+  export const CYXCODE_GIT_BASH_PATH = process.env["CYXCODE_GIT_BASH_PATH"]
+  export const CYXCODE_CONFIG = process.env["CYXCODE_CONFIG"]
+  export declare const CYXCODE_TUI_CONFIG: string | undefined
+  export declare const CYXCODE_CONFIG_DIR: string | undefined
+  export const CYXCODE_CONFIG_CONTENT = process.env["CYXCODE_CONFIG_CONTENT"]
+  export const CYXCODE_DISABLE_AUTOUPDATE = truthy("CYXCODE_DISABLE_AUTOUPDATE")
+  export const CYXCODE_ALWAYS_NOTIFY_UPDATE = truthy("CYXCODE_ALWAYS_NOTIFY_UPDATE")
+  export const CYXCODE_DISABLE_PRUNE = truthy("CYXCODE_DISABLE_PRUNE")
+  export const CYXCODE_DISABLE_TERMINAL_TITLE = truthy("CYXCODE_DISABLE_TERMINAL_TITLE")
+  export const CYXCODE_PERMISSION = process.env["CYXCODE_PERMISSION"]
+  export const CYXCODE_DISABLE_DEFAULT_PLUGINS = truthy("CYXCODE_DISABLE_DEFAULT_PLUGINS")
+  export const CYXCODE_DISABLE_LSP_DOWNLOAD = truthy("CYXCODE_DISABLE_LSP_DOWNLOAD")
+  export const CYXCODE_ENABLE_EXPERIMENTAL_MODELS = truthy("CYXCODE_ENABLE_EXPERIMENTAL_MODELS")
+  export const CYXCODE_DISABLE_AUTOCOMPACT = truthy("CYXCODE_DISABLE_AUTOCOMPACT")
+  export const CYXCODE_DISABLE_MODELS_FETCH = truthy("CYXCODE_DISABLE_MODELS_FETCH")
+  export const CYXCODE_DISABLE_CLAUDE_CODE = truthy("CYXCODE_DISABLE_CLAUDE_CODE")
+  export const CYXCODE_DISABLE_CLAUDE_CODE_PROMPT =
+    CYXCODE_DISABLE_CLAUDE_CODE || truthy("CYXCODE_DISABLE_CLAUDE_CODE_PROMPT")
+  export const CYXCODE_DISABLE_CLAUDE_CODE_SKILLS =
+    CYXCODE_DISABLE_CLAUDE_CODE || truthy("CYXCODE_DISABLE_CLAUDE_CODE_SKILLS")
+  export const CYXCODE_DISABLE_EXTERNAL_SKILLS =
+    CYXCODE_DISABLE_CLAUDE_CODE_SKILLS || truthy("CYXCODE_DISABLE_EXTERNAL_SKILLS")
+  export declare const CYXCODE_DISABLE_PROJECT_CONFIG: boolean
+  export const CYXCODE_FAKE_VCS = process.env["CYXCODE_FAKE_VCS"]
+  export declare const CYXCODE_CLIENT: string
+  export const CYXCODE_SERVER_PASSWORD = process.env["CYXCODE_SERVER_PASSWORD"]
+  export const CYXCODE_SERVER_USERNAME = process.env["CYXCODE_SERVER_USERNAME"]
+  export const CYXCODE_ENABLE_QUESTION_TOOL = truthy("CYXCODE_ENABLE_QUESTION_TOOL")
 
   // Experimental
-  export const OPENCODE_EXPERIMENTAL = truthy("OPENCODE_EXPERIMENTAL")
-  export const OPENCODE_EXPERIMENTAL_FILEWATCHER = Config.boolean("OPENCODE_EXPERIMENTAL_FILEWATCHER").pipe(
+  export const CYXCODE_EXPERIMENTAL = truthy("CYXCODE_EXPERIMENTAL")
+  export const CYXCODE_EXPERIMENTAL_FILEWATCHER = Config.boolean("CYXCODE_EXPERIMENTAL_FILEWATCHER").pipe(
     Config.withDefault(false),
   )
-  export const OPENCODE_EXPERIMENTAL_DISABLE_FILEWATCHER = Config.boolean(
-    "OPENCODE_EXPERIMENTAL_DISABLE_FILEWATCHER",
+  export const CYXCODE_EXPERIMENTAL_DISABLE_FILEWATCHER = Config.boolean(
+    "CYXCODE_EXPERIMENTAL_DISABLE_FILEWATCHER",
   ).pipe(Config.withDefault(false))
-  export const OPENCODE_EXPERIMENTAL_ICON_DISCOVERY =
-    OPENCODE_EXPERIMENTAL || truthy("OPENCODE_EXPERIMENTAL_ICON_DISCOVERY")
+  export const CYXCODE_EXPERIMENTAL_ICON_DISCOVERY =
+    CYXCODE_EXPERIMENTAL || truthy("CYXCODE_EXPERIMENTAL_ICON_DISCOVERY")
 
-  const copy = process.env["OPENCODE_EXPERIMENTAL_DISABLE_COPY_ON_SELECT"]
-  export const OPENCODE_EXPERIMENTAL_DISABLE_COPY_ON_SELECT =
-    copy === undefined ? process.platform === "win32" : truthy("OPENCODE_EXPERIMENTAL_DISABLE_COPY_ON_SELECT")
-  export const OPENCODE_ENABLE_EXA =
-    truthy("OPENCODE_ENABLE_EXA") || OPENCODE_EXPERIMENTAL || truthy("OPENCODE_EXPERIMENTAL_EXA")
-  export const OPENCODE_EXPERIMENTAL_BASH_DEFAULT_TIMEOUT_MS = number("OPENCODE_EXPERIMENTAL_BASH_DEFAULT_TIMEOUT_MS")
-  export const OPENCODE_EXPERIMENTAL_OUTPUT_TOKEN_MAX = number("OPENCODE_EXPERIMENTAL_OUTPUT_TOKEN_MAX")
-  export const OPENCODE_EXPERIMENTAL_OXFMT = OPENCODE_EXPERIMENTAL || truthy("OPENCODE_EXPERIMENTAL_OXFMT")
-  export const OPENCODE_EXPERIMENTAL_LSP_TY = truthy("OPENCODE_EXPERIMENTAL_LSP_TY")
-  export const OPENCODE_EXPERIMENTAL_LSP_TOOL = OPENCODE_EXPERIMENTAL || truthy("OPENCODE_EXPERIMENTAL_LSP_TOOL")
-  export const OPENCODE_DISABLE_FILETIME_CHECK = Config.boolean("OPENCODE_DISABLE_FILETIME_CHECK").pipe(
+  const copy = process.env["CYXCODE_EXPERIMENTAL_DISABLE_COPY_ON_SELECT"]
+  export const CYXCODE_EXPERIMENTAL_DISABLE_COPY_ON_SELECT =
+    copy === undefined ? process.platform === "win32" : truthy("CYXCODE_EXPERIMENTAL_DISABLE_COPY_ON_SELECT")
+  export const CYXCODE_ENABLE_EXA =
+    truthy("CYXCODE_ENABLE_EXA") || CYXCODE_EXPERIMENTAL || truthy("CYXCODE_EXPERIMENTAL_EXA")
+  export const CYXCODE_EXPERIMENTAL_BASH_DEFAULT_TIMEOUT_MS = number("CYXCODE_EXPERIMENTAL_BASH_DEFAULT_TIMEOUT_MS")
+  export const CYXCODE_EXPERIMENTAL_OUTPUT_TOKEN_MAX = number("CYXCODE_EXPERIMENTAL_OUTPUT_TOKEN_MAX")
+  export const CYXCODE_EXPERIMENTAL_OXFMT = CYXCODE_EXPERIMENTAL || truthy("CYXCODE_EXPERIMENTAL_OXFMT")
+  export const CYXCODE_EXPERIMENTAL_LSP_TY = truthy("CYXCODE_EXPERIMENTAL_LSP_TY")
+  export const CYXCODE_EXPERIMENTAL_LSP_TOOL = CYXCODE_EXPERIMENTAL || truthy("CYXCODE_EXPERIMENTAL_LSP_TOOL")
+  export const CYXCODE_DISABLE_FILETIME_CHECK = Config.boolean("CYXCODE_DISABLE_FILETIME_CHECK").pipe(
     Config.withDefault(false),
   )
-  export const OPENCODE_EXPERIMENTAL_PLAN_MODE = OPENCODE_EXPERIMENTAL || truthy("OPENCODE_EXPERIMENTAL_PLAN_MODE")
-  export const OPENCODE_EXPERIMENTAL_WORKSPACES = OPENCODE_EXPERIMENTAL || truthy("OPENCODE_EXPERIMENTAL_WORKSPACES")
-  export const OPENCODE_EXPERIMENTAL_MARKDOWN = !falsy("OPENCODE_EXPERIMENTAL_MARKDOWN")
-  export const OPENCODE_MODELS_URL = process.env["OPENCODE_MODELS_URL"]
-  export const OPENCODE_MODELS_PATH = process.env["OPENCODE_MODELS_PATH"]
-  export const OPENCODE_DB = process.env["OPENCODE_DB"]
-  export const OPENCODE_DISABLE_CHANNEL_DB = truthy("OPENCODE_DISABLE_CHANNEL_DB")
-  export const OPENCODE_SKIP_MIGRATIONS = truthy("OPENCODE_SKIP_MIGRATIONS")
-  export const OPENCODE_STRICT_CONFIG_DEPS = truthy("OPENCODE_STRICT_CONFIG_DEPS")
+  export const CYXCODE_EXPERIMENTAL_PLAN_MODE = CYXCODE_EXPERIMENTAL || truthy("CYXCODE_EXPERIMENTAL_PLAN_MODE")
+  export const CYXCODE_EXPERIMENTAL_WORKSPACES = CYXCODE_EXPERIMENTAL || truthy("CYXCODE_EXPERIMENTAL_WORKSPACES")
+  export const CYXCODE_EXPERIMENTAL_MARKDOWN = !falsy("CYXCODE_EXPERIMENTAL_MARKDOWN")
+  export const CYXCODE_MODELS_URL = process.env["CYXCODE_MODELS_URL"]
+  export const CYXCODE_MODELS_PATH = process.env["CYXCODE_MODELS_PATH"]
+  export const CYXCODE_DB = process.env["CYXCODE_DB"]
+  export const CYXCODE_DISABLE_CHANNEL_DB = truthy("CYXCODE_DISABLE_CHANNEL_DB")
+  export const CYXCODE_SKIP_MIGRATIONS = truthy("CYXCODE_SKIP_MIGRATIONS")
+  export const CYXCODE_STRICT_CONFIG_DEPS = truthy("CYXCODE_STRICT_CONFIG_DEPS")
 
   function number(key: string) {
     const value = process.env[key]
@@ -83,45 +83,45 @@ export namespace Flag {
   }
 }
 
-// Dynamic getter for OPENCODE_DISABLE_PROJECT_CONFIG
+// Dynamic getter for CYXCODE_DISABLE_PROJECT_CONFIG
 // This must be evaluated at access time, not module load time,
 // because external tooling may set this env var at runtime
-Object.defineProperty(Flag, "OPENCODE_DISABLE_PROJECT_CONFIG", {
+Object.defineProperty(Flag, "CYXCODE_DISABLE_PROJECT_CONFIG", {
   get() {
-    return truthy("OPENCODE_DISABLE_PROJECT_CONFIG")
+    return truthy("CYXCODE_DISABLE_PROJECT_CONFIG")
   },
   enumerable: true,
   configurable: false,
 })
 
-// Dynamic getter for OPENCODE_TUI_CONFIG
+// Dynamic getter for CYXCODE_TUI_CONFIG
 // This must be evaluated at access time, not module load time,
 // because tests and external tooling may set this env var at runtime
-Object.defineProperty(Flag, "OPENCODE_TUI_CONFIG", {
+Object.defineProperty(Flag, "CYXCODE_TUI_CONFIG", {
   get() {
-    return process.env["OPENCODE_TUI_CONFIG"]
+    return process.env["CYXCODE_TUI_CONFIG"]
   },
   enumerable: true,
   configurable: false,
 })
 
-// Dynamic getter for OPENCODE_CONFIG_DIR
+// Dynamic getter for CYXCODE_CONFIG_DIR
 // This must be evaluated at access time, not module load time,
 // because external tooling may set this env var at runtime
-Object.defineProperty(Flag, "OPENCODE_CONFIG_DIR", {
+Object.defineProperty(Flag, "CYXCODE_CONFIG_DIR", {
   get() {
-    return process.env["OPENCODE_CONFIG_DIR"]
+    return process.env["CYXCODE_CONFIG_DIR"]
   },
   enumerable: true,
   configurable: false,
 })
 
-// Dynamic getter for OPENCODE_CLIENT
+// Dynamic getter for CYXCODE_CLIENT
 // This must be evaluated at access time, not module load time,
 // because some commands override the client at runtime
-Object.defineProperty(Flag, "OPENCODE_CLIENT", {
+Object.defineProperty(Flag, "CYXCODE_CLIENT", {
   get() {
-    return process.env["OPENCODE_CLIENT"] ?? "cli"
+    return process.env["CYXCODE_CLIENT"] ?? "cli"
   },
   enumerable: true,
   configurable: false,

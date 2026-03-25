@@ -14,7 +14,7 @@ async function open(page: Page) {
 
 test("terminal reconnects without replacing the pty", async ({ page, withProject }) => {
   await withProject(async ({ gotoSession }) => {
-    const name = `OPENCODE_E2E_RECONNECT_${Date.now()}`
+    const name = `CYXCODE_E2E_RECONNECT_${Date.now()}`
     const token = `E2E_RECONNECT_${Date.now()}`
 
     await gotoSession()

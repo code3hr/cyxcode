@@ -6,7 +6,7 @@ import { proxy } from "hono/proxy"
 import { basicAuth } from "hono/basic-auth"
 import z from "zod"
 import { Provider } from "../provider/provider"
-import { NamedError } from "@opencode-ai/util/error"
+import { NamedError } from "@cyxcode/util/error"
 import { LSP } from "../lsp"
 import { Format } from "../format"
 import { TuiRoutes } from "./routes/tui"
@@ -78,9 +78,9 @@ export namespace Server {
         // Allow CORS preflight requests to succeed without auth.
         // Browser clients sending Authorization headers will preflight with OPTIONS.
         if (c.req.method === "OPTIONS") return next()
-        const password = Flag.OPENCODE_SERVER_PASSWORD
+        const password = Flag.CYXCODE_SERVER_PASSWORD
         if (!password) return next()
-        const username = Flag.OPENCODE_SERVER_USERNAME ?? "opencode"
+        const username = Flag.CYXCODE_SERVER_USERNAME ?? "opencode"
         return basicAuth({ username, password })(c, next)
       })
       .use(async (c, next) => {
@@ -114,7 +114,7 @@ export namespace Server {
             )
               return input
 
-            // *.opencode.ai (https only, adjust if needed)
+            // *.cyxcode.ai (https only, adjust if needed)
             if (/^https:\/\/([a-z0-9-]+\.)*opencode\.ai$/.test(input)) {
               return input
             }
@@ -499,11 +499,11 @@ export namespace Server {
       .all("/*", async (c) => {
         const path = c.req.path
 
-        const response = await proxy(`https://app.opencode.ai${path}`, {
+        const response = await proxy(`https://app.cyxcode.ai${path}`, {
           ...c.req,
           headers: {
             ...c.req.raw.headers,
-            host: "app.opencode.ai",
+            host: "app.cyxcode.ai",
           },
         })
         response.headers.set(

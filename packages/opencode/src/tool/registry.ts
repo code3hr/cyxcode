@@ -31,7 +31,7 @@ import type { Agent } from "../agent/agent"
 import { Tool } from "./tool"
 import { Config } from "../config/config"
 import path from "path"
-import { type ToolContext as PluginToolContext, type ToolDefinition } from "@opencode-ai/plugin"
+import { type ToolContext as PluginToolContext, type ToolDefinition } from "@cyxcode/plugin"
 import z from "zod"
 import { Plugin } from "../plugin"
 import { ProviderID, type ModelID } from "../provider/schema"
@@ -126,7 +126,7 @@ export namespace ToolRegistry {
 
       async function all(custom: Tool.Info[]): Promise<Tool.Info[]> {
         const cfg = await Config.get()
-        const question = ["app", "cli", "desktop"].includes(Flag.OPENCODE_CLIENT) || Flag.OPENCODE_ENABLE_QUESTION_TOOL
+        const question = ["app", "cli", "desktop"].includes(Flag.CYXCODE_CLIENT) || Flag.CYXCODE_ENABLE_QUESTION_TOOL
 
         return [
           InvalidTool,
@@ -144,9 +144,9 @@ export namespace ToolRegistry {
           CodeSearchTool,
           SkillTool,
           ApplyPatchTool,
-          ...(Flag.OPENCODE_EXPERIMENTAL_LSP_TOOL ? [LspTool] : []),
+          ...(Flag.CYXCODE_EXPERIMENTAL_LSP_TOOL ? [LspTool] : []),
           ...(cfg.experimental?.batch_tool === true ? [BatchTool] : []),
-          ...(Flag.OPENCODE_EXPERIMENTAL_PLAN_MODE && Flag.OPENCODE_CLIENT === "cli" ? [PlanExitTool] : []),
+          ...(Flag.CYXCODE_EXPERIMENTAL_PLAN_MODE && Flag.CYXCODE_CLIENT === "cli" ? [PlanExitTool] : []),
           ...custom,
         ]
       }
@@ -179,7 +179,7 @@ export namespace ToolRegistry {
               .filter((tool) => {
                 // Enable websearch/codesearch for zen users OR via enable flag
                 if (tool.id === "codesearch" || tool.id === "websearch") {
-                  return model.providerID === ProviderID.opencode || Flag.OPENCODE_ENABLE_EXA
+                  return model.providerID === ProviderID.opencode || Flag.CYXCODE_ENABLE_EXA
                 }
 
                 // use apply tool in same format as codex

@@ -43,7 +43,7 @@ if ! command -v bun &> /dev/null; then
 fi
 
 # Run CyxCode
-exec bun run --cwd "$CYXCODE_HOME/packages/opencode" src/index.ts "$@"
+exec bun run --cwd "$CYXCODE_HOME/packages/cyxcode" src/index.ts "$@"
 WRAPPER
 
         chmod +x /usr/bin/cyxcode

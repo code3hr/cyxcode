@@ -1,5 +1,5 @@
 {
-  "name": "@opencode-ai/function",
+  "name": "@cyxcode/function",
   "version": "1.3.2",
   "$schema": "https://json.schemastore.org/package.json",
   "private": true,

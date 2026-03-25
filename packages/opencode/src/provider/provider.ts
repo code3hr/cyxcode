@@ -8,7 +8,7 @@ import { Log } from "../util/log"
 import { BunProc } from "../bun"
 import { Hash } from "../util/hash"
 import { Plugin } from "../plugin"
-import { NamedError } from "@opencode-ai/util/error"
+import { NamedError } from "@cyxcode/util/error"
 import { ModelsDev } from "./models"
 import { Auth } from "../auth"
 import { Env } from "../env"
@@ -405,7 +405,7 @@ export namespace Provider {
         autoload: false,
         options: {
           headers: {
-            "HTTP-Referer": "https://opencode.ai/",
+            "HTTP-Referer": "https://cyxcode.ai/",
             "X-Title": "opencode",
           },
         },
@@ -416,7 +416,7 @@ export namespace Provider {
         autoload: false,
         options: {
           headers: {
-            "http-referer": "https://opencode.ai/",
+            "http-referer": "https://cyxcode.ai/",
             "x-title": "opencode",
           },
         },
@@ -515,7 +515,7 @@ export namespace Provider {
         autoload: false,
         options: {
           headers: {
-            "HTTP-Referer": "https://opencode.ai/",
+            "HTTP-Referer": "https://cyxcode.ai/",
             "X-Title": "opencode",
           },
         },
@@ -742,7 +742,7 @@ export namespace Provider {
         autoload: false,
         options: {
           headers: {
-            "HTTP-Referer": "https://opencode.ai/",
+            "HTTP-Referer": "https://cyxcode.ai/",
             "X-Title": "opencode",
           },
         },
@@ -1129,7 +1129,7 @@ export namespace Provider {
           (providerID === ProviderID.openrouter && modelID === "openai/gpt-5-chat")
         )
           delete provider.models[modelID]
-        if (model.status === "alpha" && !Flag.OPENCODE_ENABLE_EXPERIMENTAL_MODELS) delete provider.models[modelID]
+        if (model.status === "alpha" && !Flag.CYXCODE_ENABLE_EXPERIMENTAL_MODELS) delete provider.models[modelID]
         if (model.status === "deprecated") delete provider.models[modelID]
         if (
           (configProvider?.blacklist && configProvider.blacklist.includes(modelID)) ||

@@ -1,5 +1,5 @@
-import { createOpencodeClient } from "@opencode-ai/sdk/v2/client"
-import { base64Encode, checksum } from "@opencode-ai/util/encode"
+import { createOpencodeClient } from "@cyxcode/sdk/v2/client"
+import { base64Encode, checksum } from "@cyxcode/util/encode"
 
 export const serverHost = process.env.PLAYWRIGHT_SERVER_HOST ?? "127.0.0.1"
 export const serverPort = process.env.PLAYWRIGHT_SERVER_PORT ?? "4096"

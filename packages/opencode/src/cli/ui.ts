@@ -1,6 +1,6 @@
 import z from "zod"
 import { EOL } from "os"
-import { NamedError } from "@opencode-ai/util/error"
+import { NamedError } from "@cyxcode/util/error"
 import { logo as glyphs } from "./logo"
 
 export namespace UI {

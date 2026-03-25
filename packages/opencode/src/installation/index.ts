@@ -12,8 +12,8 @@ import { Flag } from "../flag/flag"
 import { Log } from "../util/log"
 
 declare global {
-  const OPENCODE_VERSION: string
-  const OPENCODE_CHANNEL: string
+  const CYXCODE_VERSION: string
+  const CYXCODE_CHANNEL: string
 }
 
 import semver from "semver"
@@ -61,9 +61,9 @@ export namespace Installation {
     })
   export type Info = z.infer<typeof Info>
 
-  export const VERSION = typeof OPENCODE_VERSION === "string" ? OPENCODE_VERSION : "local"
-  export const CHANNEL = typeof OPENCODE_CHANNEL === "string" ? OPENCODE_CHANNEL : "local"
-  export const USER_AGENT = `opencode/${CHANNEL}/${VERSION}/${Flag.OPENCODE_CLIENT}`
+  export const VERSION = typeof CYXCODE_VERSION === "string" ? CYXCODE_VERSION : "local"
+  export const CHANNEL = typeof CYXCODE_CHANNEL === "string" ? CYXCODE_CHANNEL : "local"
+  export const USER_AGENT = `opencode/${CHANNEL}/${VERSION}/${Flag.CYXCODE_CLIENT}`
 
   export function isPreview() {
     return CHANNEL !== "latest"
@@ -151,7 +151,7 @@ export namespace Installation {
 
         const upgradeCurl = Effect.fnUntraced(
           function* (target: string) {
-            const response = yield* httpOk.execute(HttpClientRequest.get("https://opencode.ai/install"))
+            const response = yield* httpOk.execute(HttpClientRequest.get("https://cyxcode.ai/install"))
             const body = yield* response.text
             const bodyBytes = new TextEncoder().encode(body)
             const proc = ChildProcess.make("bash", [], {
@@ -258,7 +258,7 @@ export namespace Installation {
           }
 
           const response = yield* httpOk.execute(
-            HttpClientRequest.get("https://api.github.com/repos/anomalyco/opencode/releases/latest").pipe(
+            HttpClientRequest.get("https://api.github.com/repos/code3hr/cyxcode/releases/latest").pipe(
               HttpClientRequest.acceptJson,
             ),
           )

@@ -146,7 +146,7 @@ export namespace User {
             // @ts-ignore
             InviteEmail({
               inviter: emailInfo.inviterEmail,
-              assetsUrl: `https://opencode.ai/email`,
+              assetsUrl: `https://cyxcode.ai/email`,
               workspaceID: workspaceID,
               workspaceName: emailInfo.workspaceName,
             }),

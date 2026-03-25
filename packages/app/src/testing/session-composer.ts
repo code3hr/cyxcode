@@ -1,4 +1,4 @@
-import type { Todo } from "@opencode-ai/sdk/v2"
+import type { Todo } from "@cyxcode/sdk/v2"
 
 export const composerEvent = "opencode:e2e:composer"
 

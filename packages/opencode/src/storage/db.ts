@@ -6,7 +6,7 @@ import { Context } from "../util/context"
 import { lazy } from "../util/lazy"
 import { Global } from "../global"
 import { Log } from "../util/log"
-import { NamedError } from "@opencode-ai/util/error"
+import { NamedError } from "@cyxcode/util/error"
 import z from "zod"
 import path from "path"
 import { readFileSync, readdirSync, existsSync } from "fs"
@@ -15,7 +15,7 @@ import { Flag } from "../flag/flag"
 import { iife } from "@/util/iife"
 import { init } from "#db"
 
-declare const OPENCODE_MIGRATIONS: { sql: string; timestamp: number; name: string }[] | undefined
+declare const CYXCODE_MIGRATIONS: { sql: string; timestamp: number; name: string }[] | undefined
 
 export const NotFoundError = NamedError.create(
   "NotFoundError",
@@ -28,12 +28,12 @@ const log = Log.create({ service: "db" })
 
 export namespace Database {
   export const Path = iife(() => {
-    if (Flag.OPENCODE_DB) {
-      if (path.isAbsolute(Flag.OPENCODE_DB)) return Flag.OPENCODE_DB
-      return path.join(Global.Path.data, Flag.OPENCODE_DB)
+    if (Flag.CYXCODE_DB) {
+      if (path.isAbsolute(Flag.CYXCODE_DB)) return Flag.CYXCODE_DB
+      return path.join(Global.Path.data, Flag.CYXCODE_DB)
     }
     const channel = Installation.CHANNEL
-    if (["latest", "beta"].includes(channel) || Flag.OPENCODE_DISABLE_CHANNEL_DB)
+    if (["latest", "beta"].includes(channel) || Flag.CYXCODE_DISABLE_CHANNEL_DB)
       return path.join(Global.Path.data, "opencode.db")
     const safe = channel.replace(/[^a-zA-Z0-9._-]/g, "-")
     return path.join(Global.Path.data, `opencode-${safe}.db`)
@@ -92,15 +92,15 @@ export namespace Database {
 
     // Apply schema migrations
     const entries =
-      typeof OPENCODE_MIGRATIONS !== "undefined"
-        ? OPENCODE_MIGRATIONS
+      typeof CYXCODE_MIGRATIONS !== "undefined"
+        ? CYXCODE_MIGRATIONS
         : migrations(path.join(import.meta.dirname, "../../migration"))
     if (entries.length > 0) {
       log.info("applying migrations", {
         count: entries.length,
-        mode: typeof OPENCODE_MIGRATIONS !== "undefined" ? "bundled" : "dev",
+        mode: typeof CYXCODE_MIGRATIONS !== "undefined" ? "bundled" : "dev",
       })
-      if (Flag.OPENCODE_SKIP_MIGRATIONS) {
+      if (Flag.CYXCODE_SKIP_MIGRATIONS) {
         for (const item of entries) {
           item.sql = "select 1;"
         }

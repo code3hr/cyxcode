@@ -12,7 +12,7 @@ import {
 import { Config } from "../config/config"
 import { Log } from "../util/log"
 import { Process } from "../util/process"
-import { NamedError } from "@opencode-ai/util/error"
+import { NamedError } from "@cyxcode/util/error"
 import z from "zod/v4"
 import { Instance } from "../project/instance"
 import { Installation } from "../installation"

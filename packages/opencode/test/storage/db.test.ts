@@ -6,7 +6,7 @@ import { Database } from "../../src/storage/db"
 
 describe("Database.Path", () => {
   test("returns database path for the current channel", () => {
-    const db = process.env["OPENCODE_DB"]
+    const db = process.env["CYXCODE_DB"]
     const expected = db
       ? path.isAbsolute(db)
         ? db

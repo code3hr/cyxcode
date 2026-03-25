@@ -292,7 +292,7 @@ export const { use: useTheme, provider: ThemeProvider } = createSimpleContext({
       themes: DEFAULT_THEMES,
       mode: lock ?? pick(kv.get("theme_mode", props.mode)) ?? props.mode,
       lock,
-      active: (config.theme ?? kv.get("theme", "opencode")) as string,
+      active: (config.theme ?? kv.get("theme", "cyxcode")) as string,
       ready: false,
     })
 

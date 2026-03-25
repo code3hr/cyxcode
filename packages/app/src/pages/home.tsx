@@ -1,6 +1,6 @@
 import { createMemo, For, Match, Switch } from "solid-js"
-import { Button } from "@opencode-ai/ui/button"
-import { Logo } from "@opencode-ai/ui/logo"
+import { Button } from "@cyxcode/ui/button"
+import { Logo } from "@cyxcode/ui/logo"
 import { useLayout } from "@/context/layout"
 import { useNavigate } from "@solidjs/router"
 import { base64Encode } from "@cyxcode/util/encode"

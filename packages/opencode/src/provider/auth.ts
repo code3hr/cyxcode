@@ -1,5 +1,5 @@
-import type { AuthOuathResult, Hooks } from "@opencode-ai/plugin"
-import { NamedError } from "@opencode-ai/util/error"
+import type { AuthOuathResult, Hooks } from "@cyxcode/plugin"
+import { NamedError } from "@cyxcode/util/error"
 import { Auth } from "@/auth"
 import { InstanceState } from "@/effect/instance-state"
 import { makeRunPromise } from "@/effect/run-service"

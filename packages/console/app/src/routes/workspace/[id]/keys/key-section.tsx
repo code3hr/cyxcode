@@ -6,7 +6,7 @@ import { withActor } from "~/context/auth.withActor"
 import { createStore } from "solid-js/store"
 import { formatDateUTC, formatDateForTable } from "../../common"
 import styles from "./key-section.module.css"
-import { Actor } from "@opencode-ai/console-core/actor.js"
+import { Actor } from "@cyxcode/console-core/actor.js"
 import { useI18n } from "~/context/i18n"
 import { formError, localizeError } from "~/lib/form-error"
 

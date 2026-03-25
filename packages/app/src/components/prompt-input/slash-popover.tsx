@@ -1,7 +1,7 @@
 import { Component, For, Match, Show, Switch } from "solid-js"
-import { FileIcon } from "@opencode-ai/ui/file-icon"
-import { Icon } from "@opencode-ai/ui/icon"
-import { getDirectory, getFilename } from "@opencode-ai/util/path"
+import { FileIcon } from "@cyxcode/ui/file-icon"
+import { Icon } from "@cyxcode/ui/icon"
+import { getDirectory, getFilename } from "@cyxcode/util/path"
 
 export type AtOption =
   | { type: "agent"; name: string; display: string }

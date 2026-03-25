@@ -61,9 +61,9 @@ export namespace Plugin {
             const client = createOpencodeClient({
               baseUrl: "http://localhost:4096",
               directory: ctx.directory,
-              headers: Flag.OPENCODE_SERVER_PASSWORD
+              headers: Flag.CYXCODE_SERVER_PASSWORD
                 ? {
-                    Authorization: `Basic ${Buffer.from(`${Flag.OPENCODE_SERVER_USERNAME ?? "opencode"}:${Flag.OPENCODE_SERVER_PASSWORD}`).toString("base64")}`,
+                    Authorization: `Basic ${Buffer.from(`${Flag.CYXCODE_SERVER_USERNAME ?? "opencode"}:${Flag.CYXCODE_SERVER_PASSWORD}`).toString("base64")}`,
                   }
                 : undefined,
               fetch: async (...args) => Server.Default().fetch(...args),
