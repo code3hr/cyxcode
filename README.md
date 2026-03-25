@@ -29,64 +29,16 @@
 
 ---
 
-## Why CyxCode?
+## What is CyxCode?
 
-OpenClaw has 700+ skills. We have 3. **Thats the point.**
+CyxCode is a fork of OpenCode that takes a fundamentally different approach to error handling. Instead of sending every error to an LLM (which burns tokens and costs money), CyxCode maintains a library of 136 regex patterns that match known errors and provide instant fixes — for free.
 
-# Package managers
-npm i -g opencode-ai@latest        # or bun/pnpm/yarn
-scoop install opencode             # Windows
-choco install opencode             # Windows
-brew install anomalyco/tap/opencode # macOS and Linux (recommended, always up to date)
-brew install opencode              # macOS and Linux (official brew formula, updated less)
-sudo pacman -S opencode            # Arch Linux (Stable)
-paru -S opencode-bin               # Arch Linux (Latest from AUR)
-mise use -g opencode               # Any OS
-nix run nixpkgs#opencode           # or github:anomalyco/opencode for latest dev branch
+When you run a command in CyxCode and it fails, the system checks the error output against all 136 patterns **before** the AI ever sees it. If a pattern matches, you get an instant fix suggestion with zero LLM token cost. If no pattern matches, it falls through to the AI as usual.
+
 ```
-
-Most developer errors are **known patterns**. Why burn tokens asking an LLM to figure out "module not found" for the 10,000th time?
-
-### Desktop App (BETA)
-
-OpenCode is also available as a desktop application. Download directly from the [releases page](https://github.com/anomalyco/opencode/releases) or [opencode.ai/download](https://opencode.ai/download).
-
-| Platform              | Download                              |
-| --------------------- | ------------------------------------- |
-| macOS (Apple Silicon) | `opencode-desktop-darwin-aarch64.dmg` |
-| macOS (Intel)         | `opencode-desktop-darwin-x64.dmg`     |
-| Windows               | `opencode-desktop-windows-x64.exe`    |
-| Linux                 | `.deb`, `.rpm`, or AppImage           |
-
-```bash
-# macOS (Homebrew)
-brew install --cask opencode-desktop
-# Windows (Scoop)
-scoop bucket add extras; scoop install extras/opencode-desktop
-```
-$ docker-compose up -d
-Error: Cannot connect to the Docker daemon. Is the docker daemon running?
-
-<cyxcode_recovery pattern="docker-daemon-not-running">
-Matched: Docker daemon not running
-Suggested fixes:
-  1. Start Docker (Linux)
-     sudo systemctl start docker
-  2. Start Docker Desktop (macOS)
-     (open Docker Desktop app)
-</cyxcode_recovery>
-
-The install script respects the following priority order for the installation path:
-
-1. `$OPENCODE_INSTALL_DIR` - Custom installation directory
-2. `$XDG_BIN_DIR` - XDG Base Directory Specification compliant path
-3. `$HOME/bin` - Standard user binary directory (if it exists or can be created)
-4. `$HOME/.opencode/bin` - Default fallback
-
-```bash
-# Examples
-OPENCODE_INSTALL_DIR=/usr/local/bin curl -fsSL https://opencode.ai/install | bash
-XDG_BIN_DIR=$HOME/.local/bin curl -fsSL https://opencode.ai/install | bash
+Traditional AI coding tools:  Every error -> LLM -> tokens burned -> response
+CyxCode:                      Every error -> Pattern check -> match? -> FREE fix
+                                                           -> no match? -> LLM fallback
 ```
 
 ### Agents
@@ -130,7 +82,39 @@ It's very similar to Claude Code in terms of capability. Here are the key differ
 
 ---
 
-## Token Savings
+## How Token Savings Work
+
+### The Problem
+
+Every time an AI coding tool encounters an error, it sends the full error output to an LLM for analysis. A typical error handling cycle looks like this:
+
+1. **Input tokens**: The error output (~100-500 tokens), system prompt (~500 tokens), conversation context (~200 tokens)
+2. **Output tokens**: The LLM's diagnosis and suggestion (~200-400 tokens)
+3. **Total cost per error**: ~800-1600 tokens
+
+For common errors like "module not found" or "port already in use", the LLM is doing the same work over and over — analyzing a known error pattern and giving the same suggestion every time.
+
+### CyxCode's Solution
+
+CyxCode intercepts errors **before** they reach the LLM. Here's what happens inside:
+
+1. A bash command fails (non-zero exit code)
+2. The `SkillRouter` in `src/cyxcode/router.ts` receives the error output
+3. It runs the output against all 136 regex patterns across 3 skills
+4. **If a pattern matches**: The fix is appended to the output with a `[CyxCode]` label. The AI sees the pre-diagnosed fix and doesn't need to spend tokens analyzing the error — it can just relay the suggestion
+5. **If no pattern matches**: The error passes through to the LLM normally
+
+### Token Estimation
+
+The `BaseSkill` class (`src/cyxcode/base-skill.ts`) estimates tokens saved per match:
+
+```
+Tokens saved = (error output length / 4) + 500 (context) + 200 (response)
+```
+
+This is a conservative estimate. In practice, the LLM often needs multiple turns to diagnose and fix an error, multiplying the token cost.
+
+### Expected Savings
 
 | Scenario | Without CyxCode | With CyxCode | Savings |
 |----------|-----------------|--------------|---------|
@@ -145,110 +129,95 @@ It's very similar to Claude Code in terms of capability. Here are the key differ
 
 ---
 
-## Skills (3 Deep, Not 700 Wide)
+## How to Tell Pattern Match vs AI
 
-### Recovery Skill - 51 patterns
-Zero LLM tokens for known build/runtime errors.
+When a command fails in CyxCode, look for the `[CyxCode]` prefix in the output. This is how you know a pattern matched instead of the AI doing the work.
 
-| Category | Patterns | Examples |
-|----------|----------|----------|
-| Node/npm | 9 | module not found, EACCES, peer deps |
-| Git | 9 | merge conflict, push rejected, auth |
-| Build | 8 | CMake, linker, compiler not found |
-| Docker | 8 | daemon not running, port conflict |
-| Python | 8 | ModuleNotFoundError, venv, encoding |
-| System | 9 | permission denied, disk full, OOM |
+### Pattern matched (free, zero tokens):
 
-### Security Skill - 39 patterns
-SSL, auth, SSH, and vulnerability detection.
+```
+$ node -e "require('fakemodule')"
+Error: Cannot find module 'fakemodule'
 
-| Category | Patterns | Examples |
-|----------|----------|----------|
-| SSL/TLS | 7 | cert expired, untrusted, handshake |
-| Auth | 8 | 401/403, OAuth, CORS, rate limit |
-| SSH | 7 | publickey denied, host key, agent |
-| Network | 8 | firewall, VPN, CSP, HSTS |
-| Scans | 9 | SQLi, XSS, CVE, exposed secrets |
+[CyxCode] Pattern matched: node-module-not-found (recovery)
+[CyxCode] Node.js module not found
+[CyxCode] Suggested fixes:
+  1. Install missing module with npm
+     npm install fakemodule
+  2. Install missing module with yarn
+     yarn add fakemodule
+  3. Install missing module with pnpm
+     pnpm add fakemodule
+  4. Install missing module with bun
+     bun add fakemodule
+[CyxCode] Tokens saved by pattern match (no LLM needed for diagnosis)
+```
 
-### DevOps Skill - 46 patterns
-Kubernetes, Terraform, CI/CD, cloud providers.
+### No pattern match (AI handles it, costs tokens):
 
-| Category | Patterns | Examples |
-|----------|----------|----------|
-| Kubernetes | 10 | CrashLoopBackOff, ImagePull, RBAC |
-| Terraform | 9 | state lock, cycles, backend, import |
-| CI/CD | 9 | GHA syntax, runner offline, cache |
-| Cloud | 10 | AWS/GCP/Azure auth, quotas |
-| Ansible | 8 | unreachable, vault, undefined vars |
+```
+$ some-obscure-command --with-unusual-flags
+Error: unexpected configuration in /etc/something.conf
+
+(no [CyxCode] lines — the AI analyzes this and responds normally)
+```
+
+**Rule of thumb**: `[CyxCode]` visible = free fix. No `[CyxCode]` = AI handled it.
 
 ---
 
-## How It Works
+## What Happens Behind the Scenes
+
+Here's the full lifecycle of an error in CyxCode:
 
 ```
-Error occurs
-     |
-     v
-+-------------------+
-| Pattern Match     |---- Match found ----> Apply fix (FREE, 0 tokens)
-| (136 patterns)    |                              |
-+---------+---------+                              |
-          |                                        |
-     No match                                      |
-          |                                        |
-          v                                        |
-+-------------------+                              |
-| LLM Fallback      |---- Novel solution ----------+
-| (costs tokens)    |                              |
-+-------------------+                              |
-                                                   v
-                                            +----------+
-                                            |  Retry   |
-                                            +----------+
+1. User types a command in the TUI
+                |
+                v
+2. Bash tool executes the command
+   (src/tool/bash.ts)
+                |
+                v
+3. Command exits with non-zero code?
+   - No  -> return output normally
+   - Yes -> continue to step 4
+                |
+                v
+4. SkillRouter.findMatching(output) called
+   (src/cyxcode/router.ts)
+                |
+                v
+5. Router iterates all 3 skills:
+   - Recovery (51 patterns: node, git, build, docker, python, system)
+   - Security (39 patterns: ssl, auth, ssh, network, scan)
+   - DevOps   (46 patterns: kubernetes, terraform, cicd, cloud, ansible)
+                |
+                v
+6. Each skill runs BaseSkill.match(error)
+   (src/cyxcode/base-skill.ts)
+   - Tests each pattern's regex against the error output
+   - If match: extracts captures ($1, $2, etc.)
+   - Returns PatternMatch with pattern, captures, extracted vars
+                |
+                v
+7. Match found?
+   - Yes -> Append [CyxCode] lines with fix suggestions to output
+            SkillRouter.recordMatch() for stats
+   - No  -> SkillRouter.recordMiss(), output passes through unchanged
+                |
+                v
+8. Output returned to the LLM
+   - With [CyxCode]: LLM sees pre-diagnosed fix, minimal token use
+   - Without: LLM analyzes error normally (full token cost)
 ```
 
----
-
-## Keyboard Shortcuts
-
-| Key | Action |
-|-----|--------|
-| `Ctrl+U` | Scroll up (half page) |
-| `Ctrl+D` | Scroll down (half page) |
-| `Ctrl+B` | Page up |
-| `Ctrl+F` | Page down |
-| `Ctrl+T` | Switch model variants |
-| `Tab` | Switch agents |
-| `Ctrl+P` | Open command palette |
-
----
-
-## Installation
-
-```bash
-# Clone and run
-git clone https://github.com/code3hr/cyxcode.git
-cd cyxcode
-bun install
-bun run dev
-```
-
-### API Key
-
-```bash
-export ANTHROPIC_API_KEY=sk-ant-...    # Claude (recommended)
-# or
-export OPENAI_API_KEY=sk-...           # GPT-4
-```
-
----
-
-## Architecture
+### Architecture
 
 ```
                         CYXCODE
     +--------------------------------------------------+
     |                  Skill Router                     |
+    |   (src/cyxcode/router.ts)                        |
     |   Match error -> Find patterns -> Suggest fix    |
     +--------------------------------------------------+
                            |
@@ -260,8 +229,353 @@ export OPENAI_API_KEY=sk-...           # GPT-4
   +-----------+      +-----------+      +-----------+
        |                  |                  |
   node, git,         ssl, auth,         k8s, tf,
-  docker, py         ssh, scan          cicd, cloud
+  build, docker,     ssh, network,      cicd, cloud,
+  python, system     scan               ansible
 ```
+
+### Key Source Files
+
+| File | Purpose |
+|------|---------|
+| `src/cyxcode/router.ts` | Singleton SkillRouter — routes errors to matching skills |
+| `src/cyxcode/base-skill.ts` | BaseSkill class — pattern matching, fix execution, token estimation |
+| `src/cyxcode/types.ts` | TypeScript types: Pattern, Fix, PatternMatch, SkillContext, SkillResult |
+| `src/cyxcode/index.ts` | Initializes and registers all 3 skills |
+| `src/tool/bash.ts` | Bash tool integration — calls SkillRouter on command failure |
+| `src/cyxcode/skills/recovery/` | Recovery skill patterns (node, git, build, docker, python, system) |
+| `src/cyxcode/skills/security/` | Security skill patterns (ssl, auth, ssh, network, scan) |
+| `src/cyxcode/skills/devops/` | DevOps skill patterns (kubernetes, terraform, cicd, cloud, ansible) |
+
+---
+
+## Skills (3 Deep, Not 700 Wide)
+
+### Recovery Skill — 51 patterns
+
+Handles known build, runtime, and development environment errors. Zero LLM tokens for common developer mistakes.
+
+| Category | Patterns | What it catches |
+|----------|----------|-----------------|
+| Node/npm | 9 | `Cannot find module`, `EACCES`, peer dep conflicts, `ENOENT package.json`, registry errors, TypeScript module errors, corrupted `node_modules`, port in use |
+| Git | 9 | Merge conflicts, push rejected (non-fast-forward), uncommitted changes, not a git repo, auth failed, branch not found, detached HEAD, diverged branches, untracked overwrite |
+| Build | 8 | CMake not found, linker errors (`undefined reference`), compiler not found, make failures, `pkg-config` missing, out of memory during build, configure failures |
+| Docker | 8 | Daemon not running, port already allocated, image not found, build failures, volume mount errors, network conflicts, permission denied, disk space |
+| Python | 8 | `ModuleNotFoundError`, venv activation, pip permission errors, version conflicts, encoding errors (`UnicodeDecodeError`), `ImportError`, syntax errors, missing `__init__.py` |
+| System | 9 | Permission denied, disk full, OOM killer, command not found, too many open files, connection refused, DNS resolution, segfault, zombie processes |
+
+### Security Skill — 39 patterns
+
+Catches SSL, authentication, SSH, network, and vulnerability scan output.
+
+| Category | Patterns | What it catches |
+|----------|----------|-----------------|
+| SSL/TLS | 7 | Certificate expired, self-signed cert, untrusted CA, handshake failure, protocol version mismatch, certificate revoked, hostname mismatch |
+| Auth | 8 | HTTP 401/403, OAuth token expired, CORS errors, rate limiting (429), invalid API key, JWT expired, session timeout, CSRF token mismatch |
+| SSH | 7 | `Permission denied (publickey)`, host key verification failed, SSH agent not running, connection timeout, key format errors, `known_hosts` conflict, port 22 refused |
+| Network | 8 | Firewall blocking, VPN tunnel down, CSP violations, HSTS errors, DNS-over-HTTPS failures, proxy auth required, MTU issues, connection reset |
+| Scans | 9 | SQL injection detected, XSS found, vulnerable dependency (CVE), exposed secrets/API keys, insecure config, outdated/EOL software, weak crypto (MD5/SHA1), directory traversal, SSRF |
+
+### DevOps Skill — 46 patterns
+
+Handles Kubernetes, Terraform, CI/CD, cloud provider, and Ansible errors.
+
+| Category | Patterns | What it catches |
+|----------|----------|-----------------|
+| Kubernetes | 10 | Context not found, connection refused, pod not found, `ImagePullBackOff`, `CrashLoopBackOff`, OOMKilled, RBAC forbidden, pod pending/unschedulable, invalid YAML, service no endpoints |
+| Terraform | 9 | State lock, dependency cycles, backend init errors, provider not found, import conflicts, plan/apply drift, variable validation, resource already exists, state corruption |
+| CI/CD | 9 | GitHub Actions syntax errors, runner offline, cache miss, artifact upload failure, secret not found, workflow timeout, matrix strategy errors, permissions errors, checkout failures |
+| Cloud | 10 | AWS credential errors, GCP auth failures, Azure login expired, S3 bucket permissions, EC2 instance limits, Lambda timeout, quota exceeded, region not enabled, IAM policy errors, billing alerts |
+| Ansible | 8 | Host unreachable, vault password wrong, undefined variable, module not found, SSH connection failed, become/sudo errors, syntax errors, handler not found |
+
+---
+
+## Pattern Anatomy
+
+Every pattern in CyxCode follows this structure:
+
+```typescript
+{
+  id: "node-module-not-found",           // Unique identifier
+  regex: /Cannot find module '([@\w\/-]+)'/,  // Regex to match error output
+  category: "node",                       // Grouping category
+  description: "Node.js module not found", // Human-readable description
+  extractors: { module: 0 },             // Map capture groups to names
+  fixes: [                               // Ordered list of fixes
+    {
+      id: "npm-install",
+      command: "npm install $1",          // $1 = first regex capture
+      description: "Install missing module with npm",
+      priority: 1                         // Lower = try first
+    },
+    {
+      id: "yarn-add",
+      command: "yarn add $1",
+      description: "Install missing module with yarn",
+      priority: 2
+    }
+  ]
+}
+```
+
+Key concepts:
+- **`regex`**: The pattern that matches against error output. Uses JavaScript regex with capture groups
+- **`extractors`**: Maps capture group indices to named variables for logging/debugging
+- **`$1`, `$2`**: In fix commands, these are replaced with regex capture groups. So `npm install $1` becomes `npm install express` if the error was `Cannot find module 'express'`
+- **`priority`**: Fixes are sorted by success rate (if tracked) then priority. Lower numbers tried first
+- **`command` vs `instructions`**: Fixes with `command` can be auto-executed. Fixes with `instructions` are manual guidance
+
+---
+
+## Installation
+
+### Prerequisites
+
+- [Bun](https://bun.sh/) v1.3+ (for older CPUs without AVX2, use the [baseline build](https://github.com/oven-sh/bun/releases) — download `bun-linux-x64-baseline.zip`)
+- An API key for Claude or GPT-4
+
+### Setup
+
+```bash
+# Clone the repository
+git clone https://github.com/code3hr/cyxcode.git
+cd cyxcode
+
+# Install dependencies
+bun install
+
+# Set your API key
+export ANTHROPIC_API_KEY=sk-ant-...    # Claude (recommended)
+# or
+export OPENAI_API_KEY=sk-...           # GPT-4
+
+# Run CyxCode
+bun run dev
+```
+
+---
+
+## Running CyxCode
+
+CyxCode has multiple modes of operation depending on your needs.
+
+### 1. TUI Mode (Default)
+
+The terminal user interface — a full-screen interactive AI agent in your terminal.
+
+```bash
+bun run dev
+# or after building:
+cyxcode
+```
+
+This starts the TUI with the CyxCode logo, prompt input, and all pattern matching active. Use keyboard shortcuts to navigate (see below).
+
+### 2. Headless Server Mode
+
+Run CyxCode as a background API server without any UI. Useful for integrations, CI/CD, or remote access.
+
+```bash
+cyxcode serve
+cyxcode serve --port 4096
+cyxcode serve --hostname 0.0.0.0 --port 4096    # Listen on all interfaces
+cyxcode serve --mdns                              # Enable mDNS discovery
+```
+
+The server exposes a full REST API at `http://localhost:<port>` with endpoints for sessions, messages, tools, and the pentest dashboard.
+
+To secure the server, set a password:
+
+```bash
+export OPENCODE_SERVER_PASSWORD=your-secret-password
+cyxcode serve --port 4096
+```
+
+### 3. Web Interface Mode
+
+Starts the server and opens the web UI in your browser automatically.
+
+```bash
+cyxcode web
+cyxcode web --port 4096
+cyxcode web --hostname 0.0.0.0    # Accessible from other machines on your network
+```
+
+Output:
+
+```
+  Local access:       http://localhost:4096
+  Network access:     http://192.168.1.100:4096
+```
+
+The web interface provides a browser-based REPL where you can interact with CyxCode the same way you would in the TUI — send prompts, run commands, view tool output, and see `[CyxCode]` pattern matches.
+
+### 4. CLI Run Mode (Non-Interactive)
+
+Send a single message and get a response without entering the TUI. Great for scripting and automation.
+
+```bash
+# Send a message
+cyxcode run "fix the login bug in auth.ts"
+
+# Continue the last session
+cyxcode run -c "now add tests for it"
+
+# Attach a file
+cyxcode run -f config.json "what's wrong with this config?"
+
+# Use a specific model
+cyxcode run -m anthropic/claude-sonnet-4-20250514 "explain this code"
+
+# Output as JSON (for piping)
+cyxcode run --format json "list all TODO comments"
+
+# Attach to a running server
+cyxcode run --attach http://localhost:4096 "check for vulnerabilities"
+```
+
+### 5. Attach Mode
+
+Connect a TUI to an already running CyxCode server (started with `serve` or `web`).
+
+```bash
+# Start server in one terminal
+cyxcode serve --port 4096
+
+# Attach from another terminal (or another machine)
+cyxcode attach http://localhost:4096
+```
+
+---
+
+## Security Dashboard & Reports
+
+CyxCode includes a built-in security dashboard for viewing pentest findings, scan results, and compliance reports.
+
+### Accessing the Dashboard
+
+The dashboard is served as part of the web interface:
+
+```bash
+cyxcode web --port 4096
+# Dashboard available at http://localhost:4096/dashboard
+```
+
+### Dashboard Features
+
+The dashboard (`src/dashboard/`) is a SolidJS web app that shows:
+
+- **Security Overview**: Total findings, critical/high open issues, scans in last 24h, mitigations in last 7 days
+- **Severity Distribution**: Pie chart of findings by severity (critical, high, medium, low, info)
+- **Finding Status**: Bar chart showing open, confirmed, mitigated, and false positive counts
+- **Trend Charts**: 30-day trend of findings created vs mitigated
+- **Active Monitors**: Number of active security monitors running
+- **Quick Actions**: Links to open findings, compliance assessments, and report generation
+
+### Generating Reports
+
+Reports can be generated through the dashboard UI or via the API.
+
+#### Via the Dashboard UI
+
+Navigate to the Reports page in the dashboard:
+
+1. Select report type: **Executive Summary**, **Technical Report**, or **Compliance Report**
+2. Optionally filter by severity (critical, high, medium, low, info) and status (open, confirmed, mitigated, false_positive)
+3. For compliance reports, select a framework: **PCI-DSS**, **HIPAA**, or **SOC2**
+4. Click "Generate Report"
+5. Download as JSON
+
+#### Via the API
+
+```bash
+# Generate an executive summary
+curl -X POST http://localhost:4096/dashboard/pentest/reports \
+  -H "Content-Type: application/json" \
+  -d '{"type": "executive"}'
+
+# Generate a technical report filtered by severity
+curl -X POST http://localhost:4096/dashboard/pentest/reports \
+  -H "Content-Type: application/json" \
+  -d '{"type": "technical", "filters": {"severity": ["critical", "high"]}}'
+
+# Generate a PCI-DSS compliance report
+curl -X POST http://localhost:4096/dashboard/pentest/reports \
+  -H "Content-Type: application/json" \
+  -d '{"type": "compliance", "framework": "pci-dss"}'
+
+# Retrieve a generated report
+curl http://localhost:4096/dashboard/pentest/reports/<report-id>
+```
+
+#### Report Types
+
+| Type | Purpose | Contents |
+|------|---------|----------|
+| **Executive** | High-level overview for stakeholders | Risk score, severity breakdown, top targets, recommendations |
+| **Technical** | Detailed findings for security teams | Full findings grouped by target, with evidence, CVEs, remediation steps |
+| **Compliance** | Framework-specific assessment | Compliance percentage, passed/failed controls, gaps, remediation priorities |
+
+### Dashboard API Endpoints
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/dashboard/pentest/findings` | GET | List findings with filters (severity, status, target) |
+| `/dashboard/pentest/findings/:id` | GET | Get a single finding |
+| `/dashboard/pentest/findings/:id` | PATCH | Update finding status/notes |
+| `/dashboard/pentest/findings/:id` | DELETE | Delete a finding |
+| `/dashboard/pentest/scans` | GET | List scans |
+| `/dashboard/pentest/scans/:id` | GET | Get scan details |
+| `/dashboard/pentest/stats/overview` | GET | Dashboard overview statistics |
+| `/dashboard/pentest/stats/severity` | GET | Severity distribution |
+| `/dashboard/pentest/stats/trends?days=30` | GET | Finding trends over time |
+| `/dashboard/pentest/monitors` | GET | List active monitors |
+| `/dashboard/pentest/monitors/:id/run` | POST | Trigger immediate monitor run |
+| `/dashboard/pentest/monitors/:id/runs` | GET | Monitor run history |
+| `/dashboard/pentest/reports` | POST | Generate a report |
+| `/dashboard/pentest/reports/:id` | GET | Retrieve a generated report |
+| `/dashboard/pentest/compliance/frameworks` | GET | List compliance frameworks |
+| `/dashboard/pentest/compliance/:framework` | GET | Get framework controls |
+| `/dashboard/pentest/compliance/:framework/assess` | POST | Run compliance assessment |
+
+---
+
+### AVX2 Note
+
+If you get an "Illegal instruction" crash, your CPU doesn't support AVX2 (common on pre-2013 Intel CPUs). Install the Bun baseline build:
+
+```bash
+# Download and install baseline Bun (no AVX2 required)
+curl -fsSL -o /tmp/bun-baseline.zip \
+  "https://github.com/oven-sh/bun/releases/latest/download/bun-linux-x64-baseline.zip"
+unzip -o /tmp/bun-baseline.zip -d /tmp
+mkdir -p ~/.bun/bin
+cp /tmp/bun-linux-x64-baseline/bun ~/.bun/bin/bun
+chmod +x ~/.bun/bin/bun
+export PATH="$HOME/.bun/bin:$PATH"
+```
+
+---
+
+## Keyboard Shortcuts
+
+### Navigation
+
+| Key | Action |
+|-----|--------|
+| `PageUp` | Scroll up (half page) |
+| `PageDown` | Scroll down (half page) |
+| `Ctrl+Alt+U` | Scroll up (quarter page) |
+| `Ctrl+Alt+D` | Scroll down (quarter page) |
+| `Home` / `Ctrl+G` | Jump to first message |
+| `End` / `Ctrl+Alt+G` | Jump to last message |
+
+### General
+
+| Key | Action |
+|-----|--------|
+| `Ctrl+T` | Switch model variants |
+| `Tab` | Switch agents |
+| `Ctrl+P` | Open command palette |
 
 ---
 
@@ -271,18 +585,20 @@ export OPENAI_API_KEY=sk-...           # GPT-4
 
 | | OpenClaw | CyxCode |
 |--|----------|---------|
-| Skills | 700+ | 3 deep |
+| Skills | 700+ thin | 3 deep |
 | Patterns | 0 | 136 |
-| Decision | LLM always | Patterns first |
-| Token cost | High | **80% lower** |
+| Error handling | LLM always decides | Patterns first, LLM fallback |
+| Token cost | High (every error costs) | **~80% lower** (136 errors are free) |
+| Error visibility | AI response only | `[CyxCode]` labels show pattern matches |
 
 ### vs Claude Code / Cursor
 
-| | Claude Code | CyxCode |
-|--|-------------|---------|
-| Error handling | LLM every time | Pattern library |
-| Domain knowledge | None built-in | 136 patterns |
-| Token savings | None | **136 free fixes** |
+| | Claude Code / Cursor | CyxCode |
+|--|----------------------|---------|
+| Error handling | LLM every time | Pattern library handles known errors |
+| Built-in domain knowledge | None | 136 patterns across 16 categories |
+| Token savings | None | **136 common errors handled for free** |
+| Error diagnosis speed | Depends on LLM latency | Instant for pattern matches |
 
 ---
 
@@ -295,15 +611,16 @@ export OPENAI_API_KEY=sk-...           # GPT-4
 | 3 | Security skill (39 patterns) | **Done** |
 | 4 | DevOps skill (46 patterns) | **Done** |
 | 5 | Bash tool integration | **Done** |
-| 6 | Track token savings | Next |
-| 7 | Community skills | Planned |
+| 6 | Visible `[CyxCode]` pattern indicators | **Done** |
+| 7 | Track token savings | Next |
+| 8 | Community skills | Planned |
 
 ---
 
 ## License
 
-MIT License - See [LICENSE](LICENSE)
+MIT License — See [LICENSE](LICENSE)
 
 ---
 
-**CyxCode** - *136 patterns. Zero tokens. Depth over breadth.*
+**CyxCode** — *136 patterns. Zero tokens. Depth over breadth.*
