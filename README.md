@@ -772,4 +772,8 @@ MIT License — See [LICENSE](LICENSE)
 
 ---
 
-**CyxCode** — *136 patterns. Zero tokens. Depth over breadth.*
+**Tokens are the new currency. CyxCode makes sure you don't waste them.**
+
+**CyxCode** — *We automate the AI that automates us.*
+
+*136 patterns. Zero tokens. Depth over breadth.*

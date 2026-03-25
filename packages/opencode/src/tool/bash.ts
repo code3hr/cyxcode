@@ -292,7 +292,7 @@ export const BashTool = Tool.define("bash", async () => {
             fixes: fixes.length
           })
         } else {
-          getRouter().recordMiss()
+          getRouter().recordMiss(ctx.messageID, output, params.command, proc.exitCode ?? 1)
         }
       }
 
