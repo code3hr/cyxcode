@@ -72,7 +72,7 @@ The screenshot above shows CyxCode's short-circuit in action. A `python3 -c 'imp
 
 ### Agents
 
-OpenCode includes two built-in agents you can switch between with the `Tab` key.
+CyxCode includes two built-in agents you can switch between with the `Tab` key.
 
 - **build** - Default, full-access agent for development work
 - **plan** - Read-only agent for analysis and code exploration
@@ -83,31 +83,38 @@ OpenCode includes two built-in agents you can switch between with the `Tab` key.
 Also included is a **general** subagent for complex searches and multistep tasks.
 This is used internally and can be invoked using `@general` in messages.
 
-Learn more about [agents](https://opencode.ai/docs/agents).
+### Why Fork OpenCode Instead of Building a Plugin?
 
-### Documentation
+A plugin can't do what CyxCode does. Here's why:
 
-For more info on how to configure OpenCode, [**head over to our docs**](https://opencode.ai/docs).
+1. **The short-circuit requires modifying the core loop.** CyxCode intercepts the prompt loop in `prompt.ts` to skip the LLM call entirely when a pattern matches. OpenCode's plugin system (`Plugin.trigger()`) can modify data flowing through hooks, but it **cannot break the LLM loop**. A plugin would still send the pattern match back to the LLM and burn tokens.
 
-### Contributing
+2. **Shell mode integration.** CyxCode adds pattern matching to `SessionPrompt.shell()` — the `!` command path. This is a core session function, not a plugin hook point. There is no plugin event for "shell command completed."
 
-If you're interested in contributing to OpenCode, please read our [contributing docs](./CONTRIBUTING.md) before submitting a pull request.
+3. **The bash tool needs internal changes.** CyxCode adds `cyxcodeMatched` metadata to tool results and modifies how outputs are constructed. The plugin system can hook into `shell.env` (environment variables) and `experimental.text.complete` (text post-processing), but not tool result metadata.
 
-### Building on OpenCode
+4. **Initialization timing matters.** CyxCode must initialize its pattern router inside the bash tool's module context (due to Bun's `--conditions=browser` creating separate module instances). This requires `import` statements in core files, not runtime plugin registration.
 
-If you are working on a project that's related to OpenCode and is using "opencode" as part of its name, for example "opencode-dashboard" or "opencode-mobile", please add a note to your README to clarify that it is not built by the OpenCode team and is not affiliated with us in any way.
+In short: plugins can decorate behavior, but CyxCode needs to **change control flow**. That requires a fork.
+
+### Supported Error Categories
+
+CyxCode matches errors across **16 categories** in 3 skills:
+
+> **Node** | **Git** | **Python** | **Docker** | **Build** | **System** | **SSL** | **Auth** | **SSH** | **Network** | **Scan** | **Kubernetes** | **Terraform** | **CI/CD** | **Cloud** | **Ansible**
 
 ### FAQ
 
-#### How is this different from Claude Code?
+#### How is this different from Claude Code / Cursor?
 
-It's very similar to Claude Code in terms of capability. Here are the key differences:
+CyxCode is built on [OpenCode](https://opencode.ai), which is similar to Claude Code in capability. Key differences:
 
 - 100% open source
-- Not coupled to any provider. Although we recommend the models we provide through [OpenCode Zen](https://opencode.ai/zen), OpenCode can be used with Claude, OpenAI, Google, or even local models. As models evolve, the gaps between them will close and pricing will drop, so being provider-agnostic is important.
+- Not coupled to any provider — works with Claude, OpenAI, Google, or local models
+- **136 error patterns that skip the LLM entirely** — no other tool does this
 - Out-of-the-box LSP support
-- A focus on TUI. OpenCode is built by neovim users and the creators of [terminal.shop](https://terminal.shop); we are going to push the limits of what's possible in the terminal.
-- A client/server architecture. This, for example, can allow OpenCode to run on your computer while you drive it remotely from a mobile app, meaning that the TUI frontend is just one of the possible clients.
+- TUI-first design
+- Client/server architecture for remote access
 
 ---
 
@@ -455,7 +462,7 @@ The server exposes a full REST API at `http://localhost:<port>` with endpoints f
 To secure the server, set a password:
 
 ```bash
-export OPENCODE_SERVER_PASSWORD=your-secret-password
+export CYXCODE_SERVER_PASSWORD=your-secret-password
 cyxcode serve --port 4096
 ```
 
@@ -648,6 +655,74 @@ export PATH="$HOME/.bun/bin:$PATH"
 
 ---
 
+## Environment Variables
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `CYXCODE_DEBUG` | `false` | Show CyxCode debug output (router state, pattern matching) |
+| `CYXCODE_SHORT_CIRCUIT` | `true` | Skip LLM when pattern matches. Set to `false` to always send to AI |
+| `ANTHROPIC_API_KEY` | — | Claude API key (recommended) |
+| `OPENAI_API_KEY` | — | OpenAI API key (alternative) |
+
+---
+
+## Adding Custom Patterns
+
+CyxCode's pattern system is extensible. Add your own error patterns to catch project-specific errors:
+
+```typescript
+{
+  id: "my-custom-error",
+  regex: /specific error message: (.+)/i,
+  category: "node",
+  description: "What went wrong",
+  fixes: [
+    { id: "fix-1", command: "npm run fix $1", description: "Run the fix", priority: 1 },
+  ],
+}
+```
+
+Full guide with examples, tips, and file locations: **[Adding Patterns](docs/ADDING-PATTERNS.md)**
+
+---
+
+## Contributing Patterns
+
+The more patterns CyxCode has, the more errors it catches for free. We especially want patterns for:
+
+> **Bun** | **Rust/Cargo** | **Go** | **Ruby/Rails** | **Java/Gradle** | **Swift/Xcode** | **.NET/NuGet**
+
+See the full contributing guide: **[Contributing Patterns](docs/CONTRIBUTING-PATTERNS.md)**
+
+---
+
+## Before/After: CyxCode vs Standard AI
+
+The same `ModuleNotFoundError` handled three ways:
+
+| Mode | LLM Calls | Tokens | Time | Cost |
+|------|-----------|--------|------|------|
+| Standard AI (no CyxCode) | 2 | ~1,200 | ~5-6s | ~$0.002 |
+| CyxCode Normal Mode | 1 (short-circuit) | ~600 | ~3-4s | ~$0.001 |
+| CyxCode Shell Mode (`!`) | **0** | **0** | **instant** | **$0.00** |
+
+Full side-by-side comparison with Git, Docker, and Python examples: **[Before/After](docs/BEFORE-AFTER.md)**
+
+---
+
+## Performance
+
+| Mode | Error diagnosed by | Response time | Token cost |
+|------|-------------------|---------------|------------|
+| Shell (`!`) + pattern match | CyxCode | **Instant** (~50ms) | **$0.00** |
+| Normal + pattern match | CyxCode (short-circuit) | ~3-5s (LLM Call #1 only) | **~50% less** |
+| Normal + no match | AI | ~5-8s (LLM Call #1 + #2) | Full cost |
+| Shell (`!`) + no match | None (raw output) | **Instant** | **$0.00** |
+
+Detailed benchmarks and session savings estimates: **[Performance](docs/PERFORMANCE.md)**
+
+---
+
 ## Comparison
 
 ### vs OpenClaw
@@ -682,8 +757,12 @@ export PATH="$HOME/.bun/bin:$PATH"
 | 5 | Bash tool integration | **Done** |
 | 6 | Visible `[CyxCode]` pattern indicators | **Done** |
 | 7 | Debug mode (`CYXCODE_DEBUG=1`) | **Done** |
-| 8 | Track token savings | Next |
-| 9 | Community skills | Planned |
+| 8 | LLM short-circuit on pattern match | **Done** |
+| 9 | Shell mode (`!`) zero-token matching | **Done** |
+| 10 | Capture substitution (`$1` -> actual values) | **Done** |
+| 11 | Track token savings | Next |
+| 12 | Community patterns (Bun, Rust, Go, Ruby) | Planned |
+| 13 | Auto-execute fixes (with approval) | Planned |
 
 ---
 
