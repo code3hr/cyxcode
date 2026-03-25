@@ -102,13 +102,31 @@ type LearnedFile = {
 let writeLock: Promise<void> = Promise.resolve()
 
 export namespace LearnedPatterns {
+  let _cachedPath: string | undefined
+
   export function filePath(): string {
-    return path.join(Instance.worktree, ".opencode", "cyxcode-learned.json")
+    if (_cachedPath) return _cachedPath
+    // Walk up from cwd to find .opencode directory (git root)
+    let dir = process.cwd()
+    for (let i = 0; i < 10; i++) {
+      const candidate = path.join(dir, ".opencode")
+      try {
+        require("fs").accessSync(candidate)
+        _cachedPath = path.join(dir, ".opencode", "cyxcode-learned.json")
+        return _cachedPath
+      } catch {}
+      const parent = path.dirname(dir)
+      if (parent === dir) break
+      dir = parent
+    }
+    _cachedPath = path.join(process.cwd(), ".opencode", "cyxcode-learned.json")
+    return _cachedPath
   }
 
   export async function read(): Promise<LearnedFile> {
     try {
-      const content = await fs.readFile(filePath(), "utf-8")
+      const fp = filePath()
+      const content = await fs.readFile(fp, "utf-8")
       return JSON.parse(content) as LearnedFile
     } catch {
       return { version: 1, pending: [], approved: [] }
@@ -139,7 +157,7 @@ export namespace LearnedPatterns {
     // Deduplicate: skip if identical regex exists
     const regexStr = pattern.regex
     if (data.pending.some(p => p.generatedPattern.regex === regexStr)) return
-    if (data.approved.some(p => p.regex === regexStr)) return
+    if (data.approved.some(p => ((p as any).generatedPattern || p).regex === regexStr)) return
 
     const pending: PendingEntry = {
       id: pattern.id,
@@ -164,17 +182,20 @@ export namespace LearnedPatterns {
     const data = await read()
     const patterns: Pattern[] = []
 
-    for (const sp of data.approved) {
+    for (const entry of data.approved) {
       try {
+        // Handle both formats: direct SerializedPattern or full PendingEntry with nested generatedPattern
+        const sp = (entry as any).generatedPattern || entry
+        if (!sp.regex || !sp.fixes) continue
         patterns.push({
           id: sp.id,
           regex: new RegExp(sp.regex, "i"),
-          category: sp.category,
-          description: sp.description,
+          category: sp.category || "learned",
+          description: sp.description || "",
           fixes: sp.fixes,
         })
       } catch (e) {
-        log.warn("Invalid learned pattern regex, skipping", { id: sp.id, regex: sp.regex })
+        log.warn("Invalid learned pattern, skipping", { id: (entry as any).id })
       }
     }
 

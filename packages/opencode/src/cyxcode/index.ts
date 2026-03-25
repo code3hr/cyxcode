@@ -36,15 +36,20 @@ export function initCyxCode() {
   // Store on globalThis to avoid module duplication issues with Bun conditions
   ;(globalThis as any).__cyxcode_router = SkillRouter
 
-  // Load learned patterns lazily (async, non-blocking)
-  import("./learned").then(async ({ LearnedPatterns, LearnedSkill }) => {
+  // Load learned patterns — store promise so first bash call can await it
+  ;(globalThis as any).__cyxcode_learned_ready = import("./learned").then(async ({ LearnedPatterns, LearnedSkill }) => {
     try {
       const approved = await LearnedPatterns.loadApproved()
       if (approved.length > 0) {
         SkillRouter.register(new LearnedSkill(approved))
+        console.error("[CyxCode] Loaded " + approved.length + " learned pattern(s)")
       }
-    } catch {}
-  }).catch(() => {})
+    } catch (e) {
+      console.error("[CyxCode] Failed to load learned patterns:", e)
+    }
+  }).catch((e) => {
+    console.error("[CyxCode] Failed to import learned module:", e)
+  })
 
   return SkillRouter
 }

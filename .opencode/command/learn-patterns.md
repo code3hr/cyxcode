@@ -2,7 +2,7 @@
 description: Review and approve learned CyxCode patterns
 ---
 
-Read the file `.opencode/cyxcode-learned.json`.
+Find and read the file `cyxcode-learned.json` in the `.opencode` directory at the project root (look for it by searching upward from the current directory, or check common locations like `.opencode/cyxcode-learned.json` and `../../.opencode/cyxcode-learned.json`).
 
 If the file doesn't exist or has no pending entries, say "No pending patterns to review."
 
