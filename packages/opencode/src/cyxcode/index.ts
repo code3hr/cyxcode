@@ -42,14 +42,9 @@ export function initCyxCode() {
       const approved = await LearnedPatterns.loadApproved()
       if (approved.length > 0) {
         SkillRouter.register(new LearnedSkill(approved))
-        console.error("[CyxCode] Loaded " + approved.length + " learned pattern(s)")
       }
-    } catch (e) {
-      console.error("[CyxCode] Failed to load learned patterns:", e)
-    }
-  }).catch((e) => {
-    console.error("[CyxCode] Failed to import learned module:", e)
-  })
+    } catch {}
+  }).catch(() => {})
 
   return SkillRouter
 }
