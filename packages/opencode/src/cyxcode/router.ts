@@ -29,10 +29,9 @@ class SkillRouterImpl implements SkillRegistry {
       log.warn("Overwriting existing skill", { name: skill.name })
     }
     this.skills.set(skill.name, skill)
-    log.info("Registered skill", {
+    log.debug("Registered skill", {
       name: skill.name,
       patterns: skill.patterns.length,
-      triggers: skill.triggers,
     })
   }
 
