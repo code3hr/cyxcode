@@ -1,15 +1,15 @@
-Source: cyxwiz
+Source: cyxcode
 Section: utils
 Priority: optional
 Maintainer: code3hr <code3hr@users.noreply.github.com>
 Build-Depends: debhelper-compat (= 13)
 Standards-Version: 4.6.0
-Homepage: https://github.com/code3hr/opencode
-Vcs-Browser: https://github.com/code3hr/opencode
-Vcs-Git: https://github.com/code3hr/opencode.git
+Homepage: https://github.com/code3hr/cyxcode
+Vcs-Browser: https://github.com/code3hr/cyxcode
+Vcs-Git: https://github.com/code3hr/cyxcode.git
 Rules-Requires-Root: no
 
-Package: cyxwiz
+Package: cyxcode
 Architecture: all
 Depends: ${misc:Depends}
 Pre-Depends: curl
@@ -38,11 +38,11 @@ Suggests: metasploit-framework,
           burpsuite,
           zaproxy
 Description: AI-powered security operations platform
- Cyxwiz is an AI-powered operations platform for security professionals.
+ CyxCode is an AI-powered operations platform for security professionals.
  It orchestrates 30+ security tools through natural language commands,
  with governance, scope enforcement, and audit logging.
  .
- Built for Kali Linux and Parrot OS, Cyxwiz leverages the 600+ security
+ Built for Kali Linux and Parrot OS, CyxCode leverages the 600+ security
  tools already installed on these distributions.
  .
  Features:

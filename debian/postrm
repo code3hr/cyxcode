@@ -4,9 +4,9 @@ set -e
 case "$1" in
     purge)
         # Remove configuration and data
-        rm -rf /usr/lib/cyxwiz
-        rm -rf /var/lib/cyxwiz
-        rm -rf /var/log/cyxwiz
+        rm -rf /usr/lib/cyxcode
+        rm -rf /var/lib/cyxcode
+        rm -rf /var/log/cyxcode
         ;;
 
     remove|upgrade|failed-upgrade|abort-install|abort-upgrade|disappear)

@@ -1,6 +1,6 @@
 # Phase 6: Continuous Monitoring - Implementation Report
 
-This document describes what was implemented in Phase 6 of the cyxwiz project.
+This document describes what was implemented in Phase 6 of the cyxcode project.
 
 ---
 

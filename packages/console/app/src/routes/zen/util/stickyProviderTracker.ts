@@ -1,4 +1,4 @@
-import { Resource } from "@opencode-ai/console-resource"
+import { Resource } from "@cyxcode/console-resource"
 
 export function createStickyTracker(stickyProvider: boolean, session: string) {
   if (!stickyProvider) return

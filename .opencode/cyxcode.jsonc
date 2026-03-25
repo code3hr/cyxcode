@@ -1,12 +1,8 @@
 {
-  "$schema": "https://opencode.ai/config.json",
-  // "plugin": ["opencode-openai-codex-auth"],
-  // "enterprise": {
-  //   "url": "https://enterprise.dev.opencode.ai",
-  // },
+  "$schema": "https://cyxcode.ai/config.json",
   "instructions": ["STYLE_GUIDE.md"],
   "provider": {
-    "opencode": {
+    "cyxcode": {
       "options": {},
     },
   },
@@ -22,5 +18,12 @@
   },
   "tui": {
     "scrollbar_visible": true,
+    "scroll_speed": 5,
+  },
+  "keybinds": {
+    "messages_half_page_up": "ctrl+u",
+    "messages_half_page_down": "ctrl+d",
+    "messages_page_up": "ctrl+b",
+    "messages_page_down": "ctrl+f",
   },
 }

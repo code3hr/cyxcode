@@ -1,6 +1,6 @@
 // @refresh reload
 import { render } from "solid-js/web"
-import { AppBaseProviders, AppInterface, PlatformProvider, Platform } from "@opencode-ai/app"
+import { AppBaseProviders, AppInterface, PlatformProvider, Platform } from "@cyxcode/app"
 import { open, save } from "@tauri-apps/plugin-dialog"
 import { open as shellOpen } from "@tauri-apps/plugin-shell"
 import { type as ostype } from "@tauri-apps/plugin-os"
@@ -12,7 +12,7 @@ import { relaunch } from "@tauri-apps/plugin-process"
 import { AsyncStorage } from "@solid-primitives/storage"
 import { fetch as tauriFetch } from "@tauri-apps/plugin-http"
 import { Store } from "@tauri-apps/plugin-store"
-import { Logo } from "@opencode-ai/ui/logo"
+import { Logo } from "@cyxcode/ui/logo"
 import { createSignal, Show, Accessor, JSX, createResource } from "solid-js"
 
 import { UPDATER_ENABLED } from "./updater"

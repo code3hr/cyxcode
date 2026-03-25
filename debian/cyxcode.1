@@ -1,23 +1,23 @@
-.TH CYXWIZ 1 "January 2026" "cyxwiz 1.0.0" "User Commands"
+.TH CYXCODE 1 "January 2026" "cyxcode 1.1.0" "User Commands"
 .SH NAME
-cyxwiz \- AI-powered security operations platform
+cyxcode \- AI-powered security operations platform
 .SH SYNOPSIS
-.B cyxwiz
+.B cyxcode
 [\fIOPTIONS\fR]
 .SH DESCRIPTION
-.B Cyxwiz
+.B CyxCode
 is an AI-powered operations platform for security professionals.
 It orchestrates 30+ security tools through natural language commands,
 with governance, scope enforcement, and comprehensive audit logging.
 .PP
-Built for Kali Linux and Parrot OS, Cyxwiz leverages the security tools
+Built for Kali Linux and Parrot OS, CyxCode leverages the security tools
 already installed on these distributions. Instead of memorizing tool
 syntax and manually orchestrating workflows, describe what you want
 to accomplish in natural language.
 .SH FEATURES
 .TP
 .B Natural Language Interface
-Describe security testing tasks in plain English. Cyxwiz translates your
+Describe security testing tasks in plain English. CyxCode translates your
 intent into the appropriate tool commands.
 .TP
 .B Governance Engine
@@ -25,7 +25,7 @@ Every action is evaluated against policies before execution. Define
 what's allowed, what needs approval, and what's blocked.
 .TP
 .B Scope Enforcement
-Define authorized targets (IPs, domains, ports). Cyxwiz prevents
+Define authorized targets (IPs, domains, ports). CyxCode prevents
 accidental out-of-scope scanning.
 .TP
 .B Audit Trail
@@ -51,9 +51,9 @@ User/group enumeration, Kerberoasting, AS-REP roasting
 OpenAPI parsing, JWT analysis, BOLA/IDOR testing
 .SH EXAMPLES
 .PP
-Start Cyxwiz:
+Start CyxCode:
 .RS
-.B cyxwiz
+.B cyxcode
 .RE
 .PP
 Scan a network for open ports:
@@ -83,21 +83,21 @@ API key for Claude AI (recommended).
 .B OPENAI_API_KEY
 API key for OpenAI GPT models (alternative).
 .TP
-.B CYXWIZ_CONFIG
+.B CYXCODE_CONFIG
 Path to configuration file (optional).
 .SH FILES
 .TP
-.I /usr/lib/cyxwiz/
-Cyxwiz installation directory.
+.I /usr/lib/cyxcode/
+CyxCode installation directory.
 .TP
-.I /usr/share/doc/cyxwiz/
+.I /usr/share/doc/cyxcode/
 Documentation files.
 .TP
-.I ~/.cyxwiz/
+.I ~/.cyxcode/
 User configuration and session data.
 .SH SECURITY
 .PP
-Cyxwiz includes governance features specifically to prevent misuse:
+CyxCode includes governance features specifically to prevent misuse:
 .IP \(bu 2
 Scope enforcement blocks unauthorized targets
 .IP \(bu 2
@@ -106,7 +106,7 @@ Audit logging creates accountability
 Designed for authorized testing only
 .PP
 .B WARNING:
-Only use Cyxwiz for authorized security testing. Unauthorized scanning
+Only use CyxCode for authorized security testing. Unauthorized scanning
 or testing is illegal and unethical.
 .SH SEE ALSO
 .BR nmap (1),
@@ -114,7 +114,7 @@ or testing is illegal and unethical.
 .BR sqlmap (1),
 .BR nuclei (1)
 .SH BUGS
-Report bugs at: https://github.com/code3hr/opencode/issues
+Report bugs at: https://github.com/code3hr/cyxcode/issues
 .SH AUTHOR
 Written by code3hr.
 .SH COPYRIGHT

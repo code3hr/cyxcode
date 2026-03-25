@@ -1,4 +1,4 @@
-# Cyxwiz - Usage Guide
+# CyxCode - Usage Guide
 
 Quick reference for development and running the project.
 
@@ -74,8 +74,8 @@ bun run --cwd packages/opencode src/index.ts web
 │   │   │   ├── session/   # Session management
 │   │   │   └── ...
 │   │   └── bin/
-│   ├── plugin/            # Plugin SDK (@opencode-ai/plugin)
-│   ├── sdk/               # Client SDK (@opencode-ai/sdk)
+│   ├── plugin/            # Plugin SDK (@cyxcode/plugin)
+│   ├── sdk/               # Client SDK (@cyxcode/sdk)
 │   ├── console/           # Console app
 │   ├── desktop/           # Desktop app
 │   └── web/               # Web interface
@@ -87,7 +87,7 @@ bun run --cwd packages/opencode src/index.ts web
 
 ---
 
-## Key Files for Cyxwiz Development
+## Key Files for CyxCode Development
 
 | File | Purpose |
 |------|---------|

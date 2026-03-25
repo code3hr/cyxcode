@@ -18,15 +18,15 @@ import {
   type PermissionRequest,
   type QuestionRequest,
   createOpencodeClient,
-} from "@opencode-ai/sdk/v2/client"
+} from "@cyxcode/sdk/v2/client"
 import { createStore, produce, reconcile } from "solid-js/store"
-import { Binary } from "@opencode-ai/util/binary"
-import { retry } from "@opencode-ai/util/retry"
+import { Binary } from "@cyxcode/util/binary"
+import { retry } from "@cyxcode/util/retry"
 import { useGlobalSDK } from "./global-sdk"
 import { ErrorPage, type InitError } from "../pages/error"
 import { batch, createContext, useContext, onCleanup, onMount, type ParentProps, Switch, Match } from "solid-js"
-import { showToast } from "@opencode-ai/ui/toast"
-import { getFilename } from "@opencode-ai/util/path"
+import { showToast } from "@cyxcode/ui/toast"
+import { getFilename } from "@cyxcode/util/path"
 import { usePlatform } from "./platform"
 
 type State = {

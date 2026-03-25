@@ -1,4 +1,4 @@
-packages/* usr/lib/cyxwiz/packages
-docs/* usr/lib/cyxwiz/docs
-package.json usr/lib/cyxwiz
-README.md usr/share/doc/cyxwiz
+packages/* usr/lib/cyxcode/packages
+docs/* usr/lib/cyxcode/docs
+package.json usr/lib/cyxcode
+README.md usr/share/doc/cyxcode

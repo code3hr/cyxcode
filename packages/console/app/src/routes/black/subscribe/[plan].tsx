@@ -6,14 +6,14 @@ import { Elements, PaymentElement, useStripe, useElements, AddressElement } from
 import { PlanID, plans } from "../common"
 import { getActor, useAuthSession } from "~/context/auth"
 import { withActor } from "~/context/auth.withActor"
-import { Actor } from "@opencode-ai/console-core/actor.js"
-import { and, Database, eq, isNull } from "@opencode-ai/console-core/drizzle/index.js"
-import { WorkspaceTable } from "@opencode-ai/console-core/schema/workspace.sql.js"
-import { UserTable } from "@opencode-ai/console-core/schema/user.sql.js"
+import { Actor } from "@cyxcode/console-core/actor.js"
+import { and, Database, eq, isNull } from "@cyxcode/console-core/drizzle/index.js"
+import { WorkspaceTable } from "@cyxcode/console-core/schema/workspace.sql.js"
+import { UserTable } from "@cyxcode/console-core/schema/user.sql.js"
 import { createList } from "solid-list"
 import { Modal } from "~/component/modal"
-import { BillingTable } from "@opencode-ai/console-core/schema/billing.sql.js"
-import { Billing } from "@opencode-ai/console-core/billing.js"
+import { BillingTable } from "@cyxcode/console-core/schema/billing.sql.js"
+import { Billing } from "@cyxcode/console-core/billing.js"
 
 const plansMap = Object.fromEntries(plans.map((p) => [p.id, p])) as Record<PlanID, (typeof plans)[number]>
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY!)

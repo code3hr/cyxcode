@@ -3,7 +3,7 @@ import { xdgData, xdgCache, xdgConfig, xdgState } from "xdg-basedir"
 import path from "path"
 import os from "os"
 
-const app = "cyxwiz"
+const app = "cyxcode"
 
 const data = path.join(xdgData!, app)
 const cache = path.join(xdgCache!, app)

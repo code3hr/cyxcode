@@ -1,6 +1,6 @@
 # Phase 5: Report Generation - Implementation Report
 
-This document describes what was implemented in Phase 5 of the cyxwiz project.
+This document describes what was implemented in Phase 5 of the cyxcode project.
 
 ---
 

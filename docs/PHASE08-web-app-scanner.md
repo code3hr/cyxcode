@@ -1,6 +1,6 @@
 # Phase 8: Web Application Scanner - Implementation Report
 
-This document describes what was implemented in Phase 8 of the cyxwiz project.
+This document describes what was implemented in Phase 8 of the cyxcode project.
 
 ---
 

@@ -1,14 +1,14 @@
-import { Button } from "@opencode-ai/ui/button"
-import { useDialog } from "@opencode-ai/ui/context/dialog"
-import { Dialog } from "@opencode-ai/ui/dialog"
-import { TextField } from "@opencode-ai/ui/text-field"
-import { Icon } from "@opencode-ai/ui/icon"
+import { Button } from "@cyxcode/ui/button"
+import { useDialog } from "@cyxcode/ui/context/dialog"
+import { Dialog } from "@cyxcode/ui/dialog"
+import { TextField } from "@cyxcode/ui/text-field"
+import { Icon } from "@cyxcode/ui/icon"
 import { createMemo, createSignal, For, Show } from "solid-js"
 import { createStore } from "solid-js/store"
 import { useGlobalSDK } from "@/context/global-sdk"
 import { type LocalProject, getAvatarColors } from "@/context/layout"
-import { getFilename } from "@opencode-ai/util/path"
-import { Avatar } from "@opencode-ai/ui/avatar"
+import { getFilename } from "@cyxcode/util/path"
+import { Avatar } from "@cyxcode/ui/avatar"
 
 const AVATAR_COLOR_KEYS = ["pink", "mint", "orange", "purple", "cyan", "lime"] as const
 

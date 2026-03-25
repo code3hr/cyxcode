@@ -7,7 +7,7 @@ import { bootstrap } from "../bootstrap"
 import { Command } from "../../command"
 import { EOL } from "os"
 import { select } from "@clack/prompts"
-import { createOpencodeClient, type OpencodeClient } from "@opencode-ai/sdk/v2"
+import { createOpencodeClient, type OpencodeClient } from "@cyxcode/sdk/v2"
 import { Server } from "../../server/server"
 import { Provider } from "../../provider/provider"
 import { Agent } from "../../agent/agent"
@@ -27,7 +27,7 @@ const TOOL: Record<string, [string, string]> = {
 
 export const RunCommand = cmd({
   command: "run [message..]",
-  describe: "run cyxwiz with a message",
+  describe: "run cyxcode with a message",
   builder: (yargs: Argv) => {
     return yargs
       .positional("message", {
@@ -81,7 +81,7 @@ export const RunCommand = cmd({
       })
       .option("attach", {
         type: "string",
-        describe: "attach to a running cyxwiz server (e.g., http://localhost:4096)",
+        describe: "attach to a running cyxcode server (e.g., http://localhost:4096)",
       })
       .option("port", {
         type: "number",

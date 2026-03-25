@@ -1,36 +1,36 @@
-id = "opencode"
-name = "OpenCode"
-description = "The open source coding agent."
+id = "cyxcode"
+name = "CyxCode"
+description = "AI-powered security operations platform."
 version = "1.1.21"
 schema_version = 1
-authors = ["Anomaly"]
-repository = "https://github.com/anomalyco/opencode"
+authors = ["code3hr"]
+repository = "https://github.com/code3hr/cyxcode"
 
-[agent_servers.opencode]
-name = "OpenCode"
-icon = "./icons/opencode.svg"
+[agent_servers.cyxcode]
+name = "CyxCode"
+icon = "./icons/cyxcode.svg"
 
-[agent_servers.opencode.targets.darwin-aarch64]
-archive = "https://github.com/anomalyco/opencode/releases/download/v1.1.21/opencode-darwin-arm64.zip"
-cmd = "./opencode"
+[agent_servers.cyxcode.targets.darwin-aarch64]
+archive = "https://github.com/code3hr/cyxcode/releases/download/v1.1.21/cyxcode-darwin-arm64.zip"
+cmd = "./cyxcode"
 args = ["acp"]
 
-[agent_servers.opencode.targets.darwin-x86_64]
-archive = "https://github.com/anomalyco/opencode/releases/download/v1.1.21/opencode-darwin-x64.zip"
-cmd = "./opencode"
+[agent_servers.cyxcode.targets.darwin-x86_64]
+archive = "https://github.com/code3hr/cyxcode/releases/download/v1.1.21/cyxcode-darwin-x64.zip"
+cmd = "./cyxcode"
 args = ["acp"]
 
-[agent_servers.opencode.targets.linux-aarch64]
-archive = "https://github.com/anomalyco/opencode/releases/download/v1.1.21/opencode-linux-arm64.tar.gz"
-cmd = "./opencode"
+[agent_servers.cyxcode.targets.linux-aarch64]
+archive = "https://github.com/code3hr/cyxcode/releases/download/v1.1.21/cyxcode-linux-arm64.tar.gz"
+cmd = "./cyxcode"
 args = ["acp"]
 
-[agent_servers.opencode.targets.linux-x86_64]
-archive = "https://github.com/anomalyco/opencode/releases/download/v1.1.21/opencode-linux-x64.tar.gz"
-cmd = "./opencode"
+[agent_servers.cyxcode.targets.linux-x86_64]
+archive = "https://github.com/code3hr/cyxcode/releases/download/v1.1.21/cyxcode-linux-x64.tar.gz"
+cmd = "./cyxcode"
 args = ["acp"]
 
-[agent_servers.opencode.targets.windows-x86_64]
-archive = "https://github.com/anomalyco/opencode/releases/download/v1.1.21/opencode-windows-x64.zip"
-cmd = "./opencode.exe"
+[agent_servers.cyxcode.targets.windows-x86_64]
+archive = "https://github.com/code3hr/cyxcode/releases/download/v1.1.21/cyxcode-windows-x64.zip"
+cmd = "./cyxcode.exe"
 args = ["acp"]

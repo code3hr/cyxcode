@@ -1,6 +1,6 @@
 # Testing Documentation
 
-This document describes the testing approach, test structure, and how to run tests for cyxwiz.
+This document describes the testing approach, test structure, and how to run tests for cyxcode.
 
 ---
 
@@ -17,7 +17,7 @@ This document describes the testing approach, test structure, and how to run tes
 
 ## Overview
 
-cyxwiz uses [Bun's built-in test runner](https://bun.sh/docs/cli/test) for unit and integration testing. Tests are located in the `packages/opencode/test/` directory and mirror the source structure.
+cyxcode uses [Bun's built-in test runner](https://bun.sh/docs/cli/test) for unit and integration testing. Tests are located in the `packages/opencode/test/` directory and mirror the source structure.
 
 ### Test Stack
 

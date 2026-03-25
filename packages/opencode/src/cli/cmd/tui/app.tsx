@@ -221,20 +221,20 @@ function App() {
     if (!terminalTitleEnabled() || Flag.OPENCODE_DISABLE_TERMINAL_TITLE) return
 
     if (route.data.type === "home") {
-      renderer.setTerminalTitle("Cyxwiz")
+      renderer.setTerminalTitle("CyxCode")
       return
     }
 
     if (route.data.type === "session") {
       const session = sync.session.get(route.data.sessionID)
       if (!session || SessionApi.isDefaultTitle(session.title)) {
-        renderer.setTerminalTitle("Cyxwiz")
+        renderer.setTerminalTitle("CyxCode")
         return
       }
 
       // Truncate title to 40 chars max
       const title = session.title.length > 40 ? session.title.slice(0, 37) + "..." : session.title
-      renderer.setTerminalTitle(`Cyxwiz | ${title}`)
+      renderer.setTerminalTitle(`CyxCode | ${title}`)
     }
   })
 

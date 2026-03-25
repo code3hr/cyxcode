@@ -3,12 +3,12 @@ import { useNavigate, useParams } from "@solidjs/router"
 import { useSync } from "@/context/sync"
 import { useSDK } from "@/context/sdk"
 import { usePrompt } from "@/context/prompt"
-import { useDialog } from "@opencode-ai/ui/context/dialog"
-import { Dialog } from "@opencode-ai/ui/dialog"
-import { List } from "@opencode-ai/ui/list"
+import { useDialog } from "@cyxcode/ui/context/dialog"
+import { Dialog } from "@cyxcode/ui/dialog"
+import { List } from "@cyxcode/ui/list"
 import { extractPromptFromParts } from "@/utils/prompt"
-import type { TextPart as SDKTextPart } from "@opencode-ai/sdk/v2/client"
-import { base64Encode } from "@opencode-ai/util/encode"
+import type { TextPart as SDKTextPart } from "@cyxcode/sdk/v2/client"
+import { base64Encode } from "@cyxcode/util/encode"
 
 interface ForkableMessage {
   id: string

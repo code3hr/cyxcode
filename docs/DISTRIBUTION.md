@@ -1,12 +1,12 @@
 # Distribution Channels: Kali Linux & Parrot OS
 
-This document outlines the strategy for distributing Cyxwiz through the official Kali Linux and Parrot OS repositories.
+This document outlines the strategy for distributing CyxCode through the official Kali Linux and Parrot OS repositories.
 
 ---
 
 ## Overview
 
-Both Kali Linux and Parrot OS use Debian-based packaging (.deb). To get Cyxwiz included in their official repositories, we need to:
+Both Kali Linux and Parrot OS use Debian-based packaging (.deb). To get CyxCode included in their official repositories, we need to:
 
 1. Create a proper Debian package
 2. Meet their tool criteria
@@ -35,7 +35,7 @@ Both Kali Linux and Parrot OS use Debian-based packaging (.deb). To get Cyxwiz i
 | Usage examples | DONE | In README |
 | Active development | DONE | Regular commits |
 | Not duplicate of existing tool | DONE | Unique AI orchestration approach |
-| Man page | DONE | debian/cyxwiz.1 |
+| Man page | DONE | debian/cyxcode.1 |
 
 ### Submission Information
 
@@ -46,7 +46,7 @@ Category: New Tool Requests
 Severity: Minor
 Priority: Normal
 
-Name: cyxwiz
+Name: cyxcode
 Version: 1.0.0 (use tagged release)
 Homepage: https://github.com/code3hr/opencode
 Author: code3hr
@@ -69,13 +69,13 @@ Installation:
 bun install && bun run build
 
 Usage:
-$ cyxwiz
+$ cyxcode
 > scan 192.168.1.0/24 for vulnerabilities
 ```
 
 ### Kali Metapackage Target
 
-Cyxwiz should be included in:
+CyxCode should be included in:
 - `kali-tools-top10` - Core tools
 - `kali-tools-automation` - Automation category
 
@@ -102,7 +102,7 @@ Cyxwiz should be included in:
 ### Submission Process
 
 1. **Email team@parrotsec.org** with:
-   - Project name: Cyxwiz
+   - Project name: CyxCode
    - Description: AI-powered security operations platform
    - Sub-project: Security tools
    - Contribution type: New tool package
@@ -120,7 +120,7 @@ Both distributions require proper Debian packaging. Here's what we need:
 ### Directory Structure (Implemented)
 
 ```
-cyxwiz/
+cyxcode/
 ├── debian/
 │   ├── changelog          # Version history (1.0.0-1)
 │   ├── compat             # Debhelper compatibility (13)
@@ -131,7 +131,7 @@ cyxwiz/
 │   ├── postinst           # Post-install script (Bun setup)
 │   ├── prerm              # Pre-removal script
 │   ├── postrm             # Post-removal script
-│   ├── cyxwiz.1           # Man page
+│   ├── cyxcode.1           # Man page
 │   └── source/
 │       └── format         # Source format (3.0 native)
 ├── packages/
@@ -141,7 +141,7 @@ cyxwiz/
 ### debian/control
 
 ```
-Source: cyxwiz
+Source: cyxcode
 Section: utils
 Priority: optional
 Maintainer: code3hr <code3hr@users.noreply.github.com>
@@ -149,13 +149,13 @@ Build-Depends: debhelper (>= 11)
 Standards-Version: 4.5.0
 Homepage: https://github.com/code3hr/opencode
 
-Package: cyxwiz
+Package: cyxcode
 Architecture: all
 Depends: ${misc:Depends}, bun
 Recommends: nmap, nikto, nuclei, gobuster, ffuf, sqlmap,
             smbclient, ldap-utils, snmp, dnsutils
 Description: AI-powered security operations platform
- Cyxwiz is an AI-powered operations platform for security professionals.
+ CyxCode is an AI-powered operations platform for security professionals.
  It orchestrates 30+ security tools through natural language commands,
  with governance, scope enforcement, and audit logging.
  .
@@ -181,10 +181,10 @@ override_dh_auto_build:
 	bun run build
 
 override_dh_auto_install:
-	mkdir -p debian/cyxwiz/usr/lib/cyxwiz
-	cp -r dist/* debian/cyxwiz/usr/lib/cyxwiz/
-	mkdir -p debian/cyxwiz/usr/bin
-	ln -s /usr/lib/cyxwiz/cyxwiz debian/cyxwiz/usr/bin/cyxwiz
+	mkdir -p debian/cyxcode/usr/lib/cyxcode
+	cp -r dist/* debian/cyxcode/usr/lib/cyxcode/
+	mkdir -p debian/cyxcode/usr/bin
+	ln -s /usr/lib/cyxcode/cyxcode debian/cyxcode/usr/bin/cyxcode
 ```
 
 ---
@@ -194,7 +194,7 @@ override_dh_auto_install:
 ### Phase 1: Prepare Package (Priority: High)
 
 - [x] Create `debian/` directory with all required files
-- [x] Write man page for cyxwiz
+- [x] Write man page for cyxcode
 - [x] Create tagged release (v1.1.0)
 - [x] Test package build locally
 - [ ] Test installation on clean Kali VM
@@ -233,8 +233,8 @@ While working on official inclusion, we can also distribute via:
 Host .deb packages on GitHub releases for manual installation:
 
 ```bash
-wget https://github.com/code3hr/opencode/releases/download/v1.1.0/cyxwiz_1.1.0-1_all.deb
-sudo dpkg -i cyxwiz_1.1.0-1_all.deb
+wget https://github.com/code3hr/opencode/releases/download/v1.1.0/cyxcode_1.1.0-1_all.deb
+sudo dpkg -i cyxcode_1.1.0-1_all.deb
 sudo apt-get install -f  # Install dependencies
 ```
 
@@ -244,12 +244,12 @@ Host our own APT repository:
 
 ```bash
 # Add repository
-echo "deb https://apt.cyxwiz.dev stable main" | sudo tee /etc/apt/sources.list.d/cyxwiz.list
-wget -qO - https://apt.cyxwiz.dev/key.gpg | sudo apt-key add -
+echo "deb https://apt.cyxcode.dev stable main" | sudo tee /etc/apt/sources.list.d/cyxcode.list
+wget -qO - https://apt.cyxcode.dev/key.gpg | sudo apt-key add -
 
 # Install
 sudo apt update
-sudo apt install cyxwiz
+sudo apt install cyxcode
 ```
 
 ### 3. Installation Script
@@ -257,14 +257,14 @@ sudo apt install cyxwiz
 One-liner installation (current method):
 
 ```bash
-curl -fsSL https://cyxwiz.dev/install.sh | bash
+curl -fsSL https://cyxcode.dev/install.sh | bash
 ```
 
 ### 4. Homebrew (for macOS users)
 
 ```bash
-brew tap code3hr/cyxwiz
-brew install cyxwiz
+brew tap code3hr/cyxcode
+brew install cyxcode
 ```
 
 ---

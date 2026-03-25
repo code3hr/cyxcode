@@ -4,10 +4,10 @@ import { SDKProvider, useSDK } from "@/context/sdk"
 import { SyncProvider, useSync } from "@/context/sync"
 import { LocalProvider } from "@/context/local"
 
-import { base64Decode } from "@opencode-ai/util/encode"
-import { DataProvider } from "@opencode-ai/ui/context"
-import { iife } from "@opencode-ai/util/iife"
-import type { QuestionAnswer } from "@opencode-ai/sdk/v2"
+import { base64Decode } from "@cyxcode/util/encode"
+import { DataProvider } from "@cyxcode/ui/context"
+import { iife } from "@cyxcode/util/iife"
+import type { QuestionAnswer } from "@cyxcode/sdk/v2"
 
 export default function Layout(props: ParentProps) {
   const params = useParams()

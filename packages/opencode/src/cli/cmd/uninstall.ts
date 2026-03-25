@@ -23,7 +23,7 @@ interface RemovalTargets {
 
 export const UninstallCommand = {
   command: "uninstall",
-  describe: "uninstall cyxwiz and remove all related files",
+  describe: "uninstall cyxcode and remove all related files",
   builder: (yargs: Argv) =>
     yargs
       .option("keep-config", {
@@ -54,7 +54,7 @@ export const UninstallCommand = {
     UI.empty()
     UI.println(UI.logo("  "))
     UI.empty()
-    prompts.intro("Uninstall CyxWiz")
+    prompts.intro("Uninstall CyxCode")
 
     const method = await Installation.method()
     prompts.log.info(`Installation method: ${method}`)
@@ -128,11 +128,11 @@ async function showRemovalSummary(targets: RemovalTargets, method: Installation.
 
   if (method !== "curl" && method !== "unknown") {
     const cmds: Record<string, string> = {
-      npm: "npm uninstall -g cyxwiz",
-      pnpm: "pnpm uninstall -g cyxwiz",
-      bun: "bun remove -g cyxwiz",
-      yarn: "yarn global remove cyxwiz",
-      brew: "brew uninstall cyxwiz",
+      npm: "npm uninstall -g cyxcode",
+      pnpm: "pnpm uninstall -g cyxcode",
+      bun: "bun remove -g cyxcode",
+      yarn: "yarn global remove cyxcode",
+      brew: "brew uninstall cyxcode",
     }
     prompts.log.info(`  ✓ Package: ${cmds[method] || method}`)
   }
@@ -177,11 +177,11 @@ async function executeUninstall(method: Installation.Method, targets: RemovalTar
 
   if (method !== "curl" && method !== "unknown") {
     const cmds: Record<string, string[]> = {
-      npm: ["npm", "uninstall", "-g", "cyxwiz"],
-      pnpm: ["pnpm", "uninstall", "-g", "cyxwiz"],
-      bun: ["bun", "remove", "-g", "cyxwiz"],
-      yarn: ["yarn", "global", "remove", "cyxwiz"],
-      brew: ["brew", "uninstall", "cyxwiz"],
+      npm: ["npm", "uninstall", "-g", "cyxcode"],
+      pnpm: ["pnpm", "uninstall", "-g", "cyxcode"],
+      bun: ["bun", "remove", "-g", "cyxcode"],
+      yarn: ["yarn", "global", "remove", "cyxcode"],
+      brew: ["brew", "uninstall", "cyxcode"],
     }
 
     const cmd = cmds[method]
@@ -204,7 +204,7 @@ async function executeUninstall(method: Installation.Method, targets: RemovalTar
     prompts.log.info(`  rm "${targets.binary}"`)
 
     const binDir = path.dirname(targets.binary)
-    if (binDir.includes(".cyxwiz")) {
+    if (binDir.includes(".cyxcode")) {
       prompts.log.info(`  rmdir "${binDir}" 2>/dev/null`)
     }
   }
@@ -218,7 +218,7 @@ async function executeUninstall(method: Installation.Method, targets: RemovalTar
   }
 
   UI.empty()
-  prompts.log.success("Thank you for using CyxWiz!")
+  prompts.log.success("Thank you for using CyxCode!")
 }
 
 async function getShellConfigFile(): Promise<string | null> {
@@ -257,7 +257,7 @@ async function getShellConfigFile(): Promise<string | null> {
     const content = await Bun.file(file)
       .text()
       .catch(() => "")
-    if (content.includes("# cyxwiz") || content.includes(".cyxwiz/bin")) {
+    if (content.includes("# cyxcode") || content.includes(".cyxcode/bin")) {
       return file
     }
   }
@@ -275,21 +275,21 @@ async function cleanShellConfig(file: string) {
   for (const line of lines) {
     const trimmed = line.trim()
 
-    if (trimmed === "# cyxwiz") {
+    if (trimmed === "# cyxcode") {
       skip = true
       continue
     }
 
     if (skip) {
       skip = false
-      if (trimmed.includes(".cyxwiz/bin") || trimmed.includes("fish_add_path")) {
+      if (trimmed.includes(".cyxcode/bin") || trimmed.includes("fish_add_path")) {
         continue
       }
     }
 
     if (
-      (trimmed.startsWith("export PATH=") && trimmed.includes(".cyxwiz/bin")) ||
-      (trimmed.startsWith("fish_add_path") && trimmed.includes(".cyxwiz"))
+      (trimmed.startsWith("export PATH=") && trimmed.includes(".cyxcode/bin")) ||
+      (trimmed.startsWith("fish_add_path") && trimmed.includes(".cyxcode"))
     ) {
       continue
     }

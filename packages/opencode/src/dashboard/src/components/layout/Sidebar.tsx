@@ -37,7 +37,7 @@ export const Sidebar: Component = () => {
             </svg>
           </div>
           <div>
-            <div class="font-semibold text-gray-100">CyxWiz</div>
+            <div class="font-semibold text-gray-100">CyxCode</div>
             <div class="text-xs text-gray-400">Pentest Dashboard</div>
           </div>
         </div>

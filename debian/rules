@@ -16,24 +16,24 @@ override_dh_auto_build:
 
 override_dh_auto_install:
 	# Create directory structure
-	mkdir -p debian/cyxwiz/usr/lib/cyxwiz
-	mkdir -p debian/cyxwiz/usr/bin
-	mkdir -p debian/cyxwiz/usr/share/doc/cyxwiz
-	mkdir -p debian/cyxwiz/usr/share/man/man1
+	mkdir -p debian/cyxcode/usr/lib/cyxcode
+	mkdir -p debian/cyxcode/usr/bin
+	mkdir -p debian/cyxcode/usr/share/doc/cyxcode
+	mkdir -p debian/cyxcode/usr/share/man/man1
 
 	# Copy source files
-	cp -r packages debian/cyxwiz/usr/lib/cyxwiz/
-	cp -r docs debian/cyxwiz/usr/lib/cyxwiz/
-	cp package.json debian/cyxwiz/usr/lib/cyxwiz/
-	cp bun.lock debian/cyxwiz/usr/lib/cyxwiz/ 2>/dev/null || true
-	cp tsconfig.json debian/cyxwiz/usr/lib/cyxwiz/ 2>/dev/null || true
+	cp -r packages debian/cyxcode/usr/lib/cyxcode/
+	cp -r docs debian/cyxcode/usr/lib/cyxcode/
+	cp package.json debian/cyxcode/usr/lib/cyxcode/
+	cp bun.lock debian/cyxcode/usr/lib/cyxcode/ 2>/dev/null || true
+	cp tsconfig.json debian/cyxcode/usr/lib/cyxcode/ 2>/dev/null || true
 
 	# Copy documentation
-	cp README.md debian/cyxwiz/usr/share/doc/cyxwiz/
-	cp LICENSE debian/cyxwiz/usr/share/doc/cyxwiz/ 2>/dev/null || true
+	cp README.md debian/cyxcode/usr/share/doc/cyxcode/
+	cp LICENSE debian/cyxcode/usr/share/doc/cyxcode/ 2>/dev/null || true
 
 	# Install man page
-	cp debian/cyxwiz.1 debian/cyxwiz/usr/share/man/man1/
+	cp debian/cyxcode.1 debian/cyxcode/usr/share/man/man1/
 
 override_dh_auto_test:
 	@echo "Skipping tests during package build"

@@ -7,7 +7,7 @@ import { UI } from "@/cli/ui"
 import { iife } from "@/util/iife"
 import { Log } from "@/util/log"
 import { withNetworkOptions, resolveNetworkOptions } from "@/cli/network"
-import type { Event } from "@opencode-ai/sdk/v2"
+import type { Event } from "@cyxcode/sdk/v2"
 import type { EventSource } from "./context/sdk"
 
 declare global {
@@ -42,12 +42,12 @@ function createEventSource(client: RpcClient): EventSource {
 
 export const TuiThreadCommand = cmd({
   command: "$0 [project]",
-  describe: "start cyxwiz tui",
+  describe: "start cyxcode tui",
   builder: (yargs) =>
     withNetworkOptions(yargs)
       .positional("project", {
         type: "string",
-        describe: "path to start cyxwiz in",
+        describe: "path to start cyxcode in",
       })
       .option("model", {
         type: "string",

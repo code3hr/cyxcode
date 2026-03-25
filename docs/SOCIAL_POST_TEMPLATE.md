@@ -1,11 +1,11 @@
-# Cyxwiz - Social Media Post Templates
+# CyxCode - Social Media Post Templates
 
 ## Short Version (Twitter/X, LinkedIn)
 
 ```
 Tired of memorizing nmap flags, nikto options, and nuclei syntax?
 
-I built Cyxwiz - an AI-powered pentest assistant. Just describe what you need:
+I built CyxCode - an AI-powered pentest assistant. Just describe what you need:
 
 "scan this network for web vulnerabilities"
 
@@ -28,7 +28,7 @@ Download: https://github.com/code3hr/opencode/releases/latest
 ## Medium Version (Reddit, Dev.to, Forums)
 
 ```
-# Cyxwiz: Stop Memorizing Tool Syntax, Start Describing What You Need
+# CyxCode: Stop Memorizing Tool Syntax, Start Describing What You Need
 
 Hey everyone,
 
@@ -43,14 +43,14 @@ As pentesters, we spend too much time on syntax:
 
 Multiply by 30+ tools per assessment. That's not security work - that's a memorization exercise.
 
-## The Solution: Cyxwiz
+## The Solution: CyxCode
 
-Cyxwiz is an AI-powered security assistant. You describe what you want in plain English:
+CyxCode is an AI-powered security assistant. You describe what you want in plain English:
 
 ```
 You: "scan 192.168.1.0/24 for web vulnerabilities"
 
-Cyxwiz: [Runs nmap → finds web servers]
+CyxCode: [Runs nmap → finds web servers]
      [Runs nikto → checks vulnerabilities]
      [Runs nuclei → matches CVEs]
 
@@ -60,7 +60,7 @@ Cyxwiz: [Runs nmap → finds web servers]
 
 ## What Makes It Different?
 
-Built on OpenCode (superior agent architecture), Cyxwiz adds:
+Built on OpenCode (superior agent architecture), CyxCode adds:
 
 - **30+ Security Tools** - nmap, nikto, nuclei, gobuster, sqlmap, etc.
 - **Intelligent Parsers** - Extracts structured findings from raw output
@@ -70,7 +70,7 @@ Built on OpenCode (superior agent architecture), Cyxwiz adds:
 
 ## Not Another Wrapper
 
-Unlike basic LLM CLIs that just run commands, Cyxwiz:
+Unlike basic LLM CLIs that just run commands, CyxCode:
 - Actually understands security tool output
 - Maintains persistent findings across sessions
 - Prevents out-of-scope accidents
@@ -92,9 +92,9 @@ What features would you want to see?
 ## Long Version (Hacker News "Show HN", Blog Post)
 
 ```
-# Show HN: Cyxwiz - AI-Powered Pentest Assistant (Open Source)
+# Show HN: CyxCode - AI-Powered Pentest Assistant (Open Source)
 
-I built Cyxwiz because I was tired of context-switching between remembering tool syntax and actually doing security work.
+I built CyxCode because I was tired of context-switching between remembering tool syntax and actually doing security work.
 
 ## Background
 
@@ -107,9 +107,9 @@ I've been doing security assessments for a while, and the workflow is always:
 6. Repeat 100 times
 7. Manually write the report
 
-## What Cyxwiz Does
+## What CyxCode Does
 
-Cyxwiz lets you describe what you want in natural language:
+CyxCode lets you describe what you want in natural language:
 
 "check if this Apache server is vulnerable to path traversal"
 
@@ -128,7 +128,7 @@ Built on OpenCode (https://github.com/sst/opencode), which provides:
 - Extensible tool framework with typed I/O
 - Multi-LLM support (Claude, GPT-4, Gemini, local models)
 
-Cyxwiz adds a security layer:
+CyxCode adds a security layer:
 - 30+ tool integrations with output parsers
 - Findings database with OWASP/CVE categorization
 - Governance engine (scope enforcement, audit trails)
@@ -163,13 +163,13 @@ Open source, MIT licensed. Feedback welcome!
 ```
 # Terminal recording script
 
-$ ./cyxwiz
+$ ./cyxcode
 
 > scan 10.0.0.5 for vulnerabilities
 
-[Cyxwiz runs nmap, detects Apache 2.4.41]
-[Cyxwiz runs nikto, finds misconfigurations]
-[Cyxwiz runs nuclei, matches CVE-2021-41773]
+[CyxCode runs nmap, detects Apache 2.4.41]
+[CyxCode runs nikto, finds misconfigurations]
+[CyxCode runs nuclei, matches CVE-2021-41773]
 
 Found 1 critical, 2 high, 3 medium findings.
 

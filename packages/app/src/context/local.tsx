@@ -1,15 +1,15 @@
 import { createStore, produce, reconcile } from "solid-js/store"
 import { batch, createMemo, onCleanup } from "solid-js"
 import { filter, firstBy, flat, groupBy, mapValues, pipe, uniqueBy, values } from "remeda"
-import type { FileContent, FileNode, Model, Provider, File as FileStatus } from "@opencode-ai/sdk/v2"
-import { createSimpleContext } from "@opencode-ai/ui/context"
+import type { FileContent, FileNode, Model, Provider, File as FileStatus } from "@cyxcode/sdk/v2"
+import { createSimpleContext } from "@cyxcode/ui/context"
 import { useSDK } from "./sdk"
 import { useSync } from "./sync"
-import { base64Encode } from "@opencode-ai/util/encode"
+import { base64Encode } from "@cyxcode/util/encode"
 import { useProviders } from "@/hooks/use-providers"
 import { DateTime } from "luxon"
 import { Persist, persisted } from "@/utils/persist"
-import { showToast } from "@opencode-ai/ui/toast"
+import { showToast } from "@cyxcode/ui/toast"
 
 export type LocalFile = FileNode &
   Partial<{

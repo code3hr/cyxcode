@@ -114,6 +114,20 @@ Error occurs
 
 ---
 
+## Keyboard Shortcuts
+
+| Key | Action |
+|-----|--------|
+| `Ctrl+U` | Scroll up (half page) |
+| `Ctrl+D` | Scroll down (half page) |
+| `Ctrl+B` | Page up |
+| `Ctrl+F` | Page down |
+| `Ctrl+T` | Switch model variants |
+| `Tab` | Switch agents |
+| `Ctrl+P` | Open command palette |
+
+---
+
 ## Installation
 
 ```bash

@@ -2,7 +2,7 @@
  * @fileoverview Governance Engine - Main Entry Point
  *
  * The Governance Engine provides comprehensive control over tool executions
- * in cyxwiz. It enforces scope restrictions, policy-based rules, and
+ * in cyxcode. It enforces scope restrictions, policy-based rules, and
  * comprehensive audit logging for all AI tool operations.
  *
  * ## Architecture Overview

@@ -5,7 +5,7 @@ import { $ } from "bun"
 
 export const PrCommand = cmd({
   command: "pr <number>",
-  describe: "fetch and checkout a GitHub PR branch, then run cyxwiz",
+  describe: "fetch and checkout a GitHub PR branch, then run cyxcode",
   builder: (yargs) =>
     yargs.positional("number", {
       type: "number",
@@ -63,15 +63,15 @@ export const PrCommand = cmd({
               await $`git branch --set-upstream-to=${remoteName}/${headRefName} ${localBranchName}`.nothrow()
             }
 
-            // Check for cyxwiz session link in PR body
+            // Check for cyxcode session link in PR body
             if (prInfo && prInfo.body) {
               const sessionMatch = prInfo.body.match(/https:\/\/opncd\.ai\/s\/([a-zA-Z0-9_-]+)/)
               if (sessionMatch) {
                 const sessionUrl = sessionMatch[0]
-                UI.println(`Found cyxwiz session: ${sessionUrl}`)
+                UI.println(`Found cyxcode session: ${sessionUrl}`)
                 UI.println(`Importing session...`)
 
-                const importResult = await $`cyxwiz import ${sessionUrl}`.nothrow()
+                const importResult = await $`cyxcode import ${sessionUrl}`.nothrow()
                 if (importResult.exitCode === 0) {
                   const importOutput = importResult.text().trim()
                   // Extract session ID from the output (format: "Imported session: <session-id>")
@@ -88,23 +88,23 @@ export const PrCommand = cmd({
 
         UI.println(`Successfully checked out PR #${prNumber} as branch '${localBranchName}'`)
         UI.println()
-        UI.println("Starting cyxwiz...")
+        UI.println("Starting cyxcode...")
         UI.println()
 
-        // Launch cyxwiz TUI with session ID if available
+        // Launch cyxcode TUI with session ID if available
         const { spawn } = await import("child_process")
-        const cyxwizArgs = sessionId ? ["-s", sessionId] : []
-        const cyxwizProcess = spawn("cyxwiz", cyxwizArgs, {
+        const cyxcodeArgs = sessionId ? ["-s", sessionId] : []
+        const cyxcodeProcess = spawn("cyxcode", cyxcodeArgs, {
           stdio: "inherit",
           cwd: process.cwd(),
         })
 
         await new Promise<void>((resolve, reject) => {
-          cyxwizProcess.on("exit", (code) => {
+          cyxcodeProcess.on("exit", (code) => {
             if (code === 0) resolve()
-            else reject(new Error(`cyxwiz exited with code ${code}`))
+            else reject(new Error(`cyxcode exited with code ${code}`))
           })
-          cyxwizProcess.on("error", reject)
+          cyxcodeProcess.on("error", reject)
         })
       },
     })

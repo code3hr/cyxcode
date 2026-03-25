@@ -1,7 +1,7 @@
 Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
-Upstream-Name: cyxwiz
+Upstream-Name: cyxcode
 Upstream-Contact: code3hr <code3hr@users.noreply.github.com>
-Source: https://github.com/code3hr/opencode
+Source: https://github.com/code3hr/cyxcode
 
 Files: *
 Copyright: 2024-2026 code3hr

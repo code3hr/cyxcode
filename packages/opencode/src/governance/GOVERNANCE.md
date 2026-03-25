@@ -1,6 +1,6 @@
 # Governance Engine Documentation
 
-The Governance Engine provides centralized control over AI tool executions in cyxwiz. It enforces scope restrictions, evaluates policy-based rules, and maintains comprehensive audit logs for all tool operations.
+The Governance Engine provides centralized control over AI tool executions in cyxcode. It enforces scope restrictions, evaluates policy-based rules, and maintains comprehensive audit logs for all tool operations.
 
 ---
 
@@ -472,7 +472,7 @@ const targets = Governance.Matcher.extractTargets("bash", {
 
 ## Integration Guide
 
-### How Governance Integrates with cyxwiz
+### How Governance Integrates with cyxcode
 
 The governance engine hooks into the plugin system:
 
