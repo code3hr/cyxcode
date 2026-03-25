@@ -90,6 +90,12 @@ When CyxCode misses a pattern, the AI handles it. But CyxCode **learns from that
 3. Generates a regex pattern automatically
 4. Saves to `.opencode/cyxcode-learned.json` as pending
 5. Run `/learn-patterns` to review and approve
+
+### Learned Pattern in Action
+
+![CyxCode Learned Pattern Match](packages/web/src/assets/lander/screenshot-cyxcode-learned.png)
+
+The screenshot shows a bun 404 error being caught by a **learned** pattern. This error was handled by the AI the first time (costing tokens). CyxCode captured it, generated a pattern, and after approval via `/learn-patterns`, it now matches automatically — the AI is short-circuited and the fix is displayed directly.
 6. Next time same error occurs -> **zero tokens**
 
 **Every AI-handled error becomes an investment — that error never costs tokens again.**
