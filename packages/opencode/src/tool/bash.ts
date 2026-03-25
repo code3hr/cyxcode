@@ -263,8 +263,10 @@ export const BashTool = Tool.define("bash", async () => {
       // CyxCode: Pattern-based error recovery
       let cyxMatched = false
       if (proc.exitCode !== 0 && proc.exitCode !== null) {
+        // Ensure learned patterns are loaded before matching
+        if ((globalThis as any).__cyxcode_learned_ready) await (globalThis as any).__cyxcode_learned_ready
         const router = getRouter()
-        if (Flag.CYXCODE_DEBUG) console.error("[CYXCODE] Router skills count:", router.all().length, "globalThis set:", !!(globalThis as any).__cyxcode_router)
+        if (Flag.CYXCODE_DEBUG) log.info("cyxcode router", { skills: router.all().length, globalThis: !!(globalThis as any).__cyxcode_router })
         const matches = router.findMatching(output)
         if (matches.length > 0) {
           const best = matches[0]
@@ -292,7 +294,7 @@ export const BashTool = Tool.define("bash", async () => {
             fixes: fixes.length
           })
         } else {
-          getRouter().recordMiss()
+          getRouter().recordMiss(ctx.messageID, output, params.command, proc.exitCode ?? 1)
         }
       }
 

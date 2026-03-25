@@ -1,0 +1,28 @@
+{
+  "version": 1,
+  "pending": [
+    {
+      "id": "learned-1774442906958",
+      "errorOutput": "bun add v1.3.11 (af24e281)\nResolving dependencies\nResolved, downloaded and extracted [7]\nerror: GET https://registry.npmjs.org/nonexist - 404\n",
+      "aiFixText": "The package `nonexist` doesn't exist on npm (404 error).",
+      "failedCommand": "bun install nonexist",
+      "exitCode": 1,
+      "timestamp": "2026-03-25T12:48:26.962Z",
+      "generatedPattern": {
+        "id": "learned-1774442906958",
+        "regex": "error: GET https://registry\\.npmjs\\.org/nonexist - 404",
+        "category": "learned",
+        "description": "error: GET https://registry.npmjs.org/nonexist - 404",
+        "fixes": [
+          {
+            "id": "learned-1774442906958-fix",
+            "description": "nonexist",
+            "command": "nonexist",
+            "priority": 1
+          }
+        ]
+      }
+    }
+  ],
+  "approved": []
+}

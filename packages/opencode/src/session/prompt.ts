@@ -773,6 +773,43 @@ export namespace SessionPrompt {
         }
       }
 
+      // CyxCode: Capture AI fix for unmatched errors (pattern learning)
+      // Only capture when the AI has finished responding (not mid-tool-call)
+      if (processor.message.finish && processor.message.finish !== "tool-calls") {
+        try {
+          const g = globalThis as any
+          const buf: Map<string, any[]> | undefined = g.__cyxcode_capture_buffer
+          const order: string[] | undefined = g.__cyxcode_capture_order
+          const captures: any[] = []
+          if (buf && buf.size > 0) {
+            for (const entries of buf.values()) captures.push(...entries)
+            buf.clear()
+            if (order) order.length = 0
+          }
+          if (Flag.CYXCODE_DEBUG) log.info("cyxcode learning", { finish: processor.message.finish, captures: captures.length })
+          if (captures.length > 0) {
+            const parts = await MessageV2.parts(processor.message.id)
+            const aiText = parts
+              .filter((p): p is MessageV2.TextPart => p.type === "text")
+              .map(p => p.text)
+              .join("\n")
+            if (aiText.trim().length > 20) {
+              const { LearnedPatterns } = await import("@/cyxcode/learned")
+              for (const capture of captures) {
+                await LearnedPatterns.addPending({
+                  errorOutput: capture.errorOutput,
+                  aiFixText: aiText,
+                  failedCommand: capture.failedCommand,
+                  exitCode: capture.exitCode,
+                })
+              }
+            }
+          }
+        } catch (e) {
+          log.warn("CyxCode pattern learning failed", { error: e })
+        }
+      }
+
       continue
     }
     SessionCompaction.prune({ sessionID })
@@ -1828,6 +1865,7 @@ NOTE: At any point in time through this workflow you should feel free to ask the
     let cyxMatched = false
     if (proc.exitCode !== 0 && proc.exitCode !== null && !aborted) {
       initCyxCode()
+      if ((globalThis as any).__cyxcode_learned_ready) await (globalThis as any).__cyxcode_learned_ready
       const router = getRouter()
       const matches = router.findMatching(output)
       if (matches.length > 0) {
