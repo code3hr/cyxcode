@@ -1,13 +1,20 @@
-import { TextAttributes, RGBA } from "@opentui/core"
-import { For, type JSX } from "solid-js"
-import { useTheme, tint } from "@tui/context/theme"
-import { logo, marks } from "@/cli/logo"
+import { TextAttributes } from "@opentui/core"
+import { For } from "solid-js"
+import { useTheme } from "@tui/context/theme"
 
-// Shadow markers (rendered chars in parens):
-// _ = full shadow cell (space with bg=shadow)
-// ^ = letter top, shadow bottom (▀ with fg=letter, bg=shadow)
-// ~ = shadow top only (▀ with fg=shadow)
-const SHADOW_MARKER = new RegExp(`[${marks}]`)
+const LOGO_LEFT = [
+  `  _____   ____  __  `,
+  ` / __\\ \\ / /\\ \\/ /  `,
+  `| (__ \\ V /  >  <   `,
+  ` \\___| |_|  /_/\\_\\  `,
+]
+
+const LOGO_RIGHT = [
+  `  ___ ___  ____  _____`,
+  ` / __/ _ \\|  _ \\| ____|`,
+  `| (_| (_) | | | |  _|  `,
+  ` \\___\\___/|_| |_|_____|`,
+]
 
 export function Logo() {
   const { theme } = useTheme()
@@ -72,11 +79,19 @@ export function Logo() {
 
   return (
     <box>
-      <For each={logo.left}>
+      <For each={LOGO_LEFT}>
         {(line, index) => (
           <box flexDirection="row" gap={1}>
-            <box flexDirection="row">{renderLine(line, theme.textMuted, false)}</box>
-            <box flexDirection="row">{renderLine(logo.right[index()], theme.text, true)}</box>
+            <box flexDirection="row">
+              <text fg={theme.textMuted} selectable={false}>
+                {line}
+              </text>
+            </box>
+            <box flexDirection="row">
+              <text fg={theme.text} attributes={TextAttributes.BOLD} selectable={false}>
+                {LOGO_RIGHT[index()]}
+              </text>
+            </box>
           </box>
         )}
       </For>

@@ -40,6 +40,7 @@ export namespace Flag {
   export const CYXCODE_SERVER_PASSWORD = process.env["CYXCODE_SERVER_PASSWORD"]
   export const CYXCODE_SERVER_USERNAME = process.env["CYXCODE_SERVER_USERNAME"]
   export const CYXCODE_ENABLE_QUESTION_TOOL = truthy("CYXCODE_ENABLE_QUESTION_TOOL")
+  export const CYXCODE_DEBUG = truthy("CYXCODE_DEBUG")
 
   // Experimental
   export const CYXCODE_EXPERIMENTAL = truthy("CYXCODE_EXPERIMENTAL")

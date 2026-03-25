@@ -29,14 +29,22 @@ export function initCyxCode() {
   SkillRouter.register(recoverySkill)
   SkillRouter.register(securitySkill)
   SkillRouter.register(devopsSkill)
-  
+
+  // Store on globalThis to avoid module duplication issues with Bun conditions
+  ;(globalThis as any).__cyxcode_router = SkillRouter
+
   const stats = SkillRouter.stats()
   const categories = Object.entries(stats.byCategory)
     .map(([k, v]) => k + "(" + v + ")")
     .join(", ")
-  
+
   console.log("[CyxCode] Initialized with " + stats.totalPatterns + " patterns across " + stats.totalSkills + " skills")
   console.log("[CyxCode] Categories: " + categories)
-  
+
   return SkillRouter
+}
+
+/** Get the initialized SkillRouter (safe across module boundaries) */
+export function getRouter() {
+  return ((globalThis as any).__cyxcode_router || SkillRouter) as typeof SkillRouter
 }

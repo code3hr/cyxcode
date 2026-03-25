@@ -10,7 +10,7 @@ export const nodePatterns: Pattern[] = [
   // MODULE NOT FOUND
   {
     id: "node-module-not-found",
-    regex: /Cannot find module ['"]([@\w\/-]+)['"]/,
+    regex: /Cannot find (?:module|package) ['"]([@\w\/-]+)['"]/,
     category: "node",
     description: "Node.js module not found",
     extractors: { module: 0 },

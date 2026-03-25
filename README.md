@@ -25,7 +25,7 @@
   <a href="README.vi.md">Tiếng Việt</a>
 </p>
 
-[![OpenCode Terminal UI](packages/web/src/assets/lander/screenshot.png)](https://opencode.ai)
+[![CyxCode Terminal UI](packages/web/src/assets/lander/screenshot-cyxcode.png)](https://github.com/code3hr/cyxcode)
 
 ---
 
@@ -40,6 +40,10 @@ Traditional AI coding tools:  Every error -> LLM -> tokens burned -> response
 CyxCode:                      Every error -> Pattern check -> match? -> FREE fix
                                                            -> no match? -> LLM fallback
 ```
+
+### Screenshot: Pattern Matching in Action
+
+The screenshot above shows CyxCode matching a Python `ModuleNotFoundError` in real time. Notice the `[CyxCode]` block in the output — that's the pattern match providing an instant fix (`pip install flask`) before the AI even needs to analyze the error. The AI then simply relays the suggestion instead of burning tokens to diagnose it.
 
 ### Agents
 
@@ -241,7 +245,8 @@ Here's the full lifecycle of an error in CyxCode:
 | `src/cyxcode/base-skill.ts` | BaseSkill class — pattern matching, fix execution, token estimation |
 | `src/cyxcode/types.ts` | TypeScript types: Pattern, Fix, PatternMatch, SkillContext, SkillResult |
 | `src/cyxcode/index.ts` | Initializes and registers all 3 skills |
-| `src/tool/bash.ts` | Bash tool integration — calls SkillRouter on command failure |
+| `src/tool/bash.ts` | Bash tool integration — calls SkillRouter on command failure, initializes CyxCode |
+| `src/flag/flag.ts` | Feature flags including `CYXCODE_DEBUG` for debug output |
 | `src/cyxcode/skills/recovery/` | Recovery skill patterns (node, git, build, docker, python, system) |
 | `src/cyxcode/skills/security/` | Security skill patterns (ssl, auth, ssh, network, scan) |
 | `src/cyxcode/skills/devops/` | DevOps skill patterns (kubernetes, terraform, cicd, cloud, ansible) |
@@ -351,6 +356,33 @@ export OPENAI_API_KEY=sk-...           # GPT-4
 # Run CyxCode
 bun run dev
 ```
+
+---
+
+## Debug Mode
+
+CyxCode includes a debug mode that shows the internal state of the pattern matching engine. This is useful for verifying that skills are loaded and patterns are being checked.
+
+```bash
+# Enable debug output
+CYXCODE_DEBUG=1 bun run dev
+
+# Or export it
+export CYXCODE_DEBUG=true
+bun run dev
+```
+
+When enabled, you'll see messages like:
+
+```
+[CYXCODE] Router skills count: 3 globalThis set: true
+```
+
+This confirms:
+- **Router skills count: 3** — All 3 skills (Recovery, Security, DevOps) are loaded with 136 patterns
+- **globalThis set: true** — The router is properly initialized across module boundaries
+
+Debug output is off by default. Set `CYXCODE_DEBUG=1` or `CYXCODE_DEBUG=true` to enable.
 
 ---
 
@@ -612,8 +644,9 @@ export PATH="$HOME/.bun/bin:$PATH"
 | 4 | DevOps skill (46 patterns) | **Done** |
 | 5 | Bash tool integration | **Done** |
 | 6 | Visible `[CyxCode]` pattern indicators | **Done** |
-| 7 | Track token savings | Next |
-| 8 | Community skills | Planned |
+| 7 | Debug mode (`CYXCODE_DEBUG=1`) | **Done** |
+| 8 | Track token savings | Next |
+| 9 | Community skills | Planned |
 
 ---
 

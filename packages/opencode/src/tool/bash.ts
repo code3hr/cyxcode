@@ -17,6 +17,10 @@ import { Shell } from "@/shell/shell"
 import { BashArity } from "@/permission/arity"
 import { Truncate } from "./truncate"
 import { Plugin } from "@/plugin"
+import { getRouter, initCyxCode } from "@/cyxcode"
+
+// Initialize CyxCode skills in this module context
+initCyxCode()
 
 const MAX_METADATA_LENGTH = 30_000
 const DEFAULT_TIMEOUT = Flag.CYXCODE_EXPERIMENTAL_BASH_DEFAULT_TIMEOUT_MS || 2 * 60 * 1000
@@ -258,7 +262,9 @@ export const BashTool = Tool.define("bash", async () => {
 
       // CyxCode: Pattern-based error recovery
       if (proc.exitCode !== 0 && proc.exitCode !== null) {
-        const matches = SkillRouter.findMatching(output)
+        const router = getRouter()
+        if (Flag.CYXCODE_DEBUG) console.error("[CYXCODE] Router skills count:", router.all().length, "globalThis set:", !!(globalThis as any).__cyxcode_router)
+        const matches = router.findMatching(output)
         if (matches.length > 0) {
           const best = matches[0]
           const fixes = best.match.pattern.fixes
@@ -266,19 +272,19 @@ export const BashTool = Tool.define("bash", async () => {
             const cmd = f.command ? "  " + f.command : "  (manual)"
             return (i + 1) + ". " + f.description + "\n" + cmd
           }).join("\n")
-          
-          output += "\n\n<cyxcode_recovery pattern=\"" + best.match.pattern.id + "\">\n"
-          output += "Matched: " + best.match.pattern.description + "\n"
-          output += "Suggested fixes:\n" + fixLines + "\n"
-          output += "</cyxcode_recovery>"
-          
-          SkillRouter.recordMatch(best.skill.name)
-          log.info("cyxcode pattern matched", { 
-            pattern: best.match.pattern.id, 
-            fixes: fixes.length 
+
+          output += "\n\n[CyxCode] Pattern matched: " + best.match.pattern.id + " (" + best.skill.name + ")\n"
+          output += "[CyxCode] " + best.match.pattern.description + "\n"
+          output += "[CyxCode] Suggested fixes:\n" + fixLines + "\n"
+          output += "[CyxCode] Tokens saved by pattern match (no LLM needed for diagnosis)\n"
+
+          getRouter().recordMatch(best.skill.name)
+          log.info("cyxcode pattern matched", {
+            pattern: best.match.pattern.id,
+            fixes: fixes.length
           })
         } else {
-          SkillRouter.recordMiss()
+          getRouter().recordMiss()
         }
       }
 
