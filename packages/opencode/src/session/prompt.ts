@@ -786,7 +786,7 @@ export namespace SessionPrompt {
             buf.clear()
             if (order) order.length = 0
           }
-          if (Flag.CYXCODE_DEBUG) console.error("[CYXCODE-LEARN] finish=" + processor.message.finish + " captures=" + captures.length)
+          if (Flag.CYXCODE_DEBUG) log.info("cyxcode learning", { finish: processor.message.finish, captures: captures.length })
           if (captures.length > 0) {
             const parts = await MessageV2.parts(processor.message.id)
             const aiText = parts
