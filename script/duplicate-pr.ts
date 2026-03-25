@@ -1,7 +1,8 @@
 #!/usr/bin/env bun
 
 import path from "path"
-import { createOpencode } from "@cyxcode/sdk"
+import { pathToFileURL } from "bun"
+import { createOpencode } from "@opencode-ai/sdk"
 import { parseArgs } from "util"
 
 async function main() {
@@ -49,7 +50,7 @@ Examples:
       }
       parts.push({
         type: "file",
-        url: `file://${resolved}`,
+        url: pathToFileURL(resolved).href,
         filename: path.basename(resolved),
         mime: "text/plain",
       })
