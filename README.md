@@ -91,6 +91,12 @@ When CyxCode misses a pattern, the AI handles it. But CyxCode **learns from that
 4. Saves to `.opencode/cyxcode-learned.json` as pending
 5. Run `/learn-patterns` to review and approve
 
+### Reviewing Learned Patterns (`/learn-patterns`)
+
+![CyxCode Learn Review](packages/web/src/assets/lander/screenshot-cyxcode-learn-review.png)
+
+Run `/learn-patterns` to review pending patterns. Each shows the error, generated regex, fix, and source command. Approve to activate, reject to discard, or skip for later.
+
 ### Learned Pattern in Action
 
 ![CyxCode Learned Pattern Match](packages/web/src/assets/lander/screenshot-cyxcode-learned.png)
