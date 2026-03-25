@@ -20,19 +20,19 @@ jobs:
         include:
           - os: ubuntu-latest
             target: linux-x64
-            artifact: cyxwiz-linux-x64
+            artifact: cyxcode-linux-x64
           - os: ubuntu-latest
             target: linux-arm64
-            artifact: cyxwiz-linux-arm64
+            artifact: cyxcode-linux-arm64
           - os: macos-14
             target: darwin-x64
-            artifact: cyxwiz-darwin-x64
+            artifact: cyxcode-darwin-x64
           - os: macos-latest
             target: darwin-arm64
-            artifact: cyxwiz-darwin-arm64
+            artifact: cyxcode-darwin-arm64
           - os: windows-latest
             target: windows-x64
-            artifact: cyxwiz-windows-x64
+            artifact: cyxcode-windows-x64
 
     runs-on: ${{ matrix.os }}
 
@@ -63,8 +63,8 @@ jobs:
           DIST_DIR=$(ls -d */ | head -1)
           cd "$DIST_DIR/bin"
           chmod +x opencode
-          mv opencode cyxwiz
-          tar -czvf ${{ matrix.artifact }}.tar.gz cyxwiz
+          mv opencode cyxcode
+          tar -czvf ${{ matrix.artifact }}.tar.gz cyxcode
           mv ${{ matrix.artifact }}.tar.gz $GITHUB_WORKSPACE/
 
       - name: Package Windows Binary
@@ -74,8 +74,8 @@ jobs:
           cd packages/opencode/dist
           $distDir = Get-ChildItem -Directory | Select-Object -First 1
           cd "$($distDir.Name)/bin"
-          Rename-Item opencode.exe cyxwiz.exe
-          Compress-Archive -Path cyxwiz.exe -DestinationPath ${{ matrix.artifact }}.zip
+          Rename-Item opencode.exe cyxcode.exe
+          Compress-Archive -Path cyxcode.exe -DestinationPath ${{ matrix.artifact }}.zip
           Move-Item ${{ matrix.artifact }}.zip $env:GITHUB_WORKSPACE/
 
       - name: Upload Artifact
