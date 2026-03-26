@@ -12,7 +12,7 @@
     "dev:console": "ulimit -n 10240 2>/dev/null; bun run --cwd packages/console/app dev",
     "dev:storybook": "bun --cwd packages/storybook storybook",
     "typecheck": "bun turbo typecheck",
-    "prepare": "husky",
+    "prepare": "husky && bun scripts/patch-baseline-browser-mapping.js",
     "random": "echo 'Random script'",
     "hello": "echo 'Hello World!'",
     "test": "echo 'do not run tests from root' && exit 1"
