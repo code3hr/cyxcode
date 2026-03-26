@@ -1,3 +1,6 @@
+// Suppress baseline-browser-mapping warning about outdated data
+process.env.BASELINE_BROWSER_MAPPING_IGNORE_OLD_DATA = "true"
+
 import yargs from "yargs"
 import { hideBin } from "yargs/helpers"
 import { RunCommand } from "./cli/cmd/run"
