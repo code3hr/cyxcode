@@ -181,6 +181,16 @@ Plugins can't do what CyxCode does:
 
 Plugins decorate. CyxCode changes control flow. That requires a fork.
 
+### A Note on Naming
+
+CyxCode is a fork of [OpenCode](https://opencode.ai). You'll see `opencode` in many internal files — config files (`opencode.json`), directory names (`.opencode/`, `packages/opencode/`), and internal references. This is intentional.
+
+A full rebrand of every internal reference would make it impossible to pull upstream improvements from OpenCode. We regularly sync with upstream to get new features, bug fixes, and TUI improvements. Renaming thousands of internal references would turn every `git pull` into a merge conflict nightmare.
+
+So we rebrand what users see — the CLI (`cyxcode`), the TUI logo, the package scope (`@cyxcode/*`), feature flags (`CYXCODE_*`), and all documentation. The core engine stays `opencode` internally for upstream compatibility.
+
+If you see `opencode` in a config path or source file, that's normal. If you see it in the UI or docs, that's a bug — please report it.
+
 ---
 
 ## Docs
