@@ -6,6 +6,7 @@
 
 ## Error Response Guidelines
 
+- `error: GET https://registry.npmjs.org/<pkg> - 404`: Package doesn't exist on npm. Check package name or use `bun add` without specifying a name to get suggestions.
 - When a bash command fails, state the problem and fix in 1-2 lines
 - Do NOT repeat the error output back to the user
 - Do NOT explain what the command was supposed to do

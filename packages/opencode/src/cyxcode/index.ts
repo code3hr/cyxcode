@@ -51,6 +51,11 @@ export function initCyxCode() {
     initMemoryCapture()
   }).catch(() => {})
 
+  // Run auto-dream consolidation (phases 1-4, code-only, no tokens)
+  import("./dream").then(({ Dream }) => {
+    Dream.initAutoDream()
+  }).catch(() => {})
+
   return SkillRouter
 }
 

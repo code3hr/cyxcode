@@ -14,10 +14,12 @@
 - [Quick Start](#quick-start)
 - [Two Modes](#two-modes)
 - [Pattern Learning](#pattern-learning)
+- [Project Memory](#project-memory)
+- [Dream Consolidation](#dream-consolidation)
 - [Supported Categories](#supported-categories)
 - [Environment Variables](#environment-variables)
 - [Why Fork?](#why-fork-opencode-instead-of-building-a-plugin)
-- [Docs](#docs)
+- [Docs & User Guide](#docs)
 - [Roadmap](#roadmap)
 
 ---
@@ -141,6 +143,28 @@ Memories are also captured automatically when sessions compact. The compaction s
 |---------|-------------|
 | `/remember <info>` | Save a memory manually |
 | `/learn-patterns` | Review and approve learned error patterns |
+| `/dream` | Consolidate memories, patterns, and stats |
+
+---
+
+## Dream Consolidation
+
+CyxCode accumulates state over time — memories, patterns, stats. `/dream` cleans it up, like sleep for AI.
+
+### `/dream` in Action
+
+![CyxCode Dream Consolidation](packages/web/src/assets/lander/screenshot-cyxcode-dream.png)
+
+### Auto-dream (runs on startup, free — no tokens)
+- Deduplicates learned patterns (removed 2→1 duplicate on first run)
+- Merges overlapping memories
+- Validates file existence and regex
+- Persists router stats to `.opencode/cyxcode-stats.json`
+
+### Manual `/dream` (AI-powered)
+- All auto-dream phases plus smart merging
+- Updates AGENTS.md with learnings from patterns and memories
+- Reports: matches, misses, hit rate, tokens saved, sessions tracked
 
 ---
 
@@ -197,6 +221,7 @@ If you see `opencode` in a config path or source file, that's normal. If you see
 
 | Document | Description |
 |----------|-------------|
+| **[User Guide](docs/USAGE.md)** | **Complete guide: all modes, commands, features** |
 | [Adding Patterns](docs/ADDING-PATTERNS.md) | Step-by-step guide to adding custom patterns |
 | [Contributing Patterns](docs/CONTRIBUTING-PATTERNS.md) | Community contribution guide, wanted categories |
 | [Before/After Comparison](docs/BEFORE-AFTER.md) | Side-by-side: CyxCode vs standard AI |
@@ -247,8 +272,10 @@ Available at `http://localhost:4096/dashboard` when running in web/server mode. 
 | 10 | Capture substitution (`$1` -> actual values) | **Done** |
 | 11 | Pattern learning system | **Done** |
 | 12 | Indexed project memory (`/remember`) | **Done** |
-| 13 | Community patterns (Bun, Rust, Go, Ruby) | Planned |
-| 14 | Auto-execute fixes (with approval) | Planned |
+| 13 | Dream consolidation (`/dream`) | **Done** |
+| 14 | Persisted router stats across sessions | **Done** |
+| 15 | Community patterns (Bun, Rust, Go, Ruby) | Planned |
+| 16 | Auto-execute fixes (with approval) | Planned |
 
 ---
 

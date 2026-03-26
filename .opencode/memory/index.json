@@ -1,0 +1,20 @@
+{
+  "version": 1,
+  "entries": [
+    {
+      "id": "auth-jwt-bcrypt-middleware",
+      "file": "auth-jwt-bcrypt-middleware.md",
+      "tags": [
+        "auth",
+        "jwt",
+        "bcrypt",
+        "middleware",
+        "typescript"
+      ],
+      "summary": "auth.ts uses JWT with bcrypt for password hashing, middleware at line 50",
+      "created": "2026-03-26",
+      "accessed": "2026-03-26",
+      "accessCount": 16
+    }
+  ]
+}

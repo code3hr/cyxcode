@@ -24,7 +24,7 @@ const PRUNE_MIN_ACCESS = 3
 
 // --- Types ---
 
-type MemoryEntry = {
+export type MemoryEntry = {
   id: string
   file: string
   tags: string[]
@@ -34,7 +34,7 @@ type MemoryEntry = {
   accessCount: number
 }
 
-type MemoryIndex = {
+export type MemoryIndex = {
   version: 1
   entries: MemoryEntry[]
 }
@@ -79,7 +79,11 @@ export namespace Memory {
     }
   }
 
-  async function writeIndex(data: MemoryIndex): Promise<void> {
+  export function getBasePath(): string {
+    return basePath()
+  }
+
+  export async function writeIndex(data: MemoryIndex): Promise<void> {
     writeLock = writeLock.then(async () => {
       await fs.mkdir(basePath(), { recursive: true })
       await fs.writeFile(indexPath(), JSON.stringify(data, null, 2))

@@ -176,6 +176,12 @@ class SkillRouterImpl implements SkillRegistry {
     }
   }
 
+  resetSessionStats(): void {
+    this.matchCount = 0
+    this.missCount = 0
+    this.tokensSaved = 0
+  }
+
   private totalPatterns(): number {
     return this.stats().totalPatterns
   }
