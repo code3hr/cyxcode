@@ -222,6 +222,7 @@ If you see `opencode` in a directory path or source file, that's normal. If you 
 | Document | Description |
 |----------|-------------|
 | **[User Guide](docs/USAGE.md)** | **Complete guide: all modes, commands, features** |
+| **[FAQ](docs/FAQ.md)** | **Community questions answered: fork vs plugin, testing, maintenance** |
 | [Adding Patterns](docs/ADDING-PATTERNS.md) | Step-by-step guide to adding custom patterns |
 | [Contributing Patterns](docs/CONTRIBUTING-PATTERNS.md) | Community contribution guide, wanted categories |
 | [Before/After Comparison](docs/BEFORE-AFTER.md) | Side-by-side: CyxCode vs standard AI |
