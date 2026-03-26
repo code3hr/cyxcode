@@ -46,6 +46,11 @@ export function initCyxCode() {
     } catch {}
   }).catch(() => {})
 
+  // Initialize memory capture system
+  import("./memory").then(({ initMemoryCapture }) => {
+    initMemoryCapture()
+  }).catch(() => {})
+
   return SkillRouter
 }
 
