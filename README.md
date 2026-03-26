@@ -108,6 +108,42 @@ The screenshot shows a bun 404 error being caught by a **learned** pattern. This
 
 ---
 
+## Project Memory
+
+The AI forgets everything between sessions. CyxCode fixes that with **indexed project memory** — small files that load selectively based on what you're working on.
+
+### Saving Memories (`/remember`)
+
+![CyxCode Memory System](packages/web/src/assets/lander/screenshot-cyxcode-memory.png)
+
+Run `/remember` to save project knowledge. The AI detects duplicates, extracts tags, and stores compact 1-5 line memories in `.opencode/memory/`. Each memory has tags for relevance matching.
+
+### How It Works
+
+```
+Session 1: /remember "auth.ts uses JWT with bcrypt, middleware at line 50"
+           -> Saved to .opencode/memory/auth-jwt-bcrypt-middleware.md
+           -> Tagged: [auth, jwt, bcrypt, middleware]
+
+Session 2: "what does auth.ts do?"
+           -> Memory auto-loaded (keyword "auth" matches tag)
+           -> AI already knows: "JWT with bcrypt, line 50"
+           -> Skips reading the file -> tokens saved
+```
+
+### Auto-Capture
+
+Memories are also captured automatically when sessions compact. The compaction summary's "Discoveries" and "Relevant files" sections become indexed memories.
+
+### Commands
+
+| Command | Description |
+|---------|-------------|
+| `/remember <info>` | Save a memory manually |
+| `/learn-patterns` | Review and approve learned error patterns |
+
+---
+
 ## Supported Categories
 
 3 skills, 16 categories, 136+ patterns:
@@ -200,8 +236,9 @@ Available at `http://localhost:4096/dashboard` when running in web/server mode. 
 | 9 | Shell mode (`!`) zero-token matching | **Done** |
 | 10 | Capture substitution (`$1` -> actual values) | **Done** |
 | 11 | Pattern learning system | **Done** |
-| 12 | Community patterns (Bun, Rust, Go, Ruby) | Planned |
-| 13 | Auto-execute fixes (with approval) | Planned |
+| 12 | Indexed project memory (`/remember`) | **Done** |
+| 13 | Community patterns (Bun, Rust, Go, Ruby) | Planned |
+| 14 | Auto-execute fixes (with approval) | Planned |
 
 ---
 
