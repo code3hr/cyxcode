@@ -49,11 +49,13 @@ Day 3:    Same correction for the 5th time      -> User frustrated
 | **Diff** | Detect what changed between sessions, what was lost (drift) |
 | **Refs** | Strength scores — how many times a correction was reinforced |
 
-### What we DON'T need:
-- Branching (AI doesn't work in parallel)
-- Merging (dream consolidation handles this)
+### What we DON'T need (yet):
 - Remote/fetch (single machine)
-- Rebase (linear history is fine)
+- Rebase (linear history is fine for now)
+
+### TODO — Future considerations:
+- **Branching** — Multi-agent / subagent workflows (Claude Code supports parallel agents via worktrees). Each agent could have its own branch of state, merged when the task completes.
+- **Merging** — When parallel agents finish, merge their discoveries and corrections back into the main state. Dream consolidation could handle conflict resolution.
 
 ---
 
