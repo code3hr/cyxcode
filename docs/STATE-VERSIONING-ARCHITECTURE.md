@@ -280,18 +280,10 @@ type EpochCommit = {
 
 ## Integration Points (Exact Code Locations)
 
-### 1. System Prompt Injection
+### 1. System Prompt Injection (direct code)
 **File:** `packages/opencode/src/session/prompt.ts` line 680
 
 ```typescript
-// BEFORE (current):
-const system = [
-  ...(await SystemPrompt.environment(model)),
-  ...(skills ? [skills] : []),
-  ...(await InstructionPrompt.system()),
-  ...(await Memory.relevant(msgs)),
-]
-
 // AFTER (with versioning):
 const { StateVersioning } = await import("@/cyxcode/versioning")
 const system = [
@@ -304,63 +296,77 @@ const system = [
 ]
 ```
 
-### 2. Compaction Hook (Auto-Commit)
-**File:** `packages/opencode/src/session/compaction.ts` line 169
+No hooks needed — just add to the system array directly.
+
+### 2. Auto-Commit on Compaction (Bus event)
+**File:** `packages/opencode/src/cyxcode/versioning/index.ts`
 
 ```typescript
-// BEFORE (current):
-const compacting = await Plugin.trigger(
-  "experimental.session.compacting",
-  { sessionID: input.sessionID },
-  { context: [], prompt: undefined },
-)
-
-// Our hook subscribes to this event in versioning/index.ts:
-// Plugin system calls our hook BEFORE compaction runs
-// We commit state inside the hook
+// Subscribe to compaction event — fires AFTER compaction completes
+// Messages are still in DB at this point, just tool outputs pruned
+Bus.subscribe(SessionCompaction.Event.Compacted, async ({ sessionID }) => {
+  await StateVersioning.autoCommit(sessionID)
+})
 ```
 
-### 3. Session End Hook
-**File:** `packages/opencode/src/session/prompt.ts` line 735-776
+No hooks, no blocking. Messages are in the database — compaction prunes tool outputs but the message structure remains. We read what we need and commit.
+
+### 3. Session End (Bus event)
+**File:** `packages/opencode/src/cyxcode/versioning/index.ts`
 
 ```typescript
-// After processor.process() returns and session is complete:
-// Hook into the "stop" path at line 735:
-if (result === "stop") {
-  // NEW: auto-commit on session end
-  await StateVersioning.sessionEnd(sessionID, msgs)
-  break
-}
+// Subscribe to status changes — filter for idle
+Bus.subscribe(SessionStatus.Event.Status, async ({ sessionID, status }) => {
+  if (status.type === "idle") {
+    await StateVersioning.sessionEnd(sessionID)
+  }
+})
 ```
 
-### 4. Correction Detection
+Uses `Event.Status` (not deprecated `Event.Idle`).
+
+### 4. Correction Detection (direct code)
 **File:** `packages/opencode/src/session/prompt.ts` line 304
 
 ```typescript
-// In the outer loop, after user message is received:
+// In the outer loop, after messages are loaded:
 let msgs = await MessageV2.filterCompacted(MessageV2.stream(sessionID))
-// NEW: scan latest user message for corrections
-await StateVersioning.detectCorrection(msgs)
+// NEW: scan latest user message for corrections (Phase 1: explicit /correct only)
 ```
 
-### 5. Dream Enhancement
+No hooks — correction detection is a simple scan of the user message text, added directly in the prompt loop. Negligible performance cost.
+
+### 5. Dream Enhancement (direct code)
 **File:** `packages/opencode/src/cyxcode/dream.ts`
 
 ```typescript
 // In Dream.run(), add after existing phases:
-// Phase 5: Correction consolidation
 await StateVersioning.dreamConsolidate()
 ```
 
-### 6. Init Wiring
+Direct function call, no events needed.
+
+### 6. Init Wiring (direct code)
 **File:** `packages/opencode/src/cyxcode/index.ts`
 
 ```typescript
-// In initCyxCode(), add:
 import("./versioning").then(({ StateVersioning }) => {
   StateVersioning.init()
 }).catch(() => {})
 ```
+
+### Summary: No Hooks Needed
+
+| Integration | Mechanism | Why not hooks? |
+|-------------|-----------|---------------|
+| System prompt | Direct code in prompt.ts | Just adding to an array |
+| Compaction | Bus event (Compacted) | Don't need to block, messages are in DB |
+| Session end | Bus event (Status → idle) | Don't need to block, just capture |
+| Corrections | Direct code in prompt.ts | Simple text scan |
+| Dream | Direct function call | Already inside our code |
+| Init | Direct import | Same pattern as memory/dream |
+
+**Events are reactive, non-blocking, and simpler.** We don't modify compaction behavior — we just observe it and save state.
 
 ---
 
@@ -574,37 +580,34 @@ Corrections always load first. If budget is tight, memories get trimmed.
 |------|--------|-------------|
 | `src/session/prompt.ts` | Add corrections + resume to system array | ~5 |
 | `src/session/prompt.ts` | Add correction detection in outer loop | ~5 |
-| `src/session/prompt.ts` | Add auto-commit on session stop | ~3 |
 | `src/cyxcode/index.ts` | Wire StateVersioning.init() | ~3 |
 | `src/cyxcode/dream.ts` | Add dreamConsolidate() call | ~5 |
 | `.gitignore` | Add .opencode/history/ | ~1 |
+
+**Not modified:** `compaction.ts`, `status.ts`, `plugin/` — we use Bus events, no code changes needed in those files.
 
 ---
 
 ## Design Decisions
 
-### 1. Bus Events vs Plugin Hooks for Auto-Commit
+### 1. Events Only — No Hooks Needed
 
-The codebase has two trigger mechanisms:
+We originally considered using plugin hooks to block compaction for pre-commit. After validation against the codebase, we found:
 
-| Mechanism | How it works | When to use |
-|-----------|-------------|-------------|
-| **Bus events** | `Bus.subscribe(Event, callback)` — async, fire-and-forget | Post-event reactions (logging, capture) |
-| **Plugin hooks** | `Plugin.trigger(name, input, output)` — sync, blocks caller | Pre-event interception (modify data before it's used) |
+1. The plugin hook can't truly block compaction — it only customizes the prompt
+2. Messages remain in the database after compaction — tool outputs are pruned but message structure stays
+3. We don't need to modify compaction behavior — we just observe and capture
 
-**Decision: Use BOTH.**
-
-- **Bus event** (`SessionCompaction.Event.Compacted`) — for post-compaction capture (already used by memory.ts). Fire-and-forget, doesn't block.
-- **Plugin hook** (`experimental.session.compacting`) — for PRE-compaction auto-commit. This runs BEFORE compaction starts, so we can save state before context is pruned. The hook blocks compaction until our commit finishes.
+**Decision: Bus events only.**
 
 ```
-Plugin hook fires (BEFORE compaction)
-  → StateVersioning.autoCommit()    # Save state BEFORE context pruned
-  → Compaction runs (context pruned)
-Bus event fires (AFTER compaction)
-  → Memory.captureFromCompaction()  # Extract discoveries from summary
-  → Corrections re-injected         # From the commit we just saved
+Compaction runs (tool outputs pruned)
+  → Bus event: SessionCompaction.Event.Compacted fires
+  → StateVersioning.autoCommit()    # Read messages from DB, save commit
+  → Memory.captureFromCompaction()  # Extract discoveries (existing)
 ```
+
+Simpler, no blocking, no plugin registration, no risk of slowing compaction.
 
 ### 2. Corrections vs Memories — How They Interact
 
@@ -796,54 +799,27 @@ Epoch commit structure:
 
 ---
 
-## Plugin Registration for Compaction Hook
+## Event Subscriptions
 
-To hook into compaction BEFORE it runs, register via the internal plugin system:
+All integration uses Bus events (non-blocking) or direct code. No hooks or plugins needed.
 
 ```typescript
-// In versioning/index.ts
+// versioning/index.ts — init()
 
-import { Plugin } from "@/plugin"
+// 1. Auto-commit after compaction
+Bus.subscribe(SessionCompaction.Event.Compacted, async ({ sessionID }) => {
+  await autoCommit(sessionID)
+})
 
-export function init() {
-  // Register compaction hook — runs BEFORE compaction
-  // Plugin.trigger("experimental.session.compacting") is called at
-  // compaction.ts line 169, before processor.process() at line 205
-  //
-  // We can't use Plugin.trigger directly (it's for internal plugins),
-  // so we subscribe to the Bus event and use the timing:
-  //
-  // Option A: Bus.subscribe (AFTER compaction — for capture)
-  Bus.subscribe(SessionCompaction.Event.Compacted, async ({ sessionID }) => {
-    await capturePostCompaction(sessionID)
-  })
-
-  // Option B: Modify compaction.ts to add a pre-compaction event
-  // This is cleaner but requires modifying compaction.ts:
-  //
-  // In compaction.ts, before line 169, add:
-  //   Bus.publish(Event.PreCompaction, { sessionID })
-  //
-  // Then subscribe:
-  //   Bus.subscribe(Event.PreCompaction, async ({ sessionID }) => {
-  //     await autoCommit(sessionID)
-  //   })
-}
+// 2. Final commit on session end
+Bus.subscribe(SessionStatus.Event.Status, async ({ sessionID, status }) => {
+  if (status.type === "idle") {
+    await sessionEnd(sessionID)
+  }
+})
 ```
 
-**Decision: Option B (add PreCompaction event)**
-
-This requires a 3-line change to `compaction.ts`:
-```typescript
-// New event definition (line 22-28):
-PreCompaction: BusEvent.define(
-  "session.pre-compaction",
-  z.object({ sessionID: SessionID.zod })
-),
-
-// Publish before compaction (line 168, before Plugin.trigger):
-await Bus.publish(Event.PreCompaction, { sessionID: input.sessionID })
-```
+No compaction.ts changes needed. No plugin registration. Messages are in the database — we read them when the event fires.
 
 ---
 
