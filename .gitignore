@@ -23,6 +23,9 @@ target
 .scripts
 .direnv/
 
+# CyxCode state versioning (private per-machine)
+.opencode/history/
+
 # Local dev files
 opencode-dev
 logs/

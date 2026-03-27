@@ -744,6 +744,11 @@ export namespace SessionPrompt {
           auto: true,
           overflow: !processor.message.finish,
         })
+        // CyxCode: auto-commit state after compaction
+        try {
+          const { StateVersioning } = await import("@/cyxcode/versioning")
+          await StateVersioning.autoCommit(sessionID, "compaction")
+        } catch {}
       }
 
       // CyxCode short-circuit: skip LLM when pattern matched
@@ -814,6 +819,13 @@ export namespace SessionPrompt {
 
       continue
     }
+
+    // CyxCode: auto-commit state when session loop exits
+    try {
+      const { StateVersioning } = await import("@/cyxcode/versioning")
+      await StateVersioning.autoCommit(sessionID, "session-end")
+    } catch {}
+
     SessionCompaction.prune({ sessionID })
     for await (const item of MessageV2.stream(sessionID)) {
       if (item.info.role === "user") continue
