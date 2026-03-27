@@ -905,3 +905,105 @@ $ARGUMENTS
 | Storage decision | Not decided | Decided: file-based with writeLock |
 | Corrections vs memories | Not covered | Full comparison table |
 | Type definitions | Inline JSON | Full TypeScript types |
+
+---
+
+## CyxCode Dream vs Claude Code AutoDream
+
+Claude Code introduced AutoDream — a memory consolidation feature. Understanding how it works helps us see what we can draw from and where we go further.
+
+### How Claude Code AutoDream Works
+
+```
+AutoDream (Claude Code):
+  Trigger: Cron (3 AM daily) or hook (every 5 sessions + 24hr gap)
+  Agent:   Spawns a subagent with LLM
+  Phases:  Orient → Gather Signal → Consolidate → Prune Index
+  Cost:    Uses LLM tokens (agent reads/writes memory files)
+  Scope:   Memory files only (MEMORY.md, per-project memories)
+  Result:  Cleaner MEMORY.md, deduplicated entries, resolved contradictions
+```
+
+### How CyxCode Dream Works (Current)
+
+```
+CyxCode Dream (current):
+  Trigger: Auto on startup (phases 1-4) or manual /dream (phase 5)
+  Agent:   Phases 1-4 are CODE-ONLY (no LLM). Phase 5 uses LLM.
+  Phases:  Deduplicate → Validate → Persist Stats → (AI Consolidate)
+  Cost:    Phases 1-4 = FREE (zero tokens). Phase 5 = tokens.
+  Scope:   Memories + learned patterns + router stats
+  Result:  Deduped patterns, validated files, persisted stats
+```
+
+### Comparison
+
+| | Claude AutoDream | CyxCode Dream | CyxCode Dream + State Versioning |
+|--|-----------------|---------------|----------------------------------|
+| **Trigger** | Cron / session count | Startup / manual | Startup + compaction + session end |
+| **Cost** | Always costs tokens (uses LLM) | Phases 1-4 free, phase 5 costs | Same — phases 1-4 free |
+| **Tracks corrections** | No | No (currently) | **Yes — strength scoring** |
+| **Tracks drift** | No | No | **Yes — behavioral drift detection** |
+| **Persists across sessions** | Memory files only | Stats + patterns | **Full state commits with history** |
+| **Resume** | No resume concept | No resume (currently) | **Yes — HEAD commit loaded on start** |
+| **Archival** | Prunes old entries | Prunes by age/access | **Epoch commits summarize history** |
+| **Multi-agent** | No | No | **TODO: branching per agent** |
+
+### What We Draw From AutoDream
+
+1. **The 4-phase concept is proven** — Orient, Gather, Consolidate, Prune works. We use the same structure.
+2. **Session count trigger** — AutoDream triggers after 5 sessions. We should track `sessions` in stats and trigger deeper consolidation at thresholds.
+3. **MEMORY.md index under 200 lines** — AutoDream enforces a lean index. We enforce via MAX_ENTRIES (200) and MAX_LOAD_CHARS (2000).
+
+### Where We Go Further
+
+1. **Free by default** — AutoDream always uses LLM tokens. Our phases 1-4 are code-based, zero cost. LLM is optional (phase 5 / `/dream` command).
+2. **Correction tracking** — AutoDream doesn't know WHAT the user corrected. It just sees messy memory files. We track corrections with strength, decay, and auto-promotion.
+3. **State versioning** — AutoDream has no history. It reads current memory, cleans it, writes it back. We maintain a commit chain — you can see what the AI knew at any point in time.
+4. **Resume** — AutoDream doesn't help with session continuity. Our HEAD commit lets the AI pick up exactly where it left off.
+5. **Drift detection** — AutoDream can't detect behavioral regression. Our system compares current behavior against committed corrections.
+6. **Compaction-safe** — AutoDream runs independently of compaction. We hook into compaction directly — auto-commit before context is pruned, corrections re-injected after.
+
+### How State Versioning Enhances Dream
+
+```
+Current Dream flow:
+  Startup → Dedup → Validate → Persist Stats → Done
+
+Enhanced Dream flow with State Versioning:
+  Startup → Dedup → Validate → Persist Stats
+    → Read commit history
+    → Check correction strengths (apply decay)
+    → Detect behavioral drift (compare last sessions)
+    → Auto-promote corrections (strength >= 3 → AGENTS.md)
+    → Archive old commits (> 100 → epoch)
+    → Report: "Promoted 2 corrections, decayed 1, 3 drifts detected"
+```
+
+Dream becomes the **garbage collector + optimizer** for the versioning system:
+- **Dream reads commits** to understand what changed over time
+- **Dream applies decay** to unused corrections
+- **Dream archives** old commits into epochs
+- **Dream promotes** high-strength corrections to permanent instructions
+- **Dream detects** patterns in drift (same correction drifts every 10 sessions → maybe it needs a different approach)
+
+### Synchronous vs Asynchronous
+
+| | Claude AutoDream | CyxCode Dream |
+|--|-----------------|---------------|
+| **Execution** | Async — spawns background agent | Sync — runs in process |
+| **Blocking** | No — runs at 3 AM or background | Auto-dream blocks startup briefly |
+| **LLM dependency** | Required — agent does all work | Optional — code handles 80% |
+| **Failure mode** | Agent fails → nothing cleaned | Code phases never fail (try/catch) |
+| **Auditability** | Agent writes changes, hard to review | Code changes are deterministic |
+
+**Our approach is more robust because:**
+- Synchronous code can't hallucinate (no LLM involved in phases 1-4)
+- Deterministic dedup/validation — same input always produces same output
+- No background agent that might modify files unexpectedly
+- Phase 5 (LLM) is explicit — user triggers `/dream`, sees what changes
+
+**But we could add async capabilities for:**
+- Session-count triggered deep consolidation (like AutoDream's 5-session trigger)
+- Background epoch archival (non-blocking, runs after startup completes)
+- Scheduled correction decay (daily, not just on startup)
