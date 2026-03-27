@@ -826,6 +826,9 @@ export namespace SessionPrompt {
     try {
       const { StateVersioning } = await import("@/cyxcode/versioning")
       await StateVersioning.autoCommit(sessionID, "session-end")
+      // Phase 5: Drift detection — check if AI followed corrections
+      const { Drift } = await import("@/cyxcode/versioning/drift")
+      await Drift.detectAndReinforce(sessionID)
     } catch {}
 
     SessionCompaction.prune({ sessionID })

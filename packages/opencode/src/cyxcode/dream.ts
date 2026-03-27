@@ -310,7 +310,72 @@ export namespace Dream {
       })
     }
 
-    return { dupPatterns, dupMemories, validation, stats }
+    // Phase 6: Auto-promote high-strength corrections to AGENTS.md
+    const promoted = await promoteCorrections()
+
+    return { dupPatterns, dupMemories, validation, stats, promoted }
+  }
+
+  /**
+   * Phase 6: Auto-promote corrections with strength >= 3 to AGENTS.md
+   */
+  async function promoteCorrections(): Promise<number> {
+    try {
+      const { Corrections } = await import("./versioning/corrections")
+      const toPromote = await Corrections.shouldPromote()
+      if (toPromote.length === 0) return 0
+
+      // Read AGENTS.md
+      const agentsPath = await findAgentsMd()
+      if (!agentsPath) return 0
+
+      let content = await fs.readFile(agentsPath, "utf-8")
+
+      for (const correction of toPromote) {
+        // Check if already in AGENTS.md
+        if (content.includes(correction.rule)) {
+          await Corrections.markPromoted(correction.id)
+          continue
+        }
+
+        // Add under Error Response Guidelines section
+        const marker = "## Error Response Guidelines"
+        if (content.includes(marker)) {
+          const idx = content.indexOf(marker)
+          const nextSection = content.indexOf("\n## ", idx + marker.length)
+          const insertAt = nextSection > 0 ? nextSection : content.length
+          const line = `- ${correction.rule}\n`
+          content = content.slice(0, insertAt) + line + content.slice(insertAt)
+        } else {
+          // Append at end if no section found
+          content += `\n- ${correction.rule}\n`
+        }
+
+        await Corrections.markPromoted(correction.id)
+        log.info("Promoted correction to AGENTS.md", { rule: correction.rule, strength: correction.strength })
+      }
+
+      await fs.writeFile(agentsPath, content)
+      return toPromote.length
+    } catch (e) {
+      log.warn("Failed to promote corrections", { error: e })
+      return 0
+    }
+  }
+
+  async function findAgentsMd(): Promise<string | null> {
+    let dir = process.cwd()
+    for (let i = 0; i < 10; i++) {
+      const candidate = path.join(dir, "AGENTS.md")
+      try {
+        await fs.access(candidate)
+        return candidate
+      } catch {}
+      const parent = path.dirname(dir)
+      if (parent === dir) break
+      dir = parent
+    }
+    return null
   }
 
   /**
