@@ -59,6 +59,158 @@ Day 3:    Same correction for the 5th time      -> User frustrated
 
 ---
 
+## Why Not Just Use Git?
+
+Git already tracks your files. Why do we need another versioning system?
+
+**Git tracks your code. State versioning tracks what the AI knows.**
+
+Git commits your changes to `auth.ts`. State versioning commits "user corrected me to use /commit skill, not raw git."
+
+Git gives you history of code. State versioning gives you history of corrections, discoveries, and preferences.
+
+You resume work by checking out code. AI resumes by loading what it learned.
+
+**What git can't tell the AI:**
+
+- "User corrected you 3x about using raw git instead of /commit"
+- "You were working on the auth feature, halfway done"
+- "User prefers concise responses"
+- "You discovered globalThis is needed for cross-module state in Bun"
+- "Files src/auth.ts and src/middleware.ts were the active context"
+
+**Example scenario:**
+
+You `git checkout` your code from yesterday. Perfect — code is restored.
+
+But the AI starts fresh. It doesn't know you corrected it yesterday. It doesn't know what it was working on. It re-reads all files to understand the project. It makes the same mistakes you already corrected.
+
+State versioning is git for the AI's brain, not your codebase.
+
+### How It Differs from Dream
+
+CyxCode already has Dream. Why do we need state versioning?
+
+**Dream (what we have now):**
+- Runs on startup, offline — no token cost
+- Consolidates patterns and memories
+- Deduplicates, prunes old entries
+- Processes what's already stored
+
+**What Dream doesn't do:**
+- Track corrections or their strength
+- Know what you were working on
+- Remember decisions made
+- Detect when AI drifts from corrections
+- Provide structured resume
+
+Dream is a processor. But it needs structured data to process. Right now it consolidates patterns and memories, but it doesn't know which corrections keep coming back, what the user was frustrated about, or what decisions were made.
+
+**State versioning feeds Dream:**
+
+```
+Session ends
+    ↓
+Auto-commit (state snapshot)
+    ↓
+Next startup: Dream runs
+    ↓
+Dream reads commit history
+    ↓
+Sees: "User corrected AI 3x about /commit skill"
+    ↓
+Promotes to AGENTS.md permanently
+    ↓
+AI never forgets again
+```
+
+State versioning captures the data. Dream processes it. Together they close the loop.
+
+### Claude Code's Auto Dream (March 2026)
+
+Claude Code released Auto Dream — a background memory consolidation feature. Here's how it works:
+
+**Four-phase cycle:** orient → gather signal → consolidate → prune
+
+**What it does:**
+- Runs between sessions as a background sub-agent
+- Converts relative dates to absolute ("yesterday" → "2026-03-15")
+- Deletes contradicted facts (switched from Express to Fastify → removes old entry)
+- Merges overlapping entries (3 sessions noted same thing → consolidate to one)
+- Triggers after 24 hours + 5 sessions
+
+**Memory architecture:**
+1. CLAUDE.md — instructions you write
+2. Auto Memory — notes Claude writes per session
+3. Session Memory — conversation continuity
+4. Auto Dream — periodic consolidation
+
+**What Auto Dream doesn't track:**
+- Correction strength (how many times you repeated something)
+- Structured project state (what you were working on)
+- Decision history (why choices were made)
+- Drift detection (when AI stops following corrections)
+- Resume context (files, progress, blockers)
+
+Auto Dream consolidates memories. State versioning tracks behavioral corrections and project context with strength scoring.
+
+Claude Code has the processor (Auto Dream). State versioning provides the structured input it needs.
+
+### What State Versioning Tracks
+
+**Project State Awareness**
+
+Without state versioning, if you ask "what's the current state of CyxCode?" I have to read dozens of files, scan git history, and piece it together — burning thousands of tokens.
+
+With state versioning, HEAD commit tells me: "Implementing state versioning. Storage layer done. Working on correction tracking. Blocked by typecheck errors in dashboard/."
+
+**Architectural Discoveries**
+
+Things I learn about your project that aren't in any single file:
+- "This project uses Bun, not Node"
+- "Tests are in packages/opencode/test/, not src/"
+- "globalThis is needed for cross-module state"
+- "Pre-push hook runs typecheck, can block push"
+
+Without versioning, I rediscover these every session.
+
+**User Preferences**
+
+How you like to work:
+- "User prefers concise responses"
+- "User wants commits with specific format and Co-Authored-By"
+- "User uses /commit skill, not raw git"
+- "User doesn't want emoji unless asked"
+
+**Active Context**
+
+What files matter right now:
+- "We were editing src/cyxcode/memory.ts and docs/STATE-VERSIONING.md"
+- "Ignore the dashboard/ folder — it's a separate project"
+- "Focus on packages/opencode/, that's the core"
+
+**Decisions Made**
+
+Choices that shouldn't be revisited:
+- "We decided to use SHA-256 for hashing"
+- "Storage goes in .opencode/history/, not .claude/"
+- "Corrections auto-promote after 3x, not 5x"
+
+**What's Been Tried**
+
+Failed approaches to avoid repeating:
+- "Tried storing corrections in memory.ts, caused circular dependency"
+- "Compaction hook fires too late, need to use 'compacting' not 'compacted'"
+
+**Blockers and Issues**
+
+Current problems I should know about:
+- "Typecheck failing — dashboard has SolidJS type errors"
+- "Can't push until typecheck passes (pre-push hook)"
+- "Memory.ts line 381 has sessionID property access bug"
+
+---
+
 ## The Solution
 
 ### Architecture
@@ -282,17 +434,187 @@ User corrects AI: "Use /commit skill, not raw git"
 
 ---
 
-## Implementation Phases
+## Implementation Plan: State Versioning + Dream Upgrade
 
-| Phase | Description | Depends on |
-|-------|-------------|------------|
-| 1 | Commit/HEAD/changelog storage layer | — |
-| 2 | Auto-commit on compaction hook | Phase 1 |
-| 3 | Correction tracking with strength | Phase 1 |
-| 4 | Resume: load HEAD into system prompt | Phase 1 |
-| 5 | Drift detection | Phase 3 |
-| 6 | Auto-promotion to AGENTS.md | Phase 3, 5 |
-| 7 | Dream integration | Phase 1, 3 |
+State versioning and dream upgrade should be built together. Dream needs commit history to do smart consolidation. State versioning needs dream to process corrections and promote them.
+
+### Integrated Flow
+
+```
+Session running
+    ↓
+User corrects AI → Correction saved (strength: 1)
+    ↓
+Session ends / Compaction triggers
+    ↓
+AUTO-COMMIT: snapshot state to .opencode/history/
+    - corrections with strength
+    - project context (goal, files, progress)
+    - discoveries
+    ↓
+Next startup (app starts immediately, not blocked)
+    ↓
+BACKGROUND DREAM (triggers: 24h + 5 sessions)
+    ↓
+Dream reads commit history
+    ↓
+Phase 1: Orient (existing)
+Phase 2: Deduplicate (existing)
+Phase 3: Validate (existing)
+Phase 4: Persist stats (existing)
+Phase 5: Process corrections ← NEW
+    - Find corrections with strength >= 3
+    - Promote to AGENTS.md
+    - Detect drift patterns
+Phase 6: Consolidate commits ← NEW
+    - Merge old commits into epoch summaries
+    - Cap at 100 commits
+    ↓
+Resume: Load HEAD into system prompt
+```
+
+### Implementation Phases
+
+| Phase | What | Depends on | Files |
+|-------|------|------------|-------|
+| **1** | State versioning storage (commits, HEAD, changelog) | — | `src/cyxcode/state.ts` (new) |
+| **2** | Auto-commit hooks (compaction, session end) | Phase 1 | `src/session/`, `state.ts` |
+| **3** | Correction tracking with strength | Phase 1 | `state.ts` |
+| **4** | Dream: background execution + triggers | — | `src/cyxcode/dream.ts` |
+| **5** | Dream: read commit history | Phase 1, 4 | `dream.ts` |
+| **6** | Dream: auto-promote corrections to AGENTS.md | Phase 3, 5 | `dream.ts` |
+| **7** | Resume: load HEAD into system prompt | Phase 1 | `src/session/prompt/` |
+| **8** | Drift detection | Phase 3, 7 | `state.ts`, `dream.ts` |
+
+### Phase 1: State Storage
+
+Create `src/cyxcode/state.ts`:
+
+```typescript
+// Storage structure
+.opencode/history/
+  HEAD.json              // { hash: "a7f3b2", timestamp: "..." }
+  commits/
+    a7f3b2.json          // State snapshot
+    c4e1d8.json
+  corrections/
+    use-commit-skill.json  // { strength: 3, rule: "...", created: "..." }
+  changelog.json         // Linear event log
+
+// Core functions
+State.commit(state)      // Create new commit, update HEAD
+State.loadHEAD()         // Read latest commit
+State.addCorrection(rule) // Add or increment correction strength
+State.getCorrections()   // Get all corrections sorted by strength
+```
+
+### Phase 2-3: Auto-Commit + Corrections
+
+Hook into existing events:
+
+```typescript
+// On compaction (before context is lost)
+experimental.session.compacting → State.commit(currentState)
+
+// On session end
+session.close → State.commit(currentState)
+
+// On user correction detected
+message.contains("don't", "stop", "I said") → State.addCorrection(rule)
+```
+
+### Phase 4: Dream Background Execution
+
+Upgrade `dream.ts`:
+
+```typescript
+// Current (blocking)
+App starts → Dream.run() → blocks → App ready
+
+// Upgraded (background with triggers)
+App starts → App ready immediately
+          ↓
+Check: shouldDream()
+  - 24h since lastDream?
+  - 5+ sessions since lastDream?
+          ↓
+Yes → setImmediate(() => Dream.run())
+          ↓
+Dream runs in background, doesn't block user
+```
+
+### Phase 5-6: Dream Reads Commits
+
+Add to `dream.ts`:
+
+```typescript
+// Phase 5: Process corrections
+async function processCorrections() {
+  const corrections = await State.getCorrections()
+  for (const c of corrections) {
+    if (c.strength >= 3 && !c.promoted) {
+      await appendToAgentsMd(c.rule)
+      c.promoted = true
+    }
+  }
+}
+
+// Phase 6: Consolidate commits
+async function consolidateCommits() {
+  const commits = await State.getAllCommits()
+  if (commits.length > 100) {
+    // Merge oldest 50 into epoch summary
+    const epoch = summarizeCommits(commits.slice(0, 50))
+    await State.replaceWithEpoch(epoch)
+  }
+}
+```
+
+### Phase 7: Resume
+
+Load HEAD into system prompt on session start:
+
+```typescript
+// In session/prompt/index.ts
+const head = await State.loadHEAD()
+if (head) {
+  systemPrompt += `
+## Previous Session Context
+Goal: ${head.state.goal}
+Working files: ${head.state.workingFiles.join(", ")}
+In progress: ${head.state.inProgress}
+
+## Corrections (follow these)
+${head.state.corrections.map(c => `- ${c.rule} (strength: ${c.strength})`).join("\n")}
+`
+}
+```
+
+### Phase 8: Drift Detection
+
+Compare behavior against corrections:
+
+```typescript
+// After session ends
+for (const correction of corrections) {
+  const followed = checkIfFollowed(correction, sessionMessages)
+  if (!followed) {
+    correction.driftCount++
+    if (correction.driftCount >= 2) {
+      // Force-inject next session
+      correction.forceInject = true
+    }
+  }
+}
+```
+
+### Order of Implementation
+
+1. **Start with Phase 1 + 4** — storage layer + background dream (independent)
+2. **Then Phase 2 + 3** — hooks + corrections (needs Phase 1)
+3. **Then Phase 5 + 6** — dream reads commits (needs Phase 1 + 4)
+4. **Then Phase 7** — resume (needs Phase 1)
+5. **Finally Phase 8** — drift detection (needs everything)
 
 ---
 
