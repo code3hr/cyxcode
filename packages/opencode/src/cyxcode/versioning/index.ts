@@ -18,7 +18,14 @@ export { Commits } from "./commit"
 export { Changelog } from "./changelog"
 export type * from "./types"
 
+// Track last active session for process exit handler
+let lastSessionID: string | undefined
+
 export namespace StateVersioning {
+
+  export function trackSession(sessionID: string) {
+    lastSessionID = sessionID
+  }
 
   export async function autoCommit(
     sessionID: string,
@@ -113,4 +120,65 @@ function extractInProgress(msgs: MessageV2.WithParts[]): string {
     }
   }
   return ""
+}
+
+// --- Process exit handler ---
+// Catches Ctrl+C, SIGTERM, and normal exit to commit state
+
+let exitHandlerRegistered = false
+
+export function registerExitHandler() {
+  if (exitHandlerRegistered) return
+  exitHandlerRegistered = true
+
+  const handler = async () => {
+    if (lastSessionID) {
+      try {
+        await StateVersioning.autoCommit(lastSessionID, "session-end")
+      } catch {}
+    }
+  }
+
+  // beforeExit fires on clean exit (not on SIGINT/SIGTERM)
+  process.on("beforeExit", () => {
+    handler()
+  })
+
+  // SIGINT (Ctrl+C) — keep process alive until commit completes
+  process.on("SIGINT", () => {
+    // Prevent immediate exit
+    setTimeout(() => process.exit(0), 5000) // hard timeout 5s
+    handler().then(() => process.exit(0)).catch(() => process.exit(0))
+  })
+
+  // SIGTERM
+  process.on("SIGTERM", () => {
+    setTimeout(() => process.exit(0), 5000)
+    handler().then(() => process.exit(0)).catch(() => process.exit(0))
+  })
+
+  // SIGHUP (terminal closed)
+  process.on("SIGHUP", () => {
+    setTimeout(() => process.exit(0), 5000)
+    handler().then(() => process.exit(0)).catch(() => process.exit(0))
+  })
+
+  // Normal exit
+  process.on("exit", () => {
+    // Sync write as last resort — exit handler can't be async
+    if (lastSessionID) {
+      try {
+        const fs = require("fs")
+        const path = require("path")
+        let dir = process.cwd()
+        for (let i = 0; i < 10; i++) {
+          const candidate = path.join(dir, ".opencode", "history")
+          try { fs.accessSync(candidate); break } catch {}
+          dir = path.dirname(dir)
+        }
+        const exitMarker = path.join(dir, ".opencode", "history", "pending-commit.json")
+        fs.writeFileSync(exitMarker, JSON.stringify({ sessionID: lastSessionID, timestamp: new Date().toISOString() }))
+      } catch {}
+    }
+  })
 }

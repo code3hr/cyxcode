@@ -9,6 +9,7 @@ import fs from "fs/promises"
 import path from "path"
 import { createHash } from "crypto"
 import { Log } from "@/util/log"
+import { historyBasePath } from "./types"
 import { Changelog } from "./changelog"
 
 const log = Log.create({ service: "cyxcode-versioning-corrections" })
@@ -31,24 +32,8 @@ export type Correction = {
 
 // --- Path resolution ---
 
-let _basePath: string | undefined
-
 function basePath(): string {
-  if (_basePath) return _basePath
-  let dir = process.cwd()
-  for (let i = 0; i < 10; i++) {
-    const candidate = path.join(dir, ".opencode")
-    try {
-      require("fs").accessSync(candidate)
-      _basePath = path.join(dir, ".opencode", "history", "corrections")
-      return _basePath
-    } catch {}
-    const parent = path.dirname(dir)
-    if (parent === dir) break
-    dir = parent
-  }
-  _basePath = path.join(process.cwd(), ".opencode", "history", "corrections")
-  return _basePath
+  return path.join(historyBasePath(), "corrections")
 }
 
 function correctionPath(id: string): string {

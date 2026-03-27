@@ -678,6 +678,10 @@ export namespace SessionPrompt {
       const skills = await SystemPrompt.skills(agent)
       const { Memory } = await import("@/cyxcode/memory")
       const { Resume } = await import("@/cyxcode/versioning/resume")
+      // Track session for exit handler
+      const versioningMod = await import("@/cyxcode/versioning/index")
+      versioningMod.StateVersioning.trackSession(sessionID)
+      versioningMod.registerExitHandler()
       const system = [
         ...(await SystemPrompt.environment(model)),
         ...(skills ? [skills] : []),
@@ -819,17 +823,17 @@ export namespace SessionPrompt {
         }
       }
 
+      // CyxCode: auto-commit state after each AI response
+      try {
+        const { StateVersioning } = await import("@/cyxcode/versioning")
+        await StateVersioning.autoCommit(sessionID, "session-end")
+        // Phase 5: Drift detection
+        const { Drift } = await import("@/cyxcode/versioning/drift")
+        await Drift.detectAndReinforce(sessionID)
+      } catch {}
+
       continue
     }
-
-    // CyxCode: auto-commit state when session loop exits
-    try {
-      const { StateVersioning } = await import("@/cyxcode/versioning")
-      await StateVersioning.autoCommit(sessionID, "session-end")
-      // Phase 5: Drift detection — check if AI followed corrections
-      const { Drift } = await import("@/cyxcode/versioning/drift")
-      await Drift.detectAndReinforce(sessionID)
-    } catch {}
 
     SessionCompaction.prune({ sessionID })
     for await (const item of MessageV2.stream(sessionID)) {
