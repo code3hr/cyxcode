@@ -292,6 +292,7 @@ export namespace Dream {
     validation: { removedMemories: number; removedPatterns: number }
     stats: StatsFile
     promoted: number
+    versioning: { decayed: number; archived: number; repaired: number }
   }> {
     const dupPatterns = await deduplicatePatterns()
     const dupMemories = await deduplicateMemories()
@@ -314,7 +315,154 @@ export namespace Dream {
     // Phase 6: Auto-promote high-strength corrections to AGENTS.md
     const promoted = await promoteCorrections()
 
-    return { dupPatterns, dupMemories, validation, stats, promoted }
+    // Phase 7: State versioning consolidation
+    const versioning = await consolidateVersioning()
+
+    return { dupPatterns, dupMemories, validation, stats, promoted, versioning }
+  }
+
+  /**
+   * Phase 7: State versioning consolidation
+   *
+   * - Decay corrections not reinforced in 10+ sessions
+   * - Archive old commits (keep last 50 in chain)
+   * - Repair broken parent pointers
+   */
+  async function consolidateVersioning(): Promise<{ decayed: number; archived: number; repaired: number }> {
+    let decayed = 0
+    let archived = 0
+    let repaired = 0
+
+    try {
+      const { Corrections } = await import("./versioning/corrections")
+      const { Commits } = await import("./versioning/commit")
+      const { Changelog } = await import("./versioning/changelog")
+
+      // --- Decay: reduce strength of unused corrections ---
+      const stats = await readStats()
+      const corrections = await Corrections.all()
+
+      for (const correction of corrections) {
+        if (correction.promoted) continue // Promoted corrections don't decay
+
+        // Decay: if correction hasn't been reinforced in 10+ sessions
+        const sessionsSinceReinforce = stats.sessions - correction.decayBase
+        if (sessionsSinceReinforce >= 10 && correction.strength > 0) {
+          const decayAmount = Math.floor(sessionsSinceReinforce / 10)
+          const newStrength = Math.max(0, correction.strength - decayAmount)
+
+          if (newStrength < correction.strength) {
+            // Write decayed correction
+            const updated = { ...correction, strength: newStrength, updated: new Date().toISOString() }
+            const corrFs = await import("fs/promises")
+            const corrPath = await import("path")
+            const { historyBasePath } = await import("./versioning/types")
+            const filePath = corrPath.default.join(historyBasePath(), "corrections", correction.id + ".json")
+            try {
+              await corrFs.default.writeFile(filePath, JSON.stringify(updated, null, 2))
+              decayed++
+
+              await Changelog.append({
+                type: "decay",
+                timestamp: new Date().toISOString(),
+                data: { id: correction.id, rule: correction.rule, from: correction.strength, to: newStrength },
+              })
+            } catch {}
+          }
+
+          // Remove if strength hits 0
+          if (newStrength <= 0) {
+            await Corrections.remove(correction.id)
+            log.info("Correction decayed to 0, removed", { id: correction.id, rule: correction.rule })
+          }
+        }
+      }
+
+      // --- Archive: keep only last 50 commits in chain ---
+      const head = await Commits.readHead()
+      if (head) {
+        // Walk the chain from HEAD, count commits
+        const chain: string[] = []
+        let hash: string | null = head.hash
+        while (hash) {
+          chain.push(hash)
+          const commit = await Commits.read(hash)
+          hash = commit?.parent ?? null
+          if (chain.length > 100) break // Safety limit
+        }
+
+        // If more than 50 in chain, archive older ones
+        if (chain.length > 50) {
+          const toArchive = chain.slice(50)
+          const { historyBasePath } = await import("./versioning/types")
+          const commitsDir = (await import("path")).default.join(historyBasePath(), "commits")
+          const archiveFs = await import("fs/promises")
+
+          for (const h of toArchive) {
+            try {
+              await archiveFs.default.unlink((await import("path")).default.join(commitsDir, h + ".json"))
+              archived++
+            } catch {}
+          }
+
+          // Update the 50th commit's parent to null (break chain)
+          if (chain.length > 50) {
+            const lastKept = await Commits.read(chain[49])
+            if (lastKept) {
+              lastKept.parent = null
+              const lastPath = (await import("path")).default.join(commitsDir, chain[49] + ".json")
+              await archiveFs.default.writeFile(lastPath, JSON.stringify(lastKept, null, 2))
+            }
+          }
+
+          if (archived > 0) {
+            await Changelog.append({
+              type: "epoch",
+              timestamp: new Date().toISOString(),
+              data: { archived, keptInChain: Math.min(chain.length, 50) },
+            })
+            log.info("Archived old commits", { archived, kept: 50 })
+          }
+        }
+      }
+
+      // --- Repair: validate HEAD points to existing commit ---
+      if (head) {
+        const headCommit = await Commits.read(head.hash)
+        if (!headCommit) {
+          // HEAD points to missing commit — find latest valid commit
+          const { historyBasePath } = await import("./versioning/types")
+          const commitsDir = (await import("path")).default.join(historyBasePath(), "commits")
+          const repairFs = await import("fs/promises")
+          try {
+            const files = await repairFs.default.readdir(commitsDir)
+            if (files.length > 0) {
+              // Pick the newest commit file
+              let newest = { name: "", time: 0 }
+              for (const f of files) {
+                const stat = await repairFs.default.stat((await import("path")).default.join(commitsDir, f))
+                if (stat.mtimeMs > newest.time) newest = { name: f, time: stat.mtimeMs }
+              }
+              if (newest.name) {
+                const hash = newest.name.replace(".json", "")
+                await Commits.writeHead({ hash, timestamp: new Date().toISOString() })
+                repaired++
+                log.warn("Repaired HEAD — was pointing to missing commit", { oldHash: head.hash, newHash: hash })
+              }
+            }
+          } catch {}
+        }
+      }
+
+    } catch (e) {
+      log.warn("Versioning consolidation failed", { error: e })
+    }
+
+    if (decayed > 0 || archived > 0 || repaired > 0) {
+      log.info("Versioning consolidated", { decayed, archived, repaired })
+    }
+
+    return { decayed, archived, repaired }
   }
 
   /**

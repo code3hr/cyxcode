@@ -61,6 +61,14 @@ export namespace Corrections {
       return reinforce(existing)
     }
 
+    // Get current session count for decay baseline
+    let sessionCount = 0
+    try {
+      const statsPath = path.join(historyBasePath(), "..", "cyxcode-stats.json")
+      const stats = JSON.parse(require("fs").readFileSync(statsPath, "utf-8"))
+      sessionCount = stats.sessions || 0
+    } catch {}
+
     const correction: Correction = {
       id,
       rule: rule.trim(),
@@ -69,7 +77,7 @@ export namespace Corrections {
       updated: new Date().toISOString(),
       source,
       promoted: false,
-      decayBase: 0,
+      decayBase: sessionCount,
     }
 
     writeLock = writeLock.then(async () => {
@@ -92,7 +100,14 @@ export namespace Corrections {
   export async function reinforce(correction: Correction): Promise<Correction> {
     correction.strength++
     correction.updated = new Date().toISOString()
-    correction.decayBase = 0 // Reset decay on reinforcement
+    // Reset decay baseline to current session count
+    try {
+      const statsPath = path.join(historyBasePath(), "..", "cyxcode-stats.json")
+      const stats = JSON.parse(require("fs").readFileSync(statsPath, "utf-8"))
+      correction.decayBase = stats.sessions || 0
+    } catch {
+      correction.decayBase = 0
+    }
 
     writeLock = writeLock.then(async () => {
       await fs.writeFile(correctionPath(correction.id), JSON.stringify(correction, null, 2))
