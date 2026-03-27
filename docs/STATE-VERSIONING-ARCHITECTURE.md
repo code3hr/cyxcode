@@ -499,3 +499,152 @@ Corrections always load first. If budget is tight, memories get trimmed.
 | `src/cyxcode/index.ts` | Wire StateVersioning.init() | ~3 |
 | `src/cyxcode/dream.ts` | Add dreamConsolidate() call | ~5 |
 | `.gitignore` | Add .opencode/history/ | ~1 |
+
+---
+
+## Design Decisions
+
+### 1. Bus Events vs Plugin Hooks for Auto-Commit
+
+The codebase has two trigger mechanisms:
+
+| Mechanism | How it works | When to use |
+|-----------|-------------|-------------|
+| **Bus events** | `Bus.subscribe(Event, callback)` — async, fire-and-forget | Post-event reactions (logging, capture) |
+| **Plugin hooks** | `Plugin.trigger(name, input, output)` — sync, blocks caller | Pre-event interception (modify data before it's used) |
+
+**Decision: Use BOTH.**
+
+- **Bus event** (`SessionCompaction.Event.Compacted`) — for post-compaction capture (already used by memory.ts). Fire-and-forget, doesn't block.
+- **Plugin hook** (`experimental.session.compacting`) — for PRE-compaction auto-commit. This runs BEFORE compaction starts, so we can save state before context is pruned. The hook blocks compaction until our commit finishes.
+
+```
+Plugin hook fires (BEFORE compaction)
+  → StateVersioning.autoCommit()    # Save state BEFORE context pruned
+  → Compaction runs (context pruned)
+Bus event fires (AFTER compaction)
+  → Memory.captureFromCompaction()  # Extract discoveries from summary
+  → Corrections re-injected         # From the commit we just saved
+```
+
+### 2. Corrections vs Memories — How They Interact
+
+Corrections and memories are **separate systems** with different purposes:
+
+| | Corrections | Memories |
+|--|------------|---------|
+| **What** | Behavioral rules ("use /commit") | Knowledge ("auth.ts uses bcrypt") |
+| **Priority** | High — loaded first in system prompt | Lower — loaded by relevance |
+| **Strength** | Increases with reinforcement | Access count only |
+| **Promotion** | Auto-promoted to AGENTS.md at strength 3 | Never auto-promoted |
+| **Decay** | -1 per 10 sessions without reinforcement | Pruned after 30 days < 3 accesses |
+| **Detection** | User corrections ("no, don't do that") | Compaction discoveries, /remember |
+| **Storage** | `.opencode/history/corrections/` | `.opencode/memory/` |
+| **Budget** | 300 tokens max | 500 tokens max |
+
+**They don't overlap.** A correction tells the AI HOW to behave. A memory tells the AI WHAT it knows. Both load into the system prompt but in different positions:
+
+```
+System prompt order:
+  1. Environment (fixed)
+  2. Skills (fixed)
+  3. CORRECTIONS (behavioral rules — highest priority)
+  4. RESUME CONTEXT (goal, progress, files)
+  5. AGENTS.md (permanent instructions)
+  6. MEMORIES (project knowledge — relevance loaded)
+```
+
+### 3. Storage: File-based with writeLock (Final Decision)
+
+**Chosen: File-based (Option A)**
+
+Reasons:
+- Consistent with `memory.ts`, `learned.ts`, `dream.ts` patterns
+- Project-local — lives in `.opencode/history/`
+- Human-readable — can inspect commits and corrections manually
+- Gitignore-able — private by default
+- Portable — copy `.opencode/` to move project context
+
+**Not using Storage service** because:
+- Storage service writes to global `~/.opencode/data/` — not project-specific
+- History should live WITH the project, not in a global directory
+- If user switches machines, project history should travel with the repo (or be gitignored for privacy)
+
+### 4. Session Identification
+
+Each commit needs to know which session it belongs to. But `sessionID` is internal to the database.
+
+**Decision:** Commits reference sessions by timestamp + slug, not raw sessionID. This makes commits human-readable:
+
+```json
+{
+  "hash": "a7f3b2",
+  "session": {
+    "slug": "auth-jwt-implementation",
+    "timestamp": "2026-03-27T10:00:00Z"
+  }
+}
+```
+
+### 5. Correction Detection Strategy
+
+Phase 1: **Explicit only** — user runs `/correct "rule"`
+Phase 2: **Heuristic detection** — scan for correction patterns in user messages
+
+Heuristic signals (Phase 2):
+- Message starts with "no", "don't", "stop", "I said", "I told you"
+- Message contains "not X, use Y" pattern
+- Message repeats an instruction from earlier in the session
+- User follows AI action with immediate correction
+
+**Conservative threshold:** Only flag as correction if 2+ signals match. Better to miss than false-flag.
+
+---
+
+## Testing Strategy
+
+Unit tests exist for the existing CyxCode systems (added from other PC):
+- Skill system tests
+- Memory system tests
+- Dream system tests
+
+### Tests to Add for State Versioning
+
+| Test | What it verifies |
+|------|-----------------|
+| `commit.test.ts` | Commit creation, hashing, HEAD update, parent chain |
+| `corrections.test.ts` | CRUD, strength increment, decay, auto-promotion threshold |
+| `resume.test.ts` | HEAD loading, system prompt formatting, missing HEAD fallback |
+| `changelog.test.ts` | Append-only log, event ordering |
+| `integration.test.ts` | Full flow: correction → commit → resume → drift → promotion |
+
+### Test approach
+- Mock file system for unit tests (no disk I/O)
+- Integration tests use temp directory
+- Test correction detection heuristics with sample messages
+- Test strength decay across simulated sessions
+- Test compaction hook ordering (commit before compaction)
+
+---
+
+## Security & Privacy
+
+| Concern | Mitigation |
+|---------|-----------|
+| Corrections may contain sensitive info | Store locally only, add to .gitignore |
+| Commit history reveals work patterns | Never sent to remote, never included in LLM context as raw data |
+| Corrections injected into system prompt | Only the rule text, not the full context of when it was made |
+| State files readable by other users on shared machine | Follow OS file permissions (user-only read/write) |
+| Large commit history | Auto-archive: keep last 100 commits, summarize older into epoch commits |
+
+---
+
+## Migration Path
+
+For users upgrading from CyxCode without versioning:
+
+1. **No migration needed** — system starts fresh if no `.opencode/history/` exists
+2. **Existing memories preserved** — `.opencode/memory/` untouched
+3. **Existing learned patterns preserved** — `.opencode/cyxcode-learned.json` untouched
+4. **Existing AGENTS.md preserved** — versioning only adds to it, never removes
+5. **First session creates first commit** — HEAD.json created on first session end
