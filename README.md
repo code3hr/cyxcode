@@ -16,6 +16,7 @@
 - [Pattern Learning](#pattern-learning)
 - [Project Memory](#project-memory)
 - [Dream Consolidation](#dream-consolidation)
+- [Behavior Versioning](#behavior-versioning-coming-soon)
 - [Supported Categories](#supported-categories)
 - [Environment Variables](#environment-variables)
 - [Why Fork?](#why-fork-opencode-instead-of-building-a-plugin)
@@ -168,6 +169,84 @@ CyxCode accumulates state over time — memories, patterns, stats. `/dream` clea
 
 ---
 
+## Behavior Versioning (Coming Soon)
+
+*Git for AI state — no other AI coding tool has this.*
+
+AI forgets after compaction. Corrections are temporary. The same reminder gets repeated 5 times across sessions. CyxCode is building a **behavior versioning system** that tracks AI state the way git tracks code.
+
+### The Problem
+
+```
+Session 1:  "Use /commit skill"      -> AI follows
+Session 5:  Context compacted         -> Instruction lost
+Session 6:  AI uses raw git           -> User corrects again
+Session 10: Same correction, 5th time -> User frustrated
+```
+
+### The Solution
+
+| Concept | What it does |
+|---------|-------------|
+| **Auto-commit** | Snapshot AI state before compaction — nothing lost |
+| **Corrections** | Track user corrections with strength scores. Corrected 3x = auto-promoted |
+| **Resume** | Load last commit on session start — AI picks up where it left off |
+| **Drift detection** | If AI stops following a learned behavior, auto-remind |
+| **Content hashing** | Space-efficient storage, same as git (~500 bytes per commit) |
+
+### Token Savings
+
+| Scenario | Without | With | Savings |
+|----------|---------|------|---------|
+| Resume work (new session) | ~25K tokens (re-read files) | ~200 tokens (load commit) | **99%** |
+| After compaction | Corrections lost, user repeats | Corrections re-injected | **100%** |
+| 5th correction of same thing | User types it again | Auto-promoted, never lost | **100%** |
+
+### Correction Lifecycle
+
+```
+User corrects AI -> strength: 1
+Corrects again   -> strength: 2
+Third time       -> strength: 3 -> AUTO-PROMOTED to system prompt
+/dream runs      -> Adds to AGENTS.md permanently
+                 -> AI never forgets this again
+```
+
+### Why No One Else Has This
+
+We researched every major AI coding tool. None have behavior versioning:
+
+| Tool | Snapshots | Memory | Corrections | Behavior Versioning |
+|------|-----------|--------|-------------|---------------------|
+| **OpenCode** | File-state only (git worktrees) | None | None | None |
+| **Claude Code** | None | AutoDream (partial, unreleased) | None | None |
+| **Cursor** | None | None | None | None |
+| **CyxCode** | File-state + **AI state** | **Indexed + relevance** | **Strength scoring** | **In progress** |
+
+**What existing tools do:**
+- OpenCode snapshots track *files*, not *what the AI learned*
+- OpenCode compaction generates summaries but *throws away corrections*
+- Claude Code's AutoDream consolidates memory files but *doesn't track corrections or drift*
+- No tool persists *why* the AI was corrected or *how many times*
+
+**What CyxCode already built (that others don't have):**
+- Pattern learning — AI pays once, error is free forever
+- Indexed memory — only relevant knowledge loaded (~500 tokens vs full file dump)
+- Dream consolidation — auto-dedup, validate, persist stats on startup
+- Router stats persistence — matches, misses, hit rate tracked across sessions
+
+**What we're building next (entirely new territory):**
+- Correction tracking with strength scoring
+- Auto-commit before compaction (nothing lost)
+- Resume from HEAD commit (AI picks up where it left off)
+- Drift detection (AI stops following learned behavior → auto-remind)
+- Auto-promotion (corrected 3x → permanent instruction)
+- Content-hashed commits (~500 bytes each, like git)
+
+Full design: **[State Versioning Design](docs/STATE-VERSIONING.md)**
+
+---
+
 ## Supported Categories
 
 3 skills, 16 categories, 136+ patterns:
@@ -226,6 +305,7 @@ If you see `opencode` in a directory path or source file, that's normal. If you 
 | [Adding Patterns](docs/ADDING-PATTERNS.md) | Step-by-step guide to adding custom patterns |
 | [Contributing Patterns](docs/CONTRIBUTING-PATTERNS.md) | Community contribution guide, wanted categories |
 | [Before/After Comparison](docs/BEFORE-AFTER.md) | Side-by-side: CyxCode vs standard AI |
+| [State Versioning Design](docs/STATE-VERSIONING.md) | Git for AI state — full design document |
 | [Performance](docs/PERFORMANCE.md) | Benchmarks, token estimates, session savings |
 
 ### Running Modes
@@ -275,8 +355,11 @@ Available at `http://localhost:4096/dashboard` when running in web/server mode. 
 | 12 | Indexed project memory (`/remember`) | **Done** |
 | 13 | Dream consolidation (`/dream`) | **Done** |
 | 14 | Persisted router stats across sessions | **Done** |
-| 15 | Community patterns (Bun, Rust, Go, Ruby) | Planned |
-| 16 | Auto-execute fixes (with approval) | Planned |
+| 15 | Behavior versioning — auto-commit, corrections, resume | In Progress |
+| 16 | Drift detection + auto-promotion to AGENTS.md | Planned |
+| 17 | Multi-agent branching/merging | Planned |
+| 18 | Community patterns (Bun, Rust, Go, Ruby) | Planned |
+| 19 | Auto-execute fixes (with approval) | Planned |
 
 ---
 
