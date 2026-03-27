@@ -152,6 +152,58 @@ Persisted to `.opencode/cyxcode-stats.json`:
 
 ---
 
+## State Versioning
+
+CyxCode tracks AI state across sessions — corrections, context, working files. Like git for AI behavior.
+
+### Corrections (`/correct`)
+
+Save behavioral rules the AI should always follow. Corrections persist across sessions and get stronger with reinforcement.
+
+```
+/correct always use bun, not npm
+```
+
+The AI will follow the correction in future sessions:
+
+**Before correction** — AI would use npm by default.
+
+**After correction** — AI recognizes the rule and self-corrects:
+
+![Correction Override](../packages/web/src/assets/lander/screenshot-cyxcode-correction-override.png)
+
+The AI's thinking shows: *"According to the instructions, I should always use bun, not npm."* It overrides the user's `npm` request and uses `bun add` instead.
+
+Even when explicitly asked to use npm, the correction takes priority:
+
+![Correction Follow](../packages/web/src/assets/lander/screenshot-cyxcode-correction-follow.png)
+
+### Resume
+
+When you start a new session, CyxCode loads the previous session's context automatically — no need to re-explain what you were working on.
+
+![Resume](../packages/web/src/assets/lander/screenshot-cyxcode-resume.png)
+
+The AI reads the `<cyxcode-resume>` context and knows: *"In the previous session, you were reading package.json — it was in progress."*
+
+### How it works
+
+1. **Auto-commit**: State is saved after each session (goal, working files, progress)
+2. **Corrections**: Saved via `/correct`, loaded into system prompt sorted by strength
+3. **Resume**: HEAD commit loaded on session start — AI picks up where it left off
+4. **Drift detection**: If AI stops following a correction, its strength increases automatically
+5. **Dream integration**: Corrections with strength >= 3 auto-promoted to AGENTS.md. Unused corrections decay over time.
+
+### Commands
+
+| Command | Description |
+|---------|-------------|
+| `/correct <rule>` | Save a behavioral correction (strength: 1, increases on reinforcement) |
+| `/dream` | Consolidate state — promote, decay, archive |
+| `/history` | Show commit log and correction history |
+
+---
+
 ## Environment Variables
 
 | Variable | Default | Description |
