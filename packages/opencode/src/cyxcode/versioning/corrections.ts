@@ -123,13 +123,21 @@ export namespace Corrections {
     try {
       await fs.mkdir(basePath(), { recursive: true })
       const files = await fs.readdir(basePath())
+      const jsonFiles = files.filter(f => f.endsWith(".json"))
+      // Batch read in parallel
+      const results = await Promise.allSettled(
+        jsonFiles.map(f => fs.readFile(path.join(basePath(), f), "utf-8"))
+      )
       const corrections: Correction[] = []
-      for (const file of files) {
-        if (!file.endsWith(".json")) continue
-        try {
-          const content = await fs.readFile(path.join(basePath(), file), "utf-8")
-          corrections.push(JSON.parse(content) as Correction)
-        } catch {}
+      for (const result of results) {
+        if (result.status === "fulfilled") {
+          try {
+            const parsed = JSON.parse(result.value)
+            if (parsed.id && parsed.rule && typeof parsed.strength === "number") {
+              corrections.push(parsed as Correction)
+            }
+          } catch {}
+        }
       }
       return corrections.sort((a, b) => b.strength - a.strength)
     } catch {
@@ -188,8 +196,9 @@ export namespace Corrections {
     const corrections = await active()
     if (corrections.length === 0) return []
 
+    const WRAPPER_OVERHEAD = 100 // <cyxcode-corrections> tags + header text
+    const MAX_CHARS = 1100 // 1200 - wrapper overhead
     let total = 0
-    const MAX_CHARS = 1200
     const lines: string[] = []
 
     for (const c of corrections) {

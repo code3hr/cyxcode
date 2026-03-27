@@ -47,10 +47,11 @@ export namespace Resume {
       }
 
       if (lines.length > 0) {
-        // Enforce budget
-        let content = lines.join("\n")
-        if (content.length > MAX_RESUME_CHARS) {
-          content = content.slice(0, MAX_RESUME_CHARS) + "..."
+        // Enforce budget — truncate by dropping lines from bottom, not mid-line
+        let content = ""
+        for (const line of lines) {
+          if (content.length + line.length + 1 > MAX_RESUME_CHARS) break
+          content += (content ? "\n" : "") + line
         }
 
         parts.push(`<cyxcode-resume>\nContext from previous session (${commit.session.slug}):\n${content}\n</cyxcode-resume>`)

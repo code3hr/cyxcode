@@ -73,14 +73,28 @@ async function extractState(sessionID: string): Promise<CommitState> {
     msgs.push(msg)
   }
 
+  // Load active memories and patterns
+  let memoryIds: string[] = []
+  let patternIds: string[] = []
+  try {
+    const { Memory } = await import("@/cyxcode/memory")
+    const idx = await Memory.readIndex()
+    memoryIds = idx.entries.filter(e => e.accessCount > 0).map(e => e.id).slice(0, 10)
+  } catch {}
+  try {
+    const { LearnedPatterns } = await import("@/cyxcode/learned")
+    const data = await LearnedPatterns.read()
+    patternIds = data.approved.map((p: any) => ((p as any).generatedPattern || p).id).slice(0, 10)
+  } catch {}
+
   return {
     goal: extractGoal(msgs),
     workingFiles: extractFiles(msgs),
     inProgress: extractInProgress(msgs),
     completed: [],
-    discoveries: [],
-    activeMemories: [],
-    activePatterns: [],
+    discoveries: extractDiscoveries(msgs),
+    activeMemories: memoryIds,
+    activePatterns: patternIds,
   }
 }
 
@@ -120,6 +134,27 @@ function extractInProgress(msgs: MessageV2.WithParts[]): string {
     }
   }
   return ""
+}
+
+function extractDiscoveries(msgs: MessageV2.WithParts[]): string[] {
+  // Extract notable findings from AI responses (look for key phrases)
+  const discoveries: string[] = []
+  const patterns = [/found that/i, /note that/i, /the issue was/i, /discovered/i, /turns out/i, /important:/i]
+
+  for (const msg of msgs) {
+    if (msg.info.role !== "assistant") continue
+    for (const part of msg.parts) {
+      if (part.type !== "text" || part.synthetic) continue
+      const lines = part.text.split("\n")
+      for (const line of lines) {
+        if (patterns.some(p => p.test(line)) && line.length > 20 && line.length < 200) {
+          discoveries.push(line.trim())
+          if (discoveries.length >= 5) return discoveries
+        }
+      }
+    }
+  }
+  return discoveries
 }
 
 // --- Process exit handler ---

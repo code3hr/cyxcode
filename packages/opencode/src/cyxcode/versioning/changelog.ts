@@ -28,7 +28,8 @@ export namespace Changelog {
   export async function read(): Promise<ChangelogEntry[]> {
     try {
       const content = await fs.readFile(logPath(), "utf-8")
-      return JSON.parse(content) as ChangelogEntry[]
+      const parsed = JSON.parse(content)
+      return Array.isArray(parsed) ? parsed : []
     } catch {
       return []
     }
@@ -44,7 +45,10 @@ export namespace Changelog {
 
       const dir = path.dirname(logPath())
       await fs.mkdir(dir, { recursive: true })
-      await fs.writeFile(logPath(), JSON.stringify(entries, null, 2))
+      // Atomic write: temp + rename
+      const temp = logPath() + ".tmp"
+      await fs.writeFile(temp, JSON.stringify(entries, null, 2))
+      await fs.rename(temp, logPath())
     }).catch(e => log.warn("Failed to append changelog", { error: e }))
     await writeLock
   }
