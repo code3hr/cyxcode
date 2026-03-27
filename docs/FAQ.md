@@ -134,7 +134,15 @@ The patterns don't know or care where commands execute. They're regex against er
 
 ## Testing & Quality
 
-### Q: Where are the tests? How do you make sure features don't break each other?
+### Q: Where are the tests?
+
+**A:** CyxCode tests are in `packages/opencode/test/cyxcode/`:
+
+```bash
+bun test packages/opencode/test/cyxcode/
+```
+
+### Q: How do you make sure features don't break each other?
 
 **A:** Fair question. We have tests now:
 
