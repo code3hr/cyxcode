@@ -102,7 +102,7 @@ function extractFiles(msgs: MessageV2.WithParts[]): string[] {
       if (part.type === "tool" && part.state.status === "completed") {
         const input = part.state.input as Record<string, any>
         if (input?.file_path) files.add(String(input.file_path))
-        if (input?.path && typeof input.path === "string" && input.path.includes("/")) {
+        if (input?.path && typeof input.path === "string" && input.path.length > 0) {
           files.add(input.path)
         }
       }
