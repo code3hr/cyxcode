@@ -677,9 +677,11 @@ export namespace SessionPrompt {
       // Build system prompt, adding structured output instruction if needed
       const skills = await SystemPrompt.skills(agent)
       const { Memory } = await import("@/cyxcode/memory")
+      const { Resume } = await import("@/cyxcode/versioning/resume")
       const system = [
         ...(await SystemPrompt.environment(model)),
         ...(skills ? [skills] : []),
+        ...(await Resume.forSystemPrompt()),
         ...(await InstructionPrompt.system()),
         ...(await Memory.relevant(msgs)),
       ]
