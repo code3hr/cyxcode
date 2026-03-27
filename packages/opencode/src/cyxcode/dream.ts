@@ -291,6 +291,7 @@ export namespace Dream {
     dupMemories: { merged: number }
     validation: { removedMemories: number; removedPatterns: number }
     stats: StatsFile
+    promoted: number
   }> {
     const dupPatterns = await deduplicatePatterns()
     const dupMemories = await deduplicateMemories()
@@ -379,9 +380,29 @@ export namespace Dream {
   }
 
   /**
+   * Recover pending commits from unclean shutdown
+   */
+  async function recoverPendingCommit(): Promise<void> {
+    try {
+      const { historyBasePath } = await import("./versioning/types")
+      const pendingPath = path.join(historyBasePath(), "pending-commit.json")
+      const content = await fs.readFile(pendingPath, "utf-8")
+      const pending = JSON.parse(content)
+      if (pending.sessionID) {
+        const { StateVersioning } = await import("./versioning")
+        await StateVersioning.autoCommit(pending.sessionID, "session-end")
+        log.info("Recovered pending commit", { sessionID: pending.sessionID })
+      }
+      await fs.unlink(pendingPath)
+    } catch {
+      // No pending commit or recovery failed — that's fine
+    }
+  }
+
+  /**
    * Initialize auto-dream on startup
    */
   export function initAutoDream() {
-    run().catch(() => {})
+    recoverPendingCommit().then(() => run()).catch(() => {})
   }
 }

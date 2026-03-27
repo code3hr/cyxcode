@@ -42,7 +42,7 @@ function hashState(state: CommitState): string {
   return createHash("sha256")
     .update(JSON.stringify(state))
     .digest("hex")
-    .slice(0, 12)
+    .slice(0, 16)
 }
 
 // --- Commits namespace ---
@@ -130,7 +130,19 @@ export namespace Commits {
       const files = await fs.readdir(dir)
       if (files.length <= MAX_COMMITS) return
 
-      // Sort by modification time, remove oldest
+      // Build parent chain from HEAD to protect referenced commits
+      const head = await readHead()
+      const protected_ = new Set<string>()
+      if (head) {
+        let hash: string | null = head.hash
+        while (hash) {
+          protected_.add(hash + ".json")
+          const commit = await read(hash)
+          hash = commit?.parent ?? null
+        }
+      }
+
+      // Sort by modification time, remove oldest (but never protected)
       const stats = await Promise.all(
         files.map(async f => ({
           name: f,
@@ -139,13 +151,16 @@ export namespace Commits {
       )
       stats.sort((a, b) => a.time - b.time)
 
-      const toRemove = stats.slice(0, files.length - MAX_COMMITS)
-      for (const f of toRemove) {
+      let removed = 0
+      for (const f of stats) {
+        if (files.length - removed <= MAX_COMMITS) break
+        if (protected_.has(f.name)) continue
         await fs.unlink(path.join(dir, f.name))
+        removed++
       }
 
-      if (toRemove.length > 0) {
-        log.debug("GC: removed old commits", { count: toRemove.length })
+      if (removed > 0) {
+        log.debug("GC: removed old commits", { count: removed })
       }
     } catch {}
   }

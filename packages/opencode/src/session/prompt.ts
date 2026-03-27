@@ -823,17 +823,16 @@ export namespace SessionPrompt {
         }
       }
 
-      // CyxCode: auto-commit state after each AI response
-      try {
-        const { StateVersioning } = await import("@/cyxcode/versioning")
-        await StateVersioning.autoCommit(sessionID, "session-end")
-        // Phase 5: Drift detection
-        const { Drift } = await import("@/cyxcode/versioning/drift")
-        await Drift.detectAndReinforce(sessionID)
-      } catch {}
-
       continue
     }
+
+    // CyxCode: auto-commit state on session end + drift detection
+    try {
+      const { StateVersioning } = await import("@/cyxcode/versioning")
+      await StateVersioning.autoCommit(sessionID, "session-end")
+      const { Drift } = await import("@/cyxcode/versioning/drift")
+      await Drift.detectAndReinforce(sessionID)
+    } catch {}
 
     SessionCompaction.prune({ sessionID })
     for await (const item of MessageV2.stream(sessionID)) {
