@@ -51,18 +51,97 @@
 packages/opencode/src/cyxcode/
 
   versioning/
-    index.ts          # Public API: StateVersioning namespace
-    commit.ts         # Commit creation, hashing, storage
-    corrections.ts    # Correction tracking, strength, detection
-    resume.ts         # HEAD loading, system prompt injection
-    changelog.ts      # Linear event log
-    types.ts          # All type definitions
+    index.ts          # Public API: StateVersioning namespace (init, autoCommit, sessionEnd)
+    commit.ts         # Commit creation, SHA-256 hashing, HEAD management, epoch archival
+    corrections.ts    # Correction CRUD, strength scoring, decay, auto-promotion, detection
+    resume.ts         # HEAD loading, system prompt formatting, budget enforcement (300 tokens)
+    changelog.ts      # Append-only event log (corrections, commits, drifts, promotions)
+    types.ts          # All type definitions (see Type Definitions section below)
 
-  memory.ts           # (existing) Indexed project memory
-  learned.ts          # (existing) Pattern learning
-  dream.ts            # (existing) Dream consolidation — enhanced
-  router.ts           # (existing) Skill router — enhanced
-  index.ts            # (existing) Init — wire versioning
+  memory.ts           # (existing) Indexed project memory — add strength field
+  learned.ts          # (existing) Pattern learning — unchanged
+  dream.ts            # (existing) Dream consolidation — add dreamConsolidate()
+  router.ts           # (existing) Skill router — unchanged
+  index.ts            # (existing) Init — wire StateVersioning.init()
+
+.opencode/
+  history/
+    HEAD.json         # { hash, timestamp } — pointer to latest commit
+    commits/          # Content-hashed state snapshots (max 100, epoch archival)
+    corrections/      # Individual correction files (JSON, not .md — structured data)
+    changelog.json    # Linear event log [{type, timestamp, data}, ...]
+  memory/             # (existing) Indexed project memories
+  cyxcode-learned.json  # (existing) Learned error patterns
+  cyxcode-stats.json    # (existing) Persisted router stats
+```
+
+### Type Definitions (`versioning/types.ts`)
+
+```typescript
+// Commit — content-hashed state snapshot
+type Commit = {
+  hash: string                    // SHA-256 of JSON.stringify(state)
+  parent: string | null           // Previous commit hash (linked list)
+  timestamp: string               // ISO 8601
+  trigger: "compaction" | "session-end" | "manual" | "correction"
+  session: {
+    slug: string                  // Human-readable session name
+    timestamp: string             // Session start time
+  }
+  state: CommitState
+}
+
+type CommitState = {
+  goal: string                    // What user is working on
+  workingFiles: string[]          // Active file paths
+  inProgress: string              // Current task
+  completed: string[]             // Done items
+  corrections: CorrectionRef[]    // Active corrections (id + strength)
+  discoveries: string[]           // What was learned
+  activeMemories: string[]        // Memory IDs loaded this session
+  activePatterns: string[]        // Learned pattern IDs active
+}
+
+// Correction — behavioral rule with strength
+type Correction = {
+  id: string                      // Content hash of rule text
+  rule: string                    // The behavioral instruction
+  strength: number                // Reinforcement count (1=new, 3+=auto-promoted)
+  created: string                 // ISO 8601
+  updated: string                 // Last reinforcement
+  source: "explicit" | "heuristic" | "dream"
+  promoted: boolean               // true if migrated to AGENTS.md
+  decayBase: number               // Session count at last reinforcement (for decay calc)
+}
+
+type CorrectionRef = {
+  id: string
+  strength: number
+}
+
+// Changelog — append-only event log
+type ChangelogEntry = {
+  type: "commit" | "correction" | "correction-reinforced"
+      | "drift" | "promotion" | "decay" | "epoch-archive"
+  timestamp: string
+  data: Record<string, any>       // Event-specific payload
+}
+
+// HEAD pointer
+type Head = {
+  hash: string
+  timestamp: string
+}
+
+// Epoch — summarized archive of old commits
+type EpochCommit = {
+  hash: string
+  timestamp: string
+  range: { from: string; to: string }  // Timestamp range covered
+  sessionsCount: number
+  corrections: CorrectionRef[]         // Corrections active during this epoch
+  summary: string                       // One-line summary of epoch
+}
 ```
 
 ---
@@ -648,3 +727,181 @@ For users upgrading from CyxCode without versioning:
 3. **Existing learned patterns preserved** — `.opencode/cyxcode-learned.json` untouched
 4. **Existing AGENTS.md preserved** — versioning only adds to it, never removes
 5. **First session creates first commit** — HEAD.json created on first session end
+
+---
+
+## Strength Decay Mechanics
+
+Corrections shouldn't live forever if they're no longer relevant. Strength decays over time without reinforcement.
+
+```
+Decay formula:
+  effective_strength = strength - floor((current_session - decayBase) / 10)
+
+  Where:
+    strength    = raw reinforcement count
+    decayBase   = session count at last reinforcement
+    10          = sessions per decay tick
+
+Example:
+  Correction "use npm" created at session 5, strength 3
+  Session 15: effective = 3 - floor((15-5)/10) = 3 - 1 = 2
+  Session 25: effective = 3 - floor((25-5)/10) = 3 - 2 = 1
+  Session 35: effective = 3 - floor((35-5)/10) = 3 - 3 = 0 → REMOVED
+
+  But if reinforced at session 20:
+    strength = 4, decayBase = 20
+  Session 30: effective = 4 - floor((30-20)/10) = 4 - 1 = 3 → still strong
+```
+
+**When decay runs:**
+- During `Dream.dreamConsolidate()` (startup auto-dream)
+- Each correction checked: if effective_strength <= 0, archived to changelog and removed
+
+**Promoted corrections (in AGENTS.md) don't decay.** Once promoted, they're permanent.
+
+---
+
+## Epoch Archival
+
+When commits exceed 100, old commits are summarized into epoch commits:
+
+```
+Before archival:
+  commits/a1.json (session 1)
+  commits/a2.json (session 2)
+  ...
+  commits/a90.json (session 90)
+  commits/a100.json (session 100)  ← HEAD
+  commits/a101.json (session 101)  ← NEW → triggers archival
+
+After archival:
+  commits/epoch-1-to-50.json      ← summarizes sessions 1-50
+  commits/a51.json (session 51)
+  ...
+  commits/a101.json (session 101)  ← HEAD
+
+Epoch commit structure:
+{
+  "hash": "epoch-abc123",
+  "type": "epoch",
+  "range": { "from": "2026-03-01", "to": "2026-03-15" },
+  "sessionsCount": 50,
+  "corrections": [{ "id": "use-commit", "strength": 5 }],
+  "summary": "50 sessions, 3 corrections active, auth system built"
+}
+```
+
+**Epoch archival runs during Dream consolidation**, not during normal commits.
+
+---
+
+## Plugin Registration for Compaction Hook
+
+To hook into compaction BEFORE it runs, register via the internal plugin system:
+
+```typescript
+// In versioning/index.ts
+
+import { Plugin } from "@/plugin"
+
+export function init() {
+  // Register compaction hook — runs BEFORE compaction
+  // Plugin.trigger("experimental.session.compacting") is called at
+  // compaction.ts line 169, before processor.process() at line 205
+  //
+  // We can't use Plugin.trigger directly (it's for internal plugins),
+  // so we subscribe to the Bus event and use the timing:
+  //
+  // Option A: Bus.subscribe (AFTER compaction — for capture)
+  Bus.subscribe(SessionCompaction.Event.Compacted, async ({ sessionID }) => {
+    await capturePostCompaction(sessionID)
+  })
+
+  // Option B: Modify compaction.ts to add a pre-compaction event
+  // This is cleaner but requires modifying compaction.ts:
+  //
+  // In compaction.ts, before line 169, add:
+  //   Bus.publish(Event.PreCompaction, { sessionID })
+  //
+  // Then subscribe:
+  //   Bus.subscribe(Event.PreCompaction, async ({ sessionID }) => {
+  //     await autoCommit(sessionID)
+  //   })
+}
+```
+
+**Decision: Option B (add PreCompaction event)**
+
+This requires a 3-line change to `compaction.ts`:
+```typescript
+// New event definition (line 22-28):
+PreCompaction: BusEvent.define(
+  "session.pre-compaction",
+  z.object({ sessionID: SessionID.zod })
+),
+
+// Publish before compaction (line 168, before Plugin.trigger):
+await Bus.publish(Event.PreCompaction, { sessionID: input.sessionID })
+```
+
+---
+
+## `/history` Command Design
+
+The `/history` command shows the commit log in a human-readable format:
+
+```markdown
+---
+description: Show CyxCode state versioning history
+---
+
+Read `.opencode/history/changelog.json` and `.opencode/history/HEAD.json`.
+
+Display the last 20 events in reverse chronological order as a table:
+
+| Time | Event | Details |
+|------|-------|---------|
+| (timestamp) | (type) | (summary) |
+
+Event types:
+- commit: "State committed (trigger: compaction/session-end)"
+- correction: "Correction added: {rule} (strength: {n})"
+- correction-reinforced: "Correction reinforced: {rule} (strength: {n-1} → {n})"
+- drift: "Drift detected: {rule} not followed"
+- promotion: "Correction promoted to AGENTS.md: {rule}"
+- decay: "Correction decayed: {rule} (strength: {n} → {n-1})"
+- epoch-archive: "Archived {n} old commits into epoch"
+
+Also show current HEAD:
+- Hash: {hash}
+- Session: {slug}
+- Active corrections: {count} ({list of rules with strengths})
+- Last dream: {timestamp}
+
+$ARGUMENTS
+```
+
+---
+
+## Cross-Reference: Design Doc vs Architecture Doc
+
+| Topic | STATE-VERSIONING.md | STATE-VERSIONING-ARCHITECTURE.md |
+|-------|--------------------|---------------------------------|
+| Problem statement | Full narrative | Referenced |
+| Git comparison table | Full table | Full table + what we add |
+| Risk mitigations | 10 scenarios | 10 scenarios + error handling matrix |
+| Commit structure | JSON example | JSON example + TypeScript types |
+| Flow diagrams | 4 flows | 5 flows + system overview |
+| Integration points | High level | Exact file paths + line numbers |
+| Correction lifecycle | Flow diagram | Flow diagram + strength decay formula |
+| Epoch archival | Mentioned in risk #1 | Full section with structure |
+| Token budget | Savings table | Savings table + allocation breakdown |
+| Testing strategy | Not covered | Full test plan |
+| Security/privacy | Risk #10 | Full section |
+| Migration path | Not covered | Full section |
+| Plugin registration | Not covered | Full code example |
+| /history command | Listed in commands | Full .md command design |
+| Storage decision | Not decided | Decided: file-based with writeLock |
+| Corrections vs memories | Not covered | Full comparison table |
+| Type definitions | Inline JSON | Full TypeScript types |
