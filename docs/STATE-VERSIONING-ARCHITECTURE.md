@@ -211,47 +211,45 @@ type EpochCommit = {
 1. Context overflow detected (compaction.ts:33-49)
         │
         ▼
-2. Hook: "experimental.session.compacting" fires (line 169)
+2. SessionCompaction.create() runs (prompt.ts line 747)
+   Summary generated, old tool outputs pruned
         │
         ▼
-3. StateVersioning.autoCommit(sessionID, messages):
-   ├── Extract goal from recent user messages
-   ├── Extract working files from tool calls (read/edit)
-   ├── Extract progress (completed/in-progress)
-   ├── Collect active corrections with strengths
-   ├── Collect active memories
-   ├── Collect active learned patterns
-   ├── Hash the state: sha256(JSON.stringify(state))
+3. DIRECT CALL from prompt.ts (line 754):
+   StateVersioning.autoCommit(sessionID, "compaction")
+   ├── Read messages from DB (still available after compaction)
+   ├── Extract goal, working files, progress
+   ├── Hash state: sha256(JSON.stringify(state))
    ├── If hash === HEAD.hash → skip (no changes)
    └── Write commit, update HEAD, append changelog
         │
         ▼
-4. Compaction proceeds (existing behavior)
-   Summary generated, old messages pruned
-        │
-        ▼
-5. After compaction:
-   Corrections re-injected via system prompt
-   (they were committed, so they survive compaction)
+4. Session continues with compacted context
+   Corrections re-injected on next prompt via resume (Phase 4)
 ```
 
 ### Flow 4: Session End (Final Commit)
 
 ```
-1. SessionStatus.Event.Idle fires (or user closes TUI)
+1. Session loop exits (prompt.ts line 832)
+   (all prompts processed, model finished)
         │
         ▼
-2. StateVersioning.sessionEnd(sessionID):
-   ├── Same commit logic as autoCommit
-   ├── Additionally: persist dream stats
-   └── Run drift detection (compare behavior vs corrections)
+2. DIRECT CALL from prompt.ts (line 834):
+   StateVersioning.autoCommit(sessionID, "session-end")
+   ├── Read messages from DB
+   ├── Extract goal, working files, progress
+   ├── Hash and write commit
+   └── Append to changelog
         │
         ▼
-3. Drift detected?
-   ├── No → done
-   └── Yes → increment correction strength
-             Log drift event in changelog
+3. SessionCompaction.prune() runs (existing cleanup)
 ```
+
+**Why direct calls, not events or hooks:**
+- Bus events don't work cross-module (Bun `--conditions=browser` creates separate module instances)
+- Plugin hooks can't block compaction (only customize the prompt)
+- Direct `await import()` from prompt.ts works reliably — same pattern used for pattern learning and short-circuit
 
 ### Flow 5: Dream Integration
 
@@ -298,45 +296,37 @@ const system = [
 
 No hooks needed — just add to the system array directly.
 
-### 2. Auto-Commit on Compaction (Bus event)
-**File:** `packages/opencode/src/cyxcode/versioning/index.ts`
+### 2. Auto-Commit on Compaction (direct call)
+**File:** `packages/opencode/src/session/prompt.ts` line 754
 
 ```typescript
-// Subscribe to compaction event — fires AFTER compaction completes
-// Messages are still in DB at this point, just tool outputs pruned
-Bus.subscribe(SessionCompaction.Event.Compacted, async ({ sessionID }) => {
-  await StateVersioning.autoCommit(sessionID)
-})
+// Right after SessionCompaction.create() completes:
+try {
+  const { StateVersioning } = await import("@/cyxcode/versioning")
+  await StateVersioning.autoCommit(sessionID, "compaction")
+} catch {}
 ```
 
-No hooks, no blocking. Messages are in the database — compaction prunes tool outputs but the message structure remains. We read what we need and commit.
-
-### 3. Session End (Bus event)
-**File:** `packages/opencode/src/cyxcode/versioning/index.ts`
+### 3. Session End (direct call)
+**File:** `packages/opencode/src/session/prompt.ts` line 834
 
 ```typescript
-// Subscribe to status changes — filter for idle
-Bus.subscribe(SessionStatus.Event.Status, async ({ sessionID, status }) => {
-  if (status.type === "idle") {
-    await StateVersioning.sessionEnd(sessionID)
-  }
-})
+// After while(true) loop exits, before SessionCompaction.prune():
+try {
+  const { StateVersioning } = await import("@/cyxcode/versioning")
+  await StateVersioning.autoCommit(sessionID, "session-end")
+} catch {}
 ```
 
-Uses `Event.Status` (not deprecated `Event.Idle`).
-
-### 4. Correction Detection (direct code)
+### 4. Correction Detection (direct code, Phase 3)
 **File:** `packages/opencode/src/session/prompt.ts` line 304
 
 ```typescript
 // In the outer loop, after messages are loaded:
-let msgs = await MessageV2.filterCompacted(MessageV2.stream(sessionID))
-// NEW: scan latest user message for corrections (Phase 1: explicit /correct only)
+// Scan latest user message for corrections (Phase 3: explicit /correct only)
 ```
 
-No hooks — correction detection is a simple scan of the user message text, added directly in the prompt loop. Negligible performance cost.
-
-### 5. Dream Enhancement (direct code)
+### 5. Dream Enhancement (direct code, Phase 7)
 **File:** `packages/opencode/src/cyxcode/dream.ts`
 
 ```typescript
@@ -344,29 +334,17 @@ No hooks — correction detection is a simple scan of the user message text, add
 await StateVersioning.dreamConsolidate()
 ```
 
-Direct function call, no events needed.
+### Summary: All Direct Calls from prompt.ts
 
-### 6. Init Wiring (direct code)
-**File:** `packages/opencode/src/cyxcode/index.ts`
-
-```typescript
-import("./versioning").then(({ StateVersioning }) => {
-  StateVersioning.init()
-}).catch(() => {})
-```
-
-### Summary: No Hooks Needed
-
-| Integration | Mechanism | Why not hooks? |
+| Integration | Mechanism | Why? |
 |-------------|-----------|---------------|
 | System prompt | Direct code in prompt.ts | Just adding to an array |
-| Compaction | Bus event (Compacted) | Don't need to block, messages are in DB |
-| Session end | Bus event (Status → idle) | Don't need to block, just capture |
-| Corrections | Direct code in prompt.ts | Simple text scan |
-| Dream | Direct function call | Already inside our code |
-| Init | Direct import | Same pattern as memory/dream |
+| Compaction commit | Direct call after `SessionCompaction.create()` in prompt.ts | Bus events don't cross module boundary |
+| Session end commit | Direct call after while loop exits in prompt.ts | Same — Bus subscribe in versioning/ never fires |
+| Corrections | Direct code in prompt.ts (Phase 3) | Simple text scan in the loop |
+| Dream | Direct function call in dream.ts (Phase 7) | Already inside our code |
 
-**Events are reactive, non-blocking, and simpler.** We don't modify compaction behavior — we just observe it and save state.
+**Lesson learned:** Bun's `--conditions=browser` flag creates separate module instances. Bus events published in `session/` are never received by subscribers in `cyxcode/`. Direct `await import()` from `prompt.ts` is the only reliable cross-module pattern. This is the same approach used for pattern learning, short-circuit, and memory capture.
 
 ---
 
@@ -590,24 +568,25 @@ Corrections always load first. If budget is tight, memories get trimmed.
 
 ## Design Decisions
 
-### 1. Events Only — No Hooks Needed
+### 1. Direct Calls — No Events, No Hooks
 
-We originally considered using plugin hooks to block compaction for pre-commit. After validation against the codebase, we found:
+We tried three approaches in order:
 
-1. The plugin hook can't truly block compaction — it only customizes the prompt
-2. Messages remain in the database after compaction — tool outputs are pruned but message structure stays
-3. We don't need to modify compaction behavior — we just observe and capture
-
-**Decision: Bus events only.**
+1. **Plugin hooks** — Can't block compaction, only customize prompt. Rejected.
+2. **Bus events** — `Bus.subscribe()` in `cyxcode/` never receives events from `session/` due to Bun `--conditions=browser` creating separate module instances. Rejected after testing.
+3. **Direct calls** — `await import("@/cyxcode/versioning")` from `prompt.ts`. Works reliably. **Accepted.**
 
 ```
 Compaction runs (tool outputs pruned)
-  → Bus event: SessionCompaction.Event.Compacted fires
-  → StateVersioning.autoCommit()    # Read messages from DB, save commit
-  → Memory.captureFromCompaction()  # Extract discoveries (existing)
+  → Direct call: StateVersioning.autoCommit(sessionID, "compaction")
+  → Read messages from DB, save commit
+
+Session loop exits
+  → Direct call: StateVersioning.autoCommit(sessionID, "session-end")
+  → Read messages from DB, save commit
 ```
 
-Simpler, no blocking, no plugin registration, no risk of slowing compaction.
+This is the same pattern used for CyxCode's pattern learning, LLM short-circuit, and memory capture. All cross-module integration goes through direct `await import()` from `prompt.ts`.
 
 ### 2. Corrections vs Memories — How They Interact
 
@@ -799,27 +778,25 @@ Epoch commit structure:
 
 ---
 
-## Event Subscriptions
+## How Auto-Commit is Triggered
 
-All integration uses Bus events (non-blocking) or direct code. No hooks or plugins needed.
+All triggers are **direct calls from `prompt.ts`** — no Bus events, no hooks, no plugins.
 
 ```typescript
-// versioning/index.ts — init()
+// prompt.ts — after compaction (line 754):
+const { StateVersioning } = await import("@/cyxcode/versioning")
+await StateVersioning.autoCommit(sessionID, "compaction")
 
-// 1. Auto-commit after compaction
-Bus.subscribe(SessionCompaction.Event.Compacted, async ({ sessionID }) => {
-  await autoCommit(sessionID)
-})
-
-// 2. Final commit on session end
-Bus.subscribe(SessionStatus.Event.Status, async ({ sessionID, status }) => {
-  if (status.type === "idle") {
-    await sessionEnd(sessionID)
-  }
-})
+// prompt.ts — after session loop exits (line 834):
+const { StateVersioning } = await import("@/cyxcode/versioning")
+await StateVersioning.autoCommit(sessionID, "session-end")
 ```
 
-No compaction.ts changes needed. No plugin registration. Messages are in the database — we read them when the event fires.
+**Why not Bus events?** Bun's `--conditions=browser` creates separate module instances. `Bus.subscribe()` in `cyxcode/versioning/` never receives events published from `session/`. This is a known limitation — pattern learning and memory capture also use direct calls for the same reason.
+
+**Why not hooks?** The `experimental.session.compacting` plugin hook can't block compaction and the payload only allows customizing the prompt text.
+
+**No changes needed** to `compaction.ts`, `status.ts`, or `plugin/`.
 
 ---
 
