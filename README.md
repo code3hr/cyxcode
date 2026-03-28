@@ -306,6 +306,7 @@ If you see `opencode` in a directory path or source file, that's normal. If you 
 | [Contributing Patterns](docs/CONTRIBUTING-PATTERNS.md) | Community contribution guide, wanted categories |
 | [Before/After Comparison](docs/BEFORE-AFTER.md) | Side-by-side: CyxCode vs standard AI |
 | [State Versioning Design](docs/STATE-VERSIONING.md) | Git for AI state — full design document |
+| [Audit System](docs/AUDIT-SYSTEM.md) | Event journal, reports, token accountability |
 | [Performance](docs/PERFORMANCE.md) | Benchmarks, token estimates, session savings |
 
 ### Running Modes
@@ -358,8 +359,9 @@ Available at `http://localhost:4096/dashboard` when running in web/server mode. 
 | 15 | Behavior versioning — auto-commit, corrections, resume | In Progress |
 | 16 | Drift detection + auto-promotion to AGENTS.md | Planned |
 | 17 | Multi-agent branching/merging | Planned |
-| 18 | Community patterns (Bun, Rust, Go, Ruby) | Planned |
-| 19 | Auto-execute fixes (with approval) | Planned |
+| 18 | Audit system — event journal, reports, token accountability | Planned |
+| 19 | Community patterns (Bun, Rust, Go, Ruby) | Planned |
+| 20 | Auto-execute fixes (with approval) | Planned |
 
 ---
 
