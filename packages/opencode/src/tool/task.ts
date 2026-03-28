@@ -71,7 +71,7 @@ export const TaskTool = Tool.define("task", async (ctx) => {
           if (found) return found
         }
 
-        return await Session.create({
+        const newSession = await Session.create({
           parentID: ctx.sessionID,
           title: params.description + ` (@${agent.name} subagent)`,
           permission: [
@@ -101,6 +101,17 @@ export const TaskTool = Tool.define("task", async (ctx) => {
             })) ?? []),
           ],
         })
+
+        // Create versioning branch for this subagent
+        try {
+          const { Branch } = await import("@/cyxcode/versioning/branch")
+          await Branch.create({
+            sessionID: newSession.id,
+            parentSessionID: ctx.sessionID,
+          })
+        } catch {}
+
+        return newSession
       })
       const msg = await MessageV2.get({ sessionID: ctx.sessionID, messageID: ctx.messageID })
       if (msg.info.role !== "assistant") throw new Error("Not an assistant message")
@@ -143,6 +154,12 @@ export const TaskTool = Tool.define("task", async (ctx) => {
         },
         parts: promptParts,
       })
+
+      // Merge branch back to main when subagent completes
+      try {
+        const { Branch } = await import("@/cyxcode/versioning/branch")
+        await Branch.merge(session.id)
+      } catch {}
 
       const text = result.parts.findLast((x) => x.type === "text")?.text ?? ""
 

@@ -72,23 +72,50 @@ export namespace Commits {
     state: CommitState,
     trigger: Commit["trigger"],
     session: Commit["session"],
+    branchSessionID?: string,
   ): Promise<Commit> {
     const hash = hashState(state)
 
-    // Skip if identical to HEAD
-    const head = await readHead()
-    if (head && head.hash === hash) {
-      const existing = await read(hash)
-      if (existing) return existing
+    // Determine parent based on branch
+    let parent: string | null
+    let branchMeta: Commit["branch"] | undefined
+
+    if (branchSessionID) {
+      // Branch commit: parent is branch HEAD or base
+      const { Branch } = await import("./branch")
+      const branch = await Branch.get(branchSessionID)
+      parent = branch?.headHash ?? branch?.baseCommitHash ?? null
+      if (parent === "root") parent = null
+      branchMeta = {
+        sessionID: branchSessionID,
+        baseHash: branch?.baseCommitHash ?? "root",
+      }
+
+      // Skip if identical to branch HEAD
+      if (branch?.headHash === hash) {
+        const existing = await read(hash)
+        if (existing) return existing
+      }
+    } else {
+      // Main branch: parent is main HEAD
+      const head = await readHead()
+      parent = head?.hash ?? null
+
+      // Skip if identical to HEAD
+      if (head && head.hash === hash) {
+        const existing = await read(hash)
+        if (existing) return existing
+      }
     }
 
     const commit: Commit = {
       hash,
-      parent: head?.hash ?? null,
+      parent,
       timestamp: new Date().toISOString(),
       trigger,
       session,
       state,
+      branch: branchMeta,
     }
 
     // Write commit file
@@ -98,13 +125,20 @@ export namespace Commits {
     }).catch(e => log.warn("Failed to write commit", { error: e }))
     await commitLock
 
-    // Update HEAD
-    await writeHead({ hash, timestamp: commit.timestamp })
+    // Update HEAD (main or branch)
+    if (branchSessionID) {
+      const { Branch } = await import("./branch")
+      await Branch.updateHead(branchSessionID, hash)
+    } else {
+      await writeHead({ hash, timestamp: commit.timestamp })
+    }
 
-    // Garbage collect old commits
-    await gc()
+    // Garbage collect old commits (main only)
+    if (!branchSessionID) {
+      await gc()
+    }
 
-    log.debug("Created commit", { hash, trigger, parent: commit.parent })
+    log.debug("Created commit", { hash, trigger, parent: commit.parent, branch: branchSessionID })
 
     return commit
   }

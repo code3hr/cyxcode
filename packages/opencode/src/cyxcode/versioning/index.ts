@@ -16,6 +16,7 @@ const log = Log.create({ service: "cyxcode-versioning" })
 
 export { Commits } from "./commit"
 export { Changelog } from "./changelog"
+export { Branch } from "./branch"
 export type * from "./types"
 
 // Track last active session for process exit handler
@@ -38,26 +39,36 @@ export namespace StateVersioning {
       if (!state.goal && state.workingFiles.length === 0) return
 
       const session = await Session.get(sessionID)
+
+      // Check if this is a subagent session (has parent)
+      // If so, commit to the branch instead of main
+      const branchSessionID = session.parentID ? sessionID : undefined
+
       const commit = await Commits.create(state, trigger, {
         slug: session.slug,
         timestamp: new Date(session.time.created).toISOString(),
-      })
+      }, branchSessionID)
 
-      await Changelog.append({
-        type: "commit",
-        timestamp: commit.timestamp,
-        data: {
-          hash: commit.hash,
-          trigger,
-          session: session.slug,
-          files: state.workingFiles.length,
-        },
-      })
+      // Only log to changelog for main branch commits
+      // Branch commits are tracked via branch-merge event
+      if (!branchSessionID) {
+        await Changelog.append({
+          type: "commit",
+          timestamp: commit.timestamp,
+          data: {
+            hash: commit.hash,
+            trigger,
+            session: session.slug,
+            files: state.workingFiles.length,
+          },
+        })
+      }
 
       log.debug("Auto-committed state", {
         hash: commit.hash,
         trigger,
         files: state.workingFiles.length,
+        branch: branchSessionID,
       })
     } catch (e) {
       log.warn("Auto-commit failed", { error: e })
