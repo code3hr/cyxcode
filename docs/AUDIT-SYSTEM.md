@@ -1,14 +1,18 @@
 # CyxCode Audit System
 
-*Token accountability. Zero dependencies.*
+*Token accountability. Built on existing infrastructure.*
 
 ---
 
 ## Overview
 
-Built-in audit trail for CyxCode — track every pattern match, AI call, correction, and drift event. Generate reports showing ROI, compliance, and effectiveness.
+CyxCode already has comprehensive audit infrastructure from the pentest/security system. Instead of building new, we **extend existing** components for token/pattern tracking.
 
-**No external dependencies.** Inspired by forensic observability tools, built lean.
+**Existing infrastructure we reuse:**
+- `governance/audit.ts` — Audit entry storage, querying, bus events
+- `pentest/reports/` — Report generation (Markdown, HTML, JSON)
+- `pentest/compliance/` — Framework mapping and scoring
+- `dashboard/` — Web UI for findings, scans, reports
 
 ---
 
@@ -19,180 +23,229 @@ Built-in audit trail for CyxCode — track every pattern match, AI call, correct
 │                        CyxCode Core                          │
 │  Router → Skills → Memory → Corrections → Dream              │
 └──────────────────────────┬──────────────────────────────────┘
-                           │ emit()
+                           │ Bus.publish()
                            ▼
 ┌─────────────────────────────────────────────────────────────┐
-│                      Audit Layer                             │
-│  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐          │
-│  │  Privacy    │  │   Events    │  │   Report    │          │
-│  │  Guard      │  │   Journal   │  │   Generator │          │
-│  └─────────────┘  └─────────────┘  └─────────────┘          │
-└─────────────────────────────────────────────────────────────┘
-                           │
-                           ▼
-┌─────────────────────────────────────────────────────────────┐
-│                      Storage                                 │
-│  .opencode/audit/                                            │
-│  ├── events-2026032812.ndjson   (hourly segments)           │
-│  ├── events-2026032813.ndjson                               │
-│  └── summary.json               (aggregated stats)          │
+│              Existing Audit Infrastructure                   │
+│  ┌─────────────────┐  ┌─────────────────┐                   │
+│  │ GovernanceAudit │  │    Reports      │                   │
+│  │ (record, list)  │  │ (md, html, json)│                   │
+│  └─────────────────┘  └─────────────────┘                   │
+│  ┌─────────────────┐  ┌─────────────────┐                   │
+│  │     Storage     │  │      Bus        │                   │
+│  │ (file, memory)  │  │ (events, alerts)│                   │
+│  └─────────────────┘  └─────────────────┘                   │
 └─────────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-## Components
+## What Exists vs What We Add
 
-### 1. Privacy Guard
+### Existing (Security Audit)
 
-Redact secrets before they reach LLM or get stored in patterns/memory.
+| Component | Purpose | Location |
+|-----------|---------|----------|
+| `GovernanceAudit.record()` | Store audit entries | `governance/audit.ts` |
+| `GovernanceAudit.list()` | Query with filters | `governance/audit.ts` |
+| `Storage.write/read()` | File/memory persistence | `storage/storage.ts` |
+| `Bus.publish()` | Real-time events | `bus.ts` |
+| `Reports.generate()` | Markdown/HTML/JSON reports | `pentest/reports/` |
+| `ComplianceMapper` | Framework mapping | `pentest/compliance/` |
+
+### New (Token Audit)
+
+| Component | Purpose | Location |
+|-----------|---------|----------|
+| `CyxAudit.record()` | Token-specific entries | `cyxcode/audit.ts` |
+| `CyxAudit.report()` | Token savings report | `cyxcode/audit.ts` |
+| Privacy guard | Secret redaction | `cyxcode/audit.ts` |
+| Bus events | Pattern/correction events | Integration points |
+
+---
+
+## Event Types
+
+### New CyxCode Events
 
 ```typescript
-// src/cyxcode/audit/privacy.ts
+// src/cyxcode/audit.ts
 
-const PATTERNS = {
-  // API Keys
+export type CyxEventType =
+  | "cyxcode.pattern.match"      // Pattern matched, tokens saved
+  | "cyxcode.pattern.miss"       // No match, AI handled
+  | "cyxcode.pattern.learned"    // New pattern generated
+  | "cyxcode.correction.added"   // User ran /correct
+  | "cyxcode.correction.promoted"// Strength >= 3
+  | "cyxcode.drift.detected"     // AI violated correction
+  | "cyxcode.drift.reminded"     // Auto-reminder injected
+  | "cyxcode.memory.loaded"      // Memory matched context
+  | "cyxcode.commit.created"     // State snapshot
+  | "cyxcode.session.start"      // New session began
+  | "cyxcode.session.end"        // Session ended
+
+export type CyxAuditEntry = {
+  id: string
+  timestamp: number
+  type: CyxEventType
+  sessionID?: string
+  data: {
+    patternId?: string
+    skill?: string
+    tokensSaved?: number
+    tokensUsed?: number
+    correctionId?: string
+    rule?: string
+    strength?: number
+    memoryId?: string
+    tags?: string[]
+    commitHash?: string
+  }
+}
+```
+
+### Integration with Existing Bus
+
+```typescript
+// Emit events using existing Bus infrastructure
+import { Bus } from "@/bus"
+
+// Define event types
+export namespace CyxEvents {
+  export const PatternMatch = Bus.event(
+    "cyxcode.pattern.match",
+    z.object({
+      patternId: z.string(),
+      skill: z.string(),
+      tokensSaved: z.number(),
+    })
+  )
+
+  export const CorrectionAdded = Bus.event(
+    "cyxcode.correction.added",
+    z.object({
+      correctionId: z.string(),
+      rule: z.string(),
+      strength: z.number(),
+    })
+  )
+
+  export const DriftDetected = Bus.event(
+    "cyxcode.drift.detected",
+    z.object({
+      correctionId: z.string(),
+      rule: z.string(),
+      violation: z.string(),
+    })
+  )
+}
+```
+
+---
+
+## Storage
+
+### Using Existing Storage Namespace
+
+```typescript
+import { Storage } from "@/storage/storage"
+import { Instance } from "@/project/instance"
+
+// Store CyxCode audit entries alongside governance audit
+const key = ["cyxcode", "audit", Instance.project.id, entry.id]
+await Storage.write(key, entry)
+
+// Query entries
+const keys = await Storage.list(["cyxcode", "audit", Instance.project.id])
+```
+
+### File Structure
+
+```
+.opencode/
+├── storage/
+│   ├── governance/audit/      # Existing security audit
+│   │   └── {projectId}/
+│   │       └── {entryId}.json
+│   └── cyxcode/audit/         # New token audit
+│       └── {projectId}/
+│           └── {entryId}.json
+├── cyxcode-stats.json          # Existing router stats
+└── history/                    # Existing versioning
+```
+
+---
+
+## Privacy Guard
+
+Redact secrets before storage (same patterns work for security + token audit):
+
+```typescript
+// src/cyxcode/audit.ts
+
+const SECRET_PATTERNS = {
   openai: /sk-[a-zA-Z0-9]{32,}/g,
   anthropic: /sk-ant-[a-zA-Z0-9-]{32,}/g,
   generic: /(?:api[_-]?key|token|secret|password)\s*[=:]\s*["']?([^\s"']+)/gi,
-
-  // High-entropy (JWTs, hex tokens)
   jwt: /eyJ[a-zA-Z0-9_-]+\.[a-zA-Z0-9_-]+\.[a-zA-Z0-9_-]+/g,
   hex: /\b[a-fA-F0-9]{32,}\b/g,
-
-  // URLs with credentials
   urlCreds: /:\/\/[^:]+:[^@]+@/g,
 }
 
-export function redact(text: string): { clean: string; redacted: number } {
+export function redactSecrets(text: string): string {
   let clean = text
-  let redacted = 0
-
-  for (const [name, pattern] of Object.entries(PATTERNS)) {
-    clean = clean.replace(pattern, (match) => {
-      // Entropy check for hex (avoid false positives like commit hashes)
-      if (name === 'hex' && entropy(match) < 3.5) return match
-      redacted++
-      return `[REDACTED:${name}]`
-    })
+  for (const [name, pattern] of Object.entries(SECRET_PATTERNS)) {
+    clean = clean.replace(pattern, `[REDACTED:${name}]`)
   }
-
-  return { clean, redacted }
-}
-
-function entropy(s: string): number {
-  const freq: Record<string, number> = {}
-  for (const c of s) freq[c] = (freq[c] || 0) + 1
-  return -Object.values(freq).reduce((h, f) => {
-    const p = f / s.length
-    return h + p * Math.log2(p)
-  }, 0)
+  return clean
 }
 ```
-
-**When applied:**
-- Before saving learned patterns
-- Before saving memories
-- Before logging error output in events
 
 ---
 
-### 2. Event Journal
+## Report Generation
 
-Append-only NDJSON log with hourly rotation.
-
-```typescript
-// src/cyxcode/audit/events.ts
-
-export type EventType =
-  | "pattern.match"      // Pattern matched, tokens saved
-  | "pattern.miss"       // No match, AI handled
-  | "pattern.learned"    // New pattern generated
-  | "correction.added"   // User ran /correct
-  | "correction.promoted"// Strength >= 3
-  | "drift.detected"     // AI violated correction
-  | "drift.reminded"     // Auto-reminder injected
-  | "memory.loaded"      // Memory matched context
-  | "commit.created"     // State snapshot
-  | "session.start"      // New session began
-  | "session.end"        // Session ended
-
-type Event = {
-  ts: number              // Unix timestamp
-  type: EventType
-  session?: string        // Session slug
-  data: Record<string, unknown>
-}
-
-export namespace EventJournal {
-  // Append event to hourly segment
-  export async function emit(type: EventType, data: Record<string, unknown>): Promise<void>
-
-  // Read events in time range
-  export async function query(since: number, until?: number): Promise<Event[]>
-
-  // Prune segments older than N days
-  export async function prune(maxAgeDays: number): Promise<number>
-}
-```
-
-**File format:**
-```
-.opencode/audit/events-2026032812.ndjson
-```
-
-```json
-{"ts":1711619245,"type":"pattern.match","data":{"patternId":"npm-404","skill":"recovery","tokensSaved":800}}
-{"ts":1711619310,"type":"correction.added","data":{"id":"abc123","rule":"use bun, not npm","strength":1}}
-{"ts":1711619400,"type":"drift.detected","data":{"correctionId":"abc123","violation":"npm install express"}}
-```
-
-**Rotation:** One file per hour, auto-prune after 30 days.
-
----
-
-### 3. Report Generator
-
-Aggregate events into human-readable reports.
+### Extend Existing Reports Namespace
 
 ```typescript
-// src/cyxcode/audit/report.ts
+// Add to pentest/reports/index.ts or new cyxcode/report.ts
 
-export type ReportPeriod = "1d" | "7d" | "30d" | "all"
+export namespace CyxReport {
+  export type Period = "1d" | "7d" | "30d" | "all"
 
-export type Report = {
-  period: { start: string; end: string }
-  tokens: {
-    saved: number
-    used: number
-    savingsPercent: number
-    costSaved: number  // USD at $0.002/1K tokens
+  export type TokenReport = {
+    period: { start: string; end: string }
+    tokens: {
+      saved: number
+      used: number
+      savingsPercent: number
+      costSaved: number  // USD at $0.002/1K tokens
+    }
+    patterns: {
+      matches: number
+      misses: number
+      hitRate: number
+      learned: number
+      top: Array<{ id: string; matches: number; tokensSaved: number }>
+    }
+    corrections: {
+      added: number
+      promoted: number
+      driftEvents: number
+      complianceRate: number
+    }
+    sessions: number
   }
-  patterns: {
-    matches: number
-    misses: number
-    hitRate: number
-    learned: number
-    topPatterns: Array<{ id: string; matches: number; tokensSaved: number }>
-  }
-  corrections: {
-    added: number
-    promoted: number
-    driftEvents: number
-    complianceRate: number
-  }
-  sessions: number
-  memories: {
-    loaded: number
-    avgChars: number
-  }
-}
 
-export namespace ReportGenerator {
-  export async function generate(period: ReportPeriod): Promise<Report>
-  export function formatText(report: Report): string
-  export function formatJSON(report: Report): string
-  export function formatCSV(report: Report): string
+  export async function generate(period: Period): Promise<TokenReport> {
+    // Query from Storage
+    const entries = await CyxAudit.list({ since: periodToTimestamp(period) })
+    return aggregate(entries)
+  }
+
+  export function formatText(report: TokenReport): string { /* ... */ }
+  export function formatJSON(report: TokenReport): string { /* ... */ }
+  export function formatMarkdown(report: TokenReport): string { /* ... */ }
 }
 ```
 
@@ -202,26 +255,22 @@ export namespace ReportGenerator {
 
 ### `cyxcode audit`
 
-Show recent events:
-
 ```bash
 $ cyxcode audit --last 1h
 
 [12:42:15] pattern.match    npm-404           800 tokens saved
-[12:43:01] pattern.miss     —                 AI handled
-[12:45:30] correction.added "use bun, not npm" strength=1
-[12:48:12] pattern.match    git-conflict      600 tokens saved
+[12:43:01] pattern.miss     —                 1,200 tokens used
+[12:45:30] correction.added "use bun"         strength=1
+[12:48:12] drift.detected   "use bun"         violation: npm install
 ```
 
 ### `cyxcode report`
-
-Generate summary report:
 
 ```bash
 $ cyxcode report --last 7d
 
 ╭─────────────────────────────────────────────────────────────╮
-│  CyxCode Report: Mar 21-28, 2026                            │
+│  CyxCode Token Report: Mar 21-28, 2026                      │
 ├─────────────────────────────────────────────────────────────┤
 │                                                             │
 │  TOKEN SAVINGS                                              │
@@ -229,81 +278,45 @@ $ cyxcode report --last 7d
 │  ├── Used:       48,600 tokens ($0.10)                     │
 │  └── Efficiency: 79.4%                                      │
 │                                                             │
-│  PATTERNS                                                   │
-│  ├── Matches:   847                                         │
-│  ├── Misses:    203                                         │
-│  ├── Hit Rate:  80.7%                                       │
-│  └── Learned:   12 new patterns                             │
+│  PATTERNS                           CORRECTIONS             │
+│  ├── Matches: 847                   ├── Added:    12        │
+│  ├── Misses:  203                   ├── Promoted: 4         │
+│  ├── Hit Rate: 80.7%                ├── Drift:    7         │
+│  └── Learned: 12                    └── Compliance: 94%     │
 │                                                             │
 │  TOP PATTERNS                                               │
 │  1. npm-404           142 matches    28,400 tokens          │
 │  2. git-conflict       98 matches    19,600 tokens          │
 │  3. ts-module-error    87 matches    17,400 tokens          │
 │                                                             │
-│  CORRECTIONS                                                │
-│  ├── Added:     12                                          │
-│  ├── Promoted:  4 (auto-promoted at strength 3)             │
-│  ├── Drift:     7 events                                    │
-│  └── Compliance: 94.2%                                      │
-│                                                             │
-│  SESSIONS: 45                                               │
-│                                                             │
 ╰─────────────────────────────────────────────────────────────╯
-```
-
-### Export formats:
-
-```bash
-$ cyxcode report --last 30d --format json > report.json
-$ cyxcode report --last 30d --format csv > report.csv
 ```
 
 ---
 
 ## Integration Points
 
-### Where events are emitted:
+### Where to Emit Events
 
-| Location | Event |
-|----------|-------|
-| `router.ts` → `route()` | `pattern.match`, `pattern.miss` |
-| `learned.ts` → `generatePattern()` | `pattern.learned` |
-| `corrections.ts` → `add()` | `correction.added` |
-| `corrections.ts` → `reinforce()` | `correction.promoted` |
-| `drift.ts` → `check()` | `drift.detected`, `drift.reminded` |
-| `memory.ts` → `relevant()` | `memory.loaded` |
-| `commit.ts` → `autoCommit()` | `commit.created` |
-| `index.ts` → session hooks | `session.start`, `session.end` |
+| Location | Event | Data |
+|----------|-------|------|
+| `router.ts` → `route()` | `pattern.match` | patternId, skill, tokensSaved |
+| `router.ts` → `route()` | `pattern.miss` | errorOutput (redacted), tokensUsed |
+| `learned.ts` → `generatePattern()` | `pattern.learned` | patternId, source |
+| `corrections.ts` → `add()` | `correction.added` | correctionId, rule, strength |
+| `corrections.ts` → `reinforce()` | `correction.promoted` | correctionId, rule |
+| `drift.ts` → `check()` | `drift.detected` | correctionId, violation |
+| `drift.ts` → `remind()` | `drift.reminded` | correctionId |
+| `memory.ts` → `relevant()` | `memory.loaded` | memoryId, tags, chars |
+| `commit.ts` → `autoCommit()` | `commit.created` | hash, trigger |
 
-### Privacy guard applied:
+### Privacy Guard Applied
 
-| Location | What's redacted |
+| Location | What's Redacted |
 |----------|-----------------|
-| `learned.ts` → before saving pattern | Error output |
-| `memory.ts` → before saving memory | Memory content |
-| `events.ts` → before logging | All event data |
-
----
-
-## Storage
-
-```
-.opencode/
-├── audit/
-│   ├── events-2026032800.ndjson    # Hour 00
-│   ├── events-2026032801.ndjson    # Hour 01
-│   ├── ...
-│   ├── events-2026032823.ndjson    # Hour 23
-│   └── summary.json                 # Cached aggregates
-├── cyxcode-stats.json               # (existing) router stats
-├── cyxcode-learned.json             # (existing) learned patterns
-└── history/                         # (existing) versioning
-```
-
-**Size estimate:**
-- ~100 bytes per event
-- ~1000 events/day = ~100KB/day
-- 30 days = ~3MB (before pruning)
+| `learned.ts` → before pattern save | Error output in pattern |
+| `memory.ts` → before memory save | Memory content |
+| `audit.ts` → before event store | All event data fields |
 
 ---
 
@@ -311,36 +324,44 @@ $ cyxcode report --last 30d --format csv > report.csv
 
 | Phase | Task | Effort |
 |-------|------|--------|
-| 1 | `privacy.ts` — secret redaction | 1 hr |
-| 2 | `events.ts` — NDJSON journal | 2 hrs |
-| 3 | Emit events from router, corrections, drift | 2 hrs |
-| 4 | `report.ts` — aggregation + formatting | 2 hrs |
-| 5 | CLI commands (`audit`, `report`) | 1 hr |
-| 6 | Auto-prune on `/dream` | 30 min |
+| 1 | `cyxcode/audit.ts` — CyxAudit namespace using Storage | 1 hr |
+| 2 | Privacy guard (redactSecrets) | 30 min |
+| 3 | Bus events (CyxEvents namespace) | 30 min |
+| 4 | Emit events from router, corrections, drift | 1 hr |
+| 5 | `cyxcode/report.ts` — CyxReport namespace | 1 hr |
+| 6 | CLI commands (`audit`, `report`) | 1 hr |
+| 7 | Auto-prune in `/dream` | 30 min |
 
-**Total: ~8-9 hours**
-
----
-
-## Future Extensions
-
-| Feature | Description |
-|---------|-------------|
-| **Web dashboard** | Visual charts in `/dashboard` |
-| **Email reports** | Weekly summary via webhook |
-| **Team aggregation** | Combine reports across machines |
-| **Compliance export** | PDF with signatures for auditors |
+**Total: ~5-6 hours** (down from 8-9 with new build)
 
 ---
 
-## Design Principles
+## Benefits of Extending vs New Build
 
-1. **Zero dependencies** — No external services, all local
-2. **Append-only** — Events are immutable once written
-3. **Privacy-first** — Secrets redacted before storage
-4. **Lightweight** — NDJSON, hourly rotation, auto-prune
-5. **Offline** — Works without network, no tokens for audit
+| Aspect | New Build | Extend Existing |
+|--------|-----------|-----------------|
+| Storage | Custom NDJSON | Existing `Storage` namespace |
+| Events | Custom emitter | Existing `Bus` |
+| Reports | Custom generator | Extend `Reports` patterns |
+| Dashboard | Build new | Add tab to existing |
+| Testing | All new tests | Reuse patterns |
+| Maintenance | Two systems | One unified system |
 
 ---
 
-*"Tokens are the new currency. Now you can audit every one."*
+## Future: Dashboard Integration
+
+Add CyxCode tab to existing security dashboard:
+
+```
+http://localhost:4096/dashboard
+├── /findings      (existing)
+├── /scans         (existing)
+├── /compliance    (existing)
+├── /reports       (existing)
+└── /tokens        (NEW - CyxCode metrics)
+```
+
+---
+
+*"Tokens are the new currency. Built on battle-tested infrastructure."*
