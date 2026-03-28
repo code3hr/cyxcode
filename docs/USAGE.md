@@ -270,13 +270,20 @@ cyxcode report --format text
 
 ### Web Dashboard
 
-When running in web or server mode, view token reports at:
+Launch the web server to access the dashboard:
 
-```
-http://localhost:4096/dashboard/tokens
+```bash
+# Start web mode (opens browser automatically)
+cyxcode web
+
+# Or start server mode (headless)
+cyxcode serve --port 4096
+
+# Then open in browser
+open http://localhost:4096/dashboard/tokens
 ```
 
-The dashboard shows:
+The Tokens page at `/dashboard/tokens` shows:
 - Token savings cards (saved, cost, hit rate)
 - Pattern statistics (matches, misses, learned)
 - Correction statistics (added, promoted, drift)
