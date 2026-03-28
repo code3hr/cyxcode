@@ -15,6 +15,7 @@ import { Memory } from "./memory"
 import type { MemoryIndex } from "./memory"
 import { LearnedPatterns } from "./learned"
 import { SkillRouter } from "./router"
+import { CyxAudit } from "./audit"
 
 const log = Log.create({ service: "cyxcode-dream" })
 
@@ -278,6 +279,7 @@ export namespace Dream {
     stats: StatsFile
     promoted: number
     versioning: { decayed: number; archived: number; repaired: number }
+    auditPruned: number
   }> {
     const dupPatterns = await deduplicatePatterns()
     const dupMemories = await deduplicateMemories()
@@ -303,7 +305,10 @@ export namespace Dream {
     // Phase 7: State versioning consolidation
     const versioning = await consolidateVersioning()
 
-    return { dupPatterns, dupMemories, validation, stats, promoted, versioning }
+    // Phase 8: Prune old audit entries (keep last 30 days)
+    const auditPruned = await CyxAudit.prune(30)
+
+    return { dupPatterns, dupMemories, validation, stats, promoted, versioning, auditPruned }
   }
 
   /**

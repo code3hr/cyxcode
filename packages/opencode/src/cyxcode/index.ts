@@ -1,6 +1,6 @@
 /**
  * CyxCode - Pattern-First Skill System
- * 
+ *
  * Deep skills, not 700 shallow ones.
  * Patterns over tokens.
  */
@@ -13,6 +13,13 @@ export { BaseSkill } from "./base-skill"
 
 // Skill router
 export { SkillRouter } from "./router"
+
+// Audit system
+export { CyxAudit, CyxEvents, redactSecrets } from "./audit"
+export type { CyxAuditEntry, CyxEventType } from "./audit"
+
+// Report generation
+export { CyxReport } from "./report"
 
 // Skills
 export { recoverySkill } from "./skills/recovery"

@@ -14,6 +14,7 @@ import { BaseSkill } from "./base-skill"
 import type { Pattern, Fix } from "./types"
 import { Log } from "@/util/log"
 import { CyxPaths } from "./paths"
+import { CyxAudit } from "./audit"
 
 const log = Log.create({ service: "cyxcode-learned" })
 
@@ -209,6 +210,13 @@ export namespace LearnedPatterns {
 
     await write(data)
     log.info("Approved learned pattern", { id })
+
+    // Emit audit event
+    CyxAudit.record("cyxcode.pattern.learned", {
+      patternId: id,
+      message: "Pattern approved via /learn-patterns",
+    }).catch(() => {})
+
     return true
   }
 

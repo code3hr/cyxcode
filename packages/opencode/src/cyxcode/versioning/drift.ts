@@ -9,6 +9,7 @@ import { Log } from "@/util/log"
 import { MessageV2 } from "@/session/message-v2"
 import { Corrections } from "./corrections"
 import { Changelog } from "./changelog"
+import { CyxAudit } from "../audit"
 import type { Correction } from "./corrections"
 
 const log = Log.create({ service: "cyxcode-versioning-drift" })
@@ -85,6 +86,15 @@ export namespace Drift {
         violations: violations.length,
         rules: reinforced,
       })
+
+      // Emit audit events for each drift
+      for (const correction of violations) {
+        CyxAudit.record("cyxcode.drift.detected", {
+          correctionId: correction.id,
+          rule: correction.rule,
+          message: `Drift detected in session ${sessionID}`,
+        }, sessionID).catch(() => {})
+      }
 
       return { drifted: violations.length, reinforced }
     } catch (e) {

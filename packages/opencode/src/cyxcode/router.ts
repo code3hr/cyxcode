@@ -10,6 +10,7 @@
 
 import type { PatternSkill, PatternMatch, SkillContext, SkillResult, SkillRegistry } from "./types"
 import { Log } from "../util/log"
+import { CyxAudit } from "./audit"
 
 const log = Log.create({ service: "cyxcode-router" })
 
@@ -77,6 +78,13 @@ class SkillRouterImpl implements SkillRegistry {
         errorLength: ctx.errorOutput.length,
         totalPatterns: this.totalPatterns(),
       })
+
+      // Emit pattern miss audit event
+      CyxAudit.record("cyxcode.pattern.miss", {
+        tokensUsed: Math.round(ctx.errorOutput.length * 0.25), // Estimate tokens
+        errorOutput: ctx.errorOutput.slice(0, 500),
+      }).catch(() => {})
+
       return null // Fall through to LLM
     }
 
@@ -96,6 +104,13 @@ class SkillRouterImpl implements SkillRegistry {
 
     if (result.success && result.tokensSaved) {
       this.tokensSaved += result.tokensSaved
+
+      // Emit pattern match audit event
+      CyxAudit.record("cyxcode.pattern.match", {
+        patternId: match.pattern.id,
+        skill: skill.name,
+        tokensSaved: result.tokensSaved,
+      }).catch(() => {})
     }
 
     return result

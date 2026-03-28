@@ -12,6 +12,7 @@ import { Log } from "@/util/log"
 import { historyBasePath } from "./types"
 import { CyxPaths } from "../paths"
 import { Changelog } from "./changelog"
+import { CyxAudit } from "../audit"
 
 const log = Log.create({ service: "cyxcode-versioning-corrections" })
 
@@ -101,6 +102,13 @@ export namespace Corrections {
 
     log.debug("Added correction", { id, rule: correction.rule, strength: 1, scope })
 
+    // Emit audit event
+    CyxAudit.record("cyxcode.correction.added", {
+      correctionId: id,
+      rule: correction.rule,
+      strength: 1,
+    }).catch(() => {})
+
     return correction
   }
 
@@ -128,6 +136,13 @@ export namespace Corrections {
     })
 
     log.debug("Reinforced correction", { id: correction.id, strength: correction.strength })
+
+    // Emit audit event
+    CyxAudit.record("cyxcode.correction.reinforced", {
+      correctionId: correction.id,
+      rule: correction.rule,
+      strength: correction.strength,
+    }).catch(() => {})
 
     return correction
   }
@@ -201,6 +216,13 @@ export namespace Corrections {
     })
 
     log.debug("Promoted correction", { id, rule: correction.rule })
+
+    // Emit audit event
+    CyxAudit.record("cyxcode.correction.promoted", {
+      correctionId: id,
+      rule: correction.rule,
+      strength: correction.strength,
+    }).catch(() => {})
   }
 
   export async function remove(id: string): Promise<void> {

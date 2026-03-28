@@ -15,6 +15,7 @@ import { Bus } from "@/bus"
 import { SessionCompaction } from "@/session/compaction"
 import { MessageV2 } from "@/session/message-v2"
 import { Session } from "@/session"
+import { CyxAudit } from "./audit"
 
 const log = Log.create({ service: "cyxcode-memory" })
 
@@ -248,6 +249,14 @@ export namespace Memory {
 
       if (results.length > 0) {
         log.debug("Loaded memories", { keywords: keywords.slice(0, 5) })
+
+        // Emit audit event for each loaded memory
+        const totalChars = results.reduce((sum, r) => sum + r.length, 0)
+        CyxAudit.record("cyxcode.memory.loaded", {
+          memoryId: keywords.slice(0, 3).join("-"),
+          tags: keywords.slice(0, 5),
+          chars: totalChars,
+        }).catch(() => {})
       }
 
       return results
