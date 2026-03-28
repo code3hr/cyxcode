@@ -1,0 +1,90 @@
+{
+  "name": "rust-errors",
+  "version": "1.0.0",
+  "author": "CyxCode Team",
+  "patterns": [
+    {
+      "id": "rust-cargo-dep-not-found",
+      "regex": "error: failed to select a version for the requirement.*`([^`]+)`|no matching package named `([^`]+)` found",
+      "category": "rust",
+      "description": "Cargo dependency version not found",
+      "fixes": [
+        { "id": "cargo-update", "command": "cargo update", "description": "Update dependency versions", "priority": 1 },
+        { "id": "check-crates", "instructions": "Check crates.io for available versions", "description": "Verify version exists", "priority": 2 }
+      ]
+    },
+    {
+      "id": "rust-borrow-moved",
+      "regex": "error\\[E0382\\]: (?:borrow of|use of) moved value: `([^`]+)`",
+      "category": "rust",
+      "description": "Value used after move",
+      "fixes": [
+        { "id": "clone-value", "instructions": "Consider using .clone() before the move, or restructure to avoid moving", "description": "Clone or restructure", "priority": 1 },
+        { "id": "use-reference", "instructions": "Pass by reference (&) instead of by value", "description": "Use reference", "priority": 2 }
+      ]
+    },
+    {
+      "id": "rust-lifetime-missing",
+      "regex": "error\\[E0106\\]: missing lifetime specifier",
+      "category": "rust",
+      "description": "Missing lifetime annotation",
+      "fixes": [
+        { "id": "add-lifetime", "instructions": "Add lifetime parameter: fn foo<'a>(x: &'a str) -> &'a str", "description": "Add lifetime annotation", "priority": 1 }
+      ]
+    },
+    {
+      "id": "rust-type-mismatch",
+      "regex": "error\\[E0308\\]: mismatched types.*expected `([^`]+)`.*found `([^`]+)`",
+      "category": "rust",
+      "description": "Type mismatch",
+      "fixes": [
+        { "id": "convert-type", "instructions": "Convert using .into(), as keyword, or explicit conversion method", "description": "Convert type", "priority": 1 }
+      ]
+    },
+    {
+      "id": "rust-compile-fail",
+      "regex": "error: could not compile `([^`]+)`|error\\[E0463\\]: can't find crate for `([^`]+)`",
+      "category": "rust",
+      "description": "Cargo compilation failed",
+      "fixes": [
+        { "id": "cargo-clean-build", "command": "cargo clean && cargo build", "description": "Clean and rebuild", "priority": 1 }
+      ]
+    },
+    {
+      "id": "rust-macro-error",
+      "regex": "error: proc-macro derive.*panicked|error\\[E0599\\].*method not found.*derive",
+      "category": "rust",
+      "description": "Derive macro error",
+      "fixes": [
+        { "id": "check-derives", "instructions": "Ensure derive macro crate is in dependencies with derive feature enabled", "description": "Check derive dependencies", "priority": 1 }
+      ]
+    },
+    {
+      "id": "rust-feature-missing",
+      "regex": "error: the crate `([^`]+)` requires the feature `([^`]+)`|error\\[E0635\\]: unknown feature `([^`]+)`",
+      "category": "rust",
+      "description": "Cargo feature not found or missing",
+      "fixes": [
+        { "id": "add-feature", "instructions": "Add feature to Cargo.toml: [features] or enable on dependency with features = [\"...\"]", "description": "Define or enable feature", "priority": 1 }
+      ]
+    },
+    {
+      "id": "rust-unsafe-call",
+      "regex": "error\\[E0133\\]: call to unsafe function.*requires unsafe|error\\[E0133\\]:.*unsafe block",
+      "category": "rust",
+      "description": "Unsafe function called outside unsafe block",
+      "fixes": [
+        { "id": "add-unsafe", "instructions": "Wrap call in unsafe { ... } block", "description": "Add unsafe block", "priority": 1 }
+      ]
+    },
+    {
+      "id": "rust-cargo-lock-outdated",
+      "regex": "warning: Cargo\\.lock.*not up to date|error: the lock file.*needs to be updated",
+      "category": "rust",
+      "description": "Cargo.lock needs update",
+      "fixes": [
+        { "id": "cargo-update-lock", "command": "cargo update", "description": "Update Cargo.lock", "priority": 1 }
+      ]
+    }
+  ]
+}

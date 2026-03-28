@@ -1,0 +1,91 @@
+{
+  "name": "ruby-errors",
+  "version": "1.0.0",
+  "author": "CyxCode Team",
+  "patterns": [
+    {
+      "id": "ruby-load-file",
+      "regex": "cannot load such file -- ([^\\s(]+)|LoadError.*cannot load such file",
+      "category": "ruby",
+      "description": "Ruby file/gem not found",
+      "fixes": [
+        { "id": "gem-install", "command": "gem install $1", "description": "Install gem", "priority": 1 },
+        { "id": "bundle-install", "command": "bundle install", "description": "Install bundled gems", "priority": 2 }
+      ]
+    },
+    {
+      "id": "ruby-bundler-gem-not-found",
+      "regex": "Could not find gem '([^']+)'|Bundler could not find compatible versions for gem \"([^\"]+)\"",
+      "category": "ruby",
+      "description": "Bundler cannot find gem",
+      "fixes": [
+        { "id": "bundle-install", "command": "bundle install", "description": "Install dependencies", "priority": 1 },
+        { "id": "bundle-update", "command": "bundle update $1", "description": "Update specific gem", "priority": 2 }
+      ]
+    },
+    {
+      "id": "ruby-syntax-error",
+      "regex": "SyntaxError:.*unexpected ([^,]+)|syntax error, unexpected",
+      "category": "ruby",
+      "description": "Ruby syntax error",
+      "fixes": [
+        { "id": "check-syntax", "instructions": "Check for missing end, parentheses, or quotes near the error", "description": "Fix syntax", "priority": 1 }
+      ]
+    },
+    {
+      "id": "ruby-rails-migration-pending",
+      "regex": "Migrations are pending|ActiveRecord::PendingMigrationError|You have \\d+ pending migration",
+      "category": "ruby",
+      "description": "Rails migrations pending",
+      "fixes": [
+        { "id": "rails-migrate", "command": "rails db:migrate", "description": "Run pending migrations", "priority": 1 }
+      ]
+    },
+    {
+      "id": "ruby-rails-asset-not-found",
+      "regex": "Sprockets::.*AssetNotFound|Asset.*was not found|The asset .* was not compiled",
+      "category": "ruby",
+      "description": "Rails asset not found",
+      "fixes": [
+        { "id": "precompile", "command": "rails assets:precompile", "description": "Precompile assets", "priority": 1 },
+        { "id": "assets-clean", "command": "rails assets:clobber && rails assets:precompile", "description": "Clean and precompile", "priority": 2 }
+      ]
+    },
+    {
+      "id": "ruby-constant-undefined",
+      "regex": "NameError: uninitialized constant ([^\\s]+)|NameError.*([A-Z][\\w:]+) is not defined",
+      "category": "ruby",
+      "description": "Uninitialized constant/class",
+      "fixes": [
+        { "id": "check-require", "instructions": "Add require statement or check class name spelling and file location", "description": "Check require", "priority": 1 }
+      ]
+    },
+    {
+      "id": "ruby-bundler-version-conflict",
+      "regex": "Bundler could not find compatible versions|There was an error parsing `Gemfile`|Your bundle is locked to",
+      "category": "ruby",
+      "description": "Bundler version conflict",
+      "fixes": [
+        { "id": "bundle-update-all", "command": "bundle update", "description": "Update all gems", "priority": 1 }
+      ]
+    },
+    {
+      "id": "ruby-rails-routing-error",
+      "regex": "No route matches|ActionController::RoutingError|Routing Error",
+      "category": "ruby",
+      "description": "Rails routing error",
+      "fixes": [
+        { "id": "show-routes", "command": "rails routes", "description": "List available routes", "priority": 1 }
+      ]
+    },
+    {
+      "id": "ruby-method-undefined",
+      "regex": "NoMethodError: undefined method `([^']+)' for|undefined method .* for .* of type",
+      "category": "ruby",
+      "description": "Undefined method called",
+      "fixes": [
+        { "id": "check-method", "instructions": "Check method name spelling, receiver type, and gem version", "description": "Verify method", "priority": 1 }
+      ]
+    }
+  ]
+}

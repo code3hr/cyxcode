@@ -1,0 +1,89 @@
+{
+  "name": "go-errors",
+  "version": "1.0.0",
+  "author": "CyxCode Team",
+  "patterns": [
+    {
+      "id": "go-mod-not-found",
+      "regex": "go: module ([^\\s]+).*not found|cannot find module providing package ([^:]+)",
+      "category": "go",
+      "description": "Go module not found",
+      "fixes": [
+        { "id": "go-get", "command": "go get $1", "description": "Download module", "priority": 1 },
+        { "id": "go-mod-tidy", "command": "go mod tidy", "description": "Tidy module dependencies", "priority": 2 }
+      ]
+    },
+    {
+      "id": "go-import-cycle",
+      "regex": "import cycle not allowed|package ([^\\s]+) imports ([^\\s]+).*imports \\1",
+      "category": "go",
+      "description": "Circular import detected",
+      "fixes": [
+        { "id": "restructure", "instructions": "Move shared code to a separate package to break the cycle", "description": "Restructure packages", "priority": 1 }
+      ]
+    },
+    {
+      "id": "go-build-pkg-not-found",
+      "regex": "cannot find package \"([^\"]+)\"|package ([^\\s]+) is not in",
+      "category": "go",
+      "description": "Package not found during build",
+      "fixes": [
+        { "id": "go-tidy-build", "command": "go mod tidy && go build ./...", "description": "Tidy and rebuild", "priority": 1 }
+      ]
+    },
+    {
+      "id": "go-mod-missing",
+      "regex": "go\\.mod file not found|go: cannot find main module|no required module provides package",
+      "category": "go",
+      "description": "No go.mod file in project",
+      "fixes": [
+        { "id": "go-mod-init", "command": "go mod init", "description": "Initialize go module", "priority": 1 }
+      ]
+    },
+    {
+      "id": "go-version-required",
+      "regex": "go: ([^\\s]+) requires go >= ([\\d.]+)|requires go ([\\d.]+) or later",
+      "category": "go",
+      "description": "Go version too old for module",
+      "fixes": [
+        { "id": "upgrade-go", "instructions": "Upgrade Go to version $2 or higher", "description": "Upgrade Go version", "priority": 1 }
+      ]
+    },
+    {
+      "id": "go-undefined",
+      "regex": "undefined: ([\\w.]+)",
+      "category": "go",
+      "description": "Undefined identifier",
+      "fixes": [
+        { "id": "check-import", "instructions": "Check import statements and package name, run go get if needed", "description": "Check imports", "priority": 1 }
+      ]
+    },
+    {
+      "id": "go-type-error",
+      "regex": "cannot use ([^\\s]+).*as.*([^\\s]+) in|cannot convert ([^\\s]+).*to type ([^\\s]+)",
+      "category": "go",
+      "description": "Type incompatibility",
+      "fixes": [
+        { "id": "type-convert", "instructions": "Convert using explicit type conversion or type assertion", "description": "Convert type", "priority": 1 }
+      ]
+    },
+    {
+      "id": "go-syntax-error",
+      "regex": "expected ([^,]+), found ([^\\s]+)|syntax error: unexpected ([^,]+)",
+      "category": "go",
+      "description": "Syntax error - unexpected token",
+      "fixes": [
+        { "id": "go-fmt", "command": "go fmt ./...", "description": "Format code", "priority": 1 }
+      ]
+    },
+    {
+      "id": "go-test-fail",
+      "regex": "FAIL\\s+([^\\s]+)\\s+\\[|--- FAIL: ([^\\s]+)",
+      "category": "go",
+      "description": "Go test failure",
+      "fixes": [
+        { "id": "go-test-verbose", "command": "go test -v ./...", "description": "Run tests with verbose output", "priority": 1 }
+      ]
+    }
+  ]
+}

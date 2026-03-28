@@ -46,8 +46,11 @@ export function initCyxCode() {
   // Load three-tier patterns — community > global > project
   ;(globalThis as any).__cyxcode_learned_ready = (async () => {
     try {
-      // Tier 1: Community patterns (from ~/.cyxcode/community/)
+      // Ensure bundled community packs are installed on first use
       const { CommunityPatterns } = await import("./community")
+      await CommunityPatterns.ensureBuiltinPacks()
+
+      // Tier 1: Community patterns (from ~/.cyxcode/community/)
       const { LearnedSkill } = await import("./learned")
       const community = await CommunityPatterns.loadAll()
       if (community.length > 0) {

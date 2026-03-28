@@ -1,0 +1,83 @@
+{
+  "name": "bun-errors",
+  "version": "1.0.0",
+  "author": "CyxCode Team",
+  "patterns": [
+    {
+      "id": "bun-pkg-not-found",
+      "regex": "error: package \"([^\"]+)\" not found",
+      "category": "bun",
+      "description": "Bun package not found in registry",
+      "fixes": [
+        { "id": "bun-add", "command": "bun add $1", "description": "Install package with bun", "priority": 1 },
+        { "id": "bun-add-dev", "command": "bun add -d $1", "description": "Install as dev dependency", "priority": 2 }
+      ]
+    },
+    {
+      "id": "bun-registry-404",
+      "regex": "404 Not Found.*GET https://registry\\.npmjs\\.org/([^\\s]+)|error: GET https://registry\\.npmjs\\.org/([^\\s]+).*404",
+      "category": "bun",
+      "description": "Package not found in npm registry",
+      "fixes": [
+        { "id": "check-name", "instructions": "Verify package name is correct - check npmjs.com", "description": "Check package name for typos", "priority": 1 },
+        { "id": "bun-cache", "command": "bun pm cache rm", "description": "Clear bun cache and retry", "priority": 2 }
+      ]
+    },
+    {
+      "id": "bun-ts-syntax",
+      "regex": "error: Expected \"([^\"]+)\" but found \"([^\"]+)\"",
+      "category": "bun",
+      "description": "TypeScript syntax error",
+      "fixes": [
+        { "id": "check-syntax", "instructions": "Check for missing $1 near the error location", "description": "Fix syntax error", "priority": 1 }
+      ]
+    },
+    {
+      "id": "bun-script-not-found",
+      "regex": "error: script \"([^\"]+)\" not found|error: No script named \"([^\"]+)\"",
+      "category": "bun",
+      "description": "npm script not defined in package.json",
+      "fixes": [
+        { "id": "list-scripts", "command": "bun run", "description": "List available scripts", "priority": 1 }
+      ]
+    },
+    {
+      "id": "bun-build-fail",
+      "regex": "Build failed with (\\d+) error",
+      "category": "bun",
+      "description": "Bun build failure",
+      "fixes": [
+        { "id": "verbose-build", "command": "bun build --verbose", "description": "Run build with verbose output", "priority": 1 }
+      ]
+    },
+    {
+      "id": "bun-install-fetch-fail",
+      "regex": "error: failed to fetch|error: GET.*failed|error: NetworkError",
+      "category": "bun",
+      "description": "Bun failed to fetch packages",
+      "fixes": [
+        { "id": "cache-and-retry", "command": "bun pm cache rm && bun install", "description": "Clear cache and reinstall", "priority": 1 },
+        { "id": "check-network", "instructions": "Check internet connection and proxy settings", "description": "Verify network", "priority": 2 }
+      ]
+    },
+    {
+      "id": "bun-lockfile-conflict",
+      "regex": "error: lockfile had changes|bun\\.lockb.*conflict|error: Lockfile is out of date",
+      "category": "bun",
+      "description": "Lockfile conflict detected",
+      "fixes": [
+        { "id": "force-install", "command": "bun install --force", "description": "Force reinstall", "priority": 1 }
+      ]
+    },
+    {
+      "id": "bun-module-not-found",
+      "regex": "Cannot find module ['\"]([^'\"]+)['\"]|error: Could not resolve ['\"]([^'\"]+)['\"]",
+      "category": "bun",
+      "description": "Module resolution failed",
+      "fixes": [
+        { "id": "bun-add-module", "command": "bun add $1", "description": "Install missing module", "priority": 1 },
+        { "id": "check-path", "instructions": "Check import path is correct", "description": "Verify import path", "priority": 2 }
+      ]
+    }
+  ]
+}

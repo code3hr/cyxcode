@@ -429,7 +429,7 @@ Available at `http://localhost:4096/dashboard` when running in web/server mode. 
 | 16 | Drift detection + auto-promotion to AGENTS.md | **Done** |
 | 17 | Multi-agent branching/merging | **Done** |
 | 18 | Audit system — event journal, reports, token accountability | **Done** |
-| 19 | Community patterns (Bun, Rust, Go, Ruby) | Planned |
+| 19 | Community patterns (Bun, Rust, Go, Ruby) | **Done** |
 | 20 | Auto-execute fixes (with approval) | Planned |
 
 ---

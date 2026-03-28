@@ -83,12 +83,16 @@ Type `/` followed by the command name:
 | `/learn` | Extract session learnings to AGENTS.md |
 | `cyxcode audit` | Show recent audit events (CLI) |
 | `cyxcode report` | Generate token savings report (CLI) |
+| `cyxcode community list` | List installed community pattern packs |
+| `cyxcode community install <path>` | Install a community pack from file or URL |
+| `cyxcode community remove <name>` | Remove an installed community pack |
+| `cyxcode community validate <path>` | Validate a community pack file |
 
 ---
 
 ## Pattern Matching
 
-CyxCode intercepts errors **before** the AI processes them. 136 built-in patterns across 16 categories:
+CyxCode intercepts errors **before** the AI processes them. 136+ built-in patterns across 16 categories, plus bundled community packs for Bun, Rust, Go, and Ruby:
 
 | Skill | Categories |
 |-------|-----------|
@@ -439,14 +443,26 @@ Originals are kept (copy, not move). A `.cyxcode-migrated` marker prevents re-mi
 
 ### Community patterns
 
-Drop community pattern packs into `~/.cyxcode/community/`:
+CyxCode ships with bundled community packs for **Bun**, **Rust**, **Go**, and **Ruby**. These are automatically installed to `~/.cyxcode/community/` on first use.
+
+**Manage community packs with CLI:**
 
 ```bash
-curl -o ~/.cyxcode/community/bun-errors.json \
-  https://example.com/patterns/bun-errors.json
+# List installed packs
+cyxcode community list
+
+# Install from file or URL
+cyxcode community install ./my-patterns.json
+cyxcode community install https://example.com/patterns/elixir.json
+
+# Remove a pack
+cyxcode community remove bun-errors
+
+# Validate pack format before sharing
+cyxcode community validate ./my-patterns.json
 ```
 
-Pack format:
+**Pack format:**
 ```json
 {
   "name": "bun-errors",

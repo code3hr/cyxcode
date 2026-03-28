@@ -6,6 +6,7 @@
  */
 
 import fs from "fs/promises"
+import path from "path"
 import { Log } from "@/util/log"
 import { CyxPaths } from "./paths"
 import type { Pattern, Fix } from "./types"
@@ -25,21 +26,6 @@ type CommunityPack = {
     description: string
     fixes: Fix[]
   }>
-}
-
-function isValidPack(data: any): data is CommunityPack {
-  return (
-    data &&
-    typeof data.name === "string" &&
-    typeof data.version === "string" &&
-    Array.isArray(data.patterns) &&
-    data.patterns.every((p: any) =>
-      typeof p.id === "string" &&
-      typeof p.regex === "string" &&
-      typeof p.description === "string" &&
-      Array.isArray(p.fixes)
-    )
-  )
 }
 
 // --- Public API ---
@@ -90,5 +76,55 @@ export namespace CommunityPatterns {
     }
 
     return patterns
+  }
+
+  /**
+   * Ensure bundled community packs are installed.
+   * Copies built-in packs to ~/.cyxcode/community/ if directory is empty.
+   */
+  export async function ensureBuiltinPacks(): Promise<void> {
+    const dir = CyxPaths.globalCommunityDir()
+
+    // Create directory if needed
+    await fs.mkdir(dir, { recursive: true })
+
+    // Check if any packs exist
+    let existing: string[] = []
+    try {
+      existing = await fs.readdir(dir)
+    } catch {}
+
+    const jsonFiles = existing.filter(f => f.endsWith(".json"))
+
+    // If empty, copy builtins
+    if (jsonFiles.length === 0) {
+      try {
+        const { allBuiltinPaths } = await import("./community-packs")
+        for (const packPath of allBuiltinPaths()) {
+          const name = path.basename(packPath)
+          const dest = path.join(dir, name)
+          await fs.copyFile(packPath, dest)
+          log.info("Installed builtin community pack", { name })
+        }
+      } catch (e) {
+        log.warn("Failed to install builtin packs", { error: e })
+      }
+    }
+  }
+
+  /** Validate a community pack file */
+  export function isValidPack(data: any): data is CommunityPack {
+    return (
+      data &&
+      typeof data.name === "string" &&
+      typeof data.version === "string" &&
+      Array.isArray(data.patterns) &&
+      data.patterns.every((p: any) =>
+        typeof p.id === "string" &&
+        typeof p.regex === "string" &&
+        typeof p.description === "string" &&
+        Array.isArray(p.fixes)
+      )
+    )
   }
 }
