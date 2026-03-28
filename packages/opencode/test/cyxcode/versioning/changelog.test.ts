@@ -10,14 +10,18 @@ import os from "os"
  */
 
 let tmpDir: string
+let originalCwd: string
 
 beforeEach(async () => {
+  originalCwd = process.cwd()
   tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), "cyxcode-test-"))
   await fs.mkdir(path.join(tmpDir, ".opencode", "history"), { recursive: true })
   process.chdir(tmpDir)
 })
 
 afterEach(async () => {
+  // Change back to original directory before cleanup (Windows requirement)
+  process.chdir(originalCwd)
   await fs.rm(tmpDir, { recursive: true, force: true })
 })
 

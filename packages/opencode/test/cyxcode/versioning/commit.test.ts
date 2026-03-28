@@ -12,8 +12,10 @@ import { createHash } from "crypto"
  */
 
 let tmpDir: string
+let originalCwd: string
 
 beforeEach(async () => {
+  originalCwd = process.cwd()
   tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), "cyxcode-test-"))
   const opencode = path.join(tmpDir, ".opencode")
   await fs.mkdir(opencode, { recursive: true })
@@ -22,6 +24,8 @@ beforeEach(async () => {
 })
 
 afterEach(async () => {
+  // Change back to original directory before cleanup (Windows requirement)
+  process.chdir(originalCwd)
   await fs.rm(tmpDir, { recursive: true, force: true })
 })
 
