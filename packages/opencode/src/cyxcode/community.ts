@@ -70,13 +70,17 @@ export namespace CommunityPatterns {
         }
 
         for (const p of pack.patterns) {
-          patterns.push({
-            id: `community-${pack.name}-${p.id}`,
-            regex: p.regex,
-            category: p.category || "community",
-            description: p.description,
-            fixes: p.fixes,
-          })
+          try {
+            patterns.push({
+              id: `community-${pack.name}-${p.id}`,
+              regex: new RegExp(p.regex, "i"),
+              category: p.category || "community",
+              description: p.description,
+              fixes: p.fixes,
+            })
+          } catch (regexErr) {
+            log.warn("Invalid regex in community pattern, skipping", { pack: pack.name, id: p.id })
+          }
         }
 
         log.info("Loaded community pack", { name: pack.name, patterns: pack.patterns.length })

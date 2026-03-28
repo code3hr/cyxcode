@@ -62,7 +62,8 @@ describe("CommunityPatterns", () => {
 
     expect(patterns).toHaveLength(2)
     expect(patterns[0].id).toBe("community-test-pack-err-1")
-    expect(patterns[0].regex).toBe("Error: something broke")
+    expect(patterns[0].regex).toBeInstanceOf(RegExp)
+    expect(patterns[0].regex.source).toBe("Error: something broke")
     expect(patterns[0].category).toBe("test")
     expect(patterns[0].fixes).toHaveLength(1)
     expect(patterns[1].id).toBe("community-test-pack-err-2")
