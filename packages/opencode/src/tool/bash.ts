@@ -17,8 +17,7 @@ import { Shell } from "@/shell/shell"
 import { BashArity } from "@/permission/arity"
 import { Truncate } from "./truncate"
 import { Plugin } from "@/plugin"
-import { getRouter, initCyxCode, CyxAudit } from "@/cyxcode"
-import { CyxPrompt } from "@/cyxcode/prompt"
+import { getRouter, initCyxCode } from "@/cyxcode"
 
 // Initialize CyxCode skills in this module context
 initCyxCode()
@@ -294,79 +293,6 @@ export const BashTool = Tool.define("bash", async () => {
             pattern: best.match.pattern.id,
             fixes: fixes.length
           })
-
-          // Auto-execute fix with approval (Phase 20)
-          const firstFix = fixes[0]
-          if (firstFix?.command) {
-            const fixCommand = sub(firstFix.command)
-            const shouldExecute = await CyxPrompt.shouldExecuteFix(fixCommand)
-
-            if (shouldExecute) {
-              output += "\n[CyxCode] Running: " + fixCommand + "\n"
-
-              try {
-                const fixProc = Bun.spawn(["bash", "-c", fixCommand], {
-                  cwd: params.workdir ?? process.cwd(),
-                  stdout: "pipe",
-                  stderr: "pipe",
-                  env: { ...process.env },
-                })
-
-                const fixStdout = await new Response(fixProc.stdout).text()
-                const fixStderr = await new Response(fixProc.stderr).text()
-                await fixProc.exited
-
-                const fixOutput = (fixStdout + fixStderr).trim()
-                if (fixOutput) {
-                  output += fixOutput + "\n"
-                }
-
-                if (fixProc.exitCode === 0) {
-                  output += "[CyxCode] Fix succeeded!\n"
-
-                  // Record successful fix execution
-                  CyxAudit.record("cyxcode.fix.executed", {
-                    patternId: best.match.pattern.id,
-                    fixId: firstFix.id,
-                    command: fixCommand,
-                    success: true,
-                  }).catch(() => {})
-
-                  log.info("cyxcode fix executed", {
-                    pattern: best.match.pattern.id,
-                    fix: firstFix.id,
-                    success: true,
-                  })
-                } else {
-                  output += "[CyxCode] Fix failed (exit " + fixProc.exitCode + ")\n"
-
-                  CyxAudit.record("cyxcode.fix.executed", {
-                    patternId: best.match.pattern.id,
-                    fixId: firstFix.id,
-                    command: fixCommand,
-                    success: false,
-                    exitCode: fixProc.exitCode ?? undefined,
-                  }).catch(() => {})
-
-                  log.info("cyxcode fix failed", {
-                    pattern: best.match.pattern.id,
-                    fix: firstFix.id,
-                    exitCode: fixProc.exitCode,
-                  })
-                }
-              } catch (e) {
-                output += "[CyxCode] Fix execution error: " + (e instanceof Error ? e.message : String(e)) + "\n"
-                log.warn("cyxcode fix error", { error: e })
-              }
-            } else {
-              // User rejected or non-interactive
-              CyxAudit.record("cyxcode.fix.rejected", {
-                patternId: best.match.pattern.id,
-                fixId: firstFix.id,
-                command: fixCommand,
-              }).catch(() => {})
-            }
-          }
         } else {
           getRouter().recordMiss(ctx.messageID, output, params.command, proc.exitCode ?? 1)
         }

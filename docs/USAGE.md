@@ -368,57 +368,12 @@ All audit entries are automatically scrubbed of secrets (API keys, JWTs, passwor
 
 ---
 
-## Auto-Execute Fixes
-
-When CyxCode matches a pattern, it can automatically execute the suggested fix after asking for approval.
-
-### Example
-
-```
-$ bun run build
-error: Cannot find module 'lodash'
-
-[CyxCode] Pattern matched: bun-module-not-found
-[CyxCode] Suggested fixes:
-1. Install package with bun
-   bun add lodash
-
-[CyxCode] Execute fix: bun add lodash? [Y/n]: y
-
-[CyxCode] Running: bun add lodash
-bun add v1.3.11
- + lodash@4.17.21
-
-[CyxCode] Fix succeeded!
-```
-
-### Modes
-
-Control auto-fix behavior with `CYXCODE_AUTO_FIX`:
-
-| Value | Behavior |
-|-------|----------|
-| `prompt` (default) | Show Y/n prompt before executing |
-| `always` | Auto-execute without asking (use with caution) |
-| `never` | Never execute, just display suggestions |
-
-```bash
-# Disable auto-fix prompts
-export CYXCODE_AUTO_FIX=never
-
-# Auto-execute without prompts
-export CYXCODE_AUTO_FIX=always
-```
-
----
-
 ## Environment Variables
 
 | Variable | Default | Description |
 |----------|---------|-------------|
 | `CYXCODE_DEBUG` | `false` | Debug output for pattern matching and learning |
 | `CYXCODE_SHORT_CIRCUIT` | `true` | Skip LLM on pattern match. `false` to always use AI |
-| `CYXCODE_AUTO_FIX` | `prompt` | Auto-execute fixes: `prompt`, `always`, or `never` |
 | `ANTHROPIC_API_KEY` | — | Claude API key |
 | `OPENAI_API_KEY` | — | OpenAI API key |
 | `CYXCODE_SERVER_PASSWORD` | — | Password for server mode |
