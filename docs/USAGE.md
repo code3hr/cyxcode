@@ -222,6 +222,63 @@ The AI reads the `<cyxcode-resume>` context and knows: *"In the previous session
 
 ---
 
+## Multi-Agent Branching
+
+When you spawn subagents (`@general`, Task tool), each gets an **isolated state branch** — like git branches for AI state.
+
+### How It Works
+
+1. **Branch creation**: When a subagent spawns, CyxCode creates a branch from the current HEAD
+2. **Isolated commits**: Subagent's state commits go to its branch, not main
+3. **Auto-merge**: When subagent completes, branch merges back via three-way merge
+4. **Discovery propagation**: New discoveries from subagents automatically merge to main
+
+### Example Flow
+
+```
+Main session: HEAD = commit_abc
+  |
+  +-- @general "find all API endpoints"
+        |
+        Branch: session_xyz (base: commit_abc)
+        Commits to branch HEAD
+        Discovers: "API uses Express router at /api/*"
+        |
+        Subagent completes
+        |
+        Three-way merge -> main HEAD updated
+        Discovery added to main state
+```
+
+### Merge Strategy
+
+| Field | Strategy |
+|-------|----------|
+| goal | Keep main (subagent works on subtask) |
+| workingFiles | Union of all |
+| discoveries | Append branch to main (cap at 10) |
+| completed | Union of all |
+| activeMemories | Union of all |
+| activePatterns | Union of all |
+
+### Storage
+
+```
+.cyxcode/history/
+  branches/{sessionID}.json   # Branch refs (status, HEAD, base)
+  merges/{mergeHash}.json     # Merge records (conflicts, discoveries)
+```
+
+### Branch Lifecycle
+
+- **active**: Subagent running, accepting commits
+- **merged**: Subagent completed, state merged to main
+- **abandoned**: Subagent crashed or cancelled
+
+Old merged/abandoned branches are garbage collected after 7 days.
+
+---
+
 ## Audit System
 
 CyxCode tracks every pattern match, correction, and drift event. Generate reports to see token savings and efficiency.
