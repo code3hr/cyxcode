@@ -430,7 +430,7 @@ Available at `http://localhost:4096/dashboard` when running in web/server mode. 
 | 17 | Multi-agent branching/merging | **Done** |
 | 18 | Audit system — event journal, reports, token accountability | **Done** |
 | 19 | Community patterns (Bun, Rust, Go, Ruby) | **Done** |
-| 20 | Auto-execute fixes (with approval) | Planned |
+| 20 | Auto-execute fixes (with approval) | **Done** |
 
 ---
 

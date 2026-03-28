@@ -83,6 +83,8 @@ export type CyxEventType =
   | "cyxcode.pattern.match" // Pattern matched, tokens saved
   | "cyxcode.pattern.miss" // No match, AI handled
   | "cyxcode.pattern.learned" // New pattern generated
+  | "cyxcode.fix.executed" // Fix command was run
+  | "cyxcode.fix.rejected" // User rejected fix
   | "cyxcode.correction.added" // User ran /correct
   | "cyxcode.correction.reinforced" // Strength increased
   | "cyxcode.correction.promoted" // Strength >= 3, added to system
@@ -119,6 +121,11 @@ export type CyxAuditEntry = {
     // Commit events
     commitHash?: string
     trigger?: string
+    // Fix execution events
+    fixId?: string
+    command?: string
+    success?: boolean
+    exitCode?: number
     // Generic
     message?: string
   }
