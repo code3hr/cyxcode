@@ -10,6 +10,7 @@
 import fs from "fs/promises"
 import path from "path"
 import { Log } from "@/util/log"
+import { CyxPaths } from "./paths"
 import { Bus } from "@/bus"
 import { SessionCompaction } from "@/session/compaction"
 import { MessageV2 } from "@/session/message-v2"
@@ -39,26 +40,10 @@ export type MemoryIndex = {
   entries: MemoryEntry[]
 }
 
-// --- File path resolution (same pattern as learned.ts) ---
-
-let _basePath: string | undefined
+// --- File path resolution (centralized in CyxPaths) ---
 
 function basePath(): string {
-  if (_basePath) return _basePath
-  let dir = process.cwd()
-  for (let i = 0; i < 10; i++) {
-    const candidate = path.join(dir, ".opencode")
-    try {
-      require("fs").accessSync(candidate)
-      _basePath = path.join(dir, ".opencode", "memory")
-      return _basePath
-    } catch {}
-    const parent = path.dirname(dir)
-    if (parent === dir) break
-    dir = parent
-  }
-  _basePath = path.join(process.cwd(), ".opencode", "memory")
-  return _basePath
+  return CyxPaths.memoryDir()
 }
 
 function indexPath(): string {
@@ -91,8 +76,18 @@ export namespace Memory {
     await writeLock
   }
 
-  export async function save(id: string, tags: string[], summary: string, content: string): Promise<void> {
-    const data = await readIndex()
+  export async function save(id: string, tags: string[], summary: string, content: string, scope: "project" | "global" = "project"): Promise<void> {
+    const dir = scope === "global" ? CyxPaths.globalMemoryDir() : basePath()
+    const idxPath = path.join(dir, "index.json")
+
+    // Read index from target dir
+    let data: MemoryIndex
+    try {
+      const raw = await fs.readFile(idxPath, "utf-8")
+      data = JSON.parse(raw) as MemoryIndex
+    } catch {
+      data = { version: 1, entries: [] }
+    }
 
     // Dedup by id
     if (data.entries.some(e => e.id === id)) return
@@ -113,19 +108,25 @@ export namespace Memory {
     }
 
     // Write memory file
-    await fs.mkdir(basePath(), { recursive: true })
-    await fs.writeFile(path.join(basePath(), file), content)
+    await fs.mkdir(dir, { recursive: true })
+    await fs.writeFile(path.join(dir, file), content)
 
     data.entries.push(entry)
 
     // Cap entries
     while (data.entries.length > MAX_ENTRIES) {
       const oldest = data.entries.shift()!
-      try { await fs.unlink(path.join(basePath(), oldest.file)) } catch {}
+      try { await fs.unlink(path.join(dir, oldest.file)) } catch {}
     }
 
-    await writeIndex(data)
-    log.debug("Saved memory", { id, tags })
+    // Write index
+    writeLock = writeLock.then(async () => {
+      await fs.mkdir(dir, { recursive: true })
+      await fs.writeFile(idxPath, JSON.stringify(data, null, 2))
+    }).catch(e => log.warn("Failed to write memory index", { error: e }))
+    await writeLock
+
+    log.debug("Saved memory", { id, tags, scope })
   }
 
   export function query(keywords: string[], entries: MemoryEntry[]): MemoryEntry[] {
@@ -173,37 +174,83 @@ export namespace Memory {
     return parts.join("\n\n")
   }
 
+  /** Load entries from a specific memory directory */
+  async function loadFromDir(dir: string): Promise<{ index: MemoryIndex; dir: string }> {
+    try {
+      const content = await fs.readFile(path.join(dir, "index.json"), "utf-8")
+      return { index: JSON.parse(content) as MemoryIndex, dir }
+    } catch {
+      return { index: { version: 1, entries: [] }, dir }
+    }
+  }
+
+  /** Load content from a specific directory */
+  async function loadContent(entries: MemoryEntry[], dir: string): Promise<string> {
+    let total = 0
+    const parts: string[] = []
+    for (const entry of entries) {
+      if (total >= MAX_LOAD_CHARS) break
+      try {
+        const content = await fs.readFile(path.join(dir, entry.file), "utf-8")
+        const trimmed = content.trim()
+        if (total + trimmed.length > MAX_LOAD_CHARS) {
+          parts.push(trimmed.slice(0, MAX_LOAD_CHARS - total))
+          total = MAX_LOAD_CHARS
+        } else {
+          parts.push(trimmed)
+          total += trimmed.length
+        }
+      } catch {}
+    }
+    return parts.join("\n\n")
+  }
+
   export async function relevant(msgs: MessageV2.WithParts[]): Promise<string[]> {
     try {
-      const data = await readIndex()
-      if (data.entries.length === 0) return []
-
-      // Extract keywords from messages
       const keywords = extractKeywords(msgs)
       if (keywords.length === 0) return []
 
-      // Query matching entries
-      const matches = query(keywords, data.entries)
-      if (matches.length === 0) return []
+      const results: string[] = []
 
-      // Load content
-      const content = await load(matches)
-      if (!content.trim()) return []
-
-      // Update accessed timestamps
-      const now = new Date().toISOString().slice(0, 10)
-      for (const match of matches) {
-        const entry = data.entries.find(e => e.id === match.id)
-        if (entry) {
-          entry.accessed = now
-          entry.accessCount++
+      // Load global memories (lower priority)
+      const globalDir = CyxPaths.globalMemoryDir()
+      const globalData = await loadFromDir(globalDir)
+      const globalMatches = query(keywords, globalData.index.entries)
+      if (globalMatches.length > 0) {
+        const globalContent = await loadContent(globalMatches, globalDir)
+        if (globalContent.trim()) {
+          results.push(`<global-memory>\n${globalContent}\n</global-memory>`)
         }
       }
-      await writeIndex(data)
 
-      log.debug("Loaded memories", { count: matches.length, keywords: keywords.slice(0, 5) })
+      // Load project memories (higher priority)
+      const data = await readIndex()
+      if (data.entries.length > 0) {
+        const matches = query(keywords, data.entries)
+        if (matches.length > 0) {
+          const content = await load(matches)
+          if (content.trim()) {
+            results.push(`<project-memory>\n${content}\n</project-memory>`)
 
-      return [`<project-memory>\n${content}\n</project-memory>`]
+            // Update accessed timestamps for project memories
+            const now = new Date().toISOString().slice(0, 10)
+            for (const match of matches) {
+              const entry = data.entries.find(e => e.id === match.id)
+              if (entry) {
+                entry.accessed = now
+                entry.accessCount++
+              }
+            }
+            await writeIndex(data)
+          }
+        }
+      }
+
+      if (results.length > 0) {
+        log.debug("Loaded memories", { keywords: keywords.slice(0, 5) })
+      }
+
+      return results
     } catch {
       return []
     }

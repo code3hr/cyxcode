@@ -13,6 +13,7 @@ import { Instance } from "@/project/instance"
 import { BaseSkill } from "./base-skill"
 import type { Pattern, Fix } from "./types"
 import { Log } from "@/util/log"
+import { CyxPaths } from "./paths"
 
 const log = Log.create({ service: "cyxcode-learned" })
 
@@ -102,25 +103,8 @@ type LearnedFile = {
 let writeLock: Promise<void> = Promise.resolve()
 
 export namespace LearnedPatterns {
-  let _cachedPath: string | undefined
-
   export function filePath(): string {
-    if (_cachedPath) return _cachedPath
-    // Walk up from cwd to find .opencode directory (git root)
-    let dir = process.cwd()
-    for (let i = 0; i < 10; i++) {
-      const candidate = path.join(dir, ".opencode")
-      try {
-        require("fs").accessSync(candidate)
-        _cachedPath = path.join(dir, ".opencode", "cyxcode-learned.json")
-        return _cachedPath
-      } catch {}
-      const parent = path.dirname(dir)
-      if (parent === dir) break
-      dir = parent
-    }
-    _cachedPath = path.join(process.cwd(), ".opencode", "cyxcode-learned.json")
-    return _cachedPath
+    return CyxPaths.learnedPath()
   }
 
   export async function read(): Promise<LearnedFile> {
@@ -178,8 +162,19 @@ export namespace LearnedPatterns {
     log.info("Saved pending learned pattern", { id: pattern.id, regex: regexStr })
   }
 
-  export async function loadApproved(): Promise<Pattern[]> {
-    const data = await read()
+  /** Load approved patterns. Optionally pass a custom file path (for global tier). */
+  export async function loadApproved(customPath?: string): Promise<Pattern[]> {
+    let data: LearnedFile
+    if (customPath) {
+      try {
+        const content = await fs.readFile(customPath, "utf-8")
+        data = JSON.parse(content) as LearnedFile
+      } catch {
+        return []
+      }
+    } else {
+      data = await read()
+    }
     const patterns: Pattern[] = []
 
     for (const entry of data.approved) {

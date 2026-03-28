@@ -23,13 +23,23 @@ export namespace ConfigPaths {
     return [
       Global.Path.config,
       ...(!Flag.CYXCODE_DISABLE_PROJECT_CONFIG
-        ? await Array.fromAsync(
-            Filesystem.up({
-              targets: [".opencode"],
-              start: directory,
-              stop: worktree,
-            }),
-          )
+        ? [
+            // .cyxcode takes precedence over .opencode
+            ...(await Array.fromAsync(
+              Filesystem.up({
+                targets: [".cyxcode"],
+                start: directory,
+                stop: worktree,
+              }),
+            )),
+            ...(await Array.fromAsync(
+              Filesystem.up({
+                targets: [".opencode"],
+                start: directory,
+                stop: worktree,
+              }),
+            )),
+          ]
         : []),
       ...(await Array.fromAsync(
         Filesystem.up({

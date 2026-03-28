@@ -16,6 +16,15 @@ bun run dev
 
 For CPUs without AVX2: install [bun baseline build](https://github.com/oven-sh/bun/releases) to `~/.bun/bin/`.
 
+### Initialize AI State Tracking
+
+```bash
+cyxcode init           # Create .cyxcode/ in project root
+cyxcode init --global  # Create ~/.cyxcode/ for cross-project state
+```
+
+This creates a `.cyxcode/` directory (like `git init` for AI state). Without `init`, CyxCode still works via `.opencode/` — `init` upgrades to the full three-tier system.
+
 ---
 
 ## Running Modes
@@ -99,7 +108,7 @@ When a command fails:
 
 When CyxCode misses a pattern, the AI handles it. But CyxCode **captures the interaction**:
 
-1. Error output + AI's fix are saved to `.opencode/cyxcode-learned.json`
+1. Error output + AI's fix are saved (`.cyxcode/patterns/learned.json` or `.opencode/cyxcode-learned.json`)
 2. A regex pattern is auto-generated
 3. Run `/learn-patterns` to review and approve
 4. Approved patterns are active on next restart
@@ -114,16 +123,19 @@ CyxCode remembers project knowledge across sessions via indexed memory files.
 ### Save memories
 ```
 /remember auth.ts uses JWT with bcrypt, middleware at line 50
+/remember --global this machine uses ~/.bun/bin baseline
 ```
 
 ### How it works
-- Memories stored in `.opencode/memory/` as small .md files (1-5 lines)
+- Memories stored in `.cyxcode/memory/` (or `.opencode/memory/`) as small .md files (1-5 lines)
 - Each memory has tags for keyword matching
 - On new sessions, only **relevant** memories load (max ~500 tokens)
 - Memories auto-captured from session compaction summaries
+- **Global memories** in `~/.cyxcode/memory/` apply to all projects on the machine
+- **Project memories** take priority over global when both match
 
 ### View memories
-Check `.opencode/memory/index.json` for all stored entries.
+Check `.cyxcode/memory/index.json` (or `.opencode/memory/index.json`) for all stored entries.
 
 ---
 
@@ -144,7 +156,7 @@ CyxCode accumulates state over time. `/dream` cleans it up — like sleep for AI
 - Reports stats: matches, misses, hit rate, tokens saved
 
 ### Stats
-Persisted to `.opencode/cyxcode-stats.json`:
+Persisted to `.cyxcode/stats.json` (or `.opencode/cyxcode-stats.json`):
 - Pattern matches/misses across sessions
 - Hit rate
 - Lifetime tokens saved
@@ -162,7 +174,10 @@ Save behavioral rules the AI should always follow. Corrections persist across se
 
 ```
 /correct always use bun, not npm
+/correct --global keep responses under 3 lines
 ```
+
+Project corrections override global ones. Global corrections (saved to `~/.cyxcode/corrections/`) apply across all projects.
 
 The AI will follow the correction in future sessions:
 
@@ -229,7 +244,131 @@ The AI reads the `<cyxcode-resume>` context and knows: *"In the previous session
 
 ---
 
+## `cyxcode init` — Three-Tier State System
+
+Run `cyxcode init` to create `.cyxcode/` — a dedicated directory for AI state, separate from `.opencode/` config.
+
+### Three tiers
+
+| Tier | Location | Scope | Priority |
+|------|----------|-------|----------|
+| **Project** | `.cyxcode/` in project root | This project only | Highest |
+| **Global** | `~/.cyxcode/` in home dir | All projects on machine | Medium |
+| **Community** | `~/.cyxcode/community/` | Downloaded pattern packs | Lowest |
+
+### `cyxcode init`
+
+```bash
+$ cyxcode init
+
+Initializing CyxCode...
+  Created .cyxcode/
+  Created .cyxcode/config.json
+  Created .cyxcode/history/
+  Created .cyxcode/memory/
+  Created .cyxcode/patterns/
+  Added .cyxcode/history/ to .gitignore
+  Detected project type: node
+
+CyxCode initialized. Ready to track AI state.
+```
+
+Options:
+- `--global` — Initialize `~/.cyxcode/` for cross-project state
+- `--no-migrate` — Skip automatic migration from `.opencode/`
+
+### Migration
+
+If `.opencode/` exists, `cyxcode init` automatically copies cyxcode-specific files to `.cyxcode/`:
+
+| Source | Destination |
+|--------|-------------|
+| `.opencode/memory/` | `.cyxcode/memory/` |
+| `.opencode/history/` | `.cyxcode/history/` |
+| `.opencode/cyxcode-learned.json` | `.cyxcode/patterns/learned.json` |
+| `.opencode/cyxcode-stats.json` | `.cyxcode/stats.json` |
+| `.opencode/command/` | `.cyxcode/command/` |
+| `.opencode/agent/` | `.cyxcode/agent/` |
+
+Originals are kept (copy, not move). A `.cyxcode-migrated` marker prevents re-migration.
+
+### Community patterns
+
+Drop community pattern packs into `~/.cyxcode/community/`:
+
+```bash
+curl -o ~/.cyxcode/community/bun-errors.json \
+  https://example.com/patterns/bun-errors.json
+```
+
+Pack format:
+```json
+{
+  "name": "bun-errors",
+  "version": "1.0.0",
+  "patterns": [
+    {
+      "id": "bun-registry-404",
+      "regex": "error: GET https://registry\\.npmjs\\.org/\\S+ - 404",
+      "category": "bun",
+      "description": "Package not found in npm registry",
+      "fixes": [{ "id": "check-name", "description": "Check package name for typos", "priority": 1 }]
+    }
+  ]
+}
+```
+
+### Loading order at startup
+
+1. Built-in patterns (136, from source code)
+2. Community patterns (`~/.cyxcode/community/`)
+3. Global learned patterns (`~/.cyxcode/patterns/learned.json`)
+4. Global corrections (`~/.cyxcode/corrections/`)
+5. Global memories (`~/.cyxcode/memory/`)
+6. Project learned patterns (`.cyxcode/patterns/learned.json`)
+7. Project corrections (`.cyxcode/history/corrections/`)
+8. Project memories (`.cyxcode/memory/`)
+
+Project overrides global. Global overrides community.
+
+### Without `init`
+
+CyxCode works without `init` — all state saves to `.opencode/` (backward compatible). `init` upgrades to the structured `.cyxcode/` layout with global and community tiers.
+
+---
+
 ## File Structure
+
+### After `cyxcode init` (recommended)
+
+```
+.cyxcode/
+  config.json               # Project config (type, created date)
+  history/
+    HEAD.json               # Latest commit pointer
+    commits/                # State snapshots
+    corrections/            # Behavioral rules
+    changelog.json          # Event log
+  memory/
+    index.json              # Memory index (tags, summaries)
+    *.md                    # Individual memories
+  patterns/
+    learned.json            # Learned error patterns (pending + approved)
+  stats.json                # Persisted router stats
+  agent/                    # Agent configs
+  command/                  # Custom slash commands
+
+~/.cyxcode/                 # Global tier (cyxcode init --global)
+  config.json
+  corrections/              # Global behavioral rules
+  memory/                   # Global memories
+  patterns/
+    learned.json            # Global learned patterns
+  community/                # Community pattern packs (*.json)
+  stats.json
+```
+
+### Legacy (without init)
 
 ```
 .opencode/

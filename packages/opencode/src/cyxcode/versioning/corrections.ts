@@ -10,6 +10,7 @@ import path from "path"
 import { createHash } from "crypto"
 import { Log } from "@/util/log"
 import { historyBasePath } from "./types"
+import { CyxPaths } from "../paths"
 import { Changelog } from "./changelog"
 
 const log = Log.create({ service: "cyxcode-versioning-corrections" })
@@ -33,7 +34,7 @@ export type Correction = {
 // --- Path resolution ---
 
 function basePath(): string {
-  return path.join(historyBasePath(), "corrections")
+  return CyxPaths.correctionsDir()
 }
 
 function correctionPath(id: string): string {
@@ -53,19 +54,23 @@ function hashRule(rule: string): string {
 // --- Corrections namespace ---
 
 export namespace Corrections {
-  export async function add(rule: string, source: Correction["source"] = "explicit"): Promise<Correction> {
+  export async function add(rule: string, source: Correction["source"] = "explicit", scope: "project" | "global" = "project"): Promise<Correction> {
     const id = hashRule(rule)
-    const existing = await get(id)
+    const targetDir = scope === "global" ? CyxPaths.globalCorrectionsDir() : basePath()
+    const targetPath = path.join(targetDir, id + ".json")
 
-    if (existing) {
-      return reinforce(existing)
-    }
+    // Check existing
+    try {
+      const content = await fs.readFile(targetPath, "utf-8")
+      const existing = JSON.parse(content) as Correction
+      if (existing.id && existing.rule) return reinforce(existing)
+    } catch {}
 
     // Get current session count for decay baseline
     let sessionCount = 0
     try {
-      const statsPath = path.join(historyBasePath(), "..", "cyxcode-stats.json")
-      const stats = JSON.parse(require("fs").readFileSync(statsPath, "utf-8"))
+      const sp = scope === "global" ? CyxPaths.globalStatsPath() : CyxPaths.statsPath()
+      const stats = JSON.parse(require("fs").readFileSync(sp, "utf-8"))
       sessionCount = stats.sessions || 0
     } catch {}
 
@@ -81,18 +86,20 @@ export namespace Corrections {
     }
 
     writeLock = writeLock.then(async () => {
-      await fs.mkdir(basePath(), { recursive: true })
-      await fs.writeFile(correctionPath(id), JSON.stringify(correction, null, 2))
+      await fs.mkdir(targetDir, { recursive: true })
+      await fs.writeFile(targetPath, JSON.stringify(correction, null, 2))
     }).catch(e => log.warn("Failed to write correction", { error: e }))
     await writeLock
 
-    await Changelog.append({
-      type: "correction",
-      timestamp: correction.created,
-      data: { id, rule: correction.rule, strength: 1, source },
-    })
+    if (scope === "project") {
+      await Changelog.append({
+        type: "correction",
+        timestamp: correction.created,
+        data: { id, rule: correction.rule, strength: 1, source },
+      })
+    }
 
-    log.debug("Added correction", { id, rule: correction.rule, strength: 1 })
+    log.debug("Added correction", { id, rule: correction.rule, strength: 1, scope })
 
     return correction
   }
@@ -202,21 +209,58 @@ export namespace Corrections {
     } catch {}
   }
 
+  /** Load corrections from a specific directory */
+  async function loadFromDir(dir: string): Promise<Correction[]> {
+    try {
+      await fs.mkdir(dir, { recursive: true })
+      const files = await fs.readdir(dir)
+      const jsonFiles = files.filter(f => f.endsWith(".json"))
+      const results = await Promise.allSettled(
+        jsonFiles.map(f => fs.readFile(path.join(dir, f), "utf-8"))
+      )
+      const corrections: Correction[] = []
+      for (const result of results) {
+        if (result.status === "fulfilled") {
+          try {
+            const parsed = JSON.parse(result.value)
+            if (parsed.id && parsed.rule && typeof parsed.strength === "number") {
+              corrections.push(parsed as Correction)
+            }
+          } catch {}
+        }
+      }
+      return corrections.sort((a, b) => b.strength - a.strength)
+    } catch {
+      return []
+    }
+  }
+
   /**
    * Format corrections for system prompt injection.
-   * Returns array of strings, sorted by strength (highest first).
+   * Merges global + project corrections (project wins on same rule hash).
    * Budget: max ~300 tokens (~1200 chars).
    */
   export async function forSystemPrompt(): Promise<string[]> {
-    const corrections = await active()
-    if (corrections.length === 0) return []
+    // Load global corrections
+    const globalCorr = await loadFromDir(CyxPaths.globalCorrectionsDir())
 
-    const WRAPPER_OVERHEAD = 100 // <cyxcode-corrections> tags + header text
-    const MAX_CHARS = 1100 // 1200 - wrapper overhead
+    // Load project corrections
+    const projectCorr = await active()
+
+    // Merge: project corrections override global ones with the same id
+    const projectIds = new Set(projectCorr.map(c => c.id))
+    const merged = [
+      ...projectCorr,
+      ...globalCorr.filter(c => !c.promoted && c.strength > 0 && !projectIds.has(c.id)),
+    ].sort((a, b) => b.strength - a.strength)
+
+    if (merged.length === 0) return []
+
+    const MAX_CHARS = 1100
     let total = 0
     const lines: string[] = []
 
-    for (const c of corrections) {
+    for (const c of merged) {
       const line = `- [strength ${c.strength}] ${c.rule}`
       if (total + line.length > MAX_CHARS) break
       lines.push(line)

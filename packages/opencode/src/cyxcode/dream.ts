@@ -10,6 +10,7 @@
 import fs from "fs/promises"
 import path from "path"
 import { Log } from "@/util/log"
+import { CyxPaths } from "./paths"
 import { Memory } from "./memory"
 import type { MemoryIndex } from "./memory"
 import { LearnedPatterns } from "./learned"
@@ -41,26 +42,10 @@ const DEFAULT_STATS: StatsFile = {
   lastDream: "",
 }
 
-// --- Path resolution (same walk-up as learned.ts) ---
-
-let _statsPath: string | undefined
+// --- Path resolution (centralized in CyxPaths) ---
 
 function statsPath(): string {
-  if (_statsPath) return _statsPath
-  let dir = process.cwd()
-  for (let i = 0; i < 10; i++) {
-    const candidate = path.join(dir, ".opencode")
-    try {
-      require("fs").accessSync(candidate)
-      _statsPath = path.join(dir, ".opencode", "cyxcode-stats.json")
-      return _statsPath
-    } catch {}
-    const parent = path.dirname(dir)
-    if (parent === dir) break
-    dir = parent
-  }
-  _statsPath = path.join(process.cwd(), ".opencode", "cyxcode-stats.json")
-  return _statsPath
+  return CyxPaths.statsPath()
 }
 
 // --- Write lock ---

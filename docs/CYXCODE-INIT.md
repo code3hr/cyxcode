@@ -2,9 +2,9 @@
 
 *Like `git init` — but for AI state.*
 
-## Status: Design Document (Not Yet Implemented)
+## Status: Implemented
 
-This documents the planned `.cyxcode` directory system. Current implementation uses `.opencode/` for backward compatibility with upstream OpenCode. This design is for a future version.
+The `.cyxcode` directory system is now implemented. Run `cyxcode init` to create the directory structure. See [USAGE.md](USAGE.md) for user-facing documentation.
 
 ---
 
@@ -248,22 +248,15 @@ System prompt order:
 
 ---
 
-## Why Not Now
+## Implementation Notes
 
-This is a future feature because:
+Implemented after state versioning phases 5-7 stabilized. Key files:
 
-1. **Upstream sync** — Renaming `.opencode/` to `.cyxcode/` everywhere breaks upstream pulls
-2. **Current system works** — `.opencode/` with walk-up path resolution works for single projects
-3. **Global tier needs design** — `~/.cyxcode/` needs init, config, and loading infrastructure
-4. **Community patterns need a registry** — Package manager or URL-based distribution
-5. **Migration path** — Need to handle users with existing `.opencode/` data
+| File | Purpose |
+|------|---------|
+| `packages/opencode/src/cyxcode/paths.ts` | Centralized path resolution (replaces 4 duplicated walk-up implementations) |
+| `packages/opencode/src/cli/cmd/init.ts` | `cyxcode init` CLI command |
+| `packages/opencode/src/cyxcode/migration.ts` | Copy-based migration from `.opencode/` |
+| `packages/opencode/src/cyxcode/community.ts` | Community pattern pack loader |
 
-### What we can do now:
-- Keep building state versioning in `.opencode/history/`
-- Keep the `--global` flag concept in mind for commands
-- Document this design for when we're ready to implement
-
-### When to implement:
-- After state versioning phases 5-7 are done and stable
-- When we have multiple users needing cross-project state
-- When community patterns are ready for distribution
+Backward compatible — without `cyxcode init`, all paths resolve to `.opencode/` (zero behavior change).
