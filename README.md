@@ -4,7 +4,7 @@
 
 [![CyxCode Terminal UI](packages/web/src/assets/lander/screenshot-cyxcode.png)](https://github.com/code3hr/cyxcode)
 
-136 error patterns. Zero tokens. The AI pays once, CyxCode remembers forever.
+170+ error patterns. Zero tokens. The AI pays once, CyxCode remembers forever.
 
 ---
 
@@ -27,7 +27,7 @@
 
 ## What is CyxCode?
 
-CyxCode is a fork of [OpenCode](https://opencode.ai) that intercepts known errors **before** the LLM sees them. 136 regex patterns match common errors and provide instant fixes — for free.
+CyxCode is a fork of [OpenCode](https://opencode.ai) that intercepts known errors **before** the LLM sees them. 170+ regex patterns match common errors and provide instant fixes — for free.
 
 ```
 Traditional AI:  Every error -> LLM -> tokens burned -> response
@@ -318,13 +318,16 @@ Full design: **[State Versioning Design](docs/STATE-VERSIONING.md)**
 
 ## Supported Categories
 
-3 skills, 16 categories, 136+ patterns:
+3 skills, 16 categories, 170+ patterns:
 
 | Skill | Categories | Patterns |
 |-------|-----------|----------|
 | **Recovery** | Node, Git, Python, Docker, Build, System | 51 |
 | **Security** | SSL, Auth, SSH, Network, Scan | 39 |
 | **DevOps** | Kubernetes, Terraform, CI/CD, Cloud, Ansible | 46 |
+| **Community** | Bun, Rust, Go, Ruby | 35 |
+
+Community packs are bundled and auto-installed to `~/.cyxcode/community/` on first use. Manage with `cyxcode community list|install|remove`.
 
 Full pattern breakdown: [docs/ADDING-PATTERNS.md](docs/ADDING-PATTERNS.md)
 

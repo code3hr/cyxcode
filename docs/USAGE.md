@@ -43,7 +43,7 @@ This creates a `.cyxcode/` directory (like `git init` for AI state). Without `in
 
 Type `!` to enter shell mode, then type a command. The command runs **directly without AI** — zero tokens.
 
-If the command fails, CyxCode checks its 136+ patterns for a match. If matched, the fix is displayed instantly. No AI involved at all.
+If the command fails, CyxCode checks its 170+ patterns for a match. If matched, the fix is displayed instantly. No AI involved at all.
 
 ```
 ! python3 -c 'import flask'
