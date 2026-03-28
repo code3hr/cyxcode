@@ -145,6 +145,8 @@ Memories are also captured automatically when sessions compact. The compaction s
 | `/remember <info>` | Save a memory manually |
 | `/learn-patterns` | Review and approve learned error patterns |
 | `/dream` | Consolidate memories, patterns, and stats |
+| `cyxcode audit` | Show recent audit events (pattern matches, corrections, drift) |
+| `cyxcode report` | Generate token savings report |
 
 ---
 
@@ -166,6 +168,73 @@ CyxCode accumulates state over time — memories, patterns, stats. `/dream` clea
 - All auto-dream phases plus smart merging
 - Updates AGENTS.md with learnings from patterns and memories
 - Reports: matches, misses, hit rate, tokens saved, sessions tracked
+
+---
+
+## Audit System
+
+Track every pattern match, correction, and drift event. Generate token savings reports.
+
+### CLI Commands
+
+```bash
+# Show recent audit events
+cyxcode audit --last 1d
+
+# Filter by event type
+cyxcode audit --type cyxcode.pattern.match
+
+# Generate token savings report (default: last 7 days)
+cyxcode report
+
+# Different time periods
+cyxcode report --period 30d
+
+# Different output formats
+cyxcode report --format json
+cyxcode report --format markdown
+cyxcode report --format text
+```
+
+### Sample Report Output
+
+```
++-------------------------------------------------------------+
+|        CyxCode Token Report: 03-21 to 03-28                 |
++-------------------------------------------------------------+
+|                                                             |
+|  TOKEN SAVINGS                                              |
+|  +-- Saved:     187,200 tokens ($0.37)                     |
+|  +-- Used:       48,600 tokens ($0.10)                     |
+|  +-- Efficiency: 79.4%                                      |
+|                                                             |
+|  PATTERNS                    CORRECTIONS                    |
+|  +-- Matches: 847            +-- Added:    12               |
+|  +-- Misses:  203            +-- Promoted: 4                |
+|  +-- Hit Rate: 80.7%         +-- Drift:    7                |
+|  +-- Learned: 12             +-- Compliance: 94%            |
+|                                                             |
++-------------------------------------------------------------+
+```
+
+### Event Types
+
+| Event | Description |
+|-------|-------------|
+| `pattern.match` | Pattern matched, tokens saved |
+| `pattern.miss` | No match, AI handled (tokens used) |
+| `pattern.learned` | New pattern approved |
+| `correction.added` | User ran `/correct` |
+| `correction.promoted` | Strength >= 3, added to system |
+| `drift.detected` | AI violated a correction |
+
+### Privacy Guard
+
+All audit entries are automatically scrubbed of secrets:
+- API keys (OpenAI, Anthropic, AWS, GitHub)
+- JWTs and bearer tokens
+- URL credentials
+- High-entropy hex strings
 
 ---
 
@@ -359,7 +428,7 @@ Available at `http://localhost:4096/dashboard` when running in web/server mode. 
 | 15 | Behavior versioning — auto-commit, corrections, resume | In Progress |
 | 16 | Drift detection + auto-promotion to AGENTS.md | Planned |
 | 17 | Multi-agent branching/merging | Planned |
-| 18 | Audit system — event journal, reports, token accountability | Planned |
+| 18 | Audit system — event journal, reports, token accountability | **Done** |
 | 19 | Community patterns (Bun, Rust, Go, Ruby) | Planned |
 | 20 | Auto-execute fixes (with approval) | Planned |
 
