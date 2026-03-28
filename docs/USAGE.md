@@ -77,9 +77,12 @@ Type `/` followed by the command name:
 | `/dream` | Run dream consolidation — deduplicate, validate, persist stats, update AGENTS.md |
 | `/remember <info>` | Save a memory about your project for future sessions |
 | `/learn-patterns` | Review and approve learned error patterns |
+| `/correct <rule>` | Save a behavioral correction for future sessions |
 | `/diagnose` | Quick error diagnosis using a lightweight model |
 | `/commit` | Git commit and push |
 | `/learn` | Extract session learnings to AGENTS.md |
+| `cyxcode audit` | Show recent audit events (CLI) |
+| `cyxcode report` | Generate token savings report (CLI) |
 
 ---
 
@@ -216,6 +219,84 @@ The AI reads the `<cyxcode-resume>` context and knows: *"In the previous session
 | `/correct <rule>` | Save a behavioral correction (strength: 1, increases on reinforcement) |
 | `/dream` | Consolidate state — promote, decay, archive |
 | `/history` | Show commit log and correction history |
+
+---
+
+## Audit System
+
+CyxCode tracks every pattern match, correction, and drift event. Generate reports to see token savings and efficiency.
+
+### CLI Commands
+
+```bash
+# Show recent audit events
+cyxcode audit --last 1d
+
+# Filter by event type
+cyxcode audit --type cyxcode.pattern.match
+
+# Generate token savings report (default: last 7 days)
+cyxcode report
+
+# Different time periods
+cyxcode report --period 30d
+
+# Different output formats
+cyxcode report --format json
+cyxcode report --format markdown
+cyxcode report --format text
+```
+
+### Sample Report
+
+```
++-------------------------------------------------------------+
+|        CyxCode Token Report: 03-21 to 03-28                 |
++-------------------------------------------------------------+
+|                                                             |
+|  TOKEN SAVINGS                                              |
+|  +-- Saved:     187,200 tokens ($0.37)                     |
+|  +-- Used:       48,600 tokens ($0.10)                     |
+|  +-- Efficiency: 79.4%                                      |
+|                                                             |
+|  PATTERNS                    CORRECTIONS                    |
+|  +-- Matches: 847            +-- Added:    12               |
+|  +-- Misses:  203            +-- Promoted: 4                |
+|  +-- Hit Rate: 80.7%         +-- Drift:    7                |
+|  +-- Learned: 12             +-- Compliance: 94%            |
+|                                                             |
++-------------------------------------------------------------+
+```
+
+### Web Dashboard
+
+When running in web or server mode, view token reports at:
+
+```
+http://localhost:4096/dashboard/tokens
+```
+
+The dashboard shows:
+- Token savings cards (saved, cost, hit rate)
+- Pattern statistics (matches, misses, learned)
+- Correction statistics (added, promoted, drift)
+- Top performing patterns
+- Recent audit events
+
+### Event Types
+
+| Event | Description |
+|-------|-------------|
+| `pattern.match` | Pattern matched, tokens saved |
+| `pattern.miss` | No match, AI handled (tokens used) |
+| `pattern.learned` | New pattern approved |
+| `correction.added` | User ran `/correct` |
+| `correction.promoted` | Strength >= 3, added to system |
+| `drift.detected` | AI violated a correction |
+
+### Privacy
+
+All audit entries are automatically scrubbed of secrets (API keys, JWTs, passwords) before storage.
 
 ---
 
