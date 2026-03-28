@@ -10,6 +10,7 @@ const Scans = lazy(() => import("./pages/Scans"))
 const Monitors = lazy(() => import("./pages/Monitors"))
 const Compliance = lazy(() => import("./pages/Compliance"))
 const Reports = lazy(() => import("./pages/Reports"))
+const Tokens = lazy(() => import("./pages/Tokens"))
 
 const Loading: Component = () => (
   <div class="flex items-center justify-center h-64">
@@ -51,6 +52,7 @@ export const App: Component = () => {
       <Route path="/compliance" component={Compliance} />
       <Route path="/compliance/:framework" component={Compliance} />
       <Route path="/reports" component={Reports} />
+      <Route path="/tokens" component={Tokens} />
     </Router>
   )
 }
