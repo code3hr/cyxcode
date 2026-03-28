@@ -425,8 +425,8 @@ Available at `http://localhost:4096/dashboard` when running in web/server mode. 
 | 12 | Indexed project memory (`/remember`) | **Done** |
 | 13 | Dream consolidation (`/dream`) | **Done** |
 | 14 | Persisted router stats across sessions | **Done** |
-| 15 | Behavior versioning — auto-commit, corrections, resume | In Progress |
-| 16 | Drift detection + auto-promotion to AGENTS.md | Planned |
+| 15 | Behavior versioning — auto-commit, corrections, resume | **Done** |
+| 16 | Drift detection + auto-promotion to AGENTS.md | **Done** |
 | 17 | Multi-agent branching/merging | Planned |
 | 18 | Audit system — event journal, reports, token accountability | **Done** |
 | 19 | Community patterns (Bun, Rust, Go, Ruby) | Planned |
