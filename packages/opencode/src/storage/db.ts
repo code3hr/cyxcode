@@ -79,7 +79,7 @@ export namespace Database {
   }
 
   export const Client = lazy(() => {
-    log.info("opening database", { path: Path })
+    log.debug("opening database", { path: Path })
 
     const db = init(Path)
 
@@ -96,7 +96,7 @@ export namespace Database {
         ? CYXCODE_MIGRATIONS
         : migrations(path.join(import.meta.dirname, "../../migration"))
     if (entries.length > 0) {
-      log.info("applying migrations", {
+      log.debug("applying migrations", {
         count: entries.length,
         mode: typeof CYXCODE_MIGRATIONS !== "undefined" ? "bundled" : "dev",
       })
