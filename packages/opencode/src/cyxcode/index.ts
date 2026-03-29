@@ -43,16 +43,25 @@ export function initCyxCode() {
   // Store on globalThis to avoid module duplication issues with Bun conditions
   ;(globalThis as any).__cyxcode_router = SkillRouter
 
-  // Load three-tier patterns — community > global > project
+  // Load three-tier patterns — community > global > project (parallelized)
   ;(globalThis as any).__cyxcode_learned_ready = (async () => {
     try {
-      // Ensure bundled community packs are installed on first use
+      // Import modules first
       const { CommunityPatterns } = await import("./community")
+      const { LearnedSkill, LearnedPatterns } = await import("./learned")
+      const { CyxPaths } = await import("./paths")
+
+      // Ensure bundled community packs are installed (must run before loadAll)
       await CommunityPatterns.ensureBuiltinPacks()
 
-      // Tier 1: Community patterns (from ~/.cyxcode/community/)
-      const { LearnedSkill } = await import("./learned")
-      const community = await CommunityPatterns.loadAll()
+      // Load all three tiers in parallel
+      const [community, globalLearned, approved] = await Promise.all([
+        CommunityPatterns.loadAll(),
+        LearnedPatterns.loadApproved(CyxPaths.globalLearnedPath()),
+        LearnedPatterns.loadApproved(),
+      ])
+
+      // Register in priority order: community < global < project
       if (community.length > 0) {
         const skill = new LearnedSkill(community)
         skill.name = "community"
@@ -60,10 +69,6 @@ export function initCyxCode() {
         SkillRouter.register(skill)
       }
 
-      // Tier 2: Global learned patterns (from ~/.cyxcode/patterns/learned.json)
-      const { CyxPaths } = await import("./paths")
-      const { LearnedPatterns } = await import("./learned")
-      const globalLearned = await LearnedPatterns.loadApproved(CyxPaths.globalLearnedPath())
       if (globalLearned.length > 0) {
         const skill = new LearnedSkill(globalLearned)
         skill.name = "global-learned"
@@ -71,8 +76,6 @@ export function initCyxCode() {
         SkillRouter.register(skill)
       }
 
-      // Tier 3: Project learned patterns (from .cyxcode/patterns/ or .opencode/)
-      const approved = await LearnedPatterns.loadApproved()
       if (approved.length > 0) {
         SkillRouter.register(new LearnedSkill(approved))
       }
