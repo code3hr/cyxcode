@@ -588,6 +588,24 @@ function App(props: { onSnapshot?: () => Promise<string[]> }) {
       category: "System",
     },
     {
+      title: "Initialize .cyxcode/",
+      value: "cyxcode.init",
+      slash: {
+        name: "cyxinit",
+      },
+      onSelect: async () => {
+        dialog.clear()
+        const { initProjectFromTUI } = await import("@/cyxcode/cyxinit")
+        const result = await initProjectFromTUI()
+        if (result.success) {
+          toast.show({ variant: "info", message: result.message, duration: 3000 })
+        } else {
+          toast.show({ variant: "warning", message: result.message, duration: 3000 })
+        }
+      },
+      category: "System",
+    },
+    {
       title: "Open docs",
       value: "docs.open",
       onSelect: () => {

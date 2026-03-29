@@ -23,7 +23,12 @@ cyxcode init           # Create .cyxcode/ in project root
 cyxcode init --global  # Create ~/.cyxcode/ for cross-project state
 ```
 
-This creates a `.cyxcode/` directory (like `git init` for AI state). Without `init`, CyxCode still works via `.opencode/` — `init` upgrades to the full three-tier system.
+Or use the slash command inside the TUI:
+```
+/cyxinit               # Initialize .cyxcode/ without leaving TUI
+```
+
+This creates a `.cyxcode/` directory (like `git init` for AI state). Without `init`, CyxCode falls back to `.opencode/` — `init` upgrades to the full three-tier system with automatic migration.
 
 ---
 
@@ -74,6 +79,7 @@ Type `/` followed by the command name:
 
 | Command | Description |
 |---------|-------------|
+| `/cyxinit` | Initialize `.cyxcode/` directory (migrates from `.opencode/` if exists) |
 | `/dream` | Run dream consolidation — deduplicate, validate, persist stats, update AGENTS.md |
 | `/remember <info>` | Save a memory about your project for future sessions |
 | `/learn-patterns` | Review and approve learned error patterns |
