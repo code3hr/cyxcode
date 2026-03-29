@@ -378,11 +378,25 @@ All audit entries are automatically scrubbed of secrets (API keys, JWTs, passwor
 
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `CYXCODE_DEBUG` | `false` | Debug output for pattern matching and learning |
+| `CYXCODE_DEBUG` | `false` | Enable verbose logging (pattern matching, database, bus events, startup details) |
 | `CYXCODE_SHORT_CIRCUIT` | `true` | Skip LLM on pattern match. `false` to always use AI |
 | `ANTHROPIC_API_KEY` | — | Claude API key |
 | `OPENAI_API_KEY` | — | OpenAI API key |
 | `CYXCODE_SERVER_PASSWORD` | — | Password for server mode |
+
+### Debug Mode
+
+By default, CyxCode runs quietly with minimal console output. Enable debug mode to see internal details:
+
+```bash
+CYXCODE_DEBUG=true cyxcode
+```
+
+Debug mode shows:
+- Pattern matching attempts and results
+- Database operations and migrations
+- Bus subscription events
+- Startup initialization timing
 
 ---
 
