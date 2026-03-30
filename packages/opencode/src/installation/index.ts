@@ -61,7 +61,15 @@ export namespace Installation {
     })
   export type Info = z.infer<typeof Info>
 
-  export const VERSION = typeof CYXCODE_VERSION === "string" ? CYXCODE_VERSION : "local"
+  // Use build-time version, fallback to package.json for dev mode
+  const PKG_VERSION = (() => {
+    try {
+      return require("../../package.json").version
+    } catch {
+      return "local"
+    }
+  })()
+  export const VERSION = typeof CYXCODE_VERSION === "string" ? CYXCODE_VERSION : PKG_VERSION
   export const CHANNEL = typeof CYXCODE_CHANNEL === "string" ? CYXCODE_CHANNEL : "local"
   export const USER_AGENT = `opencode/${CHANNEL}/${VERSION}/${Flag.CYXCODE_CLIENT}`
 
