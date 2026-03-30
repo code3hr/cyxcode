@@ -16,7 +16,7 @@
 - [Pattern Learning](#pattern-learning)
 - [Project Memory](#project-memory)
 - [Dream Consolidation](#dream-consolidation)
-- [Behavior Versioning](#behavior-versioning-coming-soon)
+- [Behavior Versioning](#behavior-versioning)
 - [Supported Categories](#supported-categories)
 - [Environment Variables](#environment-variables)
 - [Why Fork?](#why-fork-opencode-instead-of-building-a-plugin)
@@ -254,7 +254,7 @@ All audit entries are automatically scrubbed of secrets:
 
 ---
 
-## Behavior Versioning (Coming Soon)
+## Behavior Versioning
 
 *Git for AI state — no other AI coding tool has this.*
 
