@@ -1,8 +1,8 @@
 /**
- * CyxCode Command Downloader
+ * CyxCode Command Bundle
  *
- * Downloads slash command .md files from GitHub on first use.
- * Stores them in .cyxcode/command/ or .opencode/command/
+ * Copies bundled slash command .md files to project .cyxcode/command/
+ * Commands are embedded in the package - no network required.
  */
 
 import fs from "fs/promises"
@@ -12,9 +12,10 @@ import { CyxPaths } from "./paths"
 
 const log = Log.create({ service: "cyxcode-commands" })
 
-const GITHUB_RAW_BASE = "https://raw.githubusercontent.com/code3hr/cyxcode/dev/.opencode/command"
+// Path to embedded commands (relative to this file)
+const EMBEDDED_DIR = path.join(import.meta.dir, "commands")
 
-// List of bundled commands to download
+// List of bundled commands to copy
 const BUNDLED_COMMANDS = [
   "dream.md",
   "correct.md",
@@ -27,7 +28,7 @@ const BUNDLED_COMMANDS = [
 
 export namespace CommandsDownload {
   /**
-   * Check if commands need to be downloaded
+   * Check if commands need to be copied
    */
   export async function needsDownload(): Promise<boolean> {
     const commandDir = CyxPaths.commandDir()
@@ -35,7 +36,7 @@ export namespace CommandsDownload {
     try {
       const files = await fs.readdir(commandDir)
       const mdFiles = files.filter(f => f.endsWith(".md"))
-      // If we have less than half the bundled commands, download
+      // If we have less than half the bundled commands, copy them
       return mdFiles.length < BUNDLED_COMMANDS.length / 2
     } catch {
       return true
@@ -43,7 +44,7 @@ export namespace CommandsDownload {
   }
 
   /**
-   * Download all bundled commands from GitHub
+   * Copy all bundled commands from embedded package files
    */
   export async function downloadAll(): Promise<{
     downloaded: number
@@ -59,20 +60,7 @@ export namespace CommandsDownload {
 
     for (const filename of BUNDLED_COMMANDS) {
       try {
-        const url = `${GITHUB_RAW_BASE}/${filename}`
-        const response = await fetch(url, {
-          headers: {
-            "User-Agent": "cyxcode-cli",
-          },
-        })
-
-        if (!response.ok) {
-          log.warn("Failed to download command", { filename, status: response.status })
-          failed.push(filename)
-          continue
-        }
-
-        const content = await response.text()
+        const srcPath = path.join(EMBEDDED_DIR, filename)
         const destPath = path.join(commandDir, filename)
 
         // Don't overwrite existing commands (user may have customized)
@@ -82,11 +70,12 @@ export namespace CommandsDownload {
           continue
         } catch {}
 
-        await fs.writeFile(destPath, content)
+        // Copy from embedded file
+        await fs.copyFile(srcPath, destPath)
         downloaded++
-        log.debug("Downloaded command", { filename })
+        log.debug("Copied command", { filename })
       } catch (err) {
-        log.warn("Error downloading command", { filename, error: err })
+        log.warn("Error copying command", { filename, error: err })
         failed.push(filename)
       }
     }
@@ -95,7 +84,7 @@ export namespace CommandsDownload {
   }
 
   /**
-   * Download commands if needed, with user feedback
+   * Copy commands if needed, with user feedback
    */
   export async function ensureCommands(silent = false): Promise<boolean> {
     if (!(await needsDownload())) {
@@ -103,17 +92,17 @@ export namespace CommandsDownload {
     }
 
     if (!silent) {
-      console.log("  Downloading CyxCode commands from GitHub...")
+      console.log("  Copying CyxCode commands...")
     }
 
     const result = await downloadAll()
 
     if (result.downloaded > 0 && !silent) {
-      console.log(`  Downloaded ${result.downloaded} command(s)`)
+      console.log(`  Copied ${result.downloaded} command(s)`)
     }
 
     if (result.failed.length > 0 && !silent) {
-      console.log(`  Failed to download: ${result.failed.join(", ")}`)
+      console.log(`  Failed to copy: ${result.failed.join(", ")}`)
     }
 
     return result.failed.length === 0
