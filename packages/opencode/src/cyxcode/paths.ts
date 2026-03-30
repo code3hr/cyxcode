@@ -138,6 +138,11 @@ export namespace CyxPaths {
     return path.join(root, mode === "cyxcode" ? ".cyxcode" : ".opencode", "memory")
   }
 
+  /** Command directory (slash commands) */
+  export function commandDir(): string {
+    const { root, mode } = findProjectRoot()
+    return path.join(root, mode === "cyxcode" ? ".cyxcode" : ".opencode", "command")
+  }
   /** State versioning history directory */
   export function historyDir(): string {
     const { root, mode } = findProjectRoot()
