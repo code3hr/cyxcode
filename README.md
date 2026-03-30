@@ -51,6 +51,21 @@ bun run dev
 
 For CPUs without AVX2, see [AVX2 Note](docs/PERFORMANCE.md#avx2-note).
 
+### Project Setup
+
+Run `/cyxinit` inside CyxCode to initialize your project:
+
+```
+/cyxinit
+```
+
+This creates `.cyxcode/` with:
+- **Slash commands**: /dream, /correct, /remember, /learn, etc. (7 bundled)
+- **Directory structure**: memory/, patterns/, history/, command/
+- **Config**: Project type detection, gitignore entries
+
+Or use the CLI: `cyxcode init` (same result, runs outside TUI).
+
 ---
 
 ## Two Modes
@@ -142,6 +157,7 @@ Memories are also captured automatically when sessions compact. The compaction s
 
 | Command | Description |
 |---------|-------------|
+| `/cyxinit` | Initialize ``.cyxcode/`` in current project (copies bundled slash commands) |
 | `/remember <info>` | Save a memory manually |
 | `/learn-patterns` | Review and approve learned error patterns |
 | `/dream` | Consolidate memories, patterns, and stats |
