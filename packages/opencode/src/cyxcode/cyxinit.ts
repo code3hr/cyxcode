@@ -135,8 +135,18 @@ export async function initProjectFromTUI(): Promise<InitResult> {
       }
     } catch {}
 
+    // Download bundled commands from GitHub
+    let downloaded = 0
+    try {
+      const { CommandsDownload } = await import("./commands-download")
+      const result = await CommandsDownload.downloadAll()
+      downloaded = result.downloaded
+    } catch {}
+
     const message = migrated > 0
-      ? `Initialized .cyxcode/ (migrated ${migrated} files from .opencode/)`
+      ? `Initialized .cyxcode/ (migrated ${migrated} files)`
+      : downloaded > 0
+      ? `Initialized .cyxcode/ (${downloaded} commands downloaded)`
       : `Initialized .cyxcode/ (${projectType} project)`
 
     return {

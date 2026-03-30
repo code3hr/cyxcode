@@ -176,6 +176,10 @@ async function initProject(dir: string, migrate: boolean): Promise<void> {
   // Invalidate path cache so future calls use .cyxcode/
   CyxPaths.invalidateCache()
 
+  // Download bundled commands from GitHub
+  const { CommandsDownload } = await import("../../cyxcode/commands-download")
+  await CommandsDownload.ensureCommands()
+
   // Print project type and tips
   if (projectType !== "unknown") {
     console.log(`\n  Detected project type: ${projectType}`)
