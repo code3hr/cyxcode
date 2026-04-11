@@ -15,6 +15,7 @@
 - [Two Modes](#two-modes)
 - [Pattern Learning](#pattern-learning)
 - [Project Memory](#project-memory)
+- [Semantic Recall](#semantic-recall)
 - [Dream Consolidation](#dream-consolidation)
 - [Behavior Versioning](#behavior-versioning)
 - [Supported Categories](#supported-categories)
@@ -163,6 +164,44 @@ Memories are also captured automatically when sessions compact. The compaction s
 | `/dream` | Consolidate memories, patterns, and stats |
 | `cyxcode audit` | Show recent audit events (pattern matches, corrections, drift) |
 | `cyxcode report` | Generate token savings report |
+
+---
+
+## Semantic Recall
+
+*When regex patterns miss, recall finds what you've seen before — semantically, locally, still free.*
+
+Pattern matching catches 80% of known errors for free. The other 20% used to fall through to the LLM and evaporate at session end. **Recall** is a passive semantic index over everything CyxCode already captures — project memories and learned patterns — so similar prior errors surface automatically on pattern miss.
+
+```
+Shell error -> 170+ regex patterns checked (free, <1 ms)
+               |
+               +-- HIT  -> apply fix, done
+               |
+               +-- MISS -> Recall.similar(error.tail)          <-- THIS LAYER
+                            |
+                            +-- local embedding (~20 ms warm)
+                            +-- dot-product scan over SQLite   (~1 ms / 1k rows)
+                            |
+                            +-- hit  -> "[CyxCode] similar prior errors: ..."
+                            |           injected into LLM context -- zero API calls
+                            |
+                            +-- none -> fall through to LLM as before
+```
+
+### What it is
+
+- **Local MiniLM embeddings.** A 25 MB model runs on your CPU via WebAssembly — `@xenova/transformers` v2.17.2, cached once at `~/.cyxcode/models/`. No network, no API key, no cloud, no tokens spent on retrieval.
+- **Separate SQLite database.** Lives at `.cyxcode/recall.db`, independently prunable. Float32 vectors stored as raw BLOBs for bit-exact round-trip.
+- **Bus-event-driven.** Subscribes to `SessionCompaction.Compacted`, `PatternLearned`, and `MemoryLoaded`. Zero edits to `memory.ts`, `learned.ts`, or the skills themselves.
+- **Temporal fact store.** Alongside vector search, recall keeps a `(subject, predicate, object, valid_from, valid_until)` triple store so stale facts retire automatically.
+- **Reversible.** Delete `packages/opencode/src/cyxcode/recall/` and revert three files — CyxCode runs exactly as before.
+
+### Why it matters
+
+Your first encounter with `pnpm install failed: ENOENT lockfile` cost real LLM tokens. With recall, the next encounter with `pnpm install broken, lockfile gone` — different words, same meaning — surfaces the prior fix via semantic similarity *without ever calling the LLM*. Keyword search misses this. Recall catches it.
+
+See [docs/RECALL.md](docs/RECALL.md) for the full architecture, API, performance characteristics, and design rationale.
 
 ---
 
@@ -395,6 +434,7 @@ If you see `opencode` in a directory path or source file, that's normal. If you 
 | [Before/After Comparison](docs/BEFORE-AFTER.md) | Side-by-side: CyxCode vs standard AI |
 | [State Versioning Design](docs/STATE-VERSIONING.md) | Git for AI state — full design document |
 | [Audit System](docs/AUDIT-SYSTEM.md) | Event journal, reports, token accountability |
+| [Semantic Recall](docs/RECALL.md) | Local vector search over memory + learned patterns, zero API cost |
 | [Performance](docs/PERFORMANCE.md) | Benchmarks, token estimates, session savings |
 
 ### Running Modes
@@ -450,6 +490,7 @@ Available at `http://localhost:4096/dashboard` when running in web/server mode. 
 | 18 | Audit system — event journal, reports, token accountability | **Done** |
 | 19 | Community patterns (Bun, Rust, Go, Ruby) | **Done** |
 | 20 | Auto-execute fixes (with approval) | **Done** |
+| 21 | Semantic recall layer — local MiniLM embeddings over memory + learned patterns | **Done** |
 
 ---
 

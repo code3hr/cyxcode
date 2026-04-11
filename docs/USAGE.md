@@ -152,6 +152,55 @@ Check `.cyxcode/memory/index.json` (or `.opencode/memory/index.json`) for all st
 
 ---
 
+## Semantic Recall
+
+When the 170+ regex patterns miss, **recall** searches your indexed project memories and learned patterns for *semantically similar* prior errors — using local MiniLM embeddings, zero API calls.
+
+### How it works
+
+1. Shell command fails and pattern matching finds no hit.
+2. Recall embeds the last ~2000 chars of the error output with a local 25 MB model (WebAssembly, CPU-only).
+3. Dot-product similarity scan against everything in `.cyxcode/recall.db`.
+4. Top-3 hits above a confidence threshold get injected into the shell output as `[CyxCode]` hints.
+5. The LLM's next turn sees the prior-error context automatically and usually produces the right fix immediately.
+
+No network, no API key, no tokens spent on retrieval — ever.
+
+### Data sources
+
+Recall builds its index from three Bus events you already emit:
+
+| Event | What gets indexed |
+|---|---|
+| `SessionCompaction.Compacted` | Everything `memory.ts` captured during session compaction — summaries + markdown bodies |
+| `CyxEvents.PatternLearned` | The description + regex of every pattern `learned.ts` approves |
+| `CyxEvents.MemoryLoaded` | Not indexed — just bumps `accessed_at` so decay aligns with real usage |
+
+On first run, recall walks your existing `memory/index.json` and `learned.json` files and batch-embeds everything retroactively.
+
+### Files on disk
+
+| Path | What |
+|---|---|
+| `.cyxcode/recall.db` | SQLite database — vectors, facts, watermarks. ~1.5 KB per indexed row. Deletable anytime. |
+| `~/.cyxcode/models/` | MiniLM model cache (~25 MB). Shared across all projects. Deletable — re-downloads on next cold start. |
+
+### First-run UX
+
+- First boot after install: recall kicks off a background warmup. Nothing user-visible until the first pattern miss.
+- First pattern miss: instant, because warmup already loaded the model.
+- Initial model download: ~15 seconds once, cached forever.
+
+### Turning it off
+
+Delete `.cyxcode/recall.db` to wipe the index. Recall will recreate an empty DB on next boot; `similar()` returns `[]` until something gets indexed again.
+
+For a full rebuild: the internal `Recall.reindex()` API forces a wipe + retro-walk of all sources. No slash command yet — planned.
+
+See [RECALL.md](RECALL.md) for architecture, API reference, performance numbers, and design rationale.
+
+---
+
 ## Dream Consolidation
 
 CyxCode accumulates state over time. `/dream` cleans it up — like sleep for AI.

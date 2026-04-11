@@ -87,6 +87,11 @@ export function initCyxCode() {
     initMemoryCapture()
   }).catch(() => {})
 
+  // Initialize recall layer (passive semantic index over memory + learned patterns)
+  import("./recall").then(({ Recall }) => {
+    Recall.initRecall().catch(() => {})
+  }).catch(() => {})
+
   // Run auto-dream consolidation (phases 1-4, code-only, no tokens)
   import("./dream").then(({ Dream }) => {
     Dream.initAutoDream()

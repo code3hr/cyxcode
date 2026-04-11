@@ -39,6 +39,7 @@ import { ConfigMarkdown } from "../config/markdown"
 import { SessionSummary } from "./summary"
 import { NamedError } from "@cyxcode/util/error"
 import { getRouter, initCyxCode } from "../cyxcode"
+import { Recall } from "../cyxcode/recall"
 import { fn } from "@/util/fn"
 import { SessionProcessor } from "./processor"
 import { TaskTool } from "@/tool/task"
@@ -1911,6 +1912,23 @@ NOTE: At any point in time through this workflow you should feel free to ask the
 
         cyxMatched = true
         router.recordMatch(best.skill.name)
+      } else if (Recall.isReady()) {
+        try {
+          // Errors usually sit at the tail of shell output; MiniLM caps at ~512 tokens
+          // (~2000 chars) so slice the last window to avoid losing the actual error.
+          const recallQuery = output.length > 2000 ? output.slice(-2000) : output
+          const hits = await Recall.similar(recallQuery, { limit: 3, minScore: 0.5 })
+          if (hits.length > 0) {
+            const label = hits.length === 1 ? "error" : "errors"
+            output += "\n\n[CyxCode] No pattern matched, but recall found " + hits.length + " similar prior " + label + ":\n"
+            for (let i = 0; i < hits.length; i++) {
+              const h = hits[i]
+              const snippet = h.text.replace(/\s+/g, " ").slice(0, 200)
+              output += "  " + (i + 1) + ". [" + h.source + " " + h.score.toFixed(2) + "] " + snippet + "\n"
+            }
+            output += "[CyxCode] Retrieval via local embeddings — no LLM tokens spent\n"
+          }
+        } catch {}
       }
     }
 
