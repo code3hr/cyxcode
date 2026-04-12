@@ -7,6 +7,7 @@
 
 import { MessageV2 } from "@/session/message-v2"
 import { Session } from "@/session"
+import { SessionID as SessionIDType } from "@/session/schema"
 import { Log } from "@/util/log"
 import { Commits } from "./commit"
 import { Changelog } from "./changelog"
@@ -38,7 +39,7 @@ export namespace StateVersioning {
       // Skip empty state
       if (!state.goal && state.workingFiles.length === 0) return
 
-      const session = await Session.get(sessionID)
+      const session = await Session.get(SessionIDType.make(sessionID))
 
       // Check if this is a subagent session (has parent)
       // If so, commit to the branch instead of main

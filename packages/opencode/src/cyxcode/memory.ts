@@ -433,8 +433,8 @@ function hash(str: string): string {
 // --- Init ---
 
 export function initMemoryCapture() {
-  Bus.subscribe(SessionCompaction.Event.Compacted, async (payload) => {
-    await captureFromCompaction(payload.sessionID)
+  Bus.subscribe(SessionCompaction.Event.Compacted, async (event) => {
+    await captureFromCompaction(event.properties.sessionID)
   })
 
   // Prune on startup
