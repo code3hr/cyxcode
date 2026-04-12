@@ -31,6 +31,40 @@ Recall fixes this: when the regex misses, recall does a vector similarity search
 
 ---
 
+## Use cases
+
+### 1. Recurring errors with different surface syntax
+
+You hit `pnpm install failed: ENOENT lockfile` on Monday. The AI solves it (costs tokens), `learned.ts` captures the fix, and recall indexes the error+fix pair. On Thursday you hit `npm ci broken - lockfile missing` — different package manager, different words, same class of problem. The 170+ regex patterns won't match (they're syntactically different). But recall scores it at ~0.85 similarity against Monday's indexed entry and injects that prior context into the LLM's prompt. The LLM gets "you solved something like this before, here's what worked" and produces the fix on the first turn instead of the multi-turn diagnostic.
+
+**Savings:** ~2000-4000 tokens per recurrence (3-turn diagnostic compressed to 1 turn). Compounds over a month of daily development.
+
+### 2. Cross-session project memory recall
+
+You spent a session last week debugging a Docker build that failed with `no space left on device`. Memory captured it during session compaction: the discovery, the fix (`docker system prune -a`), the context. Tagged as `[docker, disk, prune]`.
+
+Three weeks later, a CI pipeline fails with `ENOSPC: write failed`. The keyword tags don't match — `ENOSPC` isn't in `[docker, disk, prune]`. Memory's tag-based lookup misses it. But recall's vector search catches the semantic overlap between "no space left on device" and "ENOSPC write failed" (~0.78 similarity). The LLM sees the prior fix context without you re-explaining the situation.
+
+**Gap filled:** Tags work for exact keyword matches; embeddings work for *meaning* matches. This is the exact gap between CyxCode's existing tag-based memory and what users actually need.
+
+### 3. Pattern learning acceleration
+
+Every time `learned.ts` approves a new pattern, recall indexes it with its description and regex. As patterns accumulate per project, the recall index becomes a growing semantic knowledge base of "errors this project has seen." When a genuinely novel error appears that no pattern matches, recall can still surface the *nearest-neighbor* pattern — not as a fix, but as diagnostic context: "this looks similar to a webpack chunking error you solved before."
+
+**Effect:** The LLM doesn't start from zero on ambiguous errors. It starts from "here's the closest thing in your project's history," shaving off the initial diagnostic phase where the AI asks clarifying questions.
+
+### When recall does NOT help
+
+- **First-time projects with no history** — recall is empty, falls through to the LLM every time until patterns and memories accumulate.
+- **Errors that are syntactically identical** — regex patterns catch those already, for free, before recall is ever consulted.
+- **Non-error use cases** — recall only fires on shell command failures in the current wiring; it doesn't help with code generation, refactoring, or chat.
+
+### The core value in one sentence
+
+Every token you spend on a novel error becomes a free hint for every *similar* future error — without writing a regex for it.
+
+---
+
 ## How it works
 
 ### The pipeline

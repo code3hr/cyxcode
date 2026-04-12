@@ -199,9 +199,15 @@ Shell error -> 170+ regex patterns checked (free, <1 ms)
 
 ### Why it matters
 
-Your first encounter with `pnpm install failed: ENOENT lockfile` cost real LLM tokens. With recall, the next encounter with `pnpm install broken, lockfile gone` — different words, same meaning — surfaces the prior fix via semantic similarity *without ever calling the LLM*. Keyword search misses this. Recall catches it.
+| Scenario | Without recall | With recall |
+|----------|---------------|-------------|
+| Same error, different words (`ENOENT lockfile` vs `lockfile missing`) | Regex misses, AI solves from scratch (3+ turns) | Recall surfaces prior fix, AI solves in 1 turn |
+| Cross-session context (`no space left` 3 weeks ago vs `ENOSPC` today) | Tag-based memory misses, AI starts fresh | Vector similarity catches meaning match |
+| Growing project history | Each novel error costs full diagnostic tokens | Nearest-neighbor pattern gives AI a head start |
 
-See [docs/RECALL.md](docs/RECALL.md) for the full architecture, API, performance characteristics, and design rationale.
+Every token you spend on a novel error becomes a free hint for every *similar* future error — without writing a regex for it.
+
+See [docs/RECALL.md](docs/RECALL.md) for use cases, architecture, API, and design rationale.
 
 ---
 
