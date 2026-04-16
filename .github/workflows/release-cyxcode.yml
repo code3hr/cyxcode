@@ -55,7 +55,7 @@ jobs:
               --draft
           fi
 
-      - name: Build CLI (linux-x64)
+      - name: Build CLI (all platforms)
         working-directory: packages/opencode
         env:
           CYXCODE_VERSION: ${{ steps.v.outputs.version }}
@@ -63,7 +63,7 @@ jobs:
           CYXCODE_CHANNEL: "latest"
           GH_REPO: ${{ github.repository }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: bun run script/build.ts --single
+        run: bun run script/build.ts
 
       - name: Publish release
         env:
