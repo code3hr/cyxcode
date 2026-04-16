@@ -159,7 +159,9 @@ export namespace Installation {
 
         const upgradeCurl = Effect.fnUntraced(
           function* (target: string) {
-            const response = yield* httpOk.execute(HttpClientRequest.get("https://cyxcode.ai/install"))
+            const response = yield* httpOk.execute(
+              HttpClientRequest.get("https://raw.githubusercontent.com/code3hr/cyxcode/main/install"),
+            )
             const body = yield* response.text
             const bodyBytes = new TextEncoder().encode(body)
             const proc = ChildProcess.make("bash", [], {
