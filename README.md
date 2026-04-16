@@ -11,6 +11,7 @@
 ## Table of Contents
 
 - [What is CyxCode?](#what-is-cyxcode)
+- [Install](#install)
 - [Quick Start](#quick-start)
 - [Two Modes](#two-modes)
 - [Pattern Learning](#pattern-learning)
@@ -37,6 +38,30 @@ CyxCode:         Every error -> Pattern check -> match? -> FREE fix
 ```
 
 When no pattern matches, the AI handles it normally — but CyxCode **captures the error + fix** and generates a new pattern. Next time, that error is free. The pattern library grows automatically.
+
+---
+
+## Install
+
+Grab a prebuilt binary — Linux, macOS, or Windows (via WSL/Git Bash):
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/code3hr/cyxcode/HEAD/install | bash
+```
+
+Pin a specific version:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/code3hr/cyxcode/HEAD/install | bash -s -- --version 2.3.2
+```
+
+The installer drops the `cyxcode` binary into `~/.opencode/bin` and adds it to `PATH`. Releases live at [github.com/code3hr/cyxcode/releases](https://github.com/code3hr/cyxcode/releases).
+
+### Upgrading
+
+Inside CyxCode, `/update` checks the latest GitHub release and runs the installer for you.
+
+> **One-time manual step for v2.2.x, v2.3.0, and v2.3.1 installs:** those builds had a broken upgrade URL baked in (pointed at a domain that was never registered / wrong branch). Run the `curl | bash` install above once to land on v2.3.2+, and auto-upgrades will work from then on.
 
 ---
 
