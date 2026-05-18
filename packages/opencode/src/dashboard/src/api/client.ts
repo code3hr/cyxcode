@@ -297,6 +297,75 @@ export const reportsApi = {
 }
 
 // ============================================================================
+// CyxWatch API
+// ============================================================================
+
+export interface WatchEvent {
+  id: string
+  ts: number
+  kind: "file.read" | "file.write" | "shell.command" | "network.outbound" | "prompt.turn"
+  project?: string
+  sessionID?: string
+  messageID?: string
+  prompt?: string
+  text?: string
+  path?: string
+  host?: string
+  method?: string
+  cmd?: string
+  bytes?: number
+  risk: number
+  flags: string[]
+  decision?: "allow" | "warn" | "require-approval" | "block"
+}
+
+export interface WatchAlert {
+  id: string
+  ts: number
+  kind: "policy_violation" | "sensitive_access" | "network_exfil" | "prompt_drift" | "repeated_sensitive"
+  title: string
+  summary: string
+  risk: number
+  flags: string[]
+  decision: "allow" | "warn" | "require-approval" | "block"
+  eventID: string
+  project?: string
+  sessionID?: string
+  messageID?: string
+  prompt?: string
+  path?: string
+  cmd?: string
+  host?: string
+}
+
+export interface WatchReport {
+  period: { name: "1h" | "1d" | "7d" | "30d" | "all"; start: string; end: string }
+  total: number
+  prompt: number
+  shell: number
+  read: number
+  write: number
+  network: number
+  risky: number
+  risk: number
+  alerts: number
+  decisions: {
+    allow: number
+    warn: number
+    requireApproval: number
+    block: number
+  }
+  flags: Array<{ name: string; count: number }>
+  top: Array<{ path: string; count: number }>
+}
+
+export const watchApi = {
+  report: (period = "7d") => request<{ report: WatchReport }>(`/cyxwatch/report?period=${period}`),
+  recent: (limit = 20) => request<{ events: WatchEvent[]; total: number }>(`/cyxwatch/recent?limit=${limit}`),
+  alerts: (limit = 20) => request<{ alerts: WatchAlert[]; total: number }>(`/cyxwatch/alerts?limit=${limit}`),
+}
+
+// ============================================================================
 // Compliance API
 // ============================================================================
 

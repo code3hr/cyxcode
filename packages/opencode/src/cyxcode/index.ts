@@ -20,9 +20,11 @@ export type { CyxAuditEntry, CyxEventType } from "./audit"
 
 // Report generation
 export { CyxReport } from "./report"
+export { CyxWatch } from "./watch"
 export { Wiki } from "./wiki"
 export { Codegraph } from "./codegraph"
 export { Graph } from "./graph"
+export type { WatchAlert, WatchAlertKind, WatchEntry, WatchKind, WatchReport } from "./watch"
 export type { WikiPage, WikiIndex, WikiGraph } from "./wiki"
 export type { CodeFile, CodeIndex, CodeGraph, CodeSymbol } from "./codegraph"
 export type { GraphData, GraphEdge, GraphKind, GraphNode } from "./graph"

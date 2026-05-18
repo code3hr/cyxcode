@@ -89,6 +89,7 @@ Type `/` followed by the command name:
 | `/learn` | Extract session learnings to AGENTS.md |
 | `cyxcode audit` | Show recent audit events (CLI) |
 | `cyxcode report` | Generate token savings report (CLI) |
+| `cyxcode watch` | Show runtime observability telemetry (CLI) |
 | `cyxcode community list` | List installed community pattern packs |
 | `cyxcode community install <path>` | Install a community pack from file or URL |
 | `cyxcode community remove <name>` | Remove an installed community pack |
@@ -462,6 +463,13 @@ cyxcode report --period 30d
 cyxcode report --format json
 cyxcode report --format markdown
 cyxcode report --format text
+
+# CyxWatch runtime observability
+cyxcode watch recent
+cyxcode watch report
+cyxcode watch alerts
+cyxcode watch report --period 30d
+cyxcode watch report --json
 ```
 
 ### Sample Report
@@ -506,6 +514,19 @@ The Tokens page at `/dashboard/tokens` shows:
 - Correction statistics (added, promoted, drift)
 - Top performing patterns
 - Recent audit events
+
+The CyxWatch layer records runtime telemetry locally and is surfaced through:
+- `cyxcode watch recent`
+- `cyxcode watch report`
+- `cyxcode watch alerts`
+- the dashboard page at `/dashboard/security`
+
+It currently tracks:
+- prompt turns with session/message correlation
+- shell commands
+- file reads and writes
+- basic risk flags for sensitive paths and risky shell strings
+- basic policy decisions: allow, warn, require-approval, block
 
 ### Event Types
 
