@@ -3,6 +3,7 @@ import path from "path"
 import { Log } from "@/util/log"
 import { Memory } from "../memory"
 import { LearnedPatterns } from "../learned"
+import { Wiki } from "../wiki"
 import { redactSecrets } from "../audit"
 import { RECALL_MODEL, type ReindexStats } from "./types"
 import { bumpWatermark, getWatermark, readMeta, upsertVector, wipeVectors, writeMeta } from "./db"
@@ -152,6 +153,17 @@ async function indexLearned(stats: ReindexStats): Promise<void> {
   if (!anyBatchFailed) bumpWatermark("learned", Date.now())
 }
 
+async function indexWiki(stats: ReindexStats, force: boolean): Promise<void> {
+  try {
+    const result = await Wiki.rebuild({ force })
+    stats.wikiIndexed += result.indexed
+    stats.errors += result.errors
+  } catch (e) {
+    stats.errors++
+    log.warn("reconcile: wiki rebuild failed", { error: e })
+  }
+}
+
 let inFlight: Promise<ReindexStats> | null = null
 
 export function isReconciling(): boolean {
@@ -167,7 +179,9 @@ export async function reconcile(opts: { force?: boolean } = {}): Promise<Reindex
 }
 
 async function runReconcile(opts: { force?: boolean }): Promise<ReindexStats> {
-  const stats: ReindexStats = { memoryIndexed: 0, learnedIndexed: 0, skipped: 0, errors: 0 }
+  const stats: ReindexStats = { memoryIndexed: 0, learnedIndexed: 0, wikiIndexed: 0, skipped: 0, errors: 0 }
+
+  await indexWiki(stats, !!opts.force)
 
   if (isDisabled()) {
     log.debug("reconcile skipped: embedder disabled")

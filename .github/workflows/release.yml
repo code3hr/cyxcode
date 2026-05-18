@@ -62,8 +62,7 @@ jobs:
           cd packages/opencode/dist
           DIST_DIR=$(ls -d */ | head -1)
           cd "$DIST_DIR/bin"
-          chmod +x opencode
-          mv opencode cyxcode
+          chmod +x cyxcode
           tar -czvf ${{ matrix.artifact }}.tar.gz cyxcode
           mv ${{ matrix.artifact }}.tar.gz $GITHUB_WORKSPACE/
 
@@ -74,7 +73,6 @@ jobs:
           cd packages/opencode/dist
           $distDir = Get-ChildItem -Directory | Select-Object -First 1
           cd "$($distDir.Name)/bin"
-          Rename-Item opencode.exe cyxcode.exe
           Compress-Archive -Path cyxcode.exe -DestinationPath ${{ matrix.artifact }}.zip
           Move-Item ${{ matrix.artifact }}.zip $env:GITHUB_WORKSPACE/
 

@@ -152,6 +152,107 @@ Check `.cyxcode/memory/index.json` (or `.opencode/memory/index.json`) for all st
 
 ---
 
+## Knowledge Wiki
+
+CyxCode also keeps markdown notes as a local wiki.
+
+### How to use it
+
+- Create notes in `.cyxcode/wiki/` or `.opencode/wiki/`
+- Link related notes with `[[wikilinks]]`
+- Use `cyxcode wiki create <title>` to add a new note
+- Use `cyxcode wiki rename <id> <title>` to retitle a note
+- Use `cyxcode wiki delete <id>` to remove a wiki note
+- Use `cyxcode wiki query [terms..]` to search the current wiki index
+- Open the web knowledge page at `/:dir/knowledge` to browse the wiki and graph
+- Run `cyxcode init` to create the wiki directory in a fresh project
+- Rebuild the wiki index when you want backlinks and graph data refreshed immediately
+
+### How it works
+
+- CyxCode scans markdown files and builds a local note index
+- Each `[[wikilink]]` becomes a backlink and graph edge
+- Relevant wiki pages can be injected into the session prompt alongside memories
+- Wiki pages are also indexed into recall, so similar docs can surface automatically
+- The unified graph now feeds prompt context too, including nearby wiki, code, memory, learned, and fact nodes
+- Wiki notes can reference code files or symbols with backticked paths, and the graph records those cross-links
+
+### Current API
+
+- `GET /experimental/wiki`
+- `GET /experimental/wiki/graph`
+- `GET /experimental/wiki/page?id=...`
+- `POST /experimental/wiki/rebuild`
+- `GET /experimental/codegraph`
+- `GET /experimental/codegraph/graph`
+- `GET /experimental/codegraph/page?id=...`
+- `POST /experimental/codegraph/rebuild`
+- `GET /experimental/graph`
+- `GET /experimental/memory`
+- `GET /experimental/memory/page?id=...`
+
+---
+
+## Knowledge Graph
+
+CyxCode also exposes a unified graph over wiki notes, code files, memories, learned patterns, and semantic facts.
+
+### How to use it
+
+- Open the graph tab on `/:dir/knowledge`
+- Use the filters to focus on wiki, code, memory, learned, or concept nodes
+- Use the hop controls to expand the graph one, two, three, or four steps out from the selected node
+- Click a node to inspect incoming and outgoing relationships
+- Jump into the linked wiki note or source detail view from a node
+- Refresh the graph after updating wiki notes, code, memory, or learned patterns
+
+### What it includes
+
+- wiki pages and `[[wikilinks]]`
+- code files, imported modules, and declared symbols
+- memory entries and their tags
+- approved learned patterns and their categories
+- semantic facts from the recall store
+- graph context from nearby linked nodes when the AI builds its prompt
+
+### Current API
+
+- `GET /experimental/graph`
+
+---
+
+## Code Graph
+
+CyxCode also scans project source files into a lightweight code graph.
+
+### What it tracks
+
+- file-to-file imports
+- file-to-symbol links for named and default imports
+- top-level symbols declared in each code file
+
+### Where it lives
+
+The code graph index is stored in:
+
+- `.cyxcode/codegraph/`
+- `.opencode/codegraph/` when legacy state is still in use
+
+### Current API
+
+- `GET /experimental/codegraph`
+- `GET /experimental/codegraph/graph`
+- `GET /experimental/codegraph/page?id=...`
+- `POST /experimental/codegraph/rebuild`
+
+### Usage
+
+1. Let CyxCode scan the repo, or call `POST /experimental/codegraph/rebuild`.
+2. Open the dashboard or query the API to inspect files and relationships.
+3. Use the graph to see which files import which modules and symbols.
+
+---
+
 ## Semantic Recall
 
 When the 170+ regex patterns miss, **recall** searches your indexed project memories and learned patterns for *semantically similar* prior errors — using local MiniLM embeddings, zero API calls.

@@ -93,6 +93,8 @@ export async function initProjectFromTUI(): Promise<InitResult> {
       "history/commits",
       "history/corrections",
       "memory",
+      "wiki",
+      "codegraph",
       "patterns",
       "agent",
       "command",

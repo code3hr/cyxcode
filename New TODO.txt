@@ -1,0 +1,442 @@
+Your fork already contains the foundation for something much bigger than a coding assistant.
+
+After reading the README, the architecture of CyxCode is actually very well positioned for an AI observability/security layer because you already have:
+
+* event-driven architecture
+* audit systems
+* behavior tracking
+* semantic recall
+* drift detection
+* correction memory
+* shell interception
+* local embeddings
+* local SQLite state
+* session instrumentation
+
+Those are exactly the primitives needed for AI monitoring.
+
+What you need now is a new subsystem:
+
+# CyxWatch Layer
+
+A runtime observability and security layer for AI agents.
+
+---
+
+# The Big Idea
+
+Right now CyxCode optimizes:
+
+* token efficiency
+* memory persistence
+* learning
+
+CyxWatch would optimize:
+
+* trust
+* visibility
+* data sovereignty
+
+---
+
+# What You Actually Want to Detect
+
+You are NOT trying to detect:
+
+* “evil AI consciousness”
+
+You ARE trying to detect:
+
+## Observable AI behaviors
+
+Examples:
+
+| Behavior                    | Why suspicious                |
+| --------------------------- | ----------------------------- |
+| Unexpected file reads       | AI scanning unrelated folders |
+| Hidden network calls        | Silent telemetry              |
+| Clipboard monitoring        | Data harvesting               |
+| Mic/camera activation       | Surveillance                  |
+| Large uploads after prompts | Prompt exfiltration           |
+| Background indexing         | Silent document harvesting    |
+| Unauthorized shell commands | Agent escalation              |
+| Browser/session scraping    | Credential theft risk         |
+
+That is technically measurable.
+
+---
+
+# Best Architecture Direction
+
+Your existing architecture already uses:
+
+* event buses
+* audit logs
+* memory systems
+* recall pipelines
+
+So do NOT bolt on antivirus-style scanning.
+
+Instead:
+
+# Add an Observability Pipeline
+
+---
+
+# Phase 1 — Proof of Concept (POC)
+
+This is what I strongly recommend.
+
+## Goal
+
+Track:
+
+1. What the AI agent accesses
+2. What it sends externally
+3. What commands it executes
+
+That alone is huge.
+
+---
+
+# POC Architecture
+
+## Layer 1 — File Access Monitor
+
+Intercept:
+
+* readFile
+* writeFile
+* shell file operations
+
+Track:
+
+* path
+* timestamp
+* AI prompt correlation
+* whether user explicitly requested access
+
+---
+
+## Example
+
+User asks:
+
+> “Fix my React app.”
+
+AI accesses:
+
+* `/project/src`
+
+Normal.
+
+But if AI accesses:
+
+* `~/.ssh`
+* browser cookies
+* password stores
+* unrelated documents
+
+CyxWatch flags it.
+
+---
+
+# Layer 2 — Network Monitor
+
+Critical feature.
+
+Track:
+
+* outbound requests
+* domains
+* upload size
+* timing
+* associated prompt/session
+
+---
+
+## Example Detection
+
+User asks:
+
+> “Summarize this code.”
+
+AI sends:
+
+* 20 MB compressed archive
+* to unknown telemetry endpoint
+
+CyxWatch alerts:
+
+> “Unexpected data transmission detected.”
+
+---
+
+# Layer 3 — Prompt/Data Correlation
+
+This becomes your secret weapon.
+
+Correlate:
+
+* user prompt
+* accessed resources
+* outbound traffic
+
+Example:
+
+| User Prompt      | AI Accessed           | Risk   |
+| ---------------- | --------------------- | ------ |
+| “Fix typo”       | SSH keys              | HIGH   |
+| “Summarize file” | Browser cookies       | HIGH   |
+| “Analyze repo”   | Entire home directory | MEDIUM |
+
+This creates:
+
+# Intent-Aware Monitoring
+
+Very advanced concept.
+
+---
+
+# Phase 2 — Secure Sandbox Layer
+
+Once monitoring works:
+
+## Add Policy Enforcement
+
+Example policies:
+
+```yaml
+allow:
+  - ./project/**
+deny:
+  - ~/.ssh/**
+  - ~/.gnupg/**
+  - ~/Documents/Finance/**
+```
+
+Now CyxWatch becomes:
+
+# AI Runtime Security
+
+Not just monitoring.
+
+---
+
+# Where to Integrate in CyxCode
+
+Your architecture already has ideal insertion points.
+
+---
+
+# Best Hook Points
+
+## 1. Shell Mode
+
+You already intercept shell execution.
+
+Perfect place to:
+
+* inspect commands
+* classify risk
+* block suspicious operations
+
+Example:
+
+```bash
+rm -rf ~
+curl unknown.site/upload
+cat ~/.ssh/id_rsa
+```
+
+---
+
+# 2. Tool Result Pipeline
+
+You already attach metadata like:
+
+```ts
+cyxcodeMatched
+```
+
+Extend this:
+
+```ts
+cyxwatchRisk
+cyxwatchFileAccess
+cyxwatchNetworkActivity
+cyxwatchSensitiveAccess
+```
+
+Excellent architectural fit.
+
+---
+
+# 3. Audit System
+
+This is already half the monitoring engine.
+
+Add new events:
+
+| Event                   | Meaning               |
+| ----------------------- | --------------------- |
+| `ai.file.read`          | File accessed         |
+| `ai.file.sensitive`     | Sensitive file access |
+| `ai.network.outbound`   | Network call          |
+| `ai.policy.violation`   | Security rule broken  |
+| `ai.prompt.correlation` | Suspicious mismatch   |
+
+---
+
+# 4. Recall Layer
+
+This becomes powerful later.
+
+You can semantically detect:
+
+* repeated suspicious behavior
+* unusual access patterns
+* escalation trends
+
+Your recall system is actually useful for security telemetry.
+
+---
+
+# POC Technical Stack
+
+Since CyxCode already uses:
+
+* Bun
+* TypeScript
+* SQLite
+* local embeddings
+
+Start there.
+
+DO NOT overengineer yet.
+
+---
+
+# Recommended Initial Components
+
+## File Monitor
+
+Node/Bun wrappers:
+
+```ts
+fs.readFile
+fs.writeFile
+fs.readdir
+```
+
+Add instrumentation.
+
+---
+
+## Network Monitor
+
+Wrap:
+
+* fetch
+* axios
+* HTTP clients
+* WebSocket connections
+
+Track:
+
+* host
+* payload size
+* prompt association
+
+---
+
+## Risk Engine
+
+Simple scoring:
+
+```ts
+risk += sensitiveFile * 40
+risk += unknownDomain * 30
+risk += unrelatedAccess * 50
+```
+
+---
+
+# Example POC Output
+
+```json
+{
+  "session": "abc123",
+  "prompt": "Fix React build",
+  "accessed": [
+    "./src/App.tsx",
+    "~/.ssh/id_rsa"
+  ],
+  "network": [
+    "api.openai.com",
+    "unknown-telemetry.xyz"
+  ],
+  "risk": 92,
+  "flags": [
+    "Sensitive file access",
+    "Unexpected outbound connection"
+  ]
+}
+```
+
+That is already extremely compelling.
+
+---
+
+# Future Secure Layer
+
+Once monitoring works:
+
+## Add:
+
+* permission prompts
+* execution approval
+* network firewalls
+* filesystem sandboxing
+* model isolation
+* local-only modes
+
+Then CyxWatch becomes:
+
+# “Zero Trust for AI Agents”
+
+That’s a powerful category.
+
+---
+
+# Strong Strategic Direction
+
+You should position this as:
+
+# AI Runtime Observability
+
+or
+
+# AI Agent Transparency Layer
+
+NOT:
+
+* anti-AI
+* AI paranoia
+* spyware detector
+
+Professional positioning matters.
+
+---
+
+# Most Important Insight
+
+The future problem is not:
+
+> “AI becoming conscious.”
+
+The real problem is:
+
+> AI systems operating with invisible permissions and invisible data flows.
+
+CyxWatch addresses exactly that.

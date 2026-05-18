@@ -36,6 +36,8 @@ import { SessionCommand } from "./cli/cmd/session"
 import { DbCommand } from "./cli/cmd/db"
 import { InitCommand } from "./cli/cmd/init"
 import { CommunityCommand } from "./cli/cmd/community"
+import { WikiCommand } from "./cli/cmd/wiki"
+import { GraphCommand } from "./cli/cmd/graph"
 import path from "path"
 import { Global } from "./global"
 import { JsonMigration } from "./storage/json-migration"
@@ -159,6 +161,8 @@ let cli = yargs(hideBin(process.argv))
   .command(DbCommand)
   .command(InitCommand)
   .command(CommunityCommand)
+  .command(WikiCommand)
+  .command(GraphCommand)
 
 if (Installation.isLocal()) {
   cli = cli.command(WorkspaceServeCommand)

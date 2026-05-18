@@ -23,6 +23,10 @@ const log = Log.create({ service: "cyxcode-recall" })
 let initialized = false
 let enabled = false
 
+function missing(e: unknown): boolean {
+  return (e instanceof Error ? e.message : String(e)).includes("No context found for instance")
+}
+
 export function __resetForTest(): void {
   initialized = false
   enabled = false
@@ -47,7 +51,11 @@ export namespace Recall {
     try {
       registerSubscribers()
     } catch (e) {
-      log.warn("recall: Bus subscribers not registered (no Instance?)", { error: e })
+      if (missing(e)) {
+        log.debug("recall: Bus subscribers deferred until Instance is available")
+      } else {
+        log.warn("recall: Bus subscribers not registered (no Instance?)", { error: e })
+      }
     }
 
     // Background: warm up the embedder so the first live similar() call is hot
@@ -132,7 +140,7 @@ export namespace Recall {
 
   export async function reindex(): Promise<ReindexStats> {
     if (!enabled || isDisabled()) {
-      return { memoryIndexed: 0, learnedIndexed: 0, skipped: 0, errors: 0 }
+      return { memoryIndexed: 0, learnedIndexed: 0, wikiIndexed: 0, skipped: 0, errors: 0 }
     }
     return reconcile({ force: true })
   }

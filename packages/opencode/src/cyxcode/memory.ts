@@ -16,6 +16,8 @@ import { SessionCompaction } from "@/session/compaction"
 import { MessageV2 } from "@/session/message-v2"
 import { Session } from "@/session"
 import { CyxAudit } from "./audit"
+import { Codegraph } from "./codegraph"
+import { Wiki } from "./wiki"
 
 const log = Log.create({ service: "cyxcode-memory" })
 
@@ -387,10 +389,80 @@ async function captureFromCompaction(sessionID: string) {
       }
     }
 
+    await captureWikiDiscoveries(sessionID, discoveries, files)
+
     log.debug("Captured memories from compaction", { sessionID })
   } catch (e) {
     log.warn("Failed to capture memories from compaction", { error: e })
   }
+}
+
+async function captureWikiDiscoveries(sessionID: string, discoveries: string | null, files: string | null) {
+  const lines = discoveries
+    ? discoveries.split("\n").map((line) => line.replace(/^[-*]\s*/, "").trim()).filter((line) => line.length > 10)
+    : []
+  const refs = files
+    ? files.split("\n").map((line) => line.replace(/^[-*]\s*/, "").trim()).filter((line) => line.length > 3)
+    : []
+  if (lines.length === 0 && refs.length === 0) return
+
+  const code = await Codegraph.readIndex()
+  const keys = [...new Set([
+    ...extractTagsFromText(`${lines.join(" ")} ${refs.join(" ")}`),
+    ...refs.flatMap((ref) => [path.basename(ref).toLowerCase(), path.basename(ref, path.extname(ref)).toLowerCase()]),
+  ])].slice(0, 12)
+  const filesHit = Codegraph.query(keys, code.files).slice(0, 5)
+  const hot = Codegraph.hotspots(code.files, 5)
+  const wiki = await Wiki.readIndex()
+
+  const text = [
+    `# Session Discoveries`,
+    "",
+    `Captured from session: ${sessionID}`,
+    "",
+    lines.length > 0
+      ? ["## Discoveries", ...lines.slice(0, 8).map((line) => `- ${line}`), ""].join("\n")
+      : "",
+    refs.length > 0
+      ? ["## Relevant files", ...refs.slice(0, 10).map((line) => `- \`${line}\``), ""].join("\n")
+      : "",
+    filesHit.length > 0
+      ? ["## Code matches", ...filesHit.map((file) => `- \`${file.path}\``), ""].join("\n")
+      : "",
+    hot.length > 0
+      ? ["## Dense code areas", ...hot.map((file) => `- \`${file.path}\``), ""].join("\n")
+      : "",
+  ]
+    .filter(Boolean)
+    .join("\n")
+    .trim()
+
+  if (!text) return
+
+  const tags = extractTagsFromText(`${lines.join(" ")} ${refs.join(" ")} ${filesHit.map((file) => file.title).join(" ")}`)
+  const related = [
+    ...Wiki.query(tags, wiki.pages),
+    ...filesHit.flatMap((file) => Wiki.query([file.title, path.basename(file.path, path.extname(file.path)).replace(/[-_]+/g, " ")], wiki.pages)),
+  ]
+    .filter((page, i, arr) => arr.findIndex((item) => item.id === page.id) === i)
+    .slice(0, 5)
+
+  const body = [
+    text,
+    "",
+    related.length > 0
+      ? ["## Related notes", ...related.map((page) => `- [[${page.title}]]`), ""].join("\n")
+      : "",
+  ]
+    .filter(Boolean)
+    .join("\n")
+    .trim()
+
+  await Wiki.upsert({
+    title: "Session Discoveries",
+    body,
+    tags: [...new Set(["discoveries", ...tags])].slice(0, 16),
+  })
 }
 
 function extractSection(text: string, heading: string): string | null {

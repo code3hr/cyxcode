@@ -1,7 +1,7 @@
 export const RECALL_MODEL = "Xenova/all-MiniLM-L6-v2"
 export const RECALL_DIM = 384
 
-export type VectorSource = "memory" | "learned" | "pattern-learned"
+export type VectorSource = "memory" | "learned" | "pattern-learned" | "wiki"
 
 export type Similar = {
   id: string
@@ -52,6 +52,7 @@ export type FactsAboutOpts = {
 export type ReindexStats = {
   memoryIndexed: number
   learnedIndexed: number
+  wikiIndexed: number
   skipped: number
   errors: number
 }

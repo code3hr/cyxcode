@@ -110,3 +110,14 @@ export function factsCount(): number {
   const row = db().prepare("SELECT count(*) as c FROM facts").get() as { c: number } | undefined
   return row?.c ?? 0
 }
+
+export function listFacts(): Fact[] {
+  const rows = db()
+    .prepare(
+      `SELECT id, subject, predicate, object, valid_from, valid_until, source_event, meta
+         FROM facts
+        ORDER BY valid_from DESC`,
+    )
+    .all() as Row[]
+  return rows.map(rowToFact)
+}

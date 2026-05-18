@@ -2221,6 +2221,18 @@ export default function Layout(props: ParentProps) {
                       >
                         {language.t("command.session.new")}
                       </Button>
+                      <Button
+                        size="large"
+                        variant="ghost"
+                        class="w-full mt-2"
+                        onClick={() => {
+                          const dir = worktree()
+                          if (!dir) return
+                          navigateWithSidebarReset(`/${base64Encode(dir)}/knowledge`)
+                        }}
+                      >
+                        Knowledge
+                      </Button>
                     </div>
                     <div class="flex-1 min-h-0">
                       <LocalWorkspace
@@ -2247,6 +2259,18 @@ export default function Layout(props: ParentProps) {
                       }}
                     >
                       {language.t("workspace.new")}
+                    </Button>
+                    <Button
+                      size="large"
+                      variant="ghost"
+                      class="w-full mt-2"
+                      onClick={() => {
+                        const dir = worktree()
+                        if (!dir) return
+                        navigateWithSidebarReset(`/${base64Encode(dir)}/knowledge`)
+                      }}
+                    >
+                      Knowledge
                     </Button>
                   </div>
                   <div class="relative flex-1 min-h-0">

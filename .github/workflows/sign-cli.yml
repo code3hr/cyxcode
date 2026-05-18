@@ -29,8 +29,8 @@ jobs:
         id: upload_unsigned_windows_cli
         uses: actions/upload-artifact@v4
         with:
-          name: unsigned-opencode-windows-cli
-          path: packages/opencode/dist/opencode-windows-x64/bin/opencode.exe
+          name: unsigned-cyxcode-windows-cli
+          path: packages/opencode/dist/cyxcode-windows-x64/bin/cyxcode.exe
           if-no-files-found: error
 
       - name: Submit SignPath signing request
@@ -44,11 +44,11 @@ jobs:
           artifact-configuration-slug: ${{ secrets.SIGNPATH_ARTIFACT_CONFIGURATION_SLUG }}
           github-artifact-id: ${{ steps.upload_unsigned_windows_cli.outputs.artifact-id }}
           wait-for-completion: true
-          output-artifact-directory: signed-opencode-cli
+          output-artifact-directory: signed-cyxcode-cli
 
       - name: Upload signed Windows CLI
         uses: actions/upload-artifact@v4
         with:
-          name: signed-opencode-windows-cli
-          path: signed-opencode-cli/*.exe
+          name: signed-cyxcode-windows-cli
+          path: signed-cyxcode-cli/*.exe
           if-no-files-found: error

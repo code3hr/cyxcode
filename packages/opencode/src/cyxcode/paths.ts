@@ -163,6 +163,18 @@ export namespace CyxPaths {
     return path.join(historyDir(), "corrections")
   }
 
+  /** Wiki directory */
+  export function wikiDir(): string {
+    const { root, mode } = findProjectRoot()
+    return path.join(root, mode === "cyxcode" ? ".cyxcode" : ".opencode", "wiki")
+  }
+
+  /** Code graph directory */
+  export function codegraphDir(): string {
+    const { root, mode } = findProjectRoot()
+    return path.join(root, mode === "cyxcode" ? ".cyxcode" : ".opencode", "codegraph")
+  }
+
   // --- Global-level paths (~/.cyxcode/) ---
 
   /** Global cyxcode directory */

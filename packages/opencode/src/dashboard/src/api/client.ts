@@ -373,3 +373,218 @@ export const complianceApi = {
       method: "POST",
     }),
 }
+
+// ============================================================================
+// Wiki API
+// ============================================================================
+
+export interface WikiPage {
+  id: string
+  path: string
+  kind: "doc" | "wiki"
+  title: string
+  summary: string
+  tags: string[]
+  links: string[]
+  backlinks: string[]
+  hash: string
+  created: number
+  modified: number
+  accessed: number
+  accessCount: number
+}
+
+export interface WikiNode {
+  id: string
+  path: string
+  kind: "doc" | "wiki"
+  title: string
+}
+
+export interface WikiEdge {
+  from: string
+  to: string
+  type: "wikilink"
+}
+
+export interface WikiGraph {
+  nodes: WikiNode[]
+  edges: WikiEdge[]
+}
+
+export interface WikiList {
+  pages: WikiPage[]
+  total: number
+}
+
+export interface WikiStats {
+  pages: number
+  indexed: number
+  links: number
+  errors: number
+}
+
+export interface WikiWrite {
+  title: string
+  body?: string
+  tags?: string[]
+}
+
+export interface GraphNode {
+  id: string
+  kind: "wiki" | "code" | "symbol" | "memory" | "learned" | "concept"
+  title: string
+  path?: string
+  summary?: string
+  tags?: string[]
+  meta?: Record<string, unknown>
+}
+
+export interface GraphEdge {
+  from: string
+  to: string
+  type: string
+}
+
+export interface GraphData {
+  nodes: GraphNode[]
+  edges: GraphEdge[]
+  stats: {
+    wiki: number
+    code: number
+    memory: number
+    learned: number
+    facts: number
+  }
+}
+
+// ============================================================================
+// Code Graph API
+// ============================================================================
+
+export interface CodeFile {
+  id: string
+  path: string
+  kind: "file"
+  title: string
+  hash: string
+  imports: string[]
+  uses: string[]
+  exports: string[]
+  symbols: string[]
+  modified: number
+}
+
+export interface CodeNode {
+  id: string
+  path: string
+  kind: "file" | "symbol"
+  title: string
+}
+
+export interface CodeEdge {
+  from: string
+  to: string
+  type: "import" | "declares" | "uses"
+}
+
+export interface CodeGraph {
+  nodes: CodeNode[]
+  edges: CodeEdge[]
+}
+
+export interface CodeList {
+  files: CodeFile[]
+  total: number
+}
+
+export const codegraphApi = {
+  list: (opts?: { search?: string; limit?: number }) => {
+    const params = new URLSearchParams()
+    if (opts?.search) params.set("search", opts.search)
+    if (opts?.limit) params.set("limit", String(opts.limit))
+    const query = params.toString() ? `?${params.toString()}` : ""
+    return request<CodeList>(`/experimental/codegraph${query}`)
+  },
+
+  graph: () => request<CodeGraph>(`/experimental/codegraph/graph`),
+
+  get: (id: string) => request<{ file: CodeFile; content: string }>(`/experimental/codegraph/page?id=${encodeURIComponent(id)}`),
+
+  rebuild: () =>
+    request<{ files: number; symbols: number; imports: number; edges: number; errors: number }>(`/experimental/codegraph/rebuild`, {
+      method: "POST",
+    }),
+}
+
+// ============================================================================
+// Memory API
+// ============================================================================
+
+export interface MemoryEntry {
+  id: string
+  file: string
+  tags: string[]
+  summary: string
+  created: string
+  accessed: string
+  accessCount: number
+}
+
+export interface MemoryList {
+  entries: MemoryEntry[]
+  total: number
+}
+
+export const memoryApi = {
+  list: (opts?: { search?: string; limit?: number }) => {
+    const params = new URLSearchParams()
+    if (opts?.search) params.set("search", opts.search)
+    if (opts?.limit) params.set("limit", String(opts.limit))
+    const query = params.toString() ? `?${params.toString()}` : ""
+    return request<MemoryList>(`/experimental/memory${query}`)
+  },
+
+  get: (id: string) => request<{ entry: MemoryEntry; content: string }>(`/experimental/memory/page?id=${encodeURIComponent(id)}`),
+}
+
+export const wikiApi = {
+  list: (opts?: { search?: string; limit?: number }) => {
+    const params = new URLSearchParams()
+    if (opts?.search) params.set("search", opts.search)
+    if (opts?.limit) params.set("limit", String(opts.limit))
+    const query = params.toString() ? `?${params.toString()}` : ""
+    return request<WikiList>(`/experimental/wiki${query}`)
+  },
+
+  graph: () => request<WikiGraph>(`/experimental/wiki/graph`),
+
+  get: (id: string) => request<{ page: WikiPage; content: string }>(`/experimental/wiki/page?id=${encodeURIComponent(id)}`),
+
+  create: (data: WikiWrite) =>
+    request<{ page: WikiPage }>(`/experimental/wiki/page`, {
+      method: "POST",
+      body: JSON.stringify(data),
+    }),
+
+  update: (id: string, data: WikiWrite) =>
+    request<{ page: WikiPage }>(`/experimental/wiki/page?id=${encodeURIComponent(id)}`, {
+      method: "PATCH",
+      body: JSON.stringify(data),
+    }),
+
+  delete: (id: string) =>
+    request<{ success: boolean }>(`/experimental/wiki/page?id=${encodeURIComponent(id)}`, {
+      method: "DELETE",
+    }),
+
+  rebuild: (force = false) =>
+    request<WikiStats>(`/experimental/wiki/rebuild`, {
+      method: "POST",
+      body: JSON.stringify({ force }),
+    }),
+}
+
+export const graphApi = {
+  get: () => request<GraphData>(`/experimental/graph`),
+}

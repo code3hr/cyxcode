@@ -678,6 +678,8 @@ export namespace SessionPrompt {
       // Build system prompt, adding structured output instruction if needed
       const skills = await SystemPrompt.skills(agent)
       const { Memory } = await import("@/cyxcode/memory")
+      const { Graph } = await import("@/cyxcode/graph")
+      const { Wiki } = await import("@/cyxcode/wiki")
       const { Resume } = await import("@/cyxcode/versioning/resume")
       // Track session for exit handler
       const versioningMod = await import("@/cyxcode/versioning/index")
@@ -689,6 +691,8 @@ export namespace SessionPrompt {
         ...(await Resume.forSystemPrompt()),
         ...(await InstructionPrompt.system()),
         ...(await Memory.relevant(msgs)),
+        ...(await Graph.relevant(msgs)),
+        ...(await Wiki.relevant(msgs)),
       ]
       const format = lastUser.format ?? { type: "text" }
       if (format.type === "json_schema") {

@@ -3,6 +3,7 @@ import { Log } from "@/util/log"
 import { cacheDir } from "./paths"
 import { RECALL_DIM, RECALL_MODEL } from "./types"
 import { RecallError } from "./errors"
+import { embedBatch as sidecarBatch, stop as stopSidecar } from "./sidecar"
 
 const log = Log.create({ service: "cyxcode-recall-embedder" })
 
@@ -29,10 +30,18 @@ async function loadPipeline(): Promise<EmbedFn> {
   if (state.pipelinePromise) return state.pipelinePromise
   state.pipelinePromise = (async () => {
     try {
+      if (typeof Bun !== "undefined" && process.platform === "win32") {
+        const fn: EmbedFn = async (texts) => sidecarBatch(texts)
+        return fn
+      }
+
       const dir = cacheDir()
       try { fs.mkdirSync(dir, { recursive: true }) } catch {}
 
+      const rel = process.release.name
+      if (typeof Bun !== "undefined" && rel === "node") process.release.name = "bun"
       const mod: any = await import("@xenova/transformers")
+      if (typeof Bun !== "undefined" && process.release.name !== rel) process.release.name = rel
       mod.env.cacheDir = dir
       mod.env.allowLocalModels = true
       const pipe = await mod.pipeline("feature-extraction", RECALL_MODEL, { quantized: true })
@@ -55,6 +64,7 @@ async function loadPipeline(): Promise<EmbedFn> {
       }
       return fn
     } catch (e) {
+      if (typeof Bun !== "undefined" && process.release.name !== "node") process.release.name = "node"
       state.disabled = true
       state.pipelinePromise = null
       log.warn("recall: embedder disabled (model load failed)", {
@@ -104,4 +114,8 @@ export async function warmup(): Promise<void> {
   } catch {
     // already logged inside loadPipeline; swallow here
   }
+}
+
+export async function shutdown(): Promise<void> {
+  await stopSidecar()
 }

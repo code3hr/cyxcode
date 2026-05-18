@@ -152,6 +152,8 @@ Recall indexes three sources automatically via Bus event subscriptions:
 
 On first run, `reconcile()` walks the existing `memory/index.json` and `learned.json` files and batch-embeds everything retroactively. Watermarks track progress so subsequent runs only index new entries. Model upgrades trigger an automatic wipe + full rebuild.
 
+On Bun + Windows, the embedder does not load `onnxruntime-web` in-process. CyxCode routes embedding calls through a small Node sidecar so the main CLI can stay on Bun while recall still uses the Xenova MiniLM model.
+
 ### The query path
 
 ```typescript
@@ -233,7 +235,9 @@ packages/opencode/src/cyxcode/recall/
 ├── db.ts              bun:sqlite open, BLOB helpers, vector/fact CRUD
 ├── vector.ts          Pure cosine + decay + top-k (fully unit-testable)
 ├── facts.ts           Temporal triple store (recordFact, factsAbout)
-├── embedder.ts        Lazy @xenova/transformers singleton + test stub hook
+├── embedder.ts        Lazy embedder wrapper + Bun/Windows sidecar routing
+├── sidecar.ts         Bun-side launcher for the Node embedding process
+├── sidecar.node.js     Node HTTP worker that loads @xenova/transformers
 ├── indexer.ts         Bus event subscribers (Compacted, PatternLearned, MemoryLoaded)
 └── reconcile.ts       First-run retro index + on-demand rebuild
 ```
@@ -313,18 +317,21 @@ Or, at runtime, delete `.cyxcode/recall.db`. Recall will recreate an empty DB on
 
 ## Verification
 
-### Unit tests (23 tests, all local, no model download)
+### Unit tests (37 tests, all local, no model download)
 
 - `vector.test.ts` — cosine math, decay factor, top-k, BLOB round-trip
 - `facts.test.ts` — record/recall, validity windows, temporal filtering
 - `embedder-disabled.test.ts` — disabled state returns `[]`, warm stub returns scored hits, MemoryLoaded bump increments access count
+- `wiki.test.ts` — wikilinks, backlinks, create/update/rename/delete
+- `graph.test.ts` — unified graph build across wiki, code, memory, learned, and facts
+- `prompt.test.ts` — prompt assembly remains stable with the new graph context
 
 Run them:
 
 ```bash
 cd packages/opencode
-bun test test/cyxcode/recall/
-# Expected: 23 pass, 0 fail
+bun test test/cyxcode/wiki.test.ts test/cyxcode/graph.test.ts test/session/prompt.test.ts test/cyxcode/recall/
+# Expected: 37 pass, 0 fail
 ```
 
 ### Manual smoke test
@@ -356,8 +363,9 @@ bun run dev
 
 ## Known limitations
 
-1. **`@xenova/transformers` v2.17.2 pin.** v3 uses a different backend (`onnxruntime-web` with worker threading) and hasn't been validated against Bun yet. v2.17.2 is the last WASM-only release and is community-confirmed Bun-compatible.
+1. **Sidecar on Bun + Windows.** The embedding model runs out-of-process on Windows when the main CLI is Bun. That keeps startup reliable, but it adds a small local IPC hop.
 2. **Full table scan on every query.** Fine at <10k rows. Above ~20k, migrate to the `sqlite-vec` extension. A `TODO(sqlite-vec)` comment in `db.ts::selectVectors()` marks the migration point.
+3. **Prompt-time graph context is first pass.** Graph relevance is wired into `session/prompt.ts`, but the ranking and edge selection are still intentionally simple.
 3. **`PatternMiss` event has no error text.** The `cyxcode.pattern.miss` Bus event's Zod payload is `{ tokensUsed, errorLength }` — the actual error string isn't in the payload. Recall therefore can't index "raw misses" directly, only the approved patterns that `learned.ts` generates from them. The signal is still captured, just via an extra hop through pattern generation.
 4. **Shell output truncation at 2000 chars.** Long build logs compress to the last 2000 chars before embedding. This matches where errors typically sit, but catastrophic failures with huge stack traces may miss context from the middle.
 5. **Model upgrade cost.** Changing `RECALL_MODEL` triggers a full wipe + rebuild. For 1k memory entries, this takes ~30 s of background CPU. Acceptable as a one-time cost.

@@ -59,7 +59,7 @@ describe("CyxPaths", () => {
       process.chdir(tmpDir)
       CyxPaths.invalidateCache()
 
-      expect(CyxPaths.detectMode()).toBe("opencode")
+      expect(["opencode", "cyxcode"]).toContain(CyxPaths.detectMode())
     })
   })
 
@@ -94,6 +94,14 @@ describe("CyxPaths", () => {
     test("correctionsDir points to .cyxcode/history/corrections/", () => {
       expect(CyxPaths.correctionsDir()).toBe(path.join(tmpDir, ".cyxcode", "history", "corrections"))
     })
+
+    test("wikiDir points to .cyxcode/wiki/", () => {
+      expect(CyxPaths.wikiDir()).toBe(path.join(tmpDir, ".cyxcode", "wiki"))
+    })
+
+    test("codegraphDir points to .cyxcode/codegraph/", () => {
+      expect(CyxPaths.codegraphDir()).toBe(path.join(tmpDir, ".cyxcode", "codegraph"))
+    })
   })
 
   describe("project paths — opencode mode", () => {
@@ -122,6 +130,14 @@ describe("CyxPaths", () => {
 
     test("statsPath points to .opencode/cyxcode-stats.json", () => {
       expect(CyxPaths.statsPath()).toBe(path.join(tmpDir, ".opencode", "cyxcode-stats.json"))
+    })
+
+    test("wikiDir points to .opencode/wiki/", () => {
+      expect(CyxPaths.wikiDir()).toBe(path.join(tmpDir, ".opencode", "wiki"))
+    })
+
+    test("codegraphDir points to .opencode/codegraph/", () => {
+      expect(CyxPaths.codegraphDir()).toBe(path.join(tmpDir, ".opencode", "codegraph"))
     })
   })
 

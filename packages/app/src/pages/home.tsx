@@ -1,6 +1,6 @@
 import { createMemo, For, Match, Switch } from "solid-js"
 import { Button } from "@cyxcode/ui/button"
-import { Logo } from "@cyxcode/ui/logo"
+import { Logo, Splash } from "@cyxcode/ui/logo"
 import { useLayout } from "@/context/layout"
 import { useNavigate } from "@solidjs/router"
 import { base64Encode } from "@cyxcode/util/encode"
@@ -69,22 +69,39 @@ export default function Home() {
   }
 
   return (
-    <div class="mx-auto mt-55 w-full md:w-auto px-4">
-      <Logo class="md:w-xl opacity-12" />
-      <Button
-        size="large"
-        variant="ghost"
-        class="mt-4 mx-auto text-14-regular text-text-weak"
-        onClick={() => dialog.show(() => <DialogSelectServer />)}
-      >
+    <div class="mx-auto mt-44 w-full px-4">
+      <div class="mx-auto flex w-full max-w-3xl flex-col items-center gap-4">
         <div
-          classList={{
-            "size-2 rounded-full": true,
-            [serverDotClass()]: true,
+          class="flex items-center justify-center"
+          style={{
+            width: "clamp(5rem, 18vw, 7rem)",
+            height: "clamp(6.25rem, 22vw, 8.75rem)",
+            opacity: 0.18,
           }}
-        />
-        {server.name}
-      </Button>
+        >
+          <Splash class="size-full" />
+        </div>
+        <div class="flex flex-col items-center gap-2 text-center">
+          <div style={{ width: "clamp(11rem, 34vw, 18rem)" }}>
+            <Logo class="w-full" />
+          </div>
+          <div class="text-12-regular text-text-weak">CyxCode</div>
+        </div>
+        <Button
+          size="large"
+          variant="ghost"
+          class="mt-2 mx-auto text-14-regular text-text-weak"
+          onClick={() => dialog.show(() => <DialogSelectServer />)}
+        >
+          <div
+            classList={{
+              "size-2 rounded-full": true,
+              [serverDotClass()]: true,
+            }}
+          />
+          {server.name}
+        </Button>
+      </div>
       <Switch>
         <Match when={sync.data.project.length > 0}>
           <div class="mt-20 w-full flex flex-col gap-4">

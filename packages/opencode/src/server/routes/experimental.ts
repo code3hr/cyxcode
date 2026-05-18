@@ -12,6 +12,10 @@ import { zodToJsonSchema } from "zod-to-json-schema"
 import { errors } from "../error"
 import { lazy } from "../../util/lazy"
 import { WorkspaceRoutes } from "./workspace"
+import { WikiRoutes } from "./wiki"
+import { CodegraphRoutes } from "./codegraph"
+import { MemoryRoutes } from "./memory"
+import { GraphRoutes } from "./graph"
 
 export const ExperimentalRoutes = lazy(() =>
   new Hono()
@@ -90,6 +94,10 @@ export const ExperimentalRoutes = lazy(() =>
       },
     )
     .route("/workspace", WorkspaceRoutes())
+    .route("/wiki", WikiRoutes())
+    .route("/codegraph", CodegraphRoutes())
+    .route("/memory", MemoryRoutes())
+    .route("/graph", GraphRoutes())
     .post(
       "/worktree",
       describeRoute({

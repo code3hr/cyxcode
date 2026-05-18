@@ -1,0 +1,73 @@
+# CyxCode Obsidian-Style Knowledge Layer
+
+## Goal
+
+Add Obsidian-style knowledge features to CyxCode so docs, code, memories, and patterns compound into a usable project wiki.
+
+## Why This Fits
+
+- CyxCode already has semantic recall, memory, audit, and state tracking.
+- CyxCode users already create docs, architecture notes, use cases, and code structure notes.
+- Obsidian adds the missing layer: backlinks, wikilinks, graph view, and knowledge navigation.
+
+## Product Direction
+
+- Build a local-first project wiki inside CyxCode.
+- Treat markdown docs as first-class knowledge objects.
+- Connect code, docs, memories, and learned patterns into one graph.
+- Let AI use the graph as context instead of re-discovering the same files every session.
+
+## Phase 1: Wikilinks and Backlinks
+
+- Parse `[[wikilinks]]` in project markdown files.
+- Track backlinks automatically.
+- Index wiki pages alongside memories and patterns.
+- Surface related notes when the AI loads context.
+
+## Phase 2: Graph View
+
+- Build a graph of:
+  - code files
+  - markdown docs
+  - memories
+  - learned patterns
+  - semantic relationships
+- Add a dashboard view for exploring the graph.
+- Add node detail panels for backlinks, references, and related context.
+
+## Phase 3: Code Relationships
+
+- Extract import graphs from source files.
+- Detect references between files, symbols, and docs.
+- Link architecture notes to real code structure.
+- Auto-suggest wiki pages from dense code areas.
+
+## Phase 4: AI Wiki Behavior
+
+- Let the AI create or update wiki pages during work.
+- Auto-link new discoveries to existing notes.
+- Use graph context in prompt building.
+- Add a command for querying the knowledge graph.
+
+## Open Questions
+
+- Should the graph live in the dashboard, the TUI, or both?
+- Should wikilinks work only in `.md` files or across more file types?
+- Should code references be full symbol-level parsing or simple file-level links first?
+- Should wiki pages be stored in `.cyxcode/` or a project-visible docs folder?
+
+## Next Actions
+
+- AI wiki behavior: let the assistant create and update wiki pages during work.
+- Replace the custom graph renderer with `sigma.js` for the next graph phase.
+- Add a little more polish to the graph UI after real usage.
+
+## Completed
+
+- Defined wiki nodes and edges in the graph layer.
+- Stored backlinks in the wiki index.
+- Implemented markdown wikilink parsing.
+- Wired graph data into the prompt/retrieval pipeline.
+- Built the first graph UI and knowledge page.
+- Auto-linked session discoveries to related wiki notes and code references.
+- Added dense-code-area suggestions to session discovery captures.

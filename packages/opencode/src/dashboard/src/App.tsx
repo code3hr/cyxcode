@@ -10,6 +10,10 @@ const Scans = lazy(() => import("./pages/Scans"))
 const Monitors = lazy(() => import("./pages/Monitors"))
 const Compliance = lazy(() => import("./pages/Compliance"))
 const Reports = lazy(() => import("./pages/Reports"))
+const Wiki = lazy(() => import("./pages/Wiki"))
+const Graph = lazy(() => import("./pages/Graph"))
+const Codegraph = lazy(() => import("./pages/Codegraph"))
+const Memory = lazy(() => import("./pages/Memory"))
 const Tokens = lazy(() => import("./pages/Tokens"))
 
 const Loading: Component = () => (
@@ -52,6 +56,10 @@ export const App: Component = () => {
       <Route path="/compliance" component={Compliance} />
       <Route path="/compliance/:framework" component={Compliance} />
       <Route path="/reports" component={Reports} />
+      <Route path="/graph" component={Graph} />
+      <Route path="/codegraph" component={Codegraph} />
+      <Route path="/memory" component={Memory} />
+      <Route path="/wiki" component={Wiki} />
       <Route path="/tokens" component={Tokens} />
     </Router>
   )
