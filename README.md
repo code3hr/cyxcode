@@ -21,6 +21,7 @@
 - [Behavior Versioning](#behavior-versioning)
 - [Supported Categories](#supported-categories)
 - [Environment Variables](#environment-variables)
+- [Positioning](#positioning)
 - [Why Fork?](#why-fork-opencode-instead-of-building-a-plugin)
 - [Docs & User Guide](#docs)
 - [Roadmap](#roadmap)
@@ -430,6 +431,17 @@ Full pattern breakdown: [docs/ADDING-PATTERNS.md](docs/ADDING-PATTERNS.md)
 | `CYXCODE_SERVER_PASSWORD` | — | Server mode password |
 
 ---
+
+## Positioning
+
+> CyxCode is a CLI coding agent built on OpenCode, but specialized for deterministic error recovery, reusable project memory, and lower token spend.
+
+| Tool | Main strength | Weakness | CyxCode angle |
+|---|---|---|---|
+| CyxCode | Deterministic error recovery + project memory | More opinionated, narrower than general agents | Best when you hit repeatable errors and want lower token use |
+| OpenCode | Solid general CLI coding workflow | Less specialized for pattern-based recovery | CyxCode is the fork that adds recovery and memory layers |
+| Claude Code | Strong general-purpose coding assistance | Less tailored to local reusable error patterns | CyxCode is more cost-aware and systemized on repeats |
+| Aider | Fast edit/apply loop in git-based workflows | Less focused on learned error handling and memory | CyxCode focuses on runtime recovery, not just patching files |
 
 ## Why Fork OpenCode Instead of Building a Plugin?
 
