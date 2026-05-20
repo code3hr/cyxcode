@@ -1,6 +1,6 @@
 import { createMemo, For, Match, Switch } from "solid-js"
 import { Button } from "@cyxcode/ui/button"
-import { Logo, Splash } from "@cyxcode/ui/logo"
+import { Splash } from "@cyxcode/ui/logo"
 import { useLayout } from "@/context/layout"
 import { useNavigate } from "@solidjs/router"
 import { base64Encode } from "@cyxcode/util/encode"
@@ -13,6 +13,7 @@ import { DialogSelectServer } from "@/components/dialog-select-server"
 import { useServer } from "@/context/server"
 import { useGlobalSync } from "@/context/global-sync"
 import { useLanguage } from "@/context/language"
+import { CyxcodeLogo } from "@/components/cyxcode-logo"
 
 export default function Home() {
   const sync = useGlobalSync()
@@ -82,10 +83,7 @@ export default function Home() {
           <Splash class="size-full" />
         </div>
         <div class="flex flex-col items-center gap-2 text-center">
-          <div style={{ width: "clamp(11rem, 34vw, 18rem)" }}>
-            <Logo class="w-full" />
-          </div>
-          <div class="text-12-regular text-text-weak">CyxCode</div>
+          <CyxcodeLogo />
         </div>
         <Button
           size="large"
@@ -101,6 +99,14 @@ export default function Home() {
           />
           {server.name}
         </Button>
+        <div class="mt-2 flex items-center gap-3">
+          <Button variant="ghost" onClick={() => navigate("/dashboard/security")}>
+            Security
+          </Button>
+          <Button variant="ghost" onClick={() => navigate("/dashboard/reports")}>
+            Reports
+          </Button>
+        </div>
       </div>
       <Switch>
         <Match when={sync.data.project.length > 0}>

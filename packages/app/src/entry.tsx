@@ -106,6 +106,10 @@ const getCurrentUrl = () => {
 
 const getDefaultUrl = () => {
   const lsDefault = readDefaultServerUrl()
+  if (import.meta.env.DEV && lsDefault === location.origin) {
+    writeDefaultServerUrl(null)
+    return getCurrentUrl()
+  }
   if (lsDefault) return lsDefault
   return getCurrentUrl()
 }

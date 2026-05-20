@@ -27,6 +27,7 @@ import { SessionRoutes } from "./routes/session"
 import { PtyRoutes } from "./routes/pty"
 import { McpRoutes } from "./routes/mcp"
 import { FileRoutes } from "./routes/file"
+import { createWatchRoutes } from "./watch"
 import { ConfigRoutes } from "./routes/config"
 import { ExperimentalRoutes } from "./routes/experimental"
 import { ProviderRoutes } from "./routes/provider"
@@ -252,6 +253,7 @@ export namespace Server {
       .route("/", EventRoutes())
       .route("/mcp", McpRoutes())
       .route("/tui", TuiRoutes())
+      .route("/", createWatchRoutes())
       .post(
         "/instance/dispose",
         describeRoute({
@@ -499,7 +501,12 @@ export namespace Server {
       )
       .all("/*", async (c) => {
         const path = c.req.path
-        const base = process.env.CYXCODE_DASHBOARD_URL ?? (Installation.isLocal() ? "http://127.0.0.1:5173" : "https://app.cyxcode.ai")
+        if (path === "/api" || path.startsWith("/api/")) {
+          return c.json({ error: "API route not found" }, 404)
+        }
+        const base =
+          process.env.CYXCODE_DASHBOARD_URL ??
+          (Installation.isLocal() ? "http://127.0.0.1:3000" : "https://app.cyxcode.ai")
 
         const response = await proxy(`${base}${path}`, {
           ...c.req,
@@ -549,15 +556,17 @@ export namespace Server {
       fetch: app.fetch,
       websocket: websocket,
     } as const
+    const errors: string[] = []
     const tryServe = (port: number) => {
       try {
         return Bun.serve({ ...args, port })
-      } catch {
+      } catch (err) {
+        errors.push(`${port}: ${err instanceof Error ? err.message : String(err)}`)
         return undefined
       }
     }
     const server = opts.port === 0 ? (tryServe(4096) ?? tryServe(0)) : tryServe(opts.port)
-    if (!server) throw new Error(`Failed to start server on port ${opts.port}`)
+    if (!server) throw new Error(`Failed to start server on port ${opts.port}: ${errors.join("; ")}`)
 
     const shouldPublishMDNS =
       opts.mdns &&
