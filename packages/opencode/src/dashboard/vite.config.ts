@@ -17,14 +17,28 @@ export default defineConfig({
     },
   },
   server: {
-    port: 5173,
+    host: "127.0.0.1",
+    port: 3002,
+    strictPort: true,
     proxy: {
       "/pentest": {
-        target: "http://localhost:4096",
+        target: "http://127.0.0.1:4096",
+        changeOrigin: true,
+      },
+      "/cyxcode": {
+        target: "http://127.0.0.1:4096",
+        changeOrigin: true,
+      },
+      "/cyxwatch": {
+        target: "http://127.0.0.1:4096",
+        changeOrigin: true,
+      },
+      "/experimental": {
+        target: "http://127.0.0.1:4096",
         changeOrigin: true,
       },
       "/global": {
-        target: "http://localhost:4096",
+        target: "http://127.0.0.1:4096",
         changeOrigin: true,
         ws: true,
       },

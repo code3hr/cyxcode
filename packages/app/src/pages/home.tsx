@@ -100,11 +100,11 @@ export default function Home() {
           {server.name}
         </Button>
         <div class="mt-2 flex items-center gap-3">
-          <Button variant="ghost" onClick={() => navigate("/dashboard/security")}>
+          <Button variant="ghost" onClick={() => window.location.assign("/dashboard/security")}>
             Security
           </Button>
-          <Button variant="ghost" onClick={() => navigate("/dashboard/reports")}>
-            Reports
+          <Button variant="ghost" onClick={() => window.location.assign("/dashboard/")}>
+            Dashboard
           </Button>
         </div>
       </div>
