@@ -1,4 +1,5 @@
 import { Log } from "@/util/log"
+import { CyxWatch } from "../watch"
 import { db, selectVectors, vectorCount } from "./db"
 import { embed, isDisabled, isWarmed, warmup } from "./embedder"
 import { factsAbout as _factsAbout, factsCount, recordFact as _recordFact } from "./facts"
@@ -88,6 +89,11 @@ export namespace Recall {
     let query: Float32Array
     try {
       query = await embed(text)
+      void CyxWatch.memory({
+        action: "embed",
+        source: "recall:query",
+        bytes: text.length,
+      }).catch(() => {})
     } catch {
       return []
     }
@@ -107,7 +113,7 @@ export namespace Recall {
       return { item: r, score: sim * factor }
     })
 
-    return topK(scored, limit, minScore).map((s) => ({
+    const out = topK(scored, limit, minScore).map((s) => ({
       id: s.item.id,
       source: s.item.source,
       sourceId: s.item.sourceId,
@@ -116,6 +122,15 @@ export namespace Recall {
       createdAt: s.item.createdAt,
       meta: s.item.meta,
     }))
+    if (out.length > 0) {
+      void CyxWatch.memory({
+        action: "retrieve",
+        source: "recall:similar",
+        bytes: out.reduce((sum, row) => sum + row.text.length, 0),
+        count: out.length,
+      }).catch(() => {})
+    }
+    return out
   }
 
   export async function factsAbout(subject: string, opts?: FactsAboutOpts): Promise<Fact[]> {

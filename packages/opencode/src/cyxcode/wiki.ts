@@ -6,6 +6,7 @@ import { Hash } from "@/util/hash"
 import { ConfigMarkdown } from "@/config/markdown"
 import { CyxPaths } from "./paths"
 import { redactSecrets } from "./audit"
+import { CyxWatch } from "./watch"
 import { embedBatch, isDisabled } from "./recall/embedder"
 import { upsertVector, bumpAccessBySourceId } from "./recall/db"
 import type { MessageV2 } from "@/session/message-v2"
@@ -514,6 +515,11 @@ export namespace Wiki {
       const text = await fs.readFile(full(page), "utf-8").catch(() => "")
       const body = text.trim().slice(0, MAX_TEXT)
       if (!body) continue
+      void CyxWatch.memory({
+        action: "read",
+        source: full(page),
+        bytes: body.length,
+      }).catch(() => {})
 
       out.push(
         [
@@ -535,6 +541,18 @@ export namespace Wiki {
     }
 
     if (out.length > 0) {
+      void CyxWatch.memory({
+        action: "retrieve",
+        source: "wiki:relevant",
+        bytes: out.reduce((sum, row) => sum + row.length, 0),
+        count: out.length,
+      }).catch(() => {})
+      void CyxWatch.memory({
+        action: "send",
+        source: "wiki:prompt-context",
+        bytes: out.reduce((sum, row) => sum + row.length, 0),
+        count: out.length,
+      }).catch(() => {})
       const current = idx.pages.map((page) => {
         const match = pages.find((item) => item.id === page.id)
         return match ?? page

@@ -18,6 +18,7 @@ import { Session } from "@/session"
 import { CyxAudit } from "./audit"
 import { Codegraph } from "./codegraph"
 import { Wiki } from "./wiki"
+import { CyxWatch } from "./watch"
 
 const log = Log.create({ service: "cyxcode-memory" })
 
@@ -171,6 +172,11 @@ export namespace Memory {
           parts.push(trimmed)
           total += trimmed.length
         }
+        void CyxWatch.memory({
+          action: "read",
+          source: path.join(basePath(), entry.file),
+          bytes: trimmed.length,
+        }).catch(() => {})
       } catch {}
     }
 
@@ -203,6 +209,11 @@ export namespace Memory {
           parts.push(trimmed)
           total += trimmed.length
         }
+        void CyxWatch.memory({
+          action: "read",
+          source: path.join(dir, entry.file),
+          bytes: trimmed.length,
+        }).catch(() => {})
       } catch {}
     }
     return parts.join("\n\n")
@@ -223,6 +234,12 @@ export namespace Memory {
         const globalContent = await loadContent(globalMatches, globalDir)
         if (globalContent.trim()) {
           results.push(`<global-memory>\n${globalContent}\n</global-memory>`)
+          void CyxWatch.memory({
+            action: "retrieve",
+            source: "memory:global",
+            bytes: globalContent.length,
+            count: globalMatches.length,
+          }).catch(() => {})
         }
       }
 
@@ -234,6 +251,12 @@ export namespace Memory {
           const content = await load(matches)
           if (content.trim()) {
             results.push(`<project-memory>\n${content}\n</project-memory>`)
+            void CyxWatch.memory({
+              action: "retrieve",
+              source: "memory:project",
+              bytes: content.length,
+              count: matches.length,
+            }).catch(() => {})
 
             // Update accessed timestamps for project memories
             const now = new Date().toISOString().slice(0, 10)
@@ -254,6 +277,12 @@ export namespace Memory {
 
         // Emit audit event for each loaded memory
         const totalChars = results.reduce((sum, r) => sum + r.length, 0)
+        void CyxWatch.memory({
+          action: "send",
+          source: "memory:prompt-context",
+          bytes: totalChars,
+          count: results.length,
+        }).catch(() => {})
         CyxAudit.record("cyxcode.memory.loaded", {
           memoryId: keywords.slice(0, 3).join("-"),
           tags: keywords.slice(0, 5),
