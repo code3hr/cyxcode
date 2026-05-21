@@ -4,6 +4,8 @@ CyxWatch is the runtime observability and security layer proposed by `New TODO.t
 It is not an antivirus product and not a separate agent framework.
 It is a set of hooks, policies, and reports that make AI-driven behavior visible, auditable, and enforceable.
 
+Related memory/privacy design: [CyxWatch Memory Firewall](./cyxwatch_memory_firewall.md).
+
 ## Goal
 
 CyxCode already has the right primitives:
@@ -37,6 +39,79 @@ CyxWatch tracks observable runtime behavior:
 
 CyxWatch does not try to infer intent from model internals.
 It monitors the agent runtime and the artifacts it touches.
+
+## Current Missing Boundaries
+
+Two gaps need to stay explicit in the plan.
+
+### Network Exfiltration
+
+Shell and filesystem visibility are not enough. An agent can use cached
+credentials or ambient auth to call hosts such as `api.github.com`, S3, package
+registries, or private service APIs. That is the other half of the trust problem.
+
+Current state:
+
+- backend URL-based flows use the shared `Http.fetch()` wrapper
+- outbound attempts are checked before execution and logged before the network call
+- remaining raw `fetch()` surfaces are internal server dispatch, browser dashboard
+  calls, plugin SDK adapters, and the local recall sidecar
+- WebSocket connections are not monitored
+
+Required next state:
+
+- all runtime HTTP calls route through a shared network wrapper
+- outbound events record host, method, payload size, session id, and prompt id
+- unknown hosts and large uploads require approval or block by policy
+- WebSocket connections are treated as persistent outbound channels
+
+### Secrets Already Inside The Process
+
+Runtime observability can show what the process did, but it does not fully solve
+secret containment. If a model or tool reads `process.env` and then includes a
+secret in the assistant response, that leak may not appear as a risky shell or
+filesystem event.
+
+CyxWatch should treat this as a separate boundary:
+
+- detect obvious shell/env access such as `env`, `printenv`, `set`, and
+  `echo $TOKEN`
+- treat `.env`, AWS credentials, SSH keys, browser credential stores, and common
+  token names as sensitive targets
+- scan tool outputs and persisted assistant text for high-confidence secrets
+- prefer credential isolation so secrets are not ambiently available inside the
+  agent process
+
+Current implementation note: tool output is redacted before the final tool result
+is returned, and assistant text is redacted before the final text part is
+persisted. Streaming assistant deltas still need a separate redaction pass.
+
+### Persistent Memory Profiling
+
+Long-term memory makes agents useful across sessions, but it also creates a
+persistent cognitive layer around the model. Memory files, skill files, agent
+profiles, recall indexes, vector databases, wiki notes, and conversation history
+can become a behavioral profile of the user or organization.
+
+The model may forget, but the surrounding system does not.
+
+CyxWatch should treat memory as a protected resource:
+
+- classify memory as `public`, `private`, `sensitive`, or `never_send`
+- keep memory local by default
+- encrypt sensitive memory at rest
+- minimize and redact memory before sending it to cloud models
+- require approval before exposing sensitive memory
+- record which memory was accessed, why, and whether it was sent outward
+
+The core rule is that the model can request memory, but local policy decides
+what memory can be read or disclosed.
+
+The long-term model is complementary boundaries:
+
+- CyxWatch: observe and enforce what the agent touches, executes, and sends
+- credential isolation: keep secrets out of the agent process where possible
+- output filtering: catch accidental secret disclosure in model/tool responses
 
 ## Architecture
 
@@ -113,6 +188,8 @@ Signals:
 - sensitive path access
 - unknown host
 - large upload
+- environment variable enumeration
+- high-confidence secret in tool or assistant output
 - access unrelated to prompt
 - repeated denied access
 - policy violation
@@ -123,6 +200,8 @@ Example flags:
 
 - sensitive file access
 - unexpected outbound connection
+- env access
+- secret in output
 - suspicious prompt mismatch
 - repeated denied access
 
@@ -167,6 +246,22 @@ Track:
 - payload size
 - destination category
 - whether the call was user-expected
+
+Network tracking must cover direct HTTP clients, not only tool-level web fetches.
+The target design is a shared wrapper used by all runtime fetch paths, followed by
+WebSocket monitoring for persistent outbound channels.
+
+### Environment and Output Leakage
+
+Track:
+
+- shell commands that enumerate environment variables
+- reads of `.env` and known credential files
+- tool results that contain high-confidence secret patterns
+- assistant output that appears to include credentials or bearer tokens
+
+This is not a replacement for credential isolation. It is the observability and
+redaction layer for cases where a secret is already visible to the process.
 
 ### Tool Pipeline
 
@@ -274,7 +369,11 @@ Suggested route:
 
 - `/dashboard/security`
 
+In the consolidated UI, this lives in the main app on port `3000`.
+
 ## Implementation Order
+
+Detailed build sequencing lives in `docs/cyxwatch_implementation_plan.md`.
 
 ### Phase 1
 
@@ -303,6 +402,22 @@ Current shipped pieces:
 - add network instrumentation
 - add prompt correlation
 - add allow / deny / require-approval rules
+- add shared HTTP wrapper and migrate direct `fetch()` calls
+- add env-access detection for shell commands and file reads
+
+Current shipped pieces:
+
+- prompt-turn correlation for CyxWatch events
+- outbound request telemetry for core URL-based flows
+- governance config schema for scope, policies, default action, and audit settings
+- governance scope and policy engine
+- permission-gate enforcement for governance outcomes:
+  - `auto-approve` skips the normal permission prompt
+  - `require-approval` keeps the normal permission prompt
+  - `blocked` denies the tool call before execution
+- low-level wrapper enforcement for hard block decisions:
+  - process wrapper blocks destructive shell commands before spawn
+  - filesystem write wrapper runs CyxWatch guard before write
 
 ### Phase 3
 
@@ -313,6 +428,7 @@ Current shipped pieces:
 Current shipped pieces:
 
 - dashboard security page
+- app route: `/dashboard/security` on port `3000`
 - `cyxcode watch report`
 - `cyxcode watch recent`
 - `cyxcode watch alerts`
@@ -323,6 +439,15 @@ Current shipped pieces:
 - add recall-based anomaly detection
 - add graph links between incidents, files, and prompts
 - add stronger sandbox enforcement
+- add response and tool-result secret scanning
+- integrate with credential isolation patterns so secrets are not ambiently available
+
+Current shipped pieces:
+
+- CyxWatch anomaly alerts over local telemetry
+- local alert history surfaced in CLI and dashboard
+- first enforcement bridge into risky tool permission checks
+- first low-level wrapper guard for paths that bypass normal tool permission checks
 
 ## Recommended Positioning
 
@@ -332,6 +457,41 @@ Use the following framing in docs and UI:
 - AI Agent Transparency Layer
 
 Do not frame it as spyware detection or anti-AI tooling.
+
+## Current Handoff
+
+Last updated: 2026-05-19.
+
+What is done:
+
+- CyxWatch records prompt turns, file reads/writes, shell commands, selected outbound requests, risk flags, decisions, and alerts.
+- `cyxcode watch report`, `cyxcode watch recent`, and `cyxcode watch alerts` expose the local telemetry.
+- `/dashboard/security` exists in the main app on port `3000`.
+- Governance config supports scope, policy rules, default action, and audit settings.
+- Governance policy decisions are enforced through the tool permission gate:
+  - `auto-approve` skips the normal permission prompt
+  - `require-approval` keeps the normal permission prompt
+  - `blocked` returns a governance-denied tool result before execution
+- CyxWatch now also guards shared lower-level wrappers for hard block decisions:
+  - `Process.spawn()` blocks destructive commands before spawn
+  - `Filesystem.write()` checks the CyxWatch guard before writing
+- CyxWatch avoids startup import cycles by lazy-loading `Log` and `Instance`.
+
+Verified:
+
+- `bun typecheck` from `packages/opencode`
+- `bun test test/governance/governance.test.ts test/cyxcode/watch.test.ts` from `packages/opencode`
+
+Next time:
+
+- Add live-session tests proving configured governance policies block real tool calls end to end.
+- Expand lower-level enforcement to network wrappers and direct fetch paths.
+- Add WebSocket monitoring after the shared HTTP wrapper exists.
+- Add env/secret leakage detection for shell commands, `.env` reads, and assistant/tool output.
+- Decide where output redaction lives in the response pipeline and how users can override false positives.
+- Add a UI for viewing/editing governance policy config.
+- Link security incidents into the graph so prompts, files, commands, and alerts are explorable together.
+- Decide whether `require-approval` should ever be handled below the tool layer, or remain only in the permission UI path.
 
 ## Summary
 
