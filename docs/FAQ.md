@@ -50,16 +50,70 @@ Is it solved? No. Code embeddings for automatic relevant context retrieval is th
 
 ### Q: Why not a plugin? Will you maintain all OpenCode changes forever?
 
-**A:** The README addresses this directly: **plugins can't do what CyxCode does**.
-
-Four technical blockers:
+The older short answer was:
 
 1. **Short-circuit requires modifying the core loop** — plugins can't break the LLM loop mid-execution
 2. **Shell mode (`!`) has no plugin hook** — `SessionPrompt.shell()` is a core function
 3. **Tool result metadata** — the `cyxcodeMatched` flag requires bash tool internals
 4. **Module initialization timing** — Bun's `--conditions=browser` needs imports in core files
 
-Plugins decorate. CyxCode changes control flow. That requires a fork.
+OpenCode's plugin model is useful and we should be precise about that. Plugins
+can subscribe to events such as `tool.execute.before`, `tool.execute.after`,
+`permission.asked`, `permission.replied`, `shell.env`, file events, message
+events, session events, and compaction hooks. They can also add custom tools.
+That is a strong extension model for workflow automation, notifications, custom
+tools, and project-specific behavior.
+
+The reason CyxCode remains a fork is that CyxCode is a downstream product, not
+one feature. Some parts are security boundaries. Some parts are memory/state
+systems. Some parts are product UX and domain workflows.
+
+1. **Short-circuiting needs control-flow ownership** - CyxCode can stop a known
+   error before it burns another LLM call. The pattern router needs to change
+   what the session does next.
+2. **Shell mode is core behavior** - the `!` path is direct command execution,
+   not a normal model turn. Zero-token shell recovery needs to live where shell
+   execution and prompt parsing are handled.
+3. **Pattern learning needs message and tool internals** - CyxCode captures
+   missed errors, the AI's fix, the source command, match metadata, and review
+   state so future repeats can be handled without another model call.
+4. **Recall, memory, and dream are persistent state systems** - CyxCode has local
+   memory, semantic recall, learned patterns, dream consolidation, and indexed
+   project knowledge. Those features need to participate in session startup,
+   compaction, prompt assembly, pruning, and local storage.
+5. **Behavior versioning changes how agent state survives** - corrections,
+   drift detection, auto-promotion, and AI-state snapshots are not just plugin
+   notifications. They change how the agent resumes, remembers, and is governed
+   across sessions.
+6. **CyxWatch needs lower-level enforcement** - the security layer must sit near
+   shared process, filesystem, network, and memory wrappers so direct library
+   calls cannot bypass policy.
+7. **Memory firewall rules must apply before context leaves the machine** -
+   classification, redaction, minimization, approval, and audit logging need to
+   run before context is sent to a model.
+8. **Governance and domain tooling are core product surfaces** - CyxCode is
+   adding security workflows, pentest/SOC/DevOps style tooling, report
+   generation, findings/state management, and policy enforcement. Those are
+   platform features, not only optional extension hooks.
+9. **Dashboard, branding, and product UX are first-class** - CyxCode has its own
+   web UI, security pages, memory controls, token views, graph/wiki/recall
+   surfaces, and governance model.
+10. **Runtime metadata belongs in core result paths** - pattern matches,
+   governance decisions, risk flags, prompt IDs, and session correlation need to
+   travel through the application reliably.
+
+Short version:
+
+> Plugins extend OpenCode. CyxCode changes the runtime, memory, governance, and
+> product boundary.
+
+We still want the fork surface to stay small. When a feature can be a plugin, it
+should be a plugin. When a feature must enforce policy before execution,
+short-circuit the LLM loop, or control what memory reaches a model, it belongs
+in core.
+
+Reference: OpenCode plugin events are documented at
+https://opencode.ai/docs/plugins/#events.
 
 ### Q: The fork vs plugin debate is worth taking seriously. Consider implementing as a pre-process wrapper instead.
 
@@ -71,7 +125,20 @@ Plugins decorate. CyxCode changes control flow. That requires a fork.
 
 3. **Pattern learning** — Capturing what the AI does when patterns miss requires hooking into the message flow after LLM responses.
 
-If OpenCode adds plugin hooks for these (tool result interception, shell mode hooks, message flow middleware), we'd happily migrate. Until then, fork is the only path.
+Two more boundaries matter now:
+
+4. **Runtime security** - a wrapper around the CLI does not see every internal
+   filesystem, network, memory, or process operation. CyxWatch needs enforcement
+   near the actual shared wrappers.
+
+5. **Memory access control** - a wrapper sees the user's prompt, but it does not
+   reliably control recall, compaction, embeddings, memory files, or context
+   assembled inside the application before a model call.
+
+If OpenCode adds stable core hooks for these boundaries - tool result
+interception, shell mode hooks, message flow middleware, shared network/process
+guards, and pre-model context policy - we would happily move more behavior into
+plugins. Until then, the fork is the practical path.
 
 ### Q: Why not contribute to the main project?
 
