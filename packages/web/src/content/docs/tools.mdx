@@ -269,6 +269,48 @@ This tool is disabled for subagents by default, but you can enable it manually. 
 
 ---
 
+### wikiwrite
+
+Create or update project wiki notes.
+
+```json title="opencode.json" {4}
+{
+  "$schema": "https://opencode.ai/config.json",
+  "permission": {
+    "wikiwrite": "allow"
+  }
+}
+```
+
+Writes durable project knowledge into the local wiki. Notes can include `[[wikilinks]]` so later sessions can reuse discovered architecture, decisions, and code relationships.
+
+:::note
+This tool is disabled for subagents by default, but you can enable it manually. [Learn more](/docs/agents/#permissions)
+:::
+
+---
+
+### wikiread
+
+Read project wiki notes.
+
+```json title="opencode.json" {4}
+{
+  "$schema": "https://opencode.ai/config.json",
+  "permission": {
+    "wikiread": "allow"
+  }
+}
+```
+
+Searches the project wiki and reads matching note summaries, links, and backlinks. Pass a page id to read note content.
+
+:::note
+This tool is disabled for subagents by default, but you can enable it manually. [Learn more](/docs/agents/#permissions)
+:::
+
+---
+
 ### webfetch
 
 Fetch web content.

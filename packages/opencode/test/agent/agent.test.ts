@@ -75,6 +75,8 @@ test("explore agent denies edit and write", async () => {
       expect(evalPerm(explore, "write")).toBe("deny")
       expect(evalPerm(explore, "todoread")).toBe("deny")
       expect(evalPerm(explore, "todowrite")).toBe("deny")
+      expect(evalPerm(explore, "wikiread")).toBe("deny")
+      expect(evalPerm(explore, "wikiwrite")).toBe("deny")
     },
   })
 })
@@ -104,6 +106,8 @@ test("general agent denies todo tools", async () => {
       expect(general?.hidden).toBeUndefined()
       expect(evalPerm(general, "todoread")).toBe("deny")
       expect(evalPerm(general, "todowrite")).toBe("deny")
+      expect(evalPerm(general, "wikiread")).toBe("deny")
+      expect(evalPerm(general, "wikiwrite")).toBe("deny")
     },
   })
 })

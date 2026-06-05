@@ -1,6 +1,26 @@
+import { MultiDirectedGraph } from "graphology"
+import Sigma from "sigma"
 import { Component, For, Show, createEffect, createMemo, createSignal, onCleanup } from "solid-js"
 import { A, useSearchParams } from "@solidjs/router"
 import { graphApi, type GraphData, type GraphEdge, type GraphNode } from "../api/client"
+
+type NodeAttr = {
+  x: number
+  y: number
+  size: number
+  label: string
+  color: string
+  kind: GraphNode["kind"]
+  act: boolean
+  hit: boolean
+  hop: number
+}
+
+type EdgeAttr = {
+  size: number
+  color: string
+  on: boolean
+}
 
 type Pos = {
   id: string
@@ -28,6 +48,13 @@ type View = {
   act: string
 }
 
+type Dot = Pos & {
+  vx: number
+  vy: number
+}
+
+const max = 260
+const ticks = 150
 const kinds: GraphNode["kind"][] = ["wiki", "code", "symbol", "memory", "learned", "concept"]
 
 const colors: Record<GraphNode["kind"], { fill: string; stroke: string; glow: string }> = {
@@ -47,65 +74,114 @@ function deg(id: string, edges: GraphEdge[]) {
   return n
 }
 
-function place(
-  ids: string[],
-  gap: number,
-  cx: number,
-  cy: number,
-  map: Map<string, GraphNode>,
-  sel: string,
-  edges: GraphEdge[],
-  hit: Set<string>,
-  hop: number,
-) {
-  const out: Pos[] = []
-  const step = (Math.PI * 2) / Math.max(1, ids.length)
-  const start = -Math.PI / 2
+function hash(text: string) {
+  let h = 2166136261
+  for (let i = 0; i < text.length; i++) {
+    h ^= text.charCodeAt(i)
+    h = Math.imul(h, 16777619)
+  }
+  return (h >>> 0) / 4294967295
+}
 
-  for (let i = 0; i < ids.length; i++) {
-    const id = ids[i]!
-    const node = map.get(id)
-    if (!node) continue
+function has(node: GraphNode, q: string) {
+  if (!q) return false
+  const meta = node.meta ? JSON.stringify(node.meta) : ""
+  return (
+    node.title.toLowerCase().includes(q) ||
+    node.id.toLowerCase().includes(q) ||
+    (node.path ?? "").toLowerCase().includes(q) ||
+    (node.summary ?? "").toLowerCase().includes(q) ||
+    (node.tags ?? []).some((tag) => tag.toLowerCase().includes(q)) ||
+    meta.toLowerCase().includes(q)
+  )
+}
 
-    const ang = start + step * i
-    out.push({
-      id,
-      x: cx + Math.cos(ang) * gap,
-      y: cy + Math.sin(ang) * gap,
-      r: id === sel ? 20 : 12,
-      act: id === sel,
-      hit: hit.has(id),
-      kind: node.kind,
-      title: node.title,
-      path: node.path,
-      deg: deg(id, edges),
-      hop,
-    })
+function force(list: Pos[], edges: GraphEdge[], act: string) {
+  const dots: Dot[] = list.map((node, i) => {
+    const a = hash(`${node.id}:a`) * Math.PI * 2
+    const ring = node.hop === 0 ? 0 : 0.38 + node.hop * 0.32
+    const off = (hash(`${node.id}:r`) - 0.5) * 0.18
+    return {
+      ...node,
+      x: node.hop === 0 ? 0 : Math.cos(a + i * 0.17) * (ring + off),
+      y: node.hop === 0 ? 0 : Math.sin(a + i * 0.17) * (ring + off),
+      vx: 0,
+      vy: 0,
+    }
+  })
+  const idx = new Map(dots.map((node, i) => [node.id, i]))
+  const wire = edges.flatMap((edge) => {
+    const a = idx.get(edge.from)
+    const b = idx.get(edge.to)
+    return a === undefined || b === undefined ? [] : [{ a, b }]
+  })
+
+  for (let t = 0; t < ticks; t++) {
+    for (let i = 0; i < dots.length; i++) {
+      for (let j = i + 1; j < dots.length; j++) {
+        const a = dots[i]!
+        const b = dots[j]!
+        const dx = a.x - b.x || 0.001
+        const dy = a.y - b.y || 0.001
+        const d2 = Math.max(0.01, dx * dx + dy * dy)
+        const d = Math.sqrt(d2)
+        const f = Math.min(0.05, 0.018 / d2)
+        const fx = (dx / d) * f
+        const fy = (dy / d) * f
+        a.vx += fx
+        a.vy += fy
+        b.vx -= fx
+        b.vy -= fy
+      }
+    }
+
+    for (const edge of wire) {
+      const a = dots[edge.a]!
+      const b = dots[edge.b]!
+      const dx = b.x - a.x || 0.001
+      const dy = b.y - a.y || 0.001
+      const d = Math.sqrt(dx * dx + dy * dy)
+      const want = a.hop === b.hop ? 0.34 : 0.28
+      const f = (d - want) * 0.024
+      const fx = (dx / d) * f
+      const fy = (dy / d) * f
+      a.vx += fx
+      a.vy += fy
+      b.vx -= fx
+      b.vy -= fy
+    }
+
+    for (const node of dots) {
+      const pull = node.id === act ? 0.12 : node.hit ? 0.014 : 0.007
+      node.vx -= node.x * pull
+      node.vy -= node.y * pull
+      node.vx *= 0.82
+      node.vy *= 0.82
+      node.x += node.vx
+      node.y += node.vy
+    }
   }
 
-  return out
+  return dots.map((node) => ({
+    id: node.id,
+    x: node.x,
+    y: node.y,
+    r: node.r,
+    act: node.act,
+    hit: node.hit,
+    kind: node.kind,
+    title: node.title,
+    path: node.path,
+    deg: node.deg,
+    hop: node.hop,
+  }))
 }
 
 function layout(data: GraphData, sel: string, q: string, allow: Set<GraphNode["kind"]>, hop: number): View {
   const nodes = data.nodes.filter((node) => allow.has(node.kind))
   const map = new Map(nodes.map((node) => [node.id, node]))
   const low = q.toLowerCase()
-  const hit = new Set(
-    nodes
-      .filter((node) => {
-        if (!low) return true
-        const meta = node.meta ? JSON.stringify(node.meta) : ""
-        return (
-          node.title.toLowerCase().includes(low) ||
-          node.id.toLowerCase().includes(low) ||
-          (node.path ?? "").toLowerCase().includes(low) ||
-          (node.summary ?? "").toLowerCase().includes(low) ||
-          (node.tags ?? []).some((tag) => tag.includes(low)) ||
-          meta.toLowerCase().includes(low)
-        )
-      })
-      .map((node) => node.id),
-  )
+  const hit = new Set(nodes.filter((node) => has(node, low)).map((node) => node.id))
 
   const adj = new Map<string, Set<string>>()
   for (const edge of data.edges) {
@@ -138,42 +214,43 @@ function layout(data: GraphData, sel: string, q: string, allow: Set<GraphNode["k
     }
   }
 
-  const view = new Map<string, number>()
-  for (const [id, step] of dist) view.set(id, step)
+  const view = new Set<string>()
+  for (const id of dist.keys()) view.add(id)
   for (const id of hit) {
-    if (!view.has(id) && map.has(id)) view.set(id, hop + 1)
+    if (map.has(id)) view.add(id)
   }
 
-  const groups = new Map<number, string[]>()
-  for (const [id, step] of view) {
-    const list = groups.get(step) ?? []
-    list.push(id)
-    groups.set(step, list)
-  }
-
-  for (const list of groups.values()) {
-    list.sort((a, b) => {
-      const da = deg(a, data.edges)
-      const db = deg(b, data.edges)
-      return db - da || (map.get(a)?.title ?? "").localeCompare(map.get(b)?.title ?? "")
+  const raw = Array.from(view)
+    .filter((id) => map.has(id))
+    .map((id) => {
+      const node = map.get(id)!
+      const step = dist.get(id) ?? hop + 1
+      return {
+        id,
+        x: 0,
+        y: 0,
+        r: id === act ? 18 : node.kind === "wiki" ? 12 : 8,
+        act: id === act,
+        hit: hit.has(id),
+        kind: node.kind,
+        title: node.title,
+        path: node.path,
+        deg: deg(id, data.edges),
+        hop: step,
+      }
     })
-  }
+    .sort((a, b) => {
+      if (a.id === act) return -1
+      if (b.id === act) return 1
+      return a.hop - b.hop || Number(b.hit) - Number(a.hit) || b.deg - a.deg || a.title.localeCompare(b.title)
+    })
+    .slice(0, max)
 
-  const cx = 320
-  const cy = 250
-  const placed = [
-    ...place(groups.get(0) ?? [], 0, cx, cy, map, act, data.edges, hit, 0),
-    ...Array.from({ length: hop }, (_, idx) => {
-      const step = idx + 1
-      const list = groups.get(step) ?? []
-      const gap = Math.max(140, 92 + step * 68)
-      return place(list, gap, cx, cy, map, act, data.edges, hit, step)
-    }).flat(),
-    ...place(groups.get(hop + 1) ?? [], Math.max(320, 92 + (hop + 1) * 68), cx, cy, map, act, data.edges, hit, hop + 1),
-  ]
-
+  const keep = new Set(raw.map((node) => node.id))
+  const linked = data.edges.filter((edge) => keep.has(edge.from) && keep.has(edge.to))
+  const placed = force(raw, linked, act)
   const pos = new Map(placed.map((node) => [node.id, node]))
-  const edges = data.edges
+  const edges = linked
     .filter((edge) => pos.has(edge.from) && pos.has(edge.to))
     .map((edge) => {
       const a = pos.get(edge.from)!
@@ -195,11 +272,10 @@ const Graph: Component = () => {
   const [sel, setSel] = createSignal("")
   const [term, setTerm] = createSignal("")
   const [load, setLoad] = createSignal(true)
-  const [busy, setBusy] = createSignal(false)
   const [err, setErr] = createSignal<string | null>(null)
-  const [msg, setMsg] = createSignal<string | null>(null)
   const [allow, setAllow] = createSignal<Set<GraphNode["kind"]>>(new Set(kinds))
   const [hop, setHop] = createSignal(2)
+  const [fit, setFit] = createSignal(0)
 
   const fetchGraph = async () => {
     setLoad(true)
@@ -232,7 +308,7 @@ const Graph: Component = () => {
         node.id.toLowerCase().includes(q) ||
         (node.path ?? "").toLowerCase().includes(q) ||
         (node.summary ?? "").toLowerCase().includes(q) ||
-        (node.tags ?? []).some((tag) => tag.includes(q)) ||
+        (node.tags ?? []).some((tag) => tag.toLowerCase().includes(q)) ||
         meta.toLowerCase().includes(q)
       )
     })
@@ -241,7 +317,7 @@ const Graph: Component = () => {
   createEffect(() => {
     const ids = visible().map((node) => node.id)
     if (ids.length === 0) return
-    const id = search.id || ""
+    const id = Array.isArray(search.id) ? search.id[0] ?? "" : search.id || ""
     if (id && ids.includes(id) && id !== sel()) {
       setSel(id)
       return
@@ -291,42 +367,38 @@ const Graph: Component = () => {
       <div class="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
         <div>
           <h1 class="text-2xl font-bold text-gray-100">Knowledge Graph</h1>
-          <p class="text-gray-400 mt-1">Explore wiki notes, code, memories, learned patterns, and semantic links</p>
+          <p class="text-gray-400 mt-1">Wiki, code, memory, learned patterns, and semantic links</p>
         </div>
 
         <div class="flex flex-wrap gap-3">
-          <div class="px-4 py-3 rounded-lg bg-gray-800 border border-gray-700">
+          <div class="stat-card">
             <div class="text-xs uppercase tracking-wide text-gray-500">Wiki</div>
             <div class="text-lg font-semibold text-gray-100">{data().stats.wiki}</div>
           </div>
-          <div class="px-4 py-3 rounded-lg bg-gray-800 border border-gray-700">
+          <div class="stat-card">
             <div class="text-xs uppercase tracking-wide text-gray-500">Code</div>
             <div class="text-lg font-semibold text-gray-100">{data().stats.code}</div>
           </div>
-          <div class="px-4 py-3 rounded-lg bg-gray-800 border border-gray-700">
+          <div class="stat-card">
             <div class="text-xs uppercase tracking-wide text-gray-500">Memory</div>
             <div class="text-lg font-semibold text-gray-100">{data().stats.memory}</div>
           </div>
-          <div class="px-4 py-3 rounded-lg bg-gray-800 border border-gray-700">
+          <div class="stat-card">
             <div class="text-xs uppercase tracking-wide text-gray-500">Facts</div>
             <div class="text-lg font-semibold text-gray-100">{data().stats.facts}</div>
           </div>
-          <button onClick={fetchGraph} class="btn btn-primary" disabled={load() || busy()}>
+          <button onClick={fetchGraph} class="btn btn-primary" disabled={load()}>
             Refresh
           </button>
         </div>
       </div>
 
       <Show when={err()}>
-        <div class="bg-red-900/50 border border-red-700 rounded-lg p-4 text-red-200">{err()}</div>
-      </Show>
-
-      <Show when={msg()}>
-        <div class="bg-blue-900/40 border border-blue-700 rounded-lg p-4 text-blue-200">{msg()}</div>
+        <div class="bg-red-900/50 border border-red-700 rounded p-4 text-red-200">{err()}</div>
       </Show>
 
       <div class="grid grid-cols-1 xl:grid-cols-12 gap-6">
-        <div class="xl:col-span-4 card">
+        <div class="xl:col-span-3 card">
           <div class="card-header">Filters</div>
           <div class="space-y-4">
             <input class="input w-full" type="text" placeholder="Search graph..." value={term()} onInput={(e) => setTerm(e.currentTarget.value)} />
@@ -377,7 +449,7 @@ const Graph: Component = () => {
                 {(node) => (
                   <button
                     onClick={() => pick(node.id)}
-                    class={`w-full text-left rounded-lg border p-3 transition-colors ${
+                    class={`w-full text-left rounded border p-3 transition-colors ${
                       view().act === node.id ? "bg-blue-900/30 border-blue-700" : "bg-gray-800 border-gray-700 hover:border-gray-600"
                     }`}
                   >
@@ -396,73 +468,36 @@ const Graph: Component = () => {
           </div>
         </div>
 
-        <div class="xl:col-span-5 card">
+        <div class="xl:col-span-6 card">
           <div class="flex items-center justify-between mb-4">
             <div>
               <div class="card-header">Graph</div>
               <div class="text-xs text-gray-500">Focused around {cur()?.title || "current node"}</div>
             </div>
-            <div class="text-xs text-gray-500">{view().nodes.length} nodes</div>
-            <div class="text-xs text-gray-500">{hop()} hop radius</div>
+            <div class="flex items-center gap-3">
+              <div class="text-xs text-gray-500">{view().nodes.length} canvas nodes</div>
+              <div class="text-xs text-gray-500">{hop()} hop radius</div>
+              <button class="btn btn-secondary text-xs" onClick={() => setFit((n) => n + 1)} disabled={view().nodes.length === 0}>
+                Fit
+              </button>
+            </div>
           </div>
 
-          <div class="rounded-xl border border-gray-700 bg-gray-900/80 overflow-hidden">
-            <svg class="w-full h-[72vh]" viewBox="0 0 640 520" role="img" aria-label="Knowledge graph">
-              <defs>
-                <linearGradient id="line" x1="0%" y1="0%" x2="100%" y2="0%">
-                  <stop offset="0%" stop-color="#374151" />
-                  <stop offset="100%" stop-color="#60a5fa" />
-                </linearGradient>
-              </defs>
-              <g opacity="0.3">
-                <circle cx="320" cy="250" r="98" fill="none" stroke="#1f2937" />
-                <circle cx="320" cy="250" r="170" fill="none" stroke="#1f2937" stroke-dasharray="5 10" />
-              </g>
-              <For each={view().edges}>
-                {(edge) => (
-                  <line
-                    x1={edge.a.x}
-                    y1={edge.a.y}
-                    x2={edge.b.x}
-                    y2={edge.b.y}
-                    stroke={edge.on ? "url(#line)" : "#374151"}
-                    stroke-width={edge.on ? "2.5" : "1.5"}
-                    opacity={edge.on ? "0.9" : "0.35"}
-                  />
-                )}
-              </For>
-              <For each={view().nodes}>
-                {(node) => {
-                  const c = colors[node.kind]
-                  return (
-                    <g transform={`translate(${node.x}, ${node.y})`} class="cursor-pointer" onClick={() => pick(node.id)}>
-                      <circle
-                        r={node.r + 9}
-                        fill={node.act ? c.glow : node.hit ? "rgba(59,130,246,0.12)" : "rgba(17,24,39,0.9)"}
-                        stroke={node.act ? c.stroke : node.hit ? "#3b82f6" : "#374151"}
-                        stroke-width={node.act ? "2.5" : "1.5"}
-                      />
-                      <circle
-                        r={node.r}
-                        fill={c.fill}
-                        stroke={node.act ? c.stroke : c.fill}
-                        stroke-width="1.5"
-                      />
-                      <text y={node.r + 14} text-anchor="middle" class="fill-gray-300 text-[10px]">
-                        {node.hop > hop() ? `${label(node.title)}*` : label(node.title)}
-                      </text>
-                    </g>
-                  )
-                }}
-              </For>
-            </svg>
+          <div class="relative rounded border border-gray-700 bg-gray-900/80 overflow-hidden">
+            <SigmaGraph view={view()} hop={hop()} fit={fit()} label={label} pick={pick} />
+            <Show when={load()}>
+              <div class="absolute inset-0 grid place-items-center bg-gray-950/70 text-sm text-gray-300">Loading graph...</div>
+            </Show>
+            <Show when={!load() && view().nodes.length === 0}>
+              <div class="absolute inset-0 grid place-items-center bg-gray-950/70 text-sm text-gray-400">No matching graph nodes.</div>
+            </Show>
           </div>
         </div>
 
         <div class="xl:col-span-3 card">
           <div class="card-header">Details</div>
 
-          <Show when={cur()} fallback={<div class="text-sm text-gray-500">Select a node to inspect its context.</div>}>
+          <Show when={cur()} fallback={<div class="text-sm text-gray-500">No node selected.</div>}>
             <div class="space-y-4">
               <div>
                 <div class="text-xl font-semibold text-gray-100">{cur()!.title}</div>
@@ -503,7 +538,7 @@ const Graph: Component = () => {
                   <div class="space-y-2">
                     <For each={Object.entries(cur()!.meta ?? {})}>
                       {([k, v]) => (
-                        <div class="rounded-lg bg-gray-900 border border-gray-700 px-3 py-2 text-xs text-gray-300">
+                        <div class="rounded bg-gray-900 border border-gray-700 px-3 py-2 text-xs text-gray-300">
                           <span class="text-gray-500">{k}</span>: <span class="text-gray-200">{String(v)}</span>
                         </div>
                       )}
@@ -543,16 +578,144 @@ const Graph: Component = () => {
                   </For>
                 </div>
               </div>
-
-              <div class="text-xs text-gray-500">
-                Select a node to inspect its relationships. Nodes marked with * are search matches outside the current hop radius.
-              </div>
             </div>
           </Show>
         </div>
       </div>
     </div>
   )
+}
+
+function SigmaGraph(props: { view: View; hop: number; fit: number; label: (text: string) => string; pick: (id: string) => void }) {
+  let el: HTMLDivElement | undefined
+
+  createEffect(() => {
+    const root = el
+    if (!root) return
+    props.fit
+    let drag = ""
+    let moved = false
+    let skip = false
+
+    const graph = new MultiDirectedGraph<NodeAttr, EdgeAttr>()
+    for (const node of props.view.nodes) {
+      const c = colors[node.kind]
+      graph.addNode(node.id, {
+        x: node.x,
+        y: node.y,
+        size: node.r,
+        label: node.hop > props.hop ? `${props.label(node.title)}*` : props.label(node.title),
+        color: c.fill,
+        kind: node.kind,
+        act: node.act,
+        hit: node.hit,
+        hop: node.hop,
+      })
+    }
+
+    props.view.edges.forEach((edge, i) => {
+      if (!graph.hasNode(edge.from) || !graph.hasNode(edge.to)) return
+      graph.addDirectedEdgeWithKey(`${edge.from}->${edge.to}:${edge.type}:${i}`, edge.from, edge.to, {
+        size: edge.on ? 2.4 : 1,
+        color: edge.on ? "#60a5fa" : "#374151",
+        on: edge.on,
+      })
+    })
+
+    const sigma = new Sigma<NodeAttr, EdgeAttr>(graph, root, {
+      autoCenter: true,
+      autoRescale: true,
+      defaultEdgeType: "line",
+      defaultNodeType: "circle",
+      enableEdgeEvents: false,
+      hideEdgesOnMove: true,
+      hideLabelsOnMove: false,
+      itemSizesReference: "positions",
+      labelColor: { color: "#d1d5db" },
+      labelDensity: 0.08,
+      labelFont: "Inter, ui-sans-serif, system-ui",
+      labelRenderedSizeThreshold: 10,
+      labelSize: 11,
+      minCameraRatio: 0.08,
+      maxCameraRatio: 8,
+      nodeReducer: (_id, data) => ({
+        color: data.act ? colors[data.kind].stroke : data.hit ? "#3b82f6" : data.color,
+        forceLabel: data.act || data.hit,
+        highlighted: data.act,
+        size: data.act ? data.size + 5 : data.hit ? data.size + 2 : data.size,
+        zIndex: data.act ? 3 : data.hit ? 2 : 1,
+      }),
+      edgeReducer: (_id, data) => ({
+        color: data.color,
+        hidden: !data.on && props.view.nodes.length > 140,
+        size: data.size,
+      }),
+      renderEdgeLabels: false,
+      renderLabels: true,
+      stagePadding: 24,
+      zIndex: true,
+    })
+
+    const camera = sigma.getCamera()
+    const mouse = sigma.getMouseCaptor()
+    const resize = new ResizeObserver(() => {
+      sigma.resize()
+      sigma.scheduleRender()
+    })
+
+    sigma.on("downNode", (event) => {
+      drag = event.node
+      moved = false
+      event.preventSigmaDefault()
+      event.event.preventSigmaDefault()
+      camera.disable()
+      root.style.cursor = "grabbing"
+    })
+    mouse.on("mousemovebody", (event) => {
+      if (!drag) return
+      moved = true
+      const pos = sigma.viewportToGraph({ x: event.x, y: event.y })
+      graph.setNodeAttribute(drag, "x", pos.x)
+      graph.setNodeAttribute(drag, "y", pos.y)
+      sigma.refresh({ partialGraph: { nodes: [drag] }, skipIndexation: false })
+    })
+    mouse.on("mouseup", () => {
+      if (!drag) return
+      skip = moved
+      drag = ""
+      camera.enable()
+      root.style.cursor = "default"
+    })
+    mouse.on("mouseleave", () => {
+      if (!drag) return
+      skip = moved
+      drag = ""
+      camera.enable()
+      root.style.cursor = "default"
+    })
+    sigma.on("clickNode", (event) => {
+      if (skip) {
+        skip = false
+        return
+      }
+      props.pick(event.node)
+    })
+    sigma.on("enterNode", () => {
+      root.style.cursor = "pointer"
+    })
+    sigma.on("leaveNode", () => {
+      if (!drag) root.style.cursor = "default"
+    })
+    sigma.getCamera().animatedReset({ duration: 250 })
+    resize.observe(root)
+
+    onCleanup(() => {
+      resize.disconnect()
+      sigma.kill()
+    })
+  })
+
+  return <div ref={el} class="h-[72vh] w-full" role="img" aria-label="Knowledge graph" />
 }
 
 function kindClass(kind: GraphNode["kind"]) {

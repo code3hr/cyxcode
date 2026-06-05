@@ -58,9 +58,7 @@ Add Obsidian-style knowledge features to CyxCode so docs, code, memories, and pa
 
 ## Next Actions
 
-- AI wiki behavior: let the assistant create and update wiki pages during work.
-- Replace the custom graph renderer with `sigma.js` for the next graph phase.
-- Add a little more polish to the graph UI after real usage.
+- None.
 
 ## Completed
 
@@ -71,3 +69,6 @@ Add Obsidian-style knowledge features to CyxCode so docs, code, memories, and pa
 - Built the first graph UI and knowledge page.
 - Auto-linked session discoveries to related wiki notes and code references.
 - Added dense-code-area suggestions to session discovery captures.
+- Added assistant-facing wiki tools for creating, updating, searching, and reading project wiki notes.
+- Replaced the unified knowledge graph renderer with `sigma.js` and `graphology`.
+- Polished the graph UI with fit, loading, empty, and node-hover states.

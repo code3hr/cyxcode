@@ -8,6 +8,7 @@ import { BatchTool } from "./batch"
 import { ReadTool } from "./read"
 import { TaskTool } from "./task"
 import { TodoWriteTool } from "./todo"
+import { WikiReadTool, WikiWriteTool } from "./wiki"
 import { WebFetchTool } from "./webfetch"
 import { WriteTool } from "./write"
 import { InvalidTool } from "./invalid"
@@ -140,6 +141,8 @@ export namespace ToolRegistry {
           TaskTool,
           WebFetchTool,
           TodoWriteTool,
+          WikiReadTool,
+          WikiWriteTool,
           WebSearchTool,
           CodeSearchTool,
           SkillTool,

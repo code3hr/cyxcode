@@ -150,6 +150,8 @@ export namespace Agent {
                 Permission.fromConfig({
                   todoread: "deny",
                   todowrite: "deny",
+                  wikiread: "deny",
+                  wikiwrite: "deny",
                 }),
                 user,
               ),

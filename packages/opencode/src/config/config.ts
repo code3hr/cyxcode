@@ -674,6 +674,8 @@ export namespace Config {
           external_directory: PermissionRule.optional(),
           todowrite: PermissionAction.optional(),
           todoread: PermissionAction.optional(),
+          wikiwrite: PermissionAction.optional(),
+          wikiread: PermissionAction.optional(),
           question: PermissionAction.optional(),
           webfetch: PermissionAction.optional(),
           websearch: PermissionAction.optional(),
