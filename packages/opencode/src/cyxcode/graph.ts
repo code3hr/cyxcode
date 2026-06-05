@@ -38,6 +38,17 @@ export type GraphData = {
   }
 }
 
+export type GraphOpts = {
+  symbols?: boolean
+}
+
+export type FocusOpts = {
+  id?: string
+  q?: string
+  hop?: number
+  limit?: number
+}
+
 type Alias = Map<string, string>
 type Rank = { node: GraphNode; score: number }
 type Link = {
@@ -234,7 +245,7 @@ function links(data: GraphData, id: string): Link[] {
 }
 
 export namespace Graph {
-  export async function build(): Promise<GraphData> {
+  export async function build(opts: GraphOpts = {}): Promise<GraphData> {
     const [wi, ci, mi, li, fa] = await Promise.all([
       Wiki.readIndex(),
       Codegraph.readIndex(),
@@ -282,21 +293,23 @@ export namespace Graph {
       nodes,
     )
 
-    join(
-      ci.symbols.map((sym) => ({
-        id: sym.id,
-        kind: "symbol" as const,
-        title: sym.name,
-        path: ci.files.find((file) => file.id === sym.fileId)?.path,
-        summary: sym.kind,
-        meta: {
-          fileId: sym.fileId,
-          exported: sym.exported,
-        },
-      })),
-      alias,
-      nodes,
-    )
+    if (opts.symbols ?? true) {
+      join(
+        ci.symbols.map((sym) => ({
+          id: sym.id,
+          kind: "symbol" as const,
+          title: sym.name,
+          path: ci.files.find((file) => file.id === sym.fileId)?.path,
+          summary: sym.kind,
+          meta: {
+            fileId: sym.fileId,
+            exported: sym.exported,
+          },
+        })),
+        alias,
+        nodes,
+      )
+    }
 
     join(
       mi.entries.map((item) => ({
@@ -345,8 +358,10 @@ export namespace Graph {
       for (const to of file.uses) edges.push({ from: file.id, to, type: "uses" })
     }
 
-    for (const sym of ci.symbols) {
-      edges.push({ from: sym.fileId, to: sym.id, type: "declares" })
+    if (opts.symbols ?? true) {
+      for (const sym of ci.symbols) {
+        edges.push({ from: sym.fileId, to: sym.id, type: "declares" })
+      }
     }
 
     for (const item of mi.entries) {
@@ -393,6 +408,68 @@ export namespace Graph {
         learned: li.approved.length,
         facts: fa.length,
       },
+    }
+  }
+
+  export function focus(data: GraphData, opts: FocusOpts): GraphData {
+    const limit = Math.max(20, Math.min(opts.limit ?? 180, 500))
+    const hop = Math.max(1, Math.min(opts.hop ?? 2, 4))
+    const ref = new Map(data.nodes.map((node) => [node.id, node]))
+    const q = opts.q?.trim().toLowerCase() ?? ""
+    const hits = q ? rank(data.nodes, [q]).map((item) => item.node.id) : []
+    const act = opts.id && ref.has(opts.id)
+      ? opts.id
+      : hits[0] ?? data.nodes.find((node) => node.kind === "wiki")?.id ?? data.nodes[0]?.id ?? ""
+    if (!act) return { ...data, nodes: [], edges: [] }
+
+    const adj = new Map<string, Set<string>>()
+    const degree = new Map<string, number>()
+    for (const edge of data.edges) {
+      if (!ref.has(edge.from) || !ref.has(edge.to)) continue
+      const a = adj.get(edge.from) ?? new Set<string>()
+      a.add(edge.to)
+      adj.set(edge.from, a)
+      degree.set(edge.from, (degree.get(edge.from) ?? 0) + 1)
+
+      const b = adj.get(edge.to) ?? new Set<string>()
+      b.add(edge.from)
+      adj.set(edge.to, b)
+      degree.set(edge.to, (degree.get(edge.to) ?? 0) + 1)
+    }
+
+    const dist = new Map<string, number>([[act, 0]])
+    const queue = [act]
+    for (let i = 0; i < queue.length; i++) {
+      if (dist.size >= limit * 3) break
+      const id = queue[i]!
+      const step = dist.get(id) ?? 0
+      if (step >= hop) continue
+      for (const next of adj.get(id) ?? []) {
+        if (dist.has(next)) continue
+        dist.set(next, step + 1)
+        queue.push(next)
+        if (dist.size >= limit * 3) break
+      }
+    }
+
+    for (const id of hits.slice(0, limit)) {
+      if (ref.has(id) && !dist.has(id)) dist.set(id, hop + 1)
+    }
+
+    const keep = new Set(
+      Array.from(dist.keys())
+        .sort((a, b) => {
+          if (a === act) return -1
+          if (b === act) return 1
+          return (dist.get(a) ?? 0) - (dist.get(b) ?? 0) || (degree.get(b) ?? 0) - (degree.get(a) ?? 0)
+        })
+        .slice(0, limit),
+    )
+
+    return {
+      ...data,
+      nodes: data.nodes.filter((node) => keep.has(node.id)),
+      edges: data.edges.filter((edge) => keep.has(edge.from) && keep.has(edge.to)),
     }
   }
 

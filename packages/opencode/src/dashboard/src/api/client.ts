@@ -655,5 +655,14 @@ export const wikiApi = {
 }
 
 export const graphApi = {
-  get: () => request<GraphData>(`/experimental/graph`),
+  get: (opts?: { id?: string; q?: string; hop?: number; limit?: number; symbols?: boolean }) => {
+    const params = new URLSearchParams()
+    if (opts?.id) params.set("id", opts.id)
+    if (opts?.q) params.set("q", opts.q)
+    if (opts?.hop) params.set("hop", String(opts.hop))
+    if (opts?.limit) params.set("limit", String(opts.limit))
+    if (opts?.symbols) params.set("symbols", "true")
+    const query = params.toString() ? `?${params.toString()}` : ""
+    return request<GraphData>(`/experimental/graph${query}`)
+  },
 }

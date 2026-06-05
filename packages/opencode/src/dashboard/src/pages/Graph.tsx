@@ -57,6 +57,7 @@ const max = 180
 const scan = max * 3
 const ticks = 70
 const kinds: GraphNode["kind"][] = ["wiki", "code", "symbol", "memory", "learned", "concept"]
+const base = kinds.filter((kind) => kind !== "symbol")
 
 const colors: Record<GraphNode["kind"], { fill: string; stroke: string; glow: string }> = {
   wiki: { fill: "#1d4ed8", stroke: "#60a5fa", glow: "rgba(37,99,235,0.18)" },
@@ -272,14 +273,20 @@ const Graph: Component = () => {
   const [term, setTerm] = createSignal("")
   const [load, setLoad] = createSignal(true)
   const [err, setErr] = createSignal<string | null>(null)
-  const [allow, setAllow] = createSignal<Set<GraphNode["kind"]>>(new Set(kinds))
+  const [allow, setAllow] = createSignal<Set<GraphNode["kind"]>>(new Set(base))
   const [hop, setHop] = createSignal(2)
   const [fit, setFit] = createSignal(0)
 
   const fetchGraph = async () => {
     setLoad(true)
     setErr(null)
-    const res = await graphApi.get()
+    const res = await graphApi.get({
+      id: sel(),
+      q: term().trim(),
+      hop: hop(),
+      limit: max,
+      symbols: allow().has("symbol"),
+    })
     if (res.error) {
       setErr(res.error)
       setLoad(false)
@@ -290,9 +297,17 @@ const Graph: Component = () => {
   }
 
   createEffect(() => {
+    const id = sel()
+    const q = term().trim()
+    const depth = hop()
+    const symbols = allow().has("symbol")
     const timer = window.setTimeout(() => {
+      id
+      q
+      depth
+      symbols
       void fetchGraph()
-    }, 0)
+    }, q ? 180 : 0)
     onCleanup(() => window.clearTimeout(timer))
   })
 

@@ -1,5 +1,5 @@
 import { Hono } from "hono"
-import { describeRoute, resolver } from "hono-openapi"
+import { describeRoute, resolver, validator } from "hono-openapi"
 import z from "zod"
 import { lazy } from "../../util/lazy"
 import { errors } from "../error"
@@ -52,8 +52,27 @@ export const GraphRoutes = lazy(() =>
         ...errors(400),
       },
     }),
+    validator(
+      "query",
+      z.object({
+        id: z.string().optional(),
+        q: z.string().optional(),
+        hop: z.coerce.number().min(1).max(4).optional(),
+        limit: z.coerce.number().min(20).max(500).optional(),
+        symbols: z.enum(["true", "false"]).optional(),
+      }),
+    ),
     async (c) => {
-      return c.json(await Graph.build())
+      const query = c.req.valid("query")
+      const full = !query.id && !query.q && !query.hop && !query.limit && !query.symbols
+      const data = await Graph.build(full ? {} : { symbols: query.symbols === "true" })
+      if (full) return c.json(data)
+      return c.json(Graph.focus(data, {
+        id: query.id,
+        q: query.q,
+        hop: query.hop,
+        limit: query.limit,
+      }))
     },
   ),
 )
