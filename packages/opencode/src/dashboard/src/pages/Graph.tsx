@@ -53,8 +53,9 @@ type Dot = Pos & {
   vy: number
 }
 
-const max = 260
-const ticks = 150
+const max = 180
+const scan = max * 3
+const ticks = 70
 const kinds: GraphNode["kind"][] = ["wiki", "code", "symbol", "memory", "learned", "concept"]
 
 const colors: Record<GraphNode["kind"], { fill: string; stroke: string; glow: string }> = {
@@ -64,14 +65,6 @@ const colors: Record<GraphNode["kind"], { fill: string; stroke: string; glow: st
   memory: { fill: "#92400e", stroke: "#fbbf24", glow: "rgba(146,64,14,0.16)" },
   learned: { fill: "#7c2d12", stroke: "#fb7185", glow: "rgba(124,45,18,0.16)" },
   concept: { fill: "#334155", stroke: "#64748b", glow: "rgba(51,65,85,0.16)" },
-}
-
-function deg(id: string, edges: GraphEdge[]) {
-  let n = 0
-  for (const edge of edges) {
-    if (edge.from === id || edge.to === id) n++
-  }
-  return n
 }
 
 function hash(text: string) {
@@ -181,18 +174,21 @@ function layout(data: GraphData, sel: string, q: string, allow: Set<GraphNode["k
   const nodes = data.nodes.filter((node) => allow.has(node.kind))
   const map = new Map(nodes.map((node) => [node.id, node]))
   const low = q.toLowerCase()
-  const hit = new Set(nodes.filter((node) => has(node, low)).map((node) => node.id))
+  const hit = low ? new Set(nodes.filter((node) => has(node, low)).map((node) => node.id)) : new Set<string>()
 
   const adj = new Map<string, Set<string>>()
+  const degree = new Map<string, number>()
   for (const edge of data.edges) {
     if (!map.has(edge.from) || !map.has(edge.to)) continue
     const a = adj.get(edge.from) ?? new Set<string>()
     a.add(edge.to)
     adj.set(edge.from, a)
+    degree.set(edge.from, (degree.get(edge.from) ?? 0) + 1)
 
     const b = adj.get(edge.to) ?? new Set<string>()
     b.add(edge.from)
     adj.set(edge.to, b)
+    degree.set(edge.to, (degree.get(edge.to) ?? 0) + 1)
   }
 
   const ids = nodes.map((node) => node.id)
@@ -202,14 +198,16 @@ function layout(data: GraphData, sel: string, q: string, allow: Set<GraphNode["k
   if (act) {
     dist.set(act, 0)
     const queue = [act]
-    while (queue.length > 0) {
-      const id = queue.shift()!
+    for (let i = 0; i < queue.length; i++) {
+      if (dist.size >= scan) break
+      const id = queue[i]!
       const step = dist.get(id) ?? 0
       if (step >= hop) continue
       for (const next of adj.get(id) ?? []) {
         if (!map.has(next) || dist.has(next)) continue
         dist.set(next, step + 1)
         queue.push(next)
+        if (dist.size >= scan) break
       }
     }
   }
@@ -225,17 +223,18 @@ function layout(data: GraphData, sel: string, q: string, allow: Set<GraphNode["k
     .map((id) => {
       const node = map.get(id)!
       const step = dist.get(id) ?? hop + 1
+      const n = degree.get(id) ?? 0
       return {
         id,
         x: 0,
         y: 0,
-        r: id === act ? 18 : node.kind === "wiki" ? 12 : 8,
+        r: id === act ? 18 : node.kind === "wiki" ? 12 : Math.min(11, 7 + Math.sqrt(n) * 0.2),
         act: id === act,
         hit: hit.has(id),
         kind: node.kind,
         title: node.title,
         path: node.path,
-        deg: deg(id, data.edges),
+        deg: n,
         hop: step,
       }
     })
