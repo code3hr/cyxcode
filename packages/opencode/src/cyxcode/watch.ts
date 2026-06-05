@@ -747,18 +747,20 @@ export namespace CyxWatch {
     })
   }
 
-  export async function request(input: { url: string; method?: string; bytes?: number; sessionID?: string; messageID?: string }) {
+  export async function request(input: { url: string; method?: string; bytes?: number; sessionID?: string; messageID?: string; guard?: WatchGuard }) {
     const out = score({
       kind: "network.outbound",
       bytes: input.bytes,
     })
-    const decision = decide(
+    const flags = input.guard?.flags ?? out.flags
+    const risk = input.guard?.risk ?? out.risk
+    const decision = input.guard?.decision ?? decide(
       {
         kind: "network.outbound",
         bytes: input.bytes,
       },
-      out.flags,
-      out.risk,
+      flags,
+      risk,
     )
     const { ts, id } = now()
     return await persist({
@@ -779,8 +781,8 @@ export namespace CyxWatch {
       })(),
       method: input.method ?? "GET",
       bytes: input.bytes,
-      risk: out.risk,
-      flags: out.flags,
+      risk,
+      flags,
       decision,
     })
   }

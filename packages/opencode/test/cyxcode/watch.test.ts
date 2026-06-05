@@ -179,6 +179,42 @@ describe("CyxWatch", () => {
     }
   })
 
+  test("records policy metadata for allowed outbound requests", async () => {
+    await CyxWatch.savePolicy({
+      version: 2,
+      rules: [
+        {
+          id: "warn-example",
+          permission: ["webfetch"],
+          host: ["example.com"],
+          decision: "warn",
+          risk: 33,
+          flags: ["tracked_host"],
+        },
+      ],
+    })
+
+    const old = globalThis.fetch
+    globalThis.fetch = Object.assign(async () => new Response("ok"), {
+      preconnect: old.preconnect,
+    })
+    try {
+      const res = await Http.fetch("https://example.com/api")
+      expect(await res.text()).toBe("ok")
+      await sleep(250)
+
+      const rows = await CyxWatch.recent(10)
+      const row = rows.find((item) => item.kind === "network.outbound" && item.path === "https://example.com/api")
+      expect(row).toBeDefined()
+      expect(row!.decision).toBe("warn")
+      expect(row!.risk).toBe(33)
+      expect(row!.flags).toContain("tracked_host")
+      expect(row!.flags).toContain("policy_warn-example")
+    } finally {
+      globalThis.fetch = old
+    }
+  })
+
   test("blocks dangerous process wrapper commands before spawn", async () => {
     await expect(Process.run(["rm", "-rf", "/"], { nothrow: true })).rejects.toThrow("CyxWatch blocked operation")
   })
