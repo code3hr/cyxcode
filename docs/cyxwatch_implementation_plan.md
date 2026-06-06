@@ -459,23 +459,28 @@ Current shipped pieces:
 - project memory privacy class metadata, defaulting to `private`
 - `/dashboard/memory` controls for inspect, export, delete, and reclassify,
   including `never_send`
+- `never_send` project/global memory is excluded before prompt-context send and
+  emits `memory.redact` telemetry
+- `/cyxwatch/context` and `/dashboard/security` expose prepared memory context
+  from `memory.send` events
 - project memory read/retrieve/send telemetry
 - wiki read/retrieve/send telemetry
 - recall query embed and similarity retrieval telemetry
 - recall sidecar embedding request telemetry
 - provider SDK fetch boundary telemetry through `Http.fetch`
-- focused test coverage for memory read, retrieve, and prompt-context send
+- focused test coverage for memory read, retrieve, prompt-context send,
+  `never_send` exclusion, and context-route visibility
 
 Remaining tasks:
 
 - default existing memory, wiki, and recall-derived records to `private`
-- add `never_send` path and tag patterns
-- expand memory event coverage to writes, redactions, minimization, and explicit
-  cloud-model disclosure boundaries
+- add `never_send` path and tag patterns outside project/global memory indexes
+- expand memory event coverage to writes, minimization, and explicit cloud-model
+  disclosure boundaries
 - add context minimizer before cloud model calls
 - add memory approval prompts
 - encrypt sensitive memory at rest
-- add Memory Firewall policy editing and context-sent views
+- add Memory Firewall policy presets and context-sent provider boundary views
 
 Exit criteria:
 

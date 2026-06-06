@@ -960,5 +960,46 @@ describe("CyxWatch", () => {
     const sent = rows.find((item) => item.kind === "memory.send" && item.path === "memory:prompt-context")
     expect(sent).toBeDefined()
     expect(sent!.flags).toContain("memory_disclosure")
+    expect(sent!.text).toContain("<project-memory>")
+    expect(sent!.text).toContain("auth uses jwt middleware")
+  })
+
+  test("excludes never_send memory before prompt context", async () => {
+    await Memory.save("private-auth", ["auth"], "private auth", "never send this auth detail")
+    await Memory.update("private-auth", { privacy: "never_send" })
+
+    const out = await Memory.relevant([
+      {
+        info: { role: "user" },
+        parts: [{ type: "text", text: "auth detail", synthetic: false }],
+      },
+    ] as Parameters<typeof Memory.relevant>[0])
+    expect(out).toEqual([])
+    await sleep(250)
+
+    const rows = await CyxWatch.recent(20)
+    const row = rows.find((item) => item.kind === "memory.redact" && item.flags.includes("redacted_never_send_memory"))
+    expect(row).toBeDefined()
+    expect(rows.some((item) => item.kind === "memory.send" && item.text?.includes("never send this auth detail"))).toBe(false)
+  })
+
+  test("context route returns sent memory text", async () => {
+    await Memory.save("route-auth", ["auth"], "route auth", "route auth context")
+    await Memory.relevant([
+      {
+        info: { role: "user" },
+        parts: [{ type: "text", text: "auth context", synthetic: false }],
+      },
+    ] as Parameters<typeof Memory.relevant>[0])
+    await sleep(250)
+
+    const app = createWatchRoutes()
+    const res = await app.request("/cyxwatch/context?limit=10")
+    expect(res.status).toBe(200)
+
+    const out = await res.json()
+    expect(out.total).toBeGreaterThan(0)
+    expect(out.events[0].kind).toBe("memory.send")
+    expect(out.events[0].text).toContain("route auth context")
   })
 })

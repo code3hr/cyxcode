@@ -69,6 +69,17 @@ export function createWatchRoutes(): Hono {
     return c.json({ events, total: events.length })
   })
 
+  app.get("/cyxwatch/context", async (c) => {
+    const query = c.req.query()
+    const limit = query.limit ? Math.max(1, Math.min(100, parseInt(query.limit, 10) || 20)) : 20
+    const { CyxWatch } = await import("../cyxcode/watch")
+    const events = await CyxWatch.context({
+      limit,
+      sessionID: query.session || query.sessionID,
+    })
+    return c.json({ events, total: events.length })
+  })
+
   app.get("/cyxwatch/policy", async (c) => {
     const { CyxWatch } = await import("../cyxcode/watch")
     return c.json({ policy: CyxWatch.policy() })

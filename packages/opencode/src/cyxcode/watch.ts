@@ -951,6 +951,7 @@ export namespace CyxWatch {
   export async function memory(input: {
     action: "read" | "retrieve" | "embed" | "send" | "redact"
     source: string
+    text?: string
     bytes?: number
     count?: number
     redactions?: string[]
@@ -972,11 +973,20 @@ export namespace CyxWatch {
       sessionID: scope?.sessionID,
       messageID: scope?.messageID,
       prompt: scope?.prompt,
+      text: input.text,
       path: input.source,
       bytes: input.bytes,
       risk: out.risk,
       flags,
       decision: decide({ kind, path: input.source, bytes: input.bytes }, flags, out.risk),
+    })
+  }
+
+  export async function context(input: { limit?: number; sessionID?: string } = {}) {
+    return await query({
+      kind: "memory.send",
+      limit: input.limit,
+      sessionID: input.sessionID,
     })
   }
 

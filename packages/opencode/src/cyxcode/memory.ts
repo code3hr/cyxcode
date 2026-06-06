@@ -53,6 +53,19 @@ function norm(entry: MemoryEntry): MemoryEntry {
   }
 }
 
+function safe(entries: MemoryEntry[], source: string): MemoryEntry[] {
+  const blocked = entries.filter((entry) => norm(entry).privacy === "never_send")
+  if (blocked.length > 0) {
+    void CyxWatch.memory({
+      action: "redact",
+      source,
+      count: blocked.length,
+      redactions: ["never_send_memory"],
+    }).catch(() => {})
+  }
+  return entries.map(norm).filter((entry) => entry.privacy !== "never_send")
+}
+
 // --- File path resolution (centralized in CyxPaths) ---
 
 function basePath(): string {
@@ -171,7 +184,7 @@ export namespace Memory {
     let total = 0
     const parts: string[] = []
 
-    for (const entry of entries) {
+    for (const entry of safe(entries, "memory:project")) {
       if (total >= MAX_LOAD_CHARS) break
       try {
         const content = await fs.readFile(path.join(basePath(), entry.file), "utf-8")
@@ -231,7 +244,8 @@ export namespace Memory {
   async function loadFromDir(dir: string): Promise<{ index: MemoryIndex; dir: string }> {
     try {
       const content = await fs.readFile(path.join(dir, "index.json"), "utf-8")
-      return { index: JSON.parse(content) as MemoryIndex, dir }
+      const idx = JSON.parse(content) as MemoryIndex
+      return { index: { version: 1, entries: idx.entries.map(norm) }, dir }
     } catch {
       return { index: { version: 1, entries: [] }, dir }
     }
@@ -241,7 +255,7 @@ export namespace Memory {
   async function loadContent(entries: MemoryEntry[], dir: string): Promise<string> {
     let total = 0
     const parts: string[] = []
-    for (const entry of entries) {
+    for (const entry of safe(entries, dir === basePath() ? "memory:project" : "memory:global")) {
       if (total >= MAX_LOAD_CHARS) break
       try {
         const content = await fs.readFile(path.join(dir, entry.file), "utf-8")
@@ -324,6 +338,7 @@ export namespace Memory {
         void CyxWatch.memory({
           action: "send",
           source: "memory:prompt-context",
+          text: results.join("\n\n"),
           bytes: totalChars,
           count: results.length,
         }).catch(() => {})

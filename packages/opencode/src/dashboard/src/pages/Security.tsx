@@ -82,6 +82,7 @@ const Security: Component = () => {
   const [report, setReport] = createSignal<WatchReport | null>(null)
   const [events, setEvents] = createSignal<WatchEvent[]>([])
   const [alerts, setAlerts] = createSignal<WatchAlert[]>([])
+  const [sent, setSent] = createSignal<WatchEvent[]>([])
   const [policy, setPolicy] = createSignal<WatchPolicy | null>(null)
   const [effective, setEffective] = createSignal<WatchPolicy | null>(null)
   const [draft, setDraft] = createSignal("")
@@ -123,7 +124,7 @@ const Security: Component = () => {
     setError(null)
     setMsg(null)
 
-    const [rep, evt, alt, cfg, eff] = await Promise.all([
+    const [rep, evt, alt, ctx, cfg, eff] = await Promise.all([
       watchApi.report(period()),
       watchApi.query({
         limit: 120,
@@ -134,6 +135,10 @@ const Security: Component = () => {
         decision: filter() === "all" ? undefined : filter(),
       }),
       watchApi.alerts(40),
+      watchApi.context({
+        limit: 20,
+        session: session().trim() || undefined,
+      }),
       watchApi.policy(),
       watchApi.effectivePolicy(),
     ])
@@ -141,12 +146,14 @@ const Security: Component = () => {
     if (rep.error) setError(rep.error)
     if (evt.error) setError((prev) => prev ?? evt.error)
     if (alt.error) setError((prev) => prev ?? alt.error)
+    if (ctx.error) setError((prev) => prev ?? ctx.error)
     if (cfg.error) setError((prev) => prev ?? cfg.error)
     if (eff.error) setError((prev) => prev ?? eff.error)
 
     if (rep.data) setReport(rep.data.report)
     if (evt.data) setEvents(evt.data.events)
     if (alt.data) setAlerts(alt.data.alerts)
+    if (ctx.data) setSent(ctx.data.events)
     if (cfg.data) {
       sync(cfg.data.policy)
     }
@@ -405,8 +412,8 @@ const Security: Component = () => {
                         <td>{event.kind}</td>
                         <td><Decision value={event.decision ?? "allow"} /></td>
                         <td>{event.risk}</td>
-                        <td class="max-w-md truncate" title={event.path ?? event.cmd ?? event.host ?? event.prompt ?? ""}>
-                          {short(event.path ?? event.cmd ?? event.host ?? event.prompt)}
+                        <td class="max-w-md truncate" title={event.path ?? event.cmd ?? event.host ?? event.text ?? event.prompt ?? ""}>
+                          {short(event.path ?? event.cmd ?? event.host ?? event.text ?? event.prompt)}
                         </td>
                         <td>
                           <div class="flex flex-wrap gap-1">
@@ -451,6 +458,42 @@ const Security: Component = () => {
             </div>
           </section>
         </div>
+
+        <section class="card">
+          <div class="flex items-center justify-between gap-3 mb-4">
+            <div>
+              <div class="card-header mb-0">Context Sent</div>
+              <div class="text-xs text-gray-500">{sent().length} memory disclosure events</div>
+            </div>
+            <button class="btn btn-secondary text-sm" onClick={() => setGroup("memory")}>
+              Memory events
+            </button>
+          </div>
+          <div class="space-y-3 max-h-[34rem] overflow-y-auto pr-1">
+            <Show when={sent().length > 0} fallback={<div class="text-sm text-gray-500">No memory context sent in this window.</div>}>
+              <For each={sent()}>
+                {(row) => (
+                  <div class="rounded border border-gray-700 bg-gray-900 p-3">
+                    <div class="flex flex-wrap items-start justify-between gap-3">
+                      <div>
+                        <div class="text-sm font-medium text-gray-100">{when(row.ts)}</div>
+                        <div class="text-xs text-gray-500">{row.sessionID ?? "no session"} / {row.messageID ?? "no message"}</div>
+                      </div>
+                      <div class="flex flex-wrap gap-2">
+                        <Decision value={row.decision ?? "allow"} />
+                        <span class="badge bg-gray-700 text-gray-300">{row.bytes ?? 0} bytes</span>
+                        <span class="badge bg-gray-700 text-gray-300">{row.path ?? "memory"}</span>
+                      </div>
+                    </div>
+                    <pre class="mt-3 max-h-72 overflow-y-auto rounded border border-gray-800 bg-black/20 p-3 text-xs leading-5 text-gray-300 whitespace-pre-wrap break-words">
+                      {(row.text ?? "").slice(0, 4000)}
+                    </pre>
+                  </div>
+                )}
+              </For>
+            </Show>
+          </div>
+        </section>
 
         <div class="grid grid-cols-1 xl:grid-cols-12 gap-5">
           <section class="xl:col-span-4 card">
