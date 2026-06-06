@@ -407,6 +407,8 @@ Current shipped pieces:
 - project-local `policy.json` loading and saving
 - optional `cyxwatch/policies/default.json` loading
 - user policy rules are evaluated before default rules so local overrides win
+- `/cyxwatch/policy` returns only editable user policy, while runtime matching
+  applies user plus default policy
 - server routes to read and update policy
 - `/dashboard/security` rule editor with add/edit/delete
 - raw JSON policy editor

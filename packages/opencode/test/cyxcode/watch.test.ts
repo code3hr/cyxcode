@@ -342,6 +342,7 @@ describe("CyxWatch", () => {
     })
     expect(base.decision).toBe("warn")
     expect(base.flags).toContain("default_policy")
+    expect(CyxWatch.policy()).toEqual({ version: 2, rules: [] })
 
     await CyxWatch.savePolicy({
       version: 2,
@@ -364,6 +365,7 @@ describe("CyxWatch", () => {
     expect(out.decision).toBe("allow")
     expect(out.flags).toContain("user_policy")
     expect(out.flags).not.toContain("default_policy")
+    expect(CyxWatch.policy().rules.map((rule) => rule.id)).toEqual(["user-allow"])
   })
 
   test("ignores invalid default policy while loading user policy", async () => {
@@ -397,6 +399,7 @@ describe("CyxWatch", () => {
     expect(out.decision).toBe("warn")
     expect(out.flags).toContain("user_policy")
     expect(out.flags).toContain("policy_user-warn")
+    expect(CyxWatch.policy().rules.map((rule) => rule.id)).toEqual(["user-warn"])
   })
 
   test("policy route rejects invalid policy with bad request", async () => {

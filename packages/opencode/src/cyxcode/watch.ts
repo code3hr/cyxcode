@@ -854,7 +854,7 @@ export namespace CyxWatch {
   }
 
   export function policy() {
-    return WatchPolicy.load()
+    return WatchPolicy.user()
   }
 
   export async function savePolicy(cfg: WatchPolicy.Config) {

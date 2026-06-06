@@ -134,6 +134,10 @@ export namespace WatchPolicy {
     }
   }
 
+  export function user(): Config {
+    return optional(file())
+  }
+
   export async function save(cfg: Config) {
     const out = parse(cfg)
     await fsp.mkdir(path.dirname(file()), { recursive: true })
