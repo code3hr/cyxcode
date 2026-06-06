@@ -361,6 +361,59 @@ describe("CyxWatch", () => {
     expect(out.policy.rules[0].host).toEqual(["example.com"])
   })
 
+  test("saved policy blocks shell wrapper commands before spawn", async () => {
+    const cmd = process.platform === "win32" ? ["cmd", "/c", "echo", "blocked-policy"] : ["sh", "-lc", "echo blocked-policy"]
+    await CyxWatch.savePolicy({
+      version: 2,
+      rules: [
+        {
+          id: "deny-shell",
+          permission: ["bash"],
+          cmd: ["*blocked-policy*"],
+          decision: "block",
+          flags: ["blocked_shell_policy"],
+        },
+      ],
+    })
+
+    await expect(Process.run(cmd, { cwd: dir, nothrow: true })).rejects.toThrow("CyxWatch blocked operation")
+    await sleep(250)
+
+    const rows = await CyxWatch.recent(10)
+    const row = rows.find((item) => item.kind === "shell.command" && item.cmd === cmd.join(" "))
+    expect(row).toBeDefined()
+    expect(row!.decision).toBe("block")
+    expect(row!.flags).toContain("blocked_shell_policy")
+    expect(row!.flags).toContain("policy_deny-shell")
+  })
+
+  test("saved policy blocks file reads before loading content", async () => {
+    const file = path.join(dir, "private-note.txt")
+    await fs.writeFile(file, "do not read")
+    await CyxWatch.savePolicy({
+      version: 2,
+      rules: [
+        {
+          id: "deny-read",
+          permission: ["read"],
+          path: [file],
+          decision: "block",
+          flags: ["blocked_read_policy"],
+        },
+      ],
+    })
+
+    await expect(Filesystem.readText(file)).rejects.toThrow("CyxWatch blocked operation")
+    await sleep(250)
+
+    const rows = await CyxWatch.recent(10)
+    const row = rows.find((item) => item.kind === "file.read" && item.path === file)
+    expect(row).toBeDefined()
+    expect(row!.decision).toBe("block")
+    expect(row!.flags).toContain("blocked_read_policy")
+    expect(row!.flags).toContain("policy_deny-read")
+  })
+
   test("records websocket connections through wrapper", async () => {
     await CyxWatch.savePolicy({
       version: 2,
