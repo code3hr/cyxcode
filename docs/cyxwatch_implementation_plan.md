@@ -467,6 +467,8 @@ Current shipped pieces:
   as `memory.send` events with `provider:<provider>:<model>` sources
 - provider-bound memory/wiki context is locally redacted for high-confidence
   secrets before prompt construction and records `memory.redact` telemetry
+- provider-bound memory/wiki context records structured minimizer summaries with
+  source tags, byte counts, line counts, and redaction status
 - `/cyxwatch/context` supports session, source, provider, and model filtering
 - `/dashboard/memory` exposes Memory Firewall policy presets for balanced,
   strict, and public project-memory postures
@@ -483,7 +485,6 @@ Remaining tasks:
 - default existing memory, wiki, and recall-derived records to `private`
 - add `never_send` path and tag patterns outside project/global memory indexes
 - expand memory event coverage to writes
-- add structured context minimizer summaries before cloud model calls
 - add memory approval prompts
 - encrypt sensitive memory at rest
 

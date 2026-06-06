@@ -51,17 +51,37 @@ export namespace LLM {
     return system.filter((item) => /<(project-memory|global-memory|wiki-note)\b/.test(item))
   }
 
+  function tag(text: string) {
+    return text.match(/<(project-memory|global-memory|wiki-note)\b/)?.[1] ?? "memory-context"
+  }
+
   export function minimize(system: string[]) {
     const rows = system.map((item) => {
-      if (!context([item]).length) return { text: item, scan: undefined }
+      if (!context([item]).length) return { text: item, raw: item, scan: undefined, ctx: false }
       const scan = WatchSecret.redact(item)
-      return { text: scan.content, scan }
+      return { text: scan.content, raw: item, scan, ctx: true }
     })
-    return {
-      system: rows.map((item) => item.text),
-      redactions: [...new Set(rows.flatMap((item) => item.scan?.detectors ?? []))],
+    const ctx = rows.filter((item) => item.ctx)
+    const redactions = [...new Set(rows.flatMap((item) => item.scan?.detectors ?? []))]
+    const summary = {
+      version: 1,
       bytesIn: Buffer.byteLength(system.join("\n\n")),
       bytesOut: Buffer.byteLength(rows.map((item) => item.text).join("\n\n")),
+      redactions,
+      sources: ctx.map((item) => ({
+        kind: tag(item.raw),
+        bytesIn: Buffer.byteLength(item.raw),
+        bytesOut: Buffer.byteLength(item.text),
+        lines: item.text.split(/\r?\n/).filter((line) => line.trim()).length,
+        redacted: (item.scan?.detectors.length ?? 0) > 0,
+      })),
+    }
+    return {
+      system: rows.map((item) => item.text),
+      redactions,
+      bytesIn: summary.bytesIn,
+      bytesOut: summary.bytesOut,
+      summary,
     }
   }
 
@@ -168,6 +188,7 @@ export namespace LLM {
         action: "send",
         source: `provider:${provider.id}:${input.model.id}`,
         text,
+        summary: JSON.stringify(min.summary),
         sessionID: input.sessionID,
         messageID: input.user.id,
         bytes: Buffer.byteLength(text),

@@ -525,6 +525,8 @@ What is done:
   sources.
 - Provider-bound memory/wiki context is locally redacted for high-confidence
   secrets before prompt construction and records `memory.redact` telemetry.
+- Provider-bound memory/wiki context records structured minimizer summaries with
+  source tags, byte counts, line counts, and redaction status.
 - `/cyxwatch/context` supports session, source, provider, and model filters for
   provider-bound memory disclosure review.
 - `/dashboard/memory` exposes Memory Firewall policy presets for balanced,
@@ -538,7 +540,6 @@ Verified:
 
 Next time:
 
-- Add structured minimizer summaries for provider-bound memory context.
 - Decide where output redaction lives in the response pipeline and how users can override false positives.
 - Add saved graph query shortcuts for common incident investigations.
 - Decide whether `require-approval` should ever be handled below the tool layer, or remain only in the permission UI path.

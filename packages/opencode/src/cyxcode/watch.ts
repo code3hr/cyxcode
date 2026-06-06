@@ -89,6 +89,7 @@ export type WatchEntry = {
   messageID?: string
   prompt?: string
   text?: string
+  summary?: string
   path?: string
   host?: string
   method?: string
@@ -952,6 +953,7 @@ export namespace CyxWatch {
     action: "read" | "retrieve" | "embed" | "send" | "redact"
     source: string
     text?: string
+    summary?: string
     sessionID?: string
     messageID?: string
     bytes?: number
@@ -976,6 +978,7 @@ export namespace CyxWatch {
       messageID: input.messageID ?? scope?.messageID,
       prompt: scope?.prompt,
       text: input.text,
+      summary: input.summary,
       path: input.source,
       bytes: input.bytes,
       risk: out.risk,

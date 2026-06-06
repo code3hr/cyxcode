@@ -38,6 +38,7 @@ function db() {
       message_id TEXT,
       prompt TEXT,
       text TEXT,
+      summary TEXT,
       path TEXT,
       host TEXT,
       method TEXT,
@@ -69,6 +70,13 @@ function db() {
     );
     CREATE INDEX IF NOT EXISTS watch_alert_ts_idx ON watch_alert(ts);
   `)
+  const cols = new Set(
+    next
+      .query("PRAGMA table_info(watch_event)")
+      .all()
+      .map((row) => String((row as { name: unknown }).name)),
+  )
+  if (!cols.has("summary")) next.exec("ALTER TABLE watch_event ADD COLUMN summary TEXT")
   dbs.set(p, next)
   return next
 }
@@ -93,6 +101,7 @@ function event(row: Record<string, unknown>): WatchEntry {
     messageID: row.message_id ? String(row.message_id) : undefined,
     prompt: row.prompt ? String(row.prompt) : undefined,
     text: row.text ? String(row.text) : undefined,
+    summary: row.summary ? String(row.summary) : undefined,
     path: row.path ? String(row.path) : undefined,
     host: row.host ? String(row.host) : undefined,
     method: row.method ? String(row.method) : undefined,
@@ -130,8 +139,8 @@ export namespace WatchStore {
     db()
       .query(
         `INSERT OR REPLACE INTO watch_event
-        (id, ts, kind, project, session_id, message_id, prompt, text, path, host, method, cmd, bytes, risk, flags, decision)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        (id, ts, kind, project, session_id, message_id, prompt, text, summary, path, host, method, cmd, bytes, risk, flags, decision)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       )
       .run(
         entry.id,
@@ -142,6 +151,7 @@ export namespace WatchStore {
         entry.messageID ?? null,
         entry.prompt ?? null,
         entry.text ?? null,
+        entry.summary ?? null,
         entry.path ?? null,
         entry.host ?? null,
         entry.method ?? null,

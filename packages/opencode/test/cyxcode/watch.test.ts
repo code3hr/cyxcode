@@ -17,6 +17,7 @@ import { ReadTool } from "../../src/tool/read"
 import { Instance } from "../../src/project/instance"
 import { Permission } from "../../src/permission"
 import { MessageID, SessionID } from "../../src/session/schema"
+import { LLM } from "../../src/session/llm"
 import { WatchPolicy } from "../../src/cyxcode/watch/policy"
 import { createWatchRoutes } from "../../src/server/watch"
 
@@ -943,6 +944,20 @@ describe("CyxWatch", () => {
     expect(JSON.stringify(row)).not.toContain("abcdefghijklmnopqrstuvwxyz123456")
   })
 
+  test("summarizes provider-bound memory context without raw secrets", () => {
+    const out = LLM.minimize([
+      "<project-memory>\nAuthorization: Bearer abcdefghijklmnopqrstuvwxyz123456\n</project-memory>",
+      "ordinary system prompt",
+    ])
+
+    expect(out.summary.sources.length).toBe(1)
+    expect(out.summary.sources[0]!.kind).toBe("project-memory")
+    expect(out.summary.sources[0]!.redacted).toBe(true)
+    expect(out.summary.redactions).toContain("bearer_token")
+    expect(out.system[0]).toContain("[REDACTED:bearer_token:1]")
+    expect(JSON.stringify(out.summary)).not.toContain("abcdefghijklmnopqrstuvwxyz123456")
+  })
+
   test("records memory reads and prompt-context sends", async () => {
     await Memory.save("auth-note", ["auth", "jwt"], "auth note", "auth uses jwt middleware")
     const out = await Memory.relevant([
@@ -1008,6 +1023,7 @@ describe("CyxWatch", () => {
       action: "send",
       source: "provider:openai:gpt-test",
       text: "<project-memory>\nprovider context\n</project-memory>",
+      summary: JSON.stringify({ version: 1, sources: [{ kind: "project-memory", bytesIn: 49, bytesOut: 49 }] }),
       sessionID: "ses_provider",
       messageID: "msg_provider",
       bytes: 49,
@@ -1028,6 +1044,7 @@ describe("CyxWatch", () => {
     expect(rows[0]!.path).toBe("provider:openai:gpt-test")
     expect(rows[0]!.messageID).toBe("msg_provider")
     expect(rows[0]!.text).toContain("provider context")
+    expect(rows[0]!.summary).toContain("project-memory")
 
     const app = createWatchRoutes()
     const res = await app.request("/cyxwatch/context?session=ses_provider&provider=anthropic&model=claude-test")
