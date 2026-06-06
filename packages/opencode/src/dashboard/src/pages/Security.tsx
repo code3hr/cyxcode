@@ -13,8 +13,18 @@ const periods: Array<{ id: Period; label: string }> = [
 
 const decisions = ["all", "allow", "warn", "require-approval", "block"] as const
 const actions = ["allow", "warn", "require-approval", "block"] as const
+const groups = [
+  { id: "all", label: "All events" },
+  { id: "file", label: "Files" },
+  { id: "shell", label: "Shell" },
+  { id: "network", label: "Network" },
+  { id: "memory", label: "Memory" },
+  { id: "secret", label: "Secrets" },
+  { id: "prompt", label: "Prompts" },
+] as const
 
 type Rule = WatchPolicy["rules"][number]
+type Group = (typeof groups)[number]["id"]
 
 const split = (text: string) =>
   text
@@ -52,6 +62,7 @@ const Security: Component = () => {
   const [flags, setFlags] = createSignal("")
   const [decision, setDecision] = createSignal<Rule["decision"]>("warn")
   const [filter, setFilter] = createSignal<(typeof decisions)[number]>("all")
+  const [group, setGroup] = createSignal<Group>("all")
   const [loading, setLoading] = createSignal(true)
   const [saving, setSaving] = createSignal(false)
   const [error, setError] = createSignal<string | null>(null)
@@ -94,8 +105,16 @@ const Security: Component = () => {
   })
 
   const rows = createMemo(() => {
-    if (filter() === "all") return events()
-    return events().filter((event) => (event.decision ?? "allow") === filter())
+    const match = (event: WatchEvent) => {
+      if (group() === "all") return true
+      if (group() === "file") return event.kind.startsWith("file.")
+      if (group() === "network") return event.kind.startsWith("network.")
+      if (group() === "memory") return event.kind.startsWith("memory.")
+      if (group() === "secret") return event.kind === "output.secret"
+      if (group() === "shell") return event.kind === "shell.command"
+      return event.kind === "prompt.turn"
+    }
+    return events().filter((event) => match(event) && (filter() === "all" || (event.decision ?? "allow") === filter()))
   })
 
   const reset = () => {
@@ -262,11 +281,18 @@ const Security: Component = () => {
                 <div class="card-header mb-0">Events</div>
                 <div class="text-xs text-gray-500">{rows().length} visible of {events().length}</div>
               </div>
-              <select class="select text-sm" value={filter()} onChange={(e) => setFilter(e.currentTarget.value as typeof filter extends () => infer T ? T : never)}>
-                <For each={decisions}>
-                  {(item) => <option value={item}>{item === "all" ? "All decisions" : item}</option>}
-                </For>
-              </select>
+              <div class="flex flex-wrap gap-2">
+                <select class="select text-sm" value={group()} onChange={(e) => setGroup(e.currentTarget.value as Group)}>
+                  <For each={groups}>
+                    {(item) => <option value={item.id}>{item.label}</option>}
+                  </For>
+                </select>
+                <select class="select text-sm" value={filter()} onChange={(e) => setFilter(e.currentTarget.value as typeof filter extends () => infer T ? T : never)}>
+                  <For each={decisions}>
+                    {(item) => <option value={item}>{item === "all" ? "All decisions" : item}</option>}
+                  </For>
+                </select>
+              </div>
             </div>
 
             <div class="overflow-x-auto">
