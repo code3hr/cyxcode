@@ -468,8 +468,11 @@ cyxcode report --format text
 cyxcode watch recent
 cyxcode watch report
 cyxcode watch alerts
+cyxcode watch policy
+cyxcode watch policy --effective
 cyxcode watch report --period 30d
 cyxcode watch report --json
+cyxcode watch policy --json
 ```
 
 ### Sample Report
@@ -519,6 +522,7 @@ The CyxWatch layer records runtime telemetry locally and is surfaced through:
 - `cyxcode watch recent`
 - `cyxcode watch report`
 - `cyxcode watch alerts`
+- `cyxcode watch policy` for saved project policy rules, or `--effective` to include defaults
 - the dashboard page at `/dashboard/security`
 
 It currently tracks:
