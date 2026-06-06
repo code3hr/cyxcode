@@ -3,6 +3,7 @@ import fs from "fs"
 import path from "path"
 import { fileURLToPath } from "url"
 import { Log } from "@/util/log"
+import { CyxWatch } from "../watch"
 import { cacheDir } from "./paths"
 import { RECALL_MODEL } from "./types"
 import { RecallError } from "./errors"
@@ -129,7 +130,20 @@ async function wait(): Promise<number> {
 
 async function request<T>(input: string, init: RequestInit): Promise<T> {
   const port = await wait()
-  const res = await fetch(`http://127.0.0.1:${port}${input}`, init)
+  const url = `http://127.0.0.1:${port}${input}`
+  const body = typeof init.body === "string" ? Buffer.byteLength(init.body) : undefined
+  await CyxWatch.request({
+    url,
+    method: init.method ?? "GET",
+    bytes: body,
+    guard: {
+      decision: "allow",
+      risk: 0,
+      flags: ["recall_sidecar", "internal_network"],
+      reason: "local recall sidecar",
+    },
+  })
+  const res = await fetch(url, init)
   if (!res.ok) {
     throw new Error(`sidecar request failed: ${res.status} ${res.statusText}`)
   }

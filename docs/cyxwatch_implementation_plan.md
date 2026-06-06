@@ -455,6 +455,7 @@ Current shipped pieces:
 - project memory read/retrieve/send telemetry
 - wiki read/retrieve/send telemetry
 - recall query embed and similarity retrieval telemetry
+- recall sidecar embedding request telemetry
 - focused test coverage for memory read, retrieve, and prompt-context send
 
 Remaining tasks:

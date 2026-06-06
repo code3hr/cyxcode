@@ -505,6 +505,8 @@ What is done:
   high-confidence secrets from tool output and assistant output telemetry.
 - Focused tests cover session-level permission-gate blocking and forced
   approval for CyxWatch decisions.
+- CyxWatch records internal recall sidecar embedding requests as allowed
+  `network.outbound` events with `recall_sidecar` and `internal_network` flags.
 - CyxWatch avoids startup import cycles by lazy-loading `Log` and `Instance`.
 
 Verified:
@@ -514,8 +516,7 @@ Verified:
 
 Next time:
 
-- Continue boundary review for provider SDK injected fetch functions and recall
-  sidecar traffic.
+- Continue boundary review for provider SDK injected fetch functions.
 - Add a Memory Firewall view for inspect, export, delete, and reclassify.
 - Add explicit cloud-model disclosure boundaries for memory events.
 - Decide where output redaction lives in the response pipeline and how users can override false positives.
