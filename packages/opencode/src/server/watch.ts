@@ -34,6 +34,11 @@ export function createWatchRoutes(): Hono {
     return c.json({ policy: CyxWatch.policy() })
   })
 
+  app.get("/cyxwatch/policy/effective", async (c) => {
+    const { CyxWatch } = await import("../cyxcode/watch")
+    return c.json({ policy: CyxWatch.effectivePolicy() })
+  })
+
   app.put("/cyxwatch/policy", async (c) => {
     const { WatchPolicy } = await import("../cyxcode/watch/policy")
     const parsed = WatchPolicy.check(await c.req.json())

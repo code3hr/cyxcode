@@ -443,6 +443,41 @@ describe("CyxWatch", () => {
     expect(out.policy.rules[0].host).toEqual(["example.com"])
   })
 
+  test("policy routes separate editable and effective policy", async () => {
+    await fs.mkdir(path.dirname(WatchPolicy.defaultFile()), { recursive: true })
+    await fs.writeFile(WatchPolicy.defaultFile(), JSON.stringify({
+      version: 2,
+      rules: [
+        {
+          id: "default-warn",
+          permission: ["webfetch"],
+          host: ["example.com"],
+          decision: "warn",
+        },
+      ],
+    }))
+    await CyxWatch.savePolicy({
+      version: 2,
+      rules: [
+        {
+          id: "user-block",
+          permission: ["webfetch"],
+          host: ["blocked.example.com"],
+          decision: "block",
+        },
+      ],
+    })
+
+    const app = createWatchRoutes()
+    const user = await app.request("/cyxwatch/policy")
+    const effective = await app.request("/cyxwatch/policy/effective")
+
+    expect(user.status).toBe(200)
+    expect(effective.status).toBe(200)
+    expect((await user.json()).policy.rules.map((rule: WatchPolicy.Rule) => rule.id)).toEqual(["user-block"])
+    expect((await effective.json()).policy.rules.map((rule: WatchPolicy.Rule) => rule.id)).toEqual(["user-block", "default-warn"])
+  })
+
   test("saved policy blocks shell wrapper commands before spawn", async () => {
     const cmd = process.platform === "win32" ? ["cmd", "/c", "echo", "blocked-policy"] : ["sh", "-lc", "echo blocked-policy"]
     await CyxWatch.savePolicy({
