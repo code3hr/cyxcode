@@ -439,10 +439,12 @@ Tasks:
   - shipped through the unified `/experimental/graph` data
 - add queries for "show sessions where agent accessed X" and "show all unknown
   outbound hosts"
+  - shipped for session, path, host, flag, and decision filters through
+    `/cyxwatch/query`
 
 Exit criteria:
 
-- dashboard can filter by session, host, path, flag, and decision
+- dashboard can filter by session, host, path, flag, and decision - shipped
 - graph can answer incident-to-prompt and incident-to-file questions - shipped
 
 ### Phase M: Memory Firewall

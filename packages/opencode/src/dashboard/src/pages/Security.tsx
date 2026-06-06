@@ -104,6 +104,10 @@ const Security: Component = () => {
   const [decision, setDecision] = createSignal<Rule["decision"]>("warn")
   const [filter, setFilter] = createSignal<(typeof decisions)[number]>("all")
   const [group, setGroup] = createSignal<Group>("all")
+  const [session, setSession] = createSignal("")
+  const [eventPath, setEventPath] = createSignal("")
+  const [eventHost, setEventHost] = createSignal("")
+  const [eventFlag, setEventFlag] = createSignal("")
   const [loading, setLoading] = createSignal(true)
   const [saving, setSaving] = createSignal(false)
   const [error, setError] = createSignal<string | null>(null)
@@ -121,7 +125,14 @@ const Security: Component = () => {
 
     const [rep, evt, alt, cfg, eff] = await Promise.all([
       watchApi.report(period()),
-      watchApi.recent(80),
+      watchApi.query({
+        limit: 120,
+        session: session().trim() || undefined,
+        path: eventPath().trim() || undefined,
+        host: eventHost().trim() || undefined,
+        flag: eventFlag().trim() || undefined,
+        decision: filter() === "all" ? undefined : filter(),
+      }),
       watchApi.alerts(40),
       watchApi.policy(),
       watchApi.effectivePolicy(),
@@ -158,8 +169,17 @@ const Security: Component = () => {
       if (group() === "shell") return event.kind === "shell.command"
       return event.kind === "prompt.turn"
     }
-    return events().filter((event) => match(event) && (filter() === "all" || (event.decision ?? "allow") === filter()))
+    return events().filter((event) => match(event))
   })
+
+  const clearEvents = () => {
+    setFilter("all")
+    setGroup("all")
+    setSession("")
+    setEventPath("")
+    setEventHost("")
+    setEventFlag("")
+  }
 
   const reset = () => {
     setEditing(null)
@@ -355,6 +375,13 @@ const Security: Component = () => {
                     {(item) => <option value={item}>{item === "all" ? "All decisions" : item}</option>}
                   </For>
                 </select>
+                <input class="input text-sm w-32" placeholder="Session" value={session()} onInput={(e) => setSession(e.currentTarget.value)} />
+                <input class="input text-sm w-40" placeholder="Path" value={eventPath()} onInput={(e) => setEventPath(e.currentTarget.value)} />
+                <input class="input text-sm w-36" placeholder="Host" value={eventHost()} onInput={(e) => setEventHost(e.currentTarget.value)} />
+                <input class="input text-sm w-36" placeholder="Flag" value={eventFlag()} onInput={(e) => setEventFlag(e.currentTarget.value)} />
+                <button class="btn btn-secondary text-sm" onClick={clearEvents}>
+                  Clear
+                </button>
               </div>
             </div>
 

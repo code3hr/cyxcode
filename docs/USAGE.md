@@ -524,6 +524,7 @@ The CyxWatch layer records runtime telemetry locally and is surfaced through:
 - `cyxcode watch recent`
 - `cyxcode watch report`
 - `cyxcode watch alerts`
+- `GET /cyxwatch/query?session=...&path=...&host=...&flag=...&decision=...`
 - `cyxcode watch policy` for saved project policy rules, or `--effective` to include defaults
 - the dashboard page at `/dashboard/security`
 

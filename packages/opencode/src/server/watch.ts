@@ -1,4 +1,22 @@
 import { Hono } from "hono"
+import type { WatchDecision, WatchKind } from "../cyxcode/watch"
+
+const decisions: WatchDecision[] = ["allow", "warn", "require-approval", "block"]
+const kinds: WatchKind[] = [
+  "file.read",
+  "file.write",
+  "shell.command",
+  "network.outbound",
+  "network.websocket",
+  "prompt.turn",
+  "output.secret",
+  "memory.read",
+  "memory.retrieve",
+  "memory.embed",
+  "memory.send",
+  "memory.redact",
+]
+
 
 export function createWatchRoutes(): Hono {
   const app = new Hono()
@@ -27,6 +45,28 @@ export function createWatchRoutes(): Hono {
     const { CyxWatch } = await import("../cyxcode/watch")
     const alerts = await CyxWatch.alerts(limit)
     return c.json({ alerts, total: alerts.length })
+  })
+
+  app.get("/cyxwatch/query", async (c) => {
+    const query = c.req.query()
+    const limit = query.limit ? Math.max(1, Math.min(500, parseInt(query.limit, 10) || 50)) : 50
+    const decision = query.decision && decisions.includes(query.decision as WatchDecision)
+      ? query.decision as WatchDecision
+      : undefined
+    const kind = query.kind && kinds.includes(query.kind as WatchKind)
+      ? query.kind as WatchKind
+      : undefined
+    const { CyxWatch } = await import("../cyxcode/watch")
+    const events = await CyxWatch.query({
+      limit,
+      sessionID: query.session || query.sessionID,
+      path: query.path,
+      host: query.host,
+      flag: query.flag,
+      decision,
+      kind,
+    })
+    return c.json({ events, total: events.length })
   })
 
   app.get("/cyxwatch/policy", async (c) => {

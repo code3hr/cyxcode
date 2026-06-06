@@ -88,6 +88,46 @@ describe("CyxWatch", () => {
     expect(await fs.stat(path.join(CyxPaths.projectDir(), "cyxwatch", "events.db"))).toBeDefined()
   })
 
+  test("queries watch history by session, path, host, flag, and decision", async () => {
+    const file = path.join(dir, "query-secret.txt")
+    await CyxWatch.scope({
+      sessionID: "ses_query",
+      messageID: "msg_query",
+      prompt: "query watch history",
+      fn: async () => {
+        await CyxWatch.note({ kind: "file.read", path: file })
+        await CyxWatch.request({
+          url: "https://query.example.com/upload",
+          method: "POST",
+          bytes: 11,
+          guard: {
+            decision: "warn",
+            risk: 9,
+            flags: ["tracked_query"],
+          },
+        })
+      },
+    })
+
+    const rows = await CyxWatch.query({
+      sessionID: "ses_query",
+      path: "query-secret",
+      limit: 10,
+    })
+    const hosts = await CyxWatch.query({
+      host: "query.example.com",
+      flag: "tracked_query",
+      decision: "warn",
+      limit: 10,
+    })
+
+    expect(rows).toHaveLength(1)
+    expect(rows[0]!.path).toBe(file)
+    expect(hosts).toHaveLength(1)
+    expect(hosts[0]!.host).toBe("query.example.com")
+    expect(hosts[0]!.decision).toBe("warn")
+  })
+
   test("records shell commands and reports risk", async () => {
     const cmd = process.platform === "win32" ? ["cmd", "/c", "echo", "hi"] : ["sh", "-lc", "echo hi"]
     await Process.run(cmd, { cwd: dir, nothrow: true })
@@ -534,6 +574,33 @@ describe("CyxWatch", () => {
     const ids = (await effective.json()).policy.rules.map((rule: WatchPolicy.Rule) => rule.id)
     expect(ids.slice(0, 2)).toEqual(["user-block", "default-warn"])
     expect(ids).toContain("default-private-key-block")
+  })
+
+  test("query route filters watch events", async () => {
+    await CyxWatch.scope({
+      sessionID: "ses_route",
+      messageID: "msg_route",
+      prompt: "query route",
+      fn: async () => {
+        await CyxWatch.request({
+          url: "https://route.example.com/api",
+          guard: {
+            decision: "warn",
+            risk: 7,
+            flags: ["route_flag"],
+          },
+        })
+      },
+    })
+
+    const app = createWatchRoutes()
+    const res = await app.request("/cyxwatch/query?session=ses_route&host=route.example.com&flag=route_flag&decision=warn")
+
+    expect(res.status).toBe(200)
+    const out = await res.json()
+    expect(out.total).toBe(1)
+    expect(out.events[0].sessionID).toBe("ses_route")
+    expect(out.events[0].host).toBe("route.example.com")
   })
 
   test("saved policy blocks shell wrapper commands before spawn", async () => {

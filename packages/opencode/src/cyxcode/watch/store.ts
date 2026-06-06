@@ -6,6 +6,16 @@ import type { WatchAlert, WatchEntry } from "../watch"
 
 const dbs = new Map<string, Database>()
 
+export type WatchQuery = {
+  limit?: number
+  sessionID?: string
+  path?: string
+  host?: string
+  flag?: string
+  decision?: WatchEntry["decision"]
+  kind?: WatchEntry["kind"]
+}
+
 function file() {
   return path.join(CyxPaths.projectDir(), "cyxwatch", "events.db")
 }
@@ -174,6 +184,28 @@ export namespace WatchStore {
     return db()
       .query("SELECT * FROM watch_event ORDER BY ts DESC LIMIT ?")
       .all(limit)
+      .map((row) => event(row as Record<string, unknown>))
+      .reverse()
+  }
+
+  export function query(input: WatchQuery) {
+    const where: string[] = []
+    const args: Array<string | number> = []
+    const add = (sql: string, value: string | number) => {
+      where.push(sql)
+      args.push(value)
+    }
+
+    if (input.sessionID) add("session_id = ?", input.sessionID)
+    if (input.kind) add("kind = ?", input.kind)
+    if (input.decision) add("decision = ?", input.decision)
+    if (input.path) add("path LIKE ?", `%${input.path}%`)
+    if (input.host) add("host LIKE ?", `%${input.host}%`)
+    if (input.flag) add("flags LIKE ?", `%${JSON.stringify(input.flag)}%`)
+
+    return db()
+      .query(`SELECT * FROM watch_event${where.length ? ` WHERE ${where.join(" AND ")}` : ""} ORDER BY ts DESC LIMIT ?`)
+      .all(...args, input.limit ?? 50)
       .map((row) => event(row as Record<string, unknown>))
       .reverse()
   }

@@ -512,6 +512,8 @@ What is done:
 - The unified graph includes CyxWatch event and alert nodes linked to sessions,
   prompt turns, touched files, commands, hosts, and matching code/wiki graph
   nodes.
+- `/cyxwatch/query` and `/dashboard/security` can filter event history by
+  session, path, host, flag, and decision.
 - CyxWatch avoids startup import cycles by lazy-loading `Log` and `Instance`.
 
 Verified:
@@ -524,7 +526,7 @@ Next time:
 - Add a Memory Firewall view for inspect, export, delete, and reclassify.
 - Add explicit cloud-model disclosure boundaries for memory events.
 - Decide where output redaction lives in the response pipeline and how users can override false positives.
-- Add saved graph queries for sessions by path, host, flag, and decision.
+- Add saved graph query shortcuts for common incident investigations.
 - Decide whether `require-approval` should ever be handled below the tool layer, or remain only in the permission UI path.
 
 ## Summary

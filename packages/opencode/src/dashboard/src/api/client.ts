@@ -385,6 +385,26 @@ export const watchApi = {
   report: (period = "7d") => request<{ report: WatchReport }>(`/cyxwatch/report?period=${period}`),
   recent: (limit = 20) => request<{ events: WatchEvent[]; total: number }>(`/cyxwatch/recent?limit=${limit}`),
   alerts: (limit = 20) => request<{ alerts: WatchAlert[]; total: number }>(`/cyxwatch/alerts?limit=${limit}`),
+  query: (opts?: {
+    limit?: number
+    session?: string
+    path?: string
+    host?: string
+    flag?: string
+    decision?: WatchEvent["decision"]
+    kind?: WatchEvent["kind"]
+  }) => {
+    const params = new URLSearchParams()
+    if (opts?.limit) params.set("limit", String(opts.limit))
+    if (opts?.session) params.set("session", opts.session)
+    if (opts?.path) params.set("path", opts.path)
+    if (opts?.host) params.set("host", opts.host)
+    if (opts?.flag) params.set("flag", opts.flag)
+    if (opts?.decision) params.set("decision", opts.decision)
+    if (opts?.kind) params.set("kind", opts.kind)
+    const query = params.toString() ? `?${params.toString()}` : ""
+    return request<{ events: WatchEvent[]; total: number }>(`/cyxwatch/query${query}`)
+  },
   policy: () => request<{ policy: WatchPolicy }>("/cyxwatch/policy"),
   effectivePolicy: () => request<{ policy: WatchPolicy }>("/cyxwatch/policy/effective"),
   savePolicy: (policy: WatchPolicy) =>

@@ -13,7 +13,7 @@ import path from "path"
 import { Context } from "../util/context"
 import { CyxPaths } from "./paths"
 import { WatchPolicy } from "./watch/policy"
-import { WatchStore } from "./watch/store"
+import { WatchStore, type WatchQuery } from "./watch/store"
 
 type Scope = {
   sessionID?: string
@@ -665,6 +665,16 @@ function item<T>(entries: T[], q: (entry: T) => string | undefined) {
     .sort((a, b) => b.count - a.count)
 }
 
+function match(entry: WatchEntry, input: WatchQuery) {
+  if (input.sessionID && entry.sessionID !== input.sessionID) return false
+  if (input.kind && entry.kind !== input.kind) return false
+  if (input.decision && entry.decision !== input.decision) return false
+  if (input.path && !entry.path?.includes(input.path)) return false
+  if (input.host && !entry.host?.includes(input.host)) return false
+  if (input.flag && !entry.flags.includes(input.flag)) return false
+  return true
+}
+
 async function read() {
   const list = [...buf]
   const raw = await fs.readFile(file(), "utf-8").catch(() => "")
@@ -851,6 +861,14 @@ export namespace CyxWatch {
     if (rows.length > 0) return rows
     const list = await readAlert()
     return list.slice(-limit)
+  }
+
+  export async function query(input: WatchQuery) {
+    const limit = Math.max(1, Math.min(input.limit ?? 50, 500))
+    const rows = WatchStore.query({ ...input, limit })
+    if (rows.length > 0 || WatchStore.recent(1).length > 0) return rows
+    const list = await read()
+    return list.filter((entry) => match(entry, input)).slice(-limit)
   }
 
   export function policy() {
