@@ -13,6 +13,10 @@ import { Http } from "../../src/util/http"
 import { Process } from "../../src/util/process"
 import { Websocket } from "../../src/util/websocket"
 import { Tool } from "../../src/tool/tool"
+import { ReadTool } from "../../src/tool/read"
+import { Instance } from "../../src/project/instance"
+import { Permission } from "../../src/permission"
+import { MessageID, SessionID } from "../../src/session/schema"
 import { WatchPolicy } from "../../src/cyxcode/watch/policy"
 import { createWatchRoutes } from "../../src/server/watch"
 
@@ -29,11 +33,37 @@ beforeEach(async () => {
 })
 
 afterEach(async () => {
+  await Instance.disposeAll()
   CyxWatch.close()
   process.chdir(cwd)
   CyxPaths.invalidateCache()
   await fs.rm(dir, { recursive: true, force: true })
 })
+
+function ctx(ruleset: Permission.Ruleset = []) {
+  const session = SessionID.make("ses_cyxwatch_test")
+  const message = MessageID.make("msg_cyxwatch_test")
+  return {
+    sessionID: session,
+    messageID: message,
+    callID: "call_cyxwatch_test",
+    agent: "build",
+    abort: new AbortController().signal,
+    messages: [],
+    metadata() {},
+    async ask(req: Omit<Permission.Request, "id" | "sessionID" | "tool">) {
+      await Permission.ask({
+        ...req,
+        sessionID: session,
+        tool: {
+          messageID: message,
+          callID: "call_cyxwatch_test",
+        },
+        ruleset,
+      })
+    },
+  } satisfies Tool.Context
+}
 
 describe("CyxWatch", () => {
   test("records file access", async () => {
@@ -557,6 +587,55 @@ describe("CyxWatch", () => {
     expect(row!.decision).toBe("block")
     expect(row!.flags).toContain("blocked_read_policy")
     expect(row!.flags).toContain("policy_deny-read")
+  })
+
+  test("permission gate denies tool reads blocked by saved CyxWatch policy", async () => {
+    const file = path.join(dir, "blocked-note.txt")
+    await fs.writeFile(file, "do not read")
+    await CyxWatch.savePolicy({
+      version: 2,
+      rules: [
+        {
+          id: "deny-tool-read",
+          permission: ["read"],
+          path: [file],
+          decision: "block",
+          flags: ["blocked_tool_read"],
+        },
+      ],
+    })
+
+    await Instance.provide({
+      directory: dir,
+      fn: async () => {
+        const read = await ReadTool.init()
+        await expect(
+          read.execute({ filePath: file }, ctx([{ permission: "read", pattern: "*", action: "allow" }])),
+        ).rejects.toThrow("prevents you from using")
+      },
+    })
+  })
+
+  test("permission gate forces approval for sensitive tool reads", async () => {
+    const file = path.join(dir, ".env")
+    await fs.writeFile(file, "TOKEN=secret")
+
+    await Instance.provide({
+      directory: dir,
+      fn: async () => {
+        const read = await ReadTool.init()
+        const task = read.execute({ filePath: file }, ctx([{ permission: "read", pattern: "*", action: "allow" }]))
+        await sleep(50)
+
+        const list = await Permission.list()
+        expect(list.length).toBe(1)
+        expect(list[0].permission).toBe("read")
+        expect(list[0].patterns).toEqual([file])
+
+        await Permission.reply({ requestID: list[0].id, reply: "reject" })
+        await expect(task).rejects.toThrow("rejected permission")
+      },
+    })
   })
 
   test("records websocket connections through wrapper", async () => {

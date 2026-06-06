@@ -417,10 +417,8 @@ Current shipped pieces:
 - focused coverage for invalid policy saves and saved-policy runtime enforcement
 - packaged starter default rules for private keys, browser credential stores,
   metadata service endpoints, and large upload approval
-
-Remaining tasks:
-
-- add full session-level policy enforcement tests
+- session-level permission-gate coverage for CyxWatch block and
+  require-approval decisions
 
 Exit criteria:
 

@@ -503,6 +503,8 @@ What is done:
   credential stores, cloud metadata endpoints, and large upload approval.
 - CyxWatch blocks env enumeration commands before spawn and redacts
   high-confidence secrets from tool output and assistant output telemetry.
+- Focused tests cover session-level permission-gate blocking and forced
+  approval for CyxWatch decisions.
 - CyxWatch avoids startup import cycles by lazy-loading `Log` and `Instance`.
 
 Verified:
@@ -512,8 +514,6 @@ Verified:
 
 Next time:
 
-- Add full session-level tests proving configured governance policies block real
-  tool calls end to end.
 - Continue boundary review for provider SDK injected fetch functions and recall
   sidecar traffic.
 - Add a Memory Firewall view for inspect, export, delete, and reclassify.
