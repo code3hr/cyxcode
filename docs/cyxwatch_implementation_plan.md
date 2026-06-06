@@ -476,6 +476,8 @@ Current shipped pieces:
 - high-confidence memory, wiki, and recall path/tag patterns are classified as
   `never_send`
 - memory and wiki note writes emit `memory.write` telemetry
+- sensitive memory and wiki relevance can trigger the existing session
+  permission prompt before context is loaded
 - project memory read/retrieve/send telemetry
 - wiki read/retrieve/send telemetry
 - recall query embed and similarity retrieval telemetry
@@ -486,7 +488,6 @@ Current shipped pieces:
 
 Remaining tasks:
 
-- add memory approval prompts
 - encrypt sensitive memory at rest
 
 Exit criteria:

@@ -681,6 +681,21 @@ export namespace SessionPrompt {
       const { Graph } = await import("@/cyxcode/graph")
       const { Wiki } = await import("@/cyxcode/wiki")
       const { Resume } = await import("@/cyxcode/versioning/resume")
+      const approve = async (req: { source: string; entries: Array<{ id: string; path: string; privacy?: string; summary?: string }> }) => {
+        const patterns = req.entries.filter((entry) => entry.privacy === "sensitive").map((entry) => entry.path || entry.id)
+        if (patterns.length === 0) return
+        await Permission.ask({
+          sessionID,
+          permission: "memory",
+          patterns,
+          metadata: {
+            source: req.source,
+            count: patterns.length,
+          },
+          always: patterns,
+          ruleset: Permission.merge(agent.permission, session.permission ?? []),
+        })
+      }
       // Track session for exit handler
       const versioningMod = await import("@/cyxcode/versioning/index")
       versioningMod.StateVersioning.trackSession(sessionID)
@@ -690,9 +705,9 @@ export namespace SessionPrompt {
         ...(skills ? [skills] : []),
         ...(await Resume.forSystemPrompt()),
         ...(await InstructionPrompt.system()),
-        ...(await Memory.relevant(msgs)),
+        ...(await Memory.relevant(msgs, { approve })),
         ...(await Graph.relevant(msgs)),
-        ...(await Wiki.relevant(msgs)),
+        ...(await Wiki.relevant(msgs, { approve })),
       ]
       const format = lastUser.format ?? { type: "text" }
       if (format.type === "json_schema") {

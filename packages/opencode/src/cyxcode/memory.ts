@@ -19,7 +19,7 @@ import { CyxAudit } from "./audit"
 import { Codegraph } from "./codegraph"
 import { Wiki } from "./wiki"
 import { CyxWatch } from "./watch"
-import { MemoryPrivacy, type Privacy } from "./memory/privacy"
+import { MemoryPrivacy, type MemoryApproval, type Privacy } from "./memory/privacy"
 
 const log = Log.create({ service: "cyxcode-memory" })
 
@@ -103,6 +103,18 @@ function preset(entry: MemoryEntry, id: MemoryPreset["id"]): MemoryEntry {
     return { ...item, privacy: "public" }
   }
   return { ...item, privacy: risky(item) ? "sensitive" : "private" }
+}
+
+function approval(source: string, dir: string, entries: MemoryEntry[]): MemoryApproval {
+  return {
+    source,
+    entries: entries.map((entry) => ({
+      id: entry.id,
+      path: path.join(dir, entry.file),
+      privacy: norm(entry).privacy,
+      summary: entry.summary,
+    })),
+  }
 }
 
 // --- File path resolution (centralized in CyxPaths) ---
@@ -368,7 +380,7 @@ export namespace Memory {
     return parts.join("\n\n")
   }
 
-  export async function relevant(msgs: MessageV2.WithParts[]): Promise<string[]> {
+  export async function relevant(msgs: MessageV2.WithParts[], opts: { approve?: (input: MemoryApproval) => Promise<void> } = {}): Promise<string[]> {
     try {
       const keywords = extractKeywords(msgs)
       if (keywords.length === 0) return []
@@ -380,6 +392,7 @@ export namespace Memory {
       const globalData = await loadFromDir(globalDir)
       const globalMatches = query(keywords, globalData.index.entries)
       if (globalMatches.length > 0) {
+        await opts.approve?.(approval("memory:global", globalDir, globalMatches))
         const globalContent = await loadContent(globalMatches, globalDir)
         if (globalContent.trim()) {
           results.push(`<global-memory>\n${globalContent}\n</global-memory>`)
@@ -397,6 +410,7 @@ export namespace Memory {
       if (data.entries.length > 0) {
         const matches = query(keywords, data.entries)
         if (matches.length > 0) {
+          await opts.approve?.(approval("memory:project", basePath(), matches))
           const content = await load(matches)
           if (content.trim()) {
             results.push(`<project-memory>\n${content}\n</project-memory>`)

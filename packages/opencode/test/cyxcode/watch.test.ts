@@ -1013,6 +1013,61 @@ describe("CyxWatch", () => {
     expect(rows.some((item) => item.kind === "memory.send" && item.text?.includes("never send this auth detail"))).toBe(false)
   })
 
+  test("requests approval before sensitive memory relevance loads", async () => {
+    await Memory.save("approval-note", ["approval"], "Approval memory", "approval memory body")
+    await Memory.update("approval-note", { privacy: "sensitive" })
+    let seen: { source: string; entries: Array<{ privacy?: string }> } | undefined
+
+    const out = await Memory.relevant([
+      {
+        info: { role: "user" },
+        parts: [{ type: "text", text: "approval memory", synthetic: false }],
+      },
+    ] as Parameters<typeof Memory.relevant>[0], {
+      approve: async (req) => {
+        seen = req
+      },
+    })
+
+    expect(out.length).toBeGreaterThan(0)
+    expect(seen?.source).toBe("memory:project")
+    expect(seen?.entries[0]?.privacy).toBe("sensitive")
+    await sleep(250)
+  })
+
+  test("requests approval before sensitive wiki relevance loads", async () => {
+    const page = await Wiki.create({
+      title: "Approval Notes",
+      body: "Approval wiki body.",
+      tags: ["approval"],
+    })
+    const idx = await Wiki.readIndex()
+    await Wiki.writeIndex({
+      version: 1,
+      pages: idx.pages.map((item) => item.id === page.id ? { ...item, privacy: "sensitive" } : item),
+    })
+    let seen: { source: string; entries: Array<{ privacy?: string }> } | undefined
+
+    const err = new Error("approval stop")
+    await expect(
+      Wiki.relevant([
+        {
+          info: { role: "user" },
+          parts: [{ type: "text", text: "approval wiki", synthetic: false }],
+        },
+      ] as Parameters<typeof Wiki.relevant>[0], {
+        approve: async (req) => {
+          seen = req
+          throw err
+        },
+      }),
+    ).rejects.toThrow("approval stop")
+
+    expect(seen?.source).toBe("wiki:relevant")
+    expect(seen?.entries[0]?.privacy).toBe("sensitive")
+    await sleep(250)
+  })
+
   test("context route returns sent memory text", async () => {
     await Memory.save("route-auth", ["auth"], "route auth", "route auth context")
     await Memory.relevant([

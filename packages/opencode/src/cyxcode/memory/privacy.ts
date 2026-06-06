@@ -1,5 +1,15 @@
 export type Privacy = "public" | "private" | "sensitive" | "never_send"
 
+export type MemoryApproval = {
+  source: string
+  entries: Array<{
+    id: string
+    path: string
+    privacy?: Privacy
+    summary?: string
+  }>
+}
+
 const vals = new Set(["public", "private", "sensitive", "never_send"])
 const tags = new Set([
   "api-key",

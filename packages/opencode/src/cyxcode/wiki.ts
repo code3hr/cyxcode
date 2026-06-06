@@ -9,7 +9,7 @@ import { redactSecrets } from "./audit"
 import { CyxWatch } from "./watch"
 import { embedBatch, isDisabled } from "./recall/embedder"
 import { upsertVector, bumpAccessBySourceId } from "./recall/db"
-import { MemoryPrivacy, type Privacy } from "./memory/privacy"
+import { MemoryPrivacy, type MemoryApproval, type Privacy } from "./memory/privacy"
 import type { MessageV2 } from "@/session/message-v2"
 
 const log = Log.create({ service: "cyxcode-wiki" })
@@ -513,7 +513,7 @@ export namespace Wiki {
       .map((item) => item.page)
   }
 
-  export async function relevant(msgs: MessageV2.WithParts[]): Promise<string[]> {
+  export async function relevant(msgs: MessageV2.WithParts[], opts: { approve?: (input: MemoryApproval) => Promise<void> } = {}): Promise<string[]> {
     const idx = await readIndex()
     if (idx.pages.length === 0) return []
 
@@ -531,6 +531,15 @@ export namespace Wiki {
     }
     const allowed = pages.filter((page) => MemoryPrivacy.classify(page) !== "never_send")
     if (allowed.length === 0) return []
+    await opts.approve?.({
+      source: "wiki:relevant",
+      entries: allowed.map((page) => ({
+        id: page.id,
+        path: full(page),
+        privacy: MemoryPrivacy.classify(page),
+        summary: page.summary,
+      })),
+    })
 
     const out: string[] = []
     const now = Date.now()
