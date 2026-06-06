@@ -14,6 +14,7 @@ import { Process } from "../../src/util/process"
 import { Websocket } from "../../src/util/websocket"
 import { Tool } from "../../src/tool/tool"
 import { WatchPolicy } from "../../src/cyxcode/watch/policy"
+import { createWatchRoutes } from "../../src/server/watch"
 
 let dir: string
 let cwd: string
@@ -317,6 +318,47 @@ describe("CyxWatch", () => {
       metadata: { url: "https://example.com/api" },
     })
     expect(out.decision).toBe("allow")
+  })
+
+  test("policy route rejects invalid policy with bad request", async () => {
+    const app = createWatchRoutes()
+    const bad = await app.request("/cyxwatch/policy", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        version: 2,
+        rules: [
+          {
+            decision: "block",
+          },
+        ],
+      }),
+    })
+
+    expect(bad.status).toBe(400)
+    expect(await bad.json()).toEqual({
+      error: "Invalid CyxWatch policy: rules.0: rule must include at least one matcher",
+    })
+    expect(CyxWatch.policy()).toEqual({ version: 2, rules: [] })
+
+    const good = await app.request("/cyxwatch/policy", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        version: 2,
+        rules: [
+          {
+            permission: ["webfetch"],
+            host: ["example.com"],
+            decision: "warn",
+          },
+        ],
+      }),
+    })
+
+    expect(good.status).toBe(200)
+    const out = await good.json()
+    expect(out.policy.rules[0].host).toEqual(["example.com"])
   })
 
   test("records websocket connections through wrapper", async () => {

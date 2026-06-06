@@ -86,12 +86,26 @@ export namespace WatchPolicy {
   }
 
   export function parse(cfg: unknown): Config {
+    const out = check(cfg)
+    if (out.ok) return out.policy
+    throw new Error(out.error)
+  }
+
+  export function check(cfg: unknown): { ok: true; policy: Config } | { ok: false; error: string } {
     const out = Config.safeParse(cfg)
-    if (out.success) return out.data
+    if (out.success) {
+      return {
+        ok: true,
+        policy: out.data,
+      }
+    }
     const text = out.error.issues
       .map((issue) => `${issue.path.join(".") || "policy"}: ${issue.message}`)
       .join("; ")
-    throw new Error(`Invalid CyxWatch policy: ${text}`)
+    return {
+      ok: false,
+      error: `Invalid CyxWatch policy: ${text}`,
+    }
   }
 
   export function load(): Config {
