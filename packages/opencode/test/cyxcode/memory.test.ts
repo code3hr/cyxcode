@@ -343,6 +343,16 @@ describe("Memory controls", () => {
     expect(idx.entries.find((entry) => entry.id === "control")?.privacy).toBe("never_send")
   })
 
+  test("marks high confidence secret tags as never_send", async () => {
+    await Memory.save("token-note", ["token"], "Token memory", "remember token handling")
+
+    const saved = await Memory.get("token-note")
+    expect(saved?.entry.privacy).toBe("never_send")
+
+    const next = await Memory.update("token-note", { privacy: "public" })
+    expect(next?.privacy).toBe("never_send")
+  })
+
   test("applies memory privacy presets conservatively", async () => {
     await Memory.save("auth-note", ["auth"], "Auth memory", "jwt middleware")
     await Memory.save("readme-note", ["docs"], "Readme memory", "project readme")

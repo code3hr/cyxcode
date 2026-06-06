@@ -4,6 +4,7 @@ import { db, selectVectors, vectorCount } from "./db"
 import { embed, isDisabled, isWarmed, warmup } from "./embedder"
 import { factsAbout as _factsAbout, factsCount, recordFact as _recordFact } from "./facts"
 import { registerSubscribers } from "./indexer"
+import { MemoryPrivacy } from "../memory/privacy"
 import { reconcile } from "./reconcile"
 import { dot, decayFactor, topK, type Scored } from "./vector"
 import type {
@@ -106,8 +107,18 @@ export namespace Recall {
       return []
     }
 
+    const blocked = rows.filter((row) => MemoryPrivacy.norm(row.meta.privacy) === "never_send")
+    if (blocked.length > 0) {
+      void CyxWatch.memory({
+        action: "redact",
+        source: "recall:similar",
+        count: blocked.length,
+        redactions: ["never_send_memory"],
+      }).catch(() => {})
+    }
+
     const now = Date.now()
-    const scored: Scored<VectorRow>[] = rows.map((r) => {
+    const scored: Scored<VectorRow>[] = rows.filter((row) => MemoryPrivacy.norm(row.meta.privacy) !== "never_send").map((r) => {
       const sim = dot(query, r.embedding)
       const factor = decay ? decayFactor(now, r.createdAt) : 1
       return { item: r, score: sim * factor }

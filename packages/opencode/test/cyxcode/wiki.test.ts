@@ -126,6 +126,24 @@ describe("Wiki", () => {
     expect(idx.pages.find((item) => item.id === page.id)?.privacy).toBe("private")
   })
 
+  test("marks high confidence secret wiki tags as never_send", async () => {
+    const page = await Wiki.create({
+      title: "Secret Notes",
+      body: "Do not send.",
+      tags: ["secret"],
+    })
+
+    const idx = await Wiki.readIndex()
+    expect(idx.pages.find((item) => item.id === page.id)?.privacy).toBe("never_send")
+    const out = await Wiki.relevant([
+      {
+        info: { role: "user" },
+        parts: [{ type: "text", text: "secret notes", synthetic: false }],
+      },
+    ] as Parameters<typeof Wiki.relevant>[0])
+    expect(out).toEqual([])
+  })
+
   test("upsert updates an existing note by title", async () => {
     const first = await Wiki.upsert({
       title: "Rolling Note",

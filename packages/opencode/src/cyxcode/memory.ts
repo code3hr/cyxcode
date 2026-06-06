@@ -19,6 +19,7 @@ import { CyxAudit } from "./audit"
 import { Codegraph } from "./codegraph"
 import { Wiki } from "./wiki"
 import { CyxWatch } from "./watch"
+import { MemoryPrivacy, type Privacy } from "./memory/privacy"
 
 const log = Log.create({ service: "cyxcode-memory" })
 
@@ -26,7 +27,6 @@ const MAX_ENTRIES = 200
 const MAX_LOAD_CHARS = 2000
 const PRUNE_DAYS = 30
 const PRUNE_MIN_ACCESS = 3
-const classes = new Set(["public", "private", "sensitive", "never_send"])
 const presetIDs = ["balanced", "strict", "public"] as const
 const terms = [
   "auth",
@@ -53,7 +53,7 @@ export type MemoryEntry = {
   created: string
   accessed: string
   accessCount: number
-  privacy?: "public" | "private" | "sensitive" | "never_send"
+  privacy?: Privacy
 }
 
 export type MemoryIndex = {
@@ -70,7 +70,7 @@ export type MemoryPreset = {
 function norm(entry: MemoryEntry): MemoryEntry {
   return {
     ...entry,
-    privacy: classes.has(entry.privacy ?? "") ? entry.privacy : "private",
+    privacy: MemoryPrivacy.classify(entry),
   }
 }
 
@@ -294,7 +294,7 @@ export namespace Memory {
     const entry = idx.entries[pos]!
     const next: MemoryEntry = {
       ...entry,
-      privacy: input.privacy && classes.has(input.privacy) ? input.privacy : entry.privacy ?? "private",
+      privacy: MemoryPrivacy.classify({ ...entry, ...input }),
       tags: input.tags ?? entry.tags,
       summary: input.summary ?? entry.summary,
     }

@@ -6,6 +6,7 @@ import { recallDbPath } from "./paths"
 import { PRAGMAS, SCHEMA_SQL } from "./schema.sql"
 import { RecallError } from "./errors"
 import { RECALL_DIM, RECALL_MODEL, type VectorRow, type VectorSource } from "./types"
+import { MemoryPrivacy } from "../memory/privacy"
 
 const log = Log.create({ service: "cyxcode-recall-db" })
 
@@ -111,10 +112,33 @@ function newVectorId(source: string, sourceId: string): string {
   return `vec_${source}_${sourceId}`
 }
 
+function text(input: Record<string, unknown>, key: string) {
+  return typeof input[key] === "string" ? input[key] : undefined
+}
+
+function list(input: Record<string, unknown>, key: string) {
+  return Array.isArray(input[key]) ? input[key].filter((item): item is string => typeof item === "string") : undefined
+}
+
+function meta(input: Record<string, unknown>, id?: string) {
+  return {
+    ...input,
+    privacy: MemoryPrivacy.classify({
+      id,
+      path: text(input, "path"),
+      file: text(input, "file"),
+      title: text(input, "title"),
+      summary: text(input, "summary"),
+      tags: list(input, "tags"),
+      privacy: input.privacy,
+    }),
+  }
+}
+
 export function upsertVector(input: UpsertVectorInput): string {
   const now = Date.now()
   const id = newVectorId(input.source, input.sourceId)
-  const meta = JSON.stringify({ privacy: "private", ...(input.meta ?? {}) })
+  const info = JSON.stringify(meta(input.meta ?? {}, input.sourceId))
   const createdAt = input.createdAt ?? now
   db()
     .prepare(
@@ -128,7 +152,7 @@ export function upsertVector(input: UpsertVectorInput): string {
          accessed_at = excluded.accessed_at,
          meta        = excluded.meta`,
     )
-    .run(id, input.source, input.sourceId, input.text, toBlob(input.embedding), RECALL_DIM, RECALL_MODEL, createdAt, now, meta)
+    .run(id, input.source, input.sourceId, input.text, toBlob(input.embedding), RECALL_DIM, RECALL_MODEL, createdAt, now, info)
   return id
 }
 
@@ -156,7 +180,7 @@ type VectorRawRow = {
 function parseMeta(text: string): Record<string, unknown> {
   try {
     const v = JSON.parse(text)
-    return v && typeof v === "object" ? { privacy: "private", ...(v as Record<string, unknown>) } : { privacy: "private" }
+    return v && typeof v === "object" ? meta(v as Record<string, unknown>) : { privacy: "private" }
   } catch {
     return { privacy: "private" }
   }

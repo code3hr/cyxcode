@@ -9,6 +9,7 @@ import { redactSecrets } from "./audit"
 import { CyxWatch } from "./watch"
 import { embedBatch, isDisabled } from "./recall/embedder"
 import { upsertVector, bumpAccessBySourceId } from "./recall/db"
+import { MemoryPrivacy, type Privacy } from "./memory/privacy"
 import type { MessageV2 } from "@/session/message-v2"
 
 const log = Log.create({ service: "cyxcode-wiki" })
@@ -30,7 +31,7 @@ export type WikiPage = {
   modified: number
   accessed: number
   accessCount: number
-  privacy?: "public" | "private" | "sensitive" | "never_send"
+  privacy?: Privacy
 }
 
 export type WikiIndex = {
@@ -158,10 +159,9 @@ function full(page: Pick<WikiPage, "path" | "kind">): string {
 }
 
 function priv(page: WikiPage): WikiPage {
-  const vals = new Set(["public", "private", "sensitive", "never_send"])
   return {
     ...page,
-    privacy: vals.has(page.privacy ?? "") ? page.privacy : "private",
+    privacy: MemoryPrivacy.classify(page),
   }
 }
 
@@ -344,6 +344,7 @@ async function read(file: string, prev?: WikiPage): Promise<WikiPage | null> {
     privacy: prev?.privacy ?? "private",
   }
   page.tags = tags(page)
+  page.privacy = MemoryPrivacy.classify(page)
   return page
 }
 
@@ -466,7 +467,7 @@ export namespace Wiki {
             links: changed[i].links,
             backlinks: changed[i].backlinks,
             kind: changed[i].kind,
-            privacy: changed[i].privacy ?? "private",
+            privacy: MemoryPrivacy.classify(changed[i]),
           },
           createdAt: changed[i].created,
         })
@@ -519,11 +520,22 @@ export namespace Wiki {
     const keys = extract(msgs)
     const pages = query(keys, idx.pages)
     if (pages.length === 0) return []
+    const blocked = pages.filter((page) => MemoryPrivacy.classify(page) === "never_send")
+    if (blocked.length > 0) {
+      void CyxWatch.memory({
+        action: "redact",
+        source: "wiki:relevant",
+        count: blocked.length,
+        redactions: ["never_send_memory"],
+      }).catch(() => {})
+    }
+    const allowed = pages.filter((page) => MemoryPrivacy.classify(page) !== "never_send")
+    if (allowed.length === 0) return []
 
     const out: string[] = []
     const now = Date.now()
 
-    for (const page of pages.slice(0, MAX_CTX)) {
+    for (const page of allowed.slice(0, MAX_CTX)) {
       const text = await fs.readFile(full(page), "utf-8").catch(() => "")
       const body = text.trim().slice(0, MAX_TEXT)
       if (!body) continue
@@ -566,7 +578,7 @@ export namespace Wiki {
         count: out.length,
       }).catch(() => {})
       const current = idx.pages.map((page) => {
-        const match = pages.find((item) => item.id === page.id)
+        const match = allowed.find((item) => item.id === page.id)
         return match ?? page
       })
       await write({ version: 1, pages: current })

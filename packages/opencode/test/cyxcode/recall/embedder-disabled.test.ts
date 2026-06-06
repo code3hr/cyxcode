@@ -101,6 +101,22 @@ describe("recall/embedder disabled path", () => {
     expect(hits[0].score).toBeCloseTo(1, 3)
   })
 
+  test("similar() excludes never_send vectors", async () => {
+    installStub((texts) => texts.map((t) => hashEmbed(t)))
+    await Recall.initRecall()
+
+    upsertVector({
+      source: "memory",
+      sourceId: "secret_seed",
+      text: "api token lives in env",
+      embedding: hashEmbed("api token lives in env"),
+      meta: { path: ".env.local" },
+    })
+
+    const hits = await Recall.similar("api token lives in env", { minScore: 0.9, decay: false })
+    expect(hits).toEqual([])
+  })
+
   test("similar() returns empty for empty query", async () => {
     installStub((texts) => texts.map((t) => hashEmbed(t)))
     await Recall.initRecall()
@@ -119,6 +135,7 @@ describe("recall/MemoryLoaded bump path", () => {
       sourceId: "mem_abc",
       text: "something",
       embedding: hashEmbed("something"),
+      meta: { path: ".env.local" },
     })
 
     const { bumpAccessBySourceId } = await import("../../../src/cyxcode/recall/db")
@@ -130,6 +147,6 @@ describe("recall/MemoryLoaded bump path", () => {
     const row = rows.find((r) => r.sourceId === "mem_abc")
     expect(row).toBeDefined()
     expect(row!.accessCount).toBe(2)
-    expect(row!.meta.privacy).toBe("private")
+    expect(row!.meta.privacy).toBe("never_send")
   })
 })
