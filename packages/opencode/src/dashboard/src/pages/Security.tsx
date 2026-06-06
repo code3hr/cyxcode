@@ -56,6 +56,27 @@ const label = (rule: Rule) => {
   return text || "global match"
 }
 
+const issue = (rule: Rule) => {
+  const has = [
+    rule.permission,
+    rule.pattern,
+    rule.path,
+    rule.host,
+    rule.cmd,
+    rule.method,
+    rule.bytes_gt,
+    rule.bytes_gte,
+    rule.bytes_lt,
+    rule.bytes_lte,
+  ].some((item) => item !== undefined)
+  if (!has) return "Rule needs at least one matcher"
+
+  const min = Math.max(rule.bytes_gt === undefined ? 0 : rule.bytes_gt + 1, rule.bytes_gte ?? 0)
+  const max = Math.min(rule.bytes_lt === undefined ? Number.MAX_SAFE_INTEGER : rule.bytes_lt - 1, rule.bytes_lte ?? Number.MAX_SAFE_INTEGER)
+  if (min > max) return "Byte thresholds cannot overlap"
+  return undefined
+}
+
 const Security: Component = () => {
   const [period, setPeriod] = createSignal<Period>("7d")
   const [report, setReport] = createSignal<WatchReport | null>(null)
@@ -203,11 +224,18 @@ const Security: Component = () => {
   }
 
   const storeRule = () => {
+    const rule = build()
+    const err = issue(rule)
+    if (err) {
+      setError(err)
+      setMsg(null)
+      return
+    }
     const cfg = policy() ?? { version: 2, rules: [] }
     const list = [...cfg.rules]
     const index = editing()
-    if (index === null) list.push(build())
-    else list[index] = build()
+    if (index === null) list.push(rule)
+    else list[index] = rule
     sync({ version: 2, rules: list })
     reset()
   }
