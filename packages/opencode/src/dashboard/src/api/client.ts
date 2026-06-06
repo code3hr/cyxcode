@@ -386,6 +386,7 @@ export const watchApi = {
   recent: (limit = 20) => request<{ events: WatchEvent[]; total: number }>(`/cyxwatch/recent?limit=${limit}`),
   alerts: (limit = 20) => request<{ alerts: WatchAlert[]; total: number }>(`/cyxwatch/alerts?limit=${limit}`),
   policy: () => request<{ policy: WatchPolicy }>("/cyxwatch/policy"),
+  effectivePolicy: () => request<{ policy: WatchPolicy }>("/cyxwatch/policy/effective"),
   savePolicy: (policy: WatchPolicy) =>
     request<{ policy: WatchPolicy }>("/cyxwatch/policy", {
       method: "PUT",

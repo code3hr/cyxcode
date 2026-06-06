@@ -62,6 +62,7 @@ const Security: Component = () => {
   const [events, setEvents] = createSignal<WatchEvent[]>([])
   const [alerts, setAlerts] = createSignal<WatchAlert[]>([])
   const [policy, setPolicy] = createSignal<WatchPolicy | null>(null)
+  const [effective, setEffective] = createSignal<WatchPolicy | null>(null)
   const [draft, setDraft] = createSignal("")
   const [editing, setEditing] = createSignal<number | null>(null)
   const [ruleId, setRuleId] = createSignal("")
@@ -97,17 +98,19 @@ const Security: Component = () => {
     setError(null)
     setMsg(null)
 
-    const [rep, evt, alt, cfg] = await Promise.all([
+    const [rep, evt, alt, cfg, eff] = await Promise.all([
       watchApi.report(period()),
       watchApi.recent(80),
       watchApi.alerts(40),
       watchApi.policy(),
+      watchApi.effectivePolicy(),
     ])
 
     if (rep.error) setError(rep.error)
     if (evt.error) setError((prev) => prev ?? evt.error)
     if (alt.error) setError((prev) => prev ?? alt.error)
     if (cfg.error) setError((prev) => prev ?? cfg.error)
+    if (eff.error) setError((prev) => prev ?? eff.error)
 
     if (rep.data) setReport(rep.data.report)
     if (evt.data) setEvents(evt.data.events)
@@ -115,6 +118,7 @@ const Security: Component = () => {
     if (cfg.data) {
       sync(cfg.data.policy)
     }
+    if (eff.data) setEffective(eff.data.policy)
 
     setLoading(false)
   }
@@ -243,6 +247,9 @@ const Security: Component = () => {
 
     if (res.data) {
       sync(res.data.policy)
+      const eff = await watchApi.effectivePolicy()
+      if (eff.data) setEffective(eff.data.policy)
+      if (eff.error) setError(eff.error)
       setMsg("Policy saved")
     }
     setSaving(false)
@@ -395,7 +402,7 @@ const Security: Component = () => {
             <div class="flex items-center justify-between gap-3 mb-4">
               <div>
                 <div class="card-header mb-0">Policy Rules</div>
-                <div class="text-xs text-gray-500">{policy()?.rules.length ?? 0} configured</div>
+                <div class="text-xs text-gray-500">{policy()?.rules.length ?? 0} editable / {effective()?.rules.length ?? policy()?.rules.length ?? 0} effective</div>
               </div>
               <button class="btn btn-secondary text-sm" onClick={reset}>
                 New
