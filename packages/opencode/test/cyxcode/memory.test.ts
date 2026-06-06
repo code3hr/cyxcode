@@ -1,5 +1,10 @@
 import { describe, expect, test, beforeEach, afterEach } from "bun:test"
+import fs from "fs/promises"
+import os from "os"
+import path from "path"
 import { Memory, type MemoryEntry, type MemoryIndex } from "../../src/cyxcode/memory"
+import { CyxPaths } from "../../src/cyxcode/paths"
+import { MemoryRoutes } from "../../src/server/routes/memory"
 
 /**
  * Memory System Tests
@@ -303,5 +308,69 @@ describe("Memory scoring algorithm", () => {
     const result = Memory.query(["foo", "bar"], entries)
     // "multi" should rank higher (2 exact matches = 6 points vs 1 = 3 points)
     expect(result[0].id).toBe("multi")
+  })
+})
+
+describe("Memory controls", () => {
+  let dir: string
+  let cwd: string
+
+  beforeEach(async () => {
+    dir = await fs.mkdtemp(path.join(os.tmpdir(), "cyx-memory-controls-"))
+    cwd = process.cwd()
+    await fs.mkdir(path.join(dir, ".opencode"), { recursive: true })
+    await fs.mkdir(path.join(dir, ".git"), { recursive: true })
+    process.chdir(dir)
+    CyxPaths.invalidateCache()
+  })
+
+  afterEach(async () => {
+    process.chdir(cwd)
+    CyxPaths.invalidateCache()
+    await fs.rm(dir, { recursive: true, force: true })
+  })
+
+  test("defaults memories to private and updates privacy class", async () => {
+    await Memory.save("control", ["auth"], "Auth memory", "remember auth middleware")
+
+    const saved = await Memory.get("control")
+    expect(saved?.entry.privacy).toBe("private")
+
+    const next = await Memory.update("control", { privacy: "never_send" })
+    expect(next?.privacy).toBe("never_send")
+
+    const idx = await Memory.readIndex()
+    expect(idx.entries.find((entry) => entry.id === "control")?.privacy).toBe("never_send")
+  })
+
+  test("deletes memory index entry and backing file", async () => {
+    await Memory.save("remove-me", ["cleanup"], "Remove memory", "delete this")
+    const saved = await Memory.get("remove-me")
+    expect(saved).toBeDefined()
+
+    expect(await Memory.remove("remove-me")).toBe(true)
+    expect(await Memory.get("remove-me")).toBeUndefined()
+    await expect(fs.stat(path.join(Memory.getBasePath(), "remove-me.md"))).rejects.toThrow()
+  })
+
+  test("memory routes export, update, and delete entries", async () => {
+    await Memory.save("route-memory", ["route"], "Route memory", "route content")
+    const app = MemoryRoutes()
+
+    const exp = await app.request("/export?id=route-memory")
+    expect(exp.status).toBe(200)
+    expect((await exp.json()).content).toBe("route content")
+
+    const patch = await app.request("/page?id=route-memory", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ privacy: "sensitive" }),
+    })
+    expect(patch.status).toBe(200)
+    expect((await patch.json()).entry.privacy).toBe("sensitive")
+
+    const del = await app.request("/page?id=route-memory", { method: "DELETE" })
+    expect(del.status).toBe(200)
+    expect((await del.json()).success).toBe(true)
   })
 })

@@ -648,6 +648,7 @@ export interface MemoryEntry {
   created: string
   accessed: string
   accessCount: number
+  privacy?: "public" | "private" | "sensitive" | "never_send"
 }
 
 export interface MemoryList {
@@ -665,6 +666,19 @@ export const memoryApi = {
   },
 
   get: (id: string) => request<{ entry: MemoryEntry; content: string }>(`/experimental/memory/page?id=${encodeURIComponent(id)}`),
+
+  export: (id: string) => request<{ entry: MemoryEntry; content: string }>(`/experimental/memory/export?id=${encodeURIComponent(id)}`),
+
+  update: (id: string, data: Partial<Pick<MemoryEntry, "privacy" | "tags" | "summary">>) =>
+    request<{ entry: MemoryEntry }>(`/experimental/memory/page?id=${encodeURIComponent(id)}`, {
+      method: "PATCH",
+      body: JSON.stringify(data),
+    }),
+
+  delete: (id: string) =>
+    request<{ success: boolean }>(`/experimental/memory/page?id=${encodeURIComponent(id)}`, {
+      method: "DELETE",
+    }),
 }
 
 export const wikiApi = {

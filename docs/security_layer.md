@@ -514,6 +514,8 @@ What is done:
   nodes.
 - `/cyxwatch/query` and `/dashboard/security` can filter event history by
   session, path, host, flag, and decision.
+- `/dashboard/memory` can inspect, export, delete, and reclassify project
+  memory records with local privacy classes.
 - CyxWatch avoids startup import cycles by lazy-loading `Log` and `Instance`.
 
 Verified:
@@ -523,7 +525,7 @@ Verified:
 
 Next time:
 
-- Add a Memory Firewall view for inspect, export, delete, and reclassify.
+- Add Memory Firewall policy editing and context-sent views.
 - Add explicit cloud-model disclosure boundaries for memory events.
 - Decide where output redaction lives in the response pipeline and how users can override false positives.
 - Add saved graph query shortcuts for common incident investigations.

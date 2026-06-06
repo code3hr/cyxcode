@@ -456,6 +456,9 @@ Current shipped pieces:
 
 - first-pass memory event types in `WatchKind`
 - `CyxWatch.memory()` helper
+- project memory privacy class metadata, defaulting to `private`
+- `/dashboard/memory` controls for inspect, export, delete, and reclassify,
+  including `never_send`
 - project memory read/retrieve/send telemetry
 - wiki read/retrieve/send telemetry
 - recall query embed and similarity retrieval telemetry
@@ -465,7 +468,6 @@ Current shipped pieces:
 
 Remaining tasks:
 
-- add memory privacy class metadata
 - default existing memory, wiki, and recall-derived records to `private`
 - add `never_send` path and tag patterns
 - expand memory event coverage to writes, redactions, minimization, and explicit
@@ -473,7 +475,7 @@ Remaining tasks:
 - add context minimizer before cloud model calls
 - add memory approval prompts
 - encrypt sensitive memory at rest
-- add dashboard controls for inspect, export, delete, and reclassify
+- add Memory Firewall policy editing and context-sent views
 
 Exit criteria:
 

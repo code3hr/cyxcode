@@ -26,6 +26,7 @@ const MAX_ENTRIES = 200
 const MAX_LOAD_CHARS = 2000
 const PRUNE_DAYS = 30
 const PRUNE_MIN_ACCESS = 3
+const classes = new Set(["public", "private", "sensitive", "never_send"])
 
 // --- Types ---
 
@@ -37,11 +38,19 @@ export type MemoryEntry = {
   created: string
   accessed: string
   accessCount: number
+  privacy?: "public" | "private" | "sensitive" | "never_send"
 }
 
 export type MemoryIndex = {
   version: 1
   entries: MemoryEntry[]
+}
+
+function norm(entry: MemoryEntry): MemoryEntry {
+  return {
+    ...entry,
+    privacy: classes.has(entry.privacy ?? "") ? entry.privacy : "private",
+  }
 }
 
 // --- File path resolution (centralized in CyxPaths) ---
@@ -62,7 +71,8 @@ export namespace Memory {
   export async function readIndex(): Promise<MemoryIndex> {
     try {
       const content = await fs.readFile(indexPath(), "utf-8")
-      return JSON.parse(content) as MemoryIndex
+      const idx = JSON.parse(content) as MemoryIndex
+      return { version: 1, entries: idx.entries.map(norm) }
     } catch {
       return { version: 1, entries: [] }
     }
@@ -109,6 +119,7 @@ export namespace Memory {
       created: new Date().toISOString().slice(0, 10),
       accessed: new Date().toISOString().slice(0, 10),
       accessCount: 0,
+      privacy: "private",
     }
 
     // Write memory file
@@ -181,6 +192,39 @@ export namespace Memory {
     }
 
     return parts.join("\n\n")
+  }
+
+  export async function get(id: string): Promise<{ entry: MemoryEntry; content: string } | undefined> {
+    const idx = await readIndex()
+    const entry = idx.entries.find((item) => item.id === id)
+    if (!entry) return undefined
+    const content = await fs.readFile(path.join(basePath(), entry.file), "utf-8").catch(() => "")
+    return { entry, content }
+  }
+
+  export async function update(id: string, input: { privacy?: MemoryEntry["privacy"]; tags?: string[]; summary?: string }) {
+    const idx = await readIndex()
+    const pos = idx.entries.findIndex((entry) => entry.id === id)
+    if (pos < 0) return undefined
+    const entry = idx.entries[pos]!
+    const next: MemoryEntry = {
+      ...entry,
+      privacy: input.privacy && classes.has(input.privacy) ? input.privacy : entry.privacy ?? "private",
+      tags: input.tags ?? entry.tags,
+      summary: input.summary ?? entry.summary,
+    }
+    idx.entries[pos] = next
+    await writeIndex(idx)
+    return next
+  }
+
+  export async function remove(id: string) {
+    const idx = await readIndex()
+    const entry = idx.entries.find((item) => item.id === id)
+    if (!entry) return false
+    await fs.unlink(path.join(basePath(), entry.file)).catch(() => {})
+    await writeIndex({ version: 1, entries: idx.entries.filter((item) => item.id !== id) })
+    return true
   }
 
   /** Load entries from a specific memory directory */

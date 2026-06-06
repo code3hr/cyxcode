@@ -1,11 +1,11 @@
-import path from "path"
 import { Hono } from "hono"
 import { describeRoute, resolver, validator } from "hono-openapi"
 import z from "zod"
 import { Memory } from "../../cyxcode/memory"
-import { Filesystem } from "../../util/filesystem"
 import { lazy } from "../../util/lazy"
 import { errors } from "../error"
+
+const privacy = z.enum(["public", "private", "sensitive", "never_send"])
 
 const item = z.object({
   id: z.string(),
@@ -15,6 +15,7 @@ const item = z.object({
   created: z.string(),
   accessed: z.string(),
   accessCount: z.number(),
+  privacy: privacy.optional(),
 })
 
 export const MemoryRoutes = lazy(() =>
@@ -97,11 +98,112 @@ export const MemoryRoutes = lazy(() =>
       ),
       async (c) => {
         const id = c.req.valid("query").id
-        const idx = await Memory.readIndex()
-        const entry = idx.entries.find((item) => item.id === id)
+        const out = await Memory.get(id)
+        if (!out) return c.json({ error: "Memory entry not found" }, 404)
+        return c.json(out)
+      },
+    )
+    .get(
+      "/export",
+      describeRoute({
+        summary: "Export memory entry",
+        description: "Return a memory entry and raw content for export.",
+        operationId: "memory.export",
+        responses: {
+          200: {
+            description: "Memory export",
+            content: {
+              "application/json": {
+                schema: resolver(
+                  z.object({
+                    entry: item,
+                    content: z.string(),
+                  }),
+                ),
+              },
+            },
+          },
+          ...errors(404),
+        },
+      }),
+      validator(
+        "query",
+        z.object({
+          id: z.string(),
+        }),
+      ),
+      async (c) => {
+        const out = await Memory.get(c.req.valid("query").id)
+        if (!out) return c.json({ error: "Memory entry not found" }, 404)
+        return c.json(out)
+      },
+    )
+    .patch(
+      "/page",
+      describeRoute({
+        summary: "Update memory entry metadata",
+        description: "Update memory tags, summary, or privacy class.",
+        operationId: "memory.update",
+        responses: {
+          200: {
+            description: "Updated memory entry",
+            content: {
+              "application/json": {
+                schema: resolver(z.object({ entry: item })),
+              },
+            },
+          },
+          ...errors(404),
+        },
+      }),
+      validator(
+        "query",
+        z.object({
+          id: z.string(),
+        }),
+      ),
+      validator(
+        "json",
+        z.object({
+          privacy: privacy.optional(),
+          tags: z.array(z.string()).optional(),
+          summary: z.string().optional(),
+        }),
+      ),
+      async (c) => {
+        const entry = await Memory.update(c.req.valid("query").id, c.req.valid("json"))
         if (!entry) return c.json({ error: "Memory entry not found" }, 404)
-        const content = await Filesystem.readText(path.join(Memory.getBasePath(), entry.file)).catch(() => "")
-        return c.json({ entry, content })
+        return c.json({ entry })
+      },
+    )
+    .delete(
+      "/page",
+      describeRoute({
+        summary: "Delete memory entry",
+        description: "Delete a memory entry and its backing file.",
+        operationId: "memory.delete",
+        responses: {
+          200: {
+            description: "Deletion result",
+            content: {
+              "application/json": {
+                schema: resolver(z.object({ success: z.boolean() })),
+              },
+            },
+          },
+          ...errors(404),
+        },
+      }),
+      validator(
+        "query",
+        z.object({
+          id: z.string(),
+        }),
+      ),
+      async (c) => {
+        const ok = await Memory.remove(c.req.valid("query").id)
+        if (!ok) return c.json({ error: "Memory entry not found" }, 404)
+        return c.json({ success: true })
       },
     ),
 )

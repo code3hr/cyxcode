@@ -2,14 +2,19 @@ import { Component, For, Show, createEffect, createSignal, onCleanup } from "sol
 import { useSearchParams, A } from "@solidjs/router"
 import { memoryApi, type MemoryEntry } from "../api/client"
 
+const classes: Array<NonNullable<MemoryEntry["privacy"]>> = ["public", "private", "sensitive", "never_send"]
+
 const Memory: Component = () => {
   const [search, setSearch] = useSearchParams()
   const [term, setTerm] = createSignal("")
   const [items, setItems] = createSignal<MemoryEntry[]>([])
   const [cur, setCur] = createSignal<MemoryEntry | null>(null)
   const [text, setText] = createSignal("")
+  const [privacy, setPrivacy] = createSignal<NonNullable<MemoryEntry["privacy"]>>("private")
   const [load, setLoad] = createSignal(true)
+  const [busy, setBusy] = createSignal(false)
   const [err, setErr] = createSignal<string | null>(null)
+  const [msg, setMsg] = createSignal<string | null>(null)
 
   const fetchList = async (q = "") => {
     setLoad(true)
@@ -35,6 +40,7 @@ const Memory: Component = () => {
     if (!res.data) return
     setCur(res.data.entry)
     setText(res.data.content)
+    setPrivacy(res.data.entry.privacy ?? "private")
   }
 
   createEffect(() => {
@@ -54,6 +60,65 @@ const Memory: Component = () => {
     setCur(next)
     setSearch({ id })
     void fetchPage(id)
+  }
+
+  const refresh = async (id?: string) => {
+    await fetchList(term().trim())
+    if (id) await fetchPage(id)
+  }
+
+  const save = async () => {
+    const item = cur()
+    if (!item) return
+    setBusy(true)
+    setErr(null)
+    setMsg(null)
+    const res = await memoryApi.update(item.id, { privacy: privacy() })
+    if (res.error) setErr(res.error)
+    if (res.data) {
+      setCur(res.data.entry)
+      setItems(items().map((entry) => entry.id === res.data!.entry.id ? res.data!.entry : entry))
+      setMsg("Memory updated")
+    }
+    setBusy(false)
+  }
+
+  const download = async () => {
+    const item = cur()
+    if (!item) return
+    setBusy(true)
+    setErr(null)
+    const res = await memoryApi.export(item.id)
+    if (res.error) setErr(res.error)
+    if (res.data) {
+      const blob = new Blob([res.data.content], { type: "text/markdown" })
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement("a")
+      a.href = url
+      a.download = res.data.entry.file
+      a.click()
+      URL.revokeObjectURL(url)
+      setMsg("Memory exported")
+    }
+    setBusy(false)
+  }
+
+  const remove = async () => {
+    const item = cur()
+    if (!item || !window.confirm(`Delete memory ${item.id}?`)) return
+    setBusy(true)
+    setErr(null)
+    setMsg(null)
+    const res = await memoryApi.delete(item.id)
+    if (res.error) setErr(res.error)
+    if (res.data) {
+      setCur(null)
+      setText("")
+      setSearch({})
+      await refresh()
+      setMsg("Memory deleted")
+    }
+    setBusy(false)
   }
 
   return (
@@ -78,6 +143,9 @@ const Memory: Component = () => {
       <Show when={err()}>
         <div class="bg-red-900/50 border border-red-700 rounded-lg p-4 text-red-200">{err()}</div>
       </Show>
+      <Show when={msg()}>
+        <div class="bg-cyan-950/50 border border-cyan-800 rounded p-3 text-sm text-cyan-200">{msg()}</div>
+      </Show>
 
       <div class="grid grid-cols-1 xl:grid-cols-12 gap-6">
         <div class="xl:col-span-4 card">
@@ -96,6 +164,7 @@ const Memory: Component = () => {
                     <div class="font-medium text-gray-100 truncate">{item.summary}</div>
                     <div class="text-xs text-gray-500 truncate">{item.id}</div>
                     <div class="mt-2 flex flex-wrap gap-2">
+                      <span class={`badge ${badge(item.privacy ?? "private")}`}>{item.privacy ?? "private"}</span>
                       <For each={item.tags.slice(0, 4)}>{(tag) => <span class="badge bg-gray-700 text-gray-300">{tag}</span>}</For>
                     </div>
                   </button>
@@ -116,6 +185,7 @@ const Memory: Component = () => {
 
               <div class="flex flex-wrap gap-2">
                 <span class="badge bg-amber-900/40 text-amber-300">memory</span>
+                <span class={`badge ${badge(cur()!.privacy ?? "private")}`}>{cur()!.privacy ?? "private"}</span>
                 <span class="badge bg-gray-700 text-gray-300">{cur()!.tags.length} tags</span>
                 <span class="badge bg-gray-700 text-gray-300">{cur()!.accessCount} loads</span>
               </div>
@@ -124,6 +194,24 @@ const Memory: Component = () => {
                 <A class="btn btn-secondary text-xs" href={`/dashboard/graph?id=${encodeURIComponent(cur()!.id)}`}>
                   Back to graph
                 </A>
+                <button class="btn btn-secondary text-xs" onClick={download} disabled={busy()}>
+                  Export
+                </button>
+                <button class="btn btn-danger text-xs" onClick={remove} disabled={busy()}>
+                  Delete
+                </button>
+              </div>
+
+              <div class="rounded border border-gray-700 bg-gray-900 p-3">
+                <div class="text-sm text-gray-400 mb-2">Privacy class</div>
+                <div class="flex flex-wrap gap-2">
+                  <select class="select text-sm" value={privacy()} onChange={(e) => setPrivacy(e.currentTarget.value as NonNullable<MemoryEntry["privacy"]>)}>
+                    <For each={classes}>{(item) => <option value={item}>{item}</option>}</For>
+                  </select>
+                  <button class="btn btn-primary text-sm" onClick={save} disabled={busy()}>
+                    Save
+                  </button>
+                </div>
               </div>
 
               <div>
@@ -149,6 +237,13 @@ const Memory: Component = () => {
       </div>
     </div>
   )
+}
+
+function badge(value: NonNullable<MemoryEntry["privacy"]>) {
+  if (value === "public") return "bg-emerald-900/40 text-emerald-300"
+  if (value === "sensitive") return "bg-orange-950 text-orange-300"
+  if (value === "never_send") return "bg-red-950 text-red-300"
+  return "bg-blue-900/40 text-blue-300"
 }
 
 export default Memory
