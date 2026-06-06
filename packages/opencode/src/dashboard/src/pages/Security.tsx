@@ -40,6 +40,22 @@ const num = (text: string) => {
   return Number.isFinite(value) ? value : undefined
 }
 
+const label = (rule: Rule) => {
+  const bytes = [
+    rule.bytes_gt === undefined ? undefined : `bytes > ${rule.bytes_gt}`,
+    rule.bytes_gte === undefined ? undefined : `bytes >= ${rule.bytes_gte}`,
+    rule.bytes_lt === undefined ? undefined : `bytes < ${rule.bytes_lt}`,
+    rule.bytes_lte === undefined ? undefined : `bytes <= ${rule.bytes_lte}`,
+  ].filter((item): item is string => !!item)
+  const text = rule.path?.join(", ")
+    ?? rule.host?.join(", ")
+    ?? rule.cmd?.join(", ")
+    ?? rule.pattern?.join(", ")
+    ?? rule.method?.join(", ")
+    ?? bytes.join(", ")
+  return text || "global match"
+}
+
 const Security: Component = () => {
   const [period, setPeriod] = createSignal<Period>("7d")
   const [report, setReport] = createSignal<WatchReport | null>(null)
@@ -396,7 +412,7 @@ const Security: Component = () => {
                       </div>
                       <div class="mt-2 text-xs text-gray-500">{rule.permission?.join(", ") ?? "all permissions"}</div>
                       <div class="mt-2 text-sm text-gray-400 truncate">
-                        {rule.path?.join(", ") ?? rule.host?.join(", ") ?? rule.cmd?.join(", ") ?? rule.pattern?.join(", ") ?? rule.method?.join(", ") ?? "global match"}
+                        {label(rule)}
                       </div>
                       <div class="mt-3 flex gap-2">
                         <button class="btn btn-secondary text-xs px-3 py-1" onClick={() => read(rule, index())}>
