@@ -984,11 +984,12 @@ export namespace CyxWatch {
     })
   }
 
-  export async function context(input: { limit?: number; sessionID?: string } = {}) {
+  export async function context(input: { limit?: number; sessionID?: string; source?: string } = {}) {
     return await query({
       kind: "memory.send",
       limit: input.limit,
       sessionID: input.sessionID,
+      path: input.source,
     })
   }
 

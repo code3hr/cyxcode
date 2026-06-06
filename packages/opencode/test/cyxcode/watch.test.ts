@@ -1013,11 +1013,27 @@ describe("CyxWatch", () => {
       bytes: 49,
       count: 1,
     })
+    await CyxWatch.memory({
+      action: "send",
+      source: "provider:anthropic:claude-test",
+      text: "<project-memory>\nother context\n</project-memory>",
+      sessionID: "ses_provider",
+      messageID: "msg_other",
+      bytes: 46,
+      count: 1,
+    })
 
-    const rows = await CyxWatch.context({ limit: 5, sessionID: "ses_provider" })
+    const rows = await CyxWatch.context({ limit: 5, sessionID: "ses_provider", source: "provider:openai" })
     expect(rows).toHaveLength(1)
     expect(rows[0]!.path).toBe("provider:openai:gpt-test")
     expect(rows[0]!.messageID).toBe("msg_provider")
     expect(rows[0]!.text).toContain("provider context")
+
+    const app = createWatchRoutes()
+    const res = await app.request("/cyxwatch/context?session=ses_provider&provider=anthropic&model=claude-test")
+    expect(res.status).toBe(200)
+    const out = await res.json()
+    expect(out.total).toBe(1)
+    expect(out.events[0].path).toBe("provider:anthropic:claude-test")
   })
 })

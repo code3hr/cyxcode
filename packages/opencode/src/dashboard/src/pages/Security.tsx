@@ -109,6 +109,7 @@ const Security: Component = () => {
   const [eventPath, setEventPath] = createSignal("")
   const [eventHost, setEventHost] = createSignal("")
   const [eventFlag, setEventFlag] = createSignal("")
+  const [source, setSource] = createSignal("")
   const [loading, setLoading] = createSignal(true)
   const [saving, setSaving] = createSignal(false)
   const [error, setError] = createSignal<string | null>(null)
@@ -138,6 +139,7 @@ const Security: Component = () => {
       watchApi.context({
         limit: 20,
         session: session().trim() || undefined,
+        source: source().trim() || undefined,
       }),
       watchApi.policy(),
       watchApi.effectivePolicy(),
@@ -186,6 +188,7 @@ const Security: Component = () => {
     setEventPath("")
     setEventHost("")
     setEventFlag("")
+    setSource("")
   }
 
   const reset = () => {
@@ -465,9 +468,12 @@ const Security: Component = () => {
               <div class="card-header mb-0">Context Sent</div>
               <div class="text-xs text-gray-500">{sent().length} memory disclosure events</div>
             </div>
-            <button class="btn btn-secondary text-sm" onClick={() => setGroup("memory")}>
-              Memory events
-            </button>
+            <div class="flex flex-wrap gap-2">
+              <input class="input text-sm w-56" placeholder="Source or provider" value={source()} onInput={(e) => setSource(e.currentTarget.value)} />
+              <button class="btn btn-secondary text-sm" onClick={() => setGroup("memory")}>
+                Memory events
+              </button>
+            </div>
           </div>
           <div class="space-y-3 max-h-[34rem] overflow-y-auto pr-1">
             <Show when={sent().length > 0} fallback={<div class="text-sm text-gray-500">No memory context sent in this window.</div>}>

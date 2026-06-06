@@ -405,10 +405,13 @@ export const watchApi = {
     const query = params.toString() ? `?${params.toString()}` : ""
     return request<{ events: WatchEvent[]; total: number }>(`/cyxwatch/query${query}`)
   },
-  context: (opts?: { limit?: number; session?: string }) => {
+  context: (opts?: { limit?: number; session?: string; source?: string; provider?: string; model?: string }) => {
     const params = new URLSearchParams()
     if (opts?.limit) params.set("limit", String(opts.limit))
     if (opts?.session) params.set("session", opts.session)
+    if (opts?.source) params.set("source", opts.source)
+    if (opts?.provider) params.set("provider", opts.provider)
+    if (opts?.model) params.set("model", opts.model)
     const query = params.toString() ? `?${params.toString()}` : ""
     return request<{ events: WatchEvent[]; total: number }>(`/cyxwatch/context${query}`)
   },
