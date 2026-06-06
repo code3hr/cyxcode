@@ -320,6 +320,85 @@ describe("CyxWatch", () => {
     expect(out.decision).toBe("allow")
   })
 
+  test("loads default policy rules and lets user policy override them", async () => {
+    await fs.mkdir(path.dirname(WatchPolicy.defaultFile()), { recursive: true })
+    await fs.writeFile(WatchPolicy.defaultFile(), JSON.stringify({
+      version: 2,
+      rules: [
+        {
+          id: "default-warn",
+          permission: ["webfetch"],
+          host: ["example.com"],
+          decision: "warn",
+          flags: ["default_policy"],
+        },
+      ],
+    }))
+
+    const base = CyxWatch.classify({
+      permission: "webfetch",
+      patterns: ["https://example.com/api"],
+      metadata: { url: "https://example.com/api" },
+    })
+    expect(base.decision).toBe("warn")
+    expect(base.flags).toContain("default_policy")
+
+    await CyxWatch.savePolicy({
+      version: 2,
+      rules: [
+        {
+          id: "user-allow",
+          permission: ["webfetch"],
+          host: ["example.com"],
+          decision: "allow",
+          flags: ["user_policy"],
+        },
+      ],
+    })
+
+    const out = CyxWatch.classify({
+      permission: "webfetch",
+      patterns: ["https://example.com/api"],
+      metadata: { url: "https://example.com/api" },
+    })
+    expect(out.decision).toBe("allow")
+    expect(out.flags).toContain("user_policy")
+    expect(out.flags).not.toContain("default_policy")
+  })
+
+  test("ignores invalid default policy while loading user policy", async () => {
+    await fs.mkdir(path.dirname(WatchPolicy.defaultFile()), { recursive: true })
+    await fs.writeFile(WatchPolicy.defaultFile(), JSON.stringify({
+      version: 2,
+      rules: [
+        {
+          decision: "warn",
+        },
+      ],
+    }))
+    await CyxWatch.savePolicy({
+      version: 2,
+      rules: [
+        {
+          id: "user-warn",
+          permission: ["webfetch"],
+          host: ["example.com"],
+          decision: "warn",
+          flags: ["user_policy"],
+        },
+      ],
+    })
+
+    const out = CyxWatch.classify({
+      permission: "webfetch",
+      patterns: ["https://example.com/api"],
+      metadata: { url: "https://example.com/api" },
+    })
+    expect(out.decision).toBe("warn")
+    expect(out.flags).toContain("user_policy")
+    expect(out.flags).toContain("policy_user-warn")
+  })
+
   test("policy route rejects invalid policy with bad request", async () => {
     const app = createWatchRoutes()
     const bad = await app.request("/cyxwatch/policy", {

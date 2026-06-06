@@ -78,6 +78,10 @@ export namespace WatchPolicy {
     return path.join(CyxPaths.projectDir(), "cyxwatch", "policy.json")
   }
 
+  export function defaultFile() {
+    return path.join(CyxPaths.projectDir(), "cyxwatch", "policies", "default.json")
+  }
+
   export function blank(): Config {
     return {
       version: 2,
@@ -108,12 +112,25 @@ export namespace WatchPolicy {
     }
   }
 
-  export function load(): Config {
-    if (!fs.existsSync(file())) return blank()
+  function read(p: string): Config {
+    if (!fs.existsSync(p)) return blank()
+    return parse(JSON.parse(fs.readFileSync(p, "utf-8")))
+  }
+
+  function optional(p: string): Config {
     try {
-      return parse(JSON.parse(fs.readFileSync(file(), "utf-8")))
+      return read(p)
     } catch {
       return blank()
+    }
+  }
+
+  export function load(): Config {
+    const base = optional(defaultFile())
+    const user = optional(file())
+    return {
+      version: 2,
+      rules: [...user.rules, ...base.rules],
     }
   }
 
