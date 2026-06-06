@@ -472,6 +472,7 @@ Current shipped pieces:
 - `/cyxwatch/context` supports session, source, provider, and model filtering
 - `/dashboard/memory` exposes Memory Firewall policy presets for balanced,
   strict, and public project-memory postures
+- existing memory, wiki, and recall-derived records default to `private`
 - project memory read/retrieve/send telemetry
 - wiki read/retrieve/send telemetry
 - recall query embed and similarity retrieval telemetry
@@ -482,7 +483,6 @@ Current shipped pieces:
 
 Remaining tasks:
 
-- default existing memory, wiki, and recall-derived records to `private`
 - add `never_send` path and tag patterns outside project/global memory indexes
 - expand memory event coverage to writes
 - add memory approval prompts

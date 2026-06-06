@@ -30,6 +30,7 @@ export type WikiPage = {
   modified: number
   accessed: number
   accessCount: number
+  privacy?: "public" | "private" | "sensitive" | "never_send"
 }
 
 export type WikiIndex = {
@@ -154,6 +155,14 @@ function kind(file: string): WikiPage["kind"] {
 function full(page: Pick<WikiPage, "path" | "kind">): string {
   if (page.kind === "wiki") return path.join(CyxPaths.projectDir(), page.path)
   return path.join(CyxPaths.projectRoot(), page.path)
+}
+
+function priv(page: WikiPage): WikiPage {
+  const vals = new Set(["public", "private", "sensitive", "never_send"])
+  return {
+    ...page,
+    privacy: vals.has(page.privacy ?? "") ? page.privacy : "private",
+  }
 }
 
 function isHidden(file: string): boolean {
@@ -332,6 +341,7 @@ async function read(file: string, prev?: WikiPage): Promise<WikiPage | null> {
     modified: stat.mtimeMs,
     accessed: prev?.accessed ?? stat.mtimeMs,
     accessCount: prev?.accessCount ?? 0,
+    privacy: prev?.privacy ?? "private",
   }
   page.tags = tags(page)
   return page
@@ -359,7 +369,8 @@ export namespace Wiki {
     const content = await fs.readFile(indexPath(), "utf-8").catch(() => "")
     if (!content) return { version: 1, pages: [] }
     try {
-      return JSON.parse(content) as WikiIndex
+      const idx = JSON.parse(content) as WikiIndex
+      return { version: 1, pages: idx.pages.map(priv) }
     } catch {
       return { version: 1, pages: [] }
     }
@@ -455,6 +466,7 @@ export namespace Wiki {
             links: changed[i].links,
             backlinks: changed[i].backlinks,
             kind: changed[i].kind,
+            privacy: changed[i].privacy ?? "private",
           },
           createdAt: changed[i].created,
         })

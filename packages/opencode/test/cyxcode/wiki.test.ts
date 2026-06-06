@@ -123,6 +123,7 @@ describe("Wiki", () => {
 
     const idx = await Wiki.readIndex()
     expect(idx.pages.some((item) => item.id === page.id)).toBe(true)
+    expect(idx.pages.find((item) => item.id === page.id)?.privacy).toBe("private")
   })
 
   test("upsert updates an existing note by title", async () => {

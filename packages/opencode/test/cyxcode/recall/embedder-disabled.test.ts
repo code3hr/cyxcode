@@ -130,5 +130,6 @@ describe("recall/MemoryLoaded bump path", () => {
     const row = rows.find((r) => r.sourceId === "mem_abc")
     expect(row).toBeDefined()
     expect(row!.accessCount).toBe(2)
+    expect(row!.meta.privacy).toBe("private")
   })
 })

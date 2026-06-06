@@ -114,7 +114,7 @@ function newVectorId(source: string, sourceId: string): string {
 export function upsertVector(input: UpsertVectorInput): string {
   const now = Date.now()
   const id = newVectorId(input.source, input.sourceId)
-  const meta = JSON.stringify(input.meta ?? {})
+  const meta = JSON.stringify({ privacy: "private", ...(input.meta ?? {}) })
   const createdAt = input.createdAt ?? now
   db()
     .prepare(
@@ -156,9 +156,9 @@ type VectorRawRow = {
 function parseMeta(text: string): Record<string, unknown> {
   try {
     const v = JSON.parse(text)
-    return v && typeof v === "object" ? (v as Record<string, unknown>) : {}
+    return v && typeof v === "object" ? { privacy: "private", ...(v as Record<string, unknown>) } : { privacy: "private" }
   } catch {
-    return {}
+    return { privacy: "private" }
   }
 }
 
