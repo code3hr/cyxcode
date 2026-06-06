@@ -303,7 +303,7 @@ export const reportsApi = {
 export interface WatchEvent {
   id: string
   ts: number
-  kind: "file.read" | "file.write" | "shell.command" | "network.outbound" | "prompt.turn"
+  kind: "file.read" | "file.write" | "shell.command" | "network.outbound" | "network.websocket" | "prompt.turn" | "output.secret" | "memory.read" | "memory.retrieve" | "memory.embed" | "memory.send" | "memory.redact"
   project?: string
   sessionID?: string
   messageID?: string
@@ -359,10 +359,38 @@ export interface WatchReport {
   top: Array<{ path: string; count: number }>
 }
 
+export interface WatchPolicy {
+  version: 2
+  rules: Array<{
+    id?: string
+    description?: string
+    enabled?: boolean
+    permission?: string[]
+    pattern?: string[]
+    path?: string[]
+    host?: string[]
+    cmd?: string[]
+    method?: string[]
+    bytes_gt?: number
+    bytes_gte?: number
+    bytes_lt?: number
+    bytes_lte?: number
+    decision: "allow" | "warn" | "require-approval" | "block"
+    risk?: number
+    flags?: string[]
+  }>
+}
+
 export const watchApi = {
   report: (period = "7d") => request<{ report: WatchReport }>(`/cyxwatch/report?period=${period}`),
   recent: (limit = 20) => request<{ events: WatchEvent[]; total: number }>(`/cyxwatch/recent?limit=${limit}`),
   alerts: (limit = 20) => request<{ alerts: WatchAlert[]; total: number }>(`/cyxwatch/alerts?limit=${limit}`),
+  policy: () => request<{ policy: WatchPolicy }>("/cyxwatch/policy"),
+  savePolicy: (policy: WatchPolicy) =>
+    request<{ policy: WatchPolicy }>("/cyxwatch/policy", {
+      method: "PUT",
+      body: JSON.stringify(policy),
+    }),
 }
 
 // ============================================================================
