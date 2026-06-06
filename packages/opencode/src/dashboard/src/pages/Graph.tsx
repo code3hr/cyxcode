@@ -29,6 +29,10 @@ const max = 180
 const scan = max * 3
 const kinds: GraphNode["kind"][] = ["wiki", "code", "symbol", "memory", "learned", "concept", "cyxwatch"]
 const base = kinds.filter((kind) => kind !== "symbol")
+const empty: GraphData = { nodes: [], edges: [], stats: { wiki: 0, code: 0, memory: 0, learned: 0, facts: 0, cyxwatch: 0 } }
+
+let cache: GraphData | undefined
+let token = 0
 
 const colors: Record<GraphNode["kind"], { fill: string; stroke: string; glow: string }> = {
   wiki: { fill: "#1d4ed8", stroke: "#60a5fa", glow: "rgba(37,99,235,0.18)" },
@@ -139,18 +143,23 @@ function layout(data: GraphData, sel: string, q: string, allow: Set<GraphNode["k
 
 const Graph: Component = () => {
   const [search, setSearch] = useSearchParams()
-  const [data, setData] = createSignal<GraphData>({ nodes: [], edges: [], stats: { wiki: 0, code: 0, memory: 0, learned: 0, facts: 0, cyxwatch: 0 } })
-  const [sel, setSel] = createSignal("")
+  const [data, setData] = createSignal<GraphData>(cache ?? empty)
+  const [sel, setSel] = createSignal(Array.isArray(search.id) ? search.id[0] ?? "" : search.id || "")
   const [term, setTerm] = createSignal("")
-  const [load, setLoad] = createSignal(true)
+  const [load, setLoad] = createSignal(!cache)
   const [err, setErr] = createSignal<string | null>(null)
   const [allow, setAllow] = createSignal<Set<GraphNode["kind"]>>(new Set(base))
   const [hop, setHop] = createSignal(2)
   const [fit, setFit] = createSignal(0)
   const [full, setFull] = createSignal(false)
 
-  const fetchGraph = async () => {
-    setLoad(true)
+  onCleanup(() => {
+    token++
+  })
+
+  const fetchGraph = async (force = false) => {
+    const id = ++token
+    if (force || data().nodes.length === 0) setLoad(true)
     setErr(null)
     const res = await graphApi.get({
       id: sel(),
@@ -159,12 +168,16 @@ const Graph: Component = () => {
       limit: max,
       symbols: allow().has("symbol"),
     })
+    if (id !== token) return
     if (res.error) {
       setErr(res.error)
       setLoad(false)
       return
     }
-    if (res.data) setData(res.data)
+    if (res.data) {
+      cache = res.data
+      setData(res.data)
+    }
     setLoad(false)
   }
 
@@ -289,7 +302,7 @@ const Graph: Component = () => {
             <div class="text-xs uppercase tracking-wide text-gray-500">Watch</div>
             <div class="text-lg font-semibold text-gray-100">{data().stats.cyxwatch}</div>
           </div>
-          <button onClick={fetchGraph} class="btn btn-primary" disabled={load()}>
+          <button onClick={() => void fetchGraph(true)} class="btn btn-primary" disabled={load()}>
             Refresh
           </button>
         </div>
@@ -393,7 +406,7 @@ const Graph: Component = () => {
             <Show when={!full()}>
               <CyGraph view={view()} hop={hop()} fit={fit()} full={false} pick={pick} />
             </Show>
-            <Show when={load()}>
+            <Show when={load() && data().nodes.length === 0}>
               <div class="absolute inset-0 grid place-items-center bg-gray-950/70 text-sm text-gray-300">Loading graph...</div>
             </Show>
             <Show when={!load() && view().nodes.length === 0}>
@@ -512,7 +525,7 @@ const Graph: Component = () => {
           </div>
           <div class="relative min-h-0 flex-1">
             <CyGraph view={view()} hop={hop()} fit={fit()} full={true} pick={pick} />
-            <Show when={load()}>
+            <Show when={load() && data().nodes.length === 0}>
               <div class="absolute inset-0 grid place-items-center bg-gray-950/70 text-sm text-gray-300">Loading graph...</div>
             </Show>
             <Show when={!load() && view().nodes.length === 0}>
@@ -527,11 +540,11 @@ const Graph: Component = () => {
 
 function CyGraph(props: { view: View; hop: number; fit: number; full: boolean; pick: (id: string) => void }) {
   let el: HTMLDivElement | undefined
+  let graph: cytoscape.Core | undefined
 
   createEffect(() => {
     const root = el
     if (!root) return
-    props.fit
 
     const nodes = props.view.nodes.map((node) => {
       const c = colors[node.kind]
@@ -667,11 +680,12 @@ function CyGraph(props: { view: View; hop: number; fit: number; full: boolean; p
         nestingFactor: 1.15,
         nodeOverlap: 18,
         nodeRepulsion: 7600,
-        numIter: props.view.nodes.length > 120 ? 650 : 950,
+        numIter: props.view.nodes.length > 120 ? 180 : 260,
         padding: 36,
         randomize: true,
       },
     })
+    graph = cy
 
     cy.on("tap", "node", (event) => {
       props.pick(event.target.id())
@@ -692,6 +706,17 @@ function CyGraph(props: { view: View; hop: number; fit: number; full: boolean; p
     onCleanup(() => {
       resize.disconnect()
       cy.destroy()
+      graph = undefined
+    })
+  })
+
+  createEffect(() => {
+    props.fit
+    const cy = graph
+    if (!cy) return
+    queueMicrotask(() => {
+      cy.resize()
+      cy.fit(undefined, 36)
     })
   })
 

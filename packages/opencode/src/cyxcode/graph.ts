@@ -68,6 +68,15 @@ type Item = {
   meta?: Record<string, unknown>
 }
 
+type Cache = {
+  at: number
+  data?: GraphData
+  task?: Promise<GraphData>
+}
+
+const ttl = 30_000
+const cache = new Map<string, Cache>()
+
 function norm(text: string): string {
   return text
     .replaceAll("\\", "/")
@@ -382,6 +391,24 @@ function links(data: GraphData, id: string): Link[] {
 
 export namespace Graph {
   export async function build(opts: GraphOpts = {}): Promise<GraphData> {
+    const key = opts.symbols === false ? "nosymbols" : "symbols"
+    const now = Date.now()
+    const hit = cache.get(key)
+    if (hit?.data && now - hit.at < ttl) return hit.data
+    if (hit?.task) return hit.task
+
+    const task = buildFresh(opts).then((data) => {
+      cache.set(key, { at: Date.now(), data })
+      return data
+    }).finally(() => {
+      const item = cache.get(key)
+      if (item?.task) cache.set(key, { at: item.at, data: item.data })
+    })
+    cache.set(key, { at: now, data: hit?.data, task })
+    return task
+  }
+
+  async function buildFresh(opts: GraphOpts = {}): Promise<GraphData> {
     const [wi, ci, mi, li, fa, ev, wa] = await Promise.all([
       Wiki.readIndex(),
       Codegraph.readIndex(),
@@ -525,18 +552,21 @@ export namespace Graph {
 
     watch(ev, wa, alias, nodes, edges)
 
-    for (const page of wi.pages) {
+    const ref = await Promise.all(wi.pages.map(async (page) => {
       const text = await body(page)
-      if (!text) continue
+      if (!text) return []
       const seen = new Set<string>()
+      const out: GraphEdge[] = []
 
       for (const raw of refs(text)) {
         const hit = by(alias, raw)
         if (!hit || hit === page.id || seen.has(hit)) continue
         seen.add(hit)
-        edges.push({ from: page.id, to: hit, type: "references" })
+        out.push({ from: page.id, to: hit, type: "references" })
       }
-    }
+      return out
+    }))
+    edges.push(...ref.flat())
 
     return {
       nodes,
