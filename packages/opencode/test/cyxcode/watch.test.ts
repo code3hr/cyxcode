@@ -21,9 +21,16 @@ import { MessageID, SessionID } from "../../src/session/schema"
 import { LLM } from "../../src/session/llm"
 import { WatchPolicy } from "../../src/cyxcode/watch/policy"
 import { createWatchRoutes } from "../../src/server/watch"
+import { close as closeRecall } from "../../src/cyxcode/recall/db"
+import { disable as disableRecall } from "../../src/cyxcode/recall/embedder"
 
 let dir: string
 let cwd: string
+let recall: boolean | undefined
+
+function recallState() {
+  return globalThis as typeof globalThis & { __cyxcode_recall_embedder?: { disabled: boolean } }
+}
 
 beforeEach(async () => {
   cwd = process.cwd()
@@ -32,14 +39,20 @@ beforeEach(async () => {
   process.chdir(dir)
   CyxPaths.invalidateCache()
   CyxWatch.clear()
+  recall = recallState().__cyxcode_recall_embedder?.disabled
+  disableRecall("cyxwatch tests")
 })
 
 afterEach(async () => {
   await Instance.disposeAll()
+  closeRecall()
   CyxWatch.close()
+  await sleep(250)
+  const state = recallState().__cyxcode_recall_embedder
+  if (recall !== undefined && state) state.disabled = recall
   process.chdir(cwd)
   CyxPaths.invalidateCache()
-  await fs.rm(dir, { recursive: true, force: true })
+  await fs.rm(dir, { recursive: true, force: true, maxRetries: 10, retryDelay: 100 })
 })
 
 function ctx(ruleset: Permission.Ruleset = []) {
@@ -1036,15 +1049,29 @@ describe("CyxWatch", () => {
   })
 
   test("requests approval before sensitive wiki relevance loads", async () => {
-    const page = await Wiki.create({
-      title: "Approval Notes",
-      body: "Approval wiki body.",
-      tags: ["approval"],
-    })
-    const idx = await Wiki.readIndex()
+    const now = Date.now()
+    await fs.mkdir(CyxPaths.wikiDir(), { recursive: true })
+    await fs.writeFile(path.join(CyxPaths.wikiDir(), "approval-notes.md"), "---\ntitle: Approval Notes\ntags:\n  - approval\n---\n# Approval Notes\n\nApproval wiki body.")
     await Wiki.writeIndex({
       version: 1,
-      pages: idx.pages.map((item) => item.id === page.id ? { ...item, privacy: "sensitive" } : item),
+      pages: [
+        {
+          id: "wiki/approval-notes",
+          path: "wiki/approval-notes.md",
+          kind: "wiki",
+          title: "Approval Notes",
+          summary: "Approval wiki body.",
+          tags: ["approval"],
+          links: [],
+          backlinks: [],
+          hash: "approval",
+          created: now,
+          modified: now,
+          accessed: now,
+          accessCount: 0,
+          privacy: "sensitive",
+        },
+      ],
     })
     let seen: { source: string; entries: Array<{ privacy?: string }> } | undefined
 

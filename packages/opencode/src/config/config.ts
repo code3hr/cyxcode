@@ -23,6 +23,7 @@ import {
 import { Instance } from "../project/instance"
 import { LSPServer } from "../lsp/server"
 import { BunProc } from "@/bun"
+import { Http } from "@/util/http"
 import { Installation } from "@/installation"
 import { ConfigMarkdown } from "./markdown"
 import { constants, existsSync } from "fs"
@@ -92,7 +93,7 @@ export namespace Config {
         const url = key.replace(/\/+$/, "")
         process.env[value.key] = value.token
         log.debug("fetching remote config", { url: `${url}/.well-known/opencode` })
-        const response = await fetch(`${url}/.well-known/opencode`)
+        const response = await Http.fetch(`${url}/.well-known/opencode`)
         if (!response.ok) {
           throw new Error(`failed to fetch remote config from ${url}: ${response.status}`)
         }

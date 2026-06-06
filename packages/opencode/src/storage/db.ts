@@ -10,7 +10,6 @@ import { NamedError } from "@cyxcode/util/error"
 import z from "zod"
 import path from "path"
 import { readFileSync, readdirSync, existsSync } from "fs"
-import { Installation } from "../installation"
 import { Flag } from "../flag/flag"
 import { iife } from "@/util/iife"
 import { init } from "#db"
@@ -32,7 +31,8 @@ export namespace Database {
       if (path.isAbsolute(Flag.CYXCODE_DB)) return Flag.CYXCODE_DB
       return path.join(Global.Path.data, Flag.CYXCODE_DB)
     }
-    const channel = Installation.CHANNEL
+    const g = globalThis as { CYXCODE_CHANNEL?: string }
+    const channel = g.CYXCODE_CHANNEL ?? "local"
     if (["latest", "beta"].includes(channel) || Flag.CYXCODE_DISABLE_CHANNEL_DB)
       return path.join(Global.Path.data, "cyxcode.db")
     const safe = channel.replace(/[^a-zA-Z0-9._-]/g, "-")

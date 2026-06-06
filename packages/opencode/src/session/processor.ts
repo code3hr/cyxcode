@@ -16,6 +16,7 @@ import { Permission } from "@/permission"
 import { Question } from "@/question"
 import { PartID } from "./schema"
 import type { SessionID, MessageID } from "./schema"
+import { WatchSecret } from "@/cyxcode/watch/secret"
 
 export namespace SessionProcessor {
   const DOOM_LOOP_THRESHOLD = 3
@@ -329,7 +330,12 @@ export namespace SessionProcessor {
                       },
                       { text: currentText.text },
                     )
-                    currentText.text = textOutput.text
+                    currentText.text = (
+                      await WatchSecret.scan({
+                        source: `assistant:${input.assistantMessage.id}:${currentText.id}`,
+                        text: textOutput.text,
+                      })
+                    ).content
                     currentText.time = {
                       start: Date.now(),
                       end: Date.now(),

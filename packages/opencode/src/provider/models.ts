@@ -6,6 +6,7 @@ import { Installation } from "../installation"
 import { Flag } from "../flag/flag"
 import { lazy } from "@/util/lazy"
 import { Filesystem } from "../util/filesystem"
+import { Http } from "../util/http"
 
 // Try to import bundled snapshot (generated at build time)
 // Falls back to undefined in dev mode when snapshot doesn't exist
@@ -94,7 +95,7 @@ export namespace ModelsDev {
       .catch(() => undefined)
     if (snapshot) return snapshot
     if (Flag.CYXCODE_DISABLE_MODELS_FETCH) return {}
-    const json = await fetch(`${url()}/api.json`).then((x) => x.text())
+    const json = await Http.fetch(`${url()}/api.json`).then((x) => x.text())
     return JSON.parse(json)
   })
 
@@ -104,7 +105,7 @@ export namespace ModelsDev {
   }
 
   export async function refresh() {
-    const result = await fetch(`${url()}/api.json`, {
+    const result = await Http.fetch(`${url()}/api.json`, {
       headers: {
         "User-Agent": Installation.USER_AGENT,
       },
@@ -121,7 +122,10 @@ export namespace ModelsDev {
   }
 }
 
-if (!Flag.CYXCODE_DISABLE_MODELS_FETCH && !process.argv.includes("--get-yargs-completions")) {
+const cmd = process.argv.slice(2).find((item) => !item.startsWith("-"))
+const cold = ["serve", "web", "workspace-serve"]
+
+if (!Flag.CYXCODE_DISABLE_MODELS_FETCH && !process.argv.includes("--get-yargs-completions") && !cold.includes(cmd ?? "")) {
   ModelsDev.refresh()
   setInterval(
     async () => {

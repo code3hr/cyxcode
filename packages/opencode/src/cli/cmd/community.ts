@@ -14,6 +14,7 @@ import path from "path"
 import { cmd } from "./cmd"
 import { CyxPaths } from "../../cyxcode/paths"
 import { CommunityPatterns } from "../../cyxcode/community"
+import { Http } from "../../util/http"
 
 // --- List subcommand ---
 
@@ -89,7 +90,7 @@ const InstallCommand = cmd({
     // Fetch content
     if (source.startsWith("http://") || source.startsWith("https://")) {
       try {
-        const response = await fetch(source)
+        const response = await Http.fetch(source)
         if (!response.ok) {
           console.error(`Failed to fetch: ${response.statusText}`)
           process.exitCode = 1

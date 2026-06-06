@@ -38,6 +38,7 @@ import { InitCommand } from "./cli/cmd/init"
 import { CommunityCommand } from "./cli/cmd/community"
 import { WikiCommand } from "./cli/cmd/wiki"
 import { GraphCommand } from "./cli/cmd/graph"
+import { WatchCommand } from "./cli/cmd/watch"
 import path from "path"
 import { Global } from "./global"
 import { JsonMigration } from "./storage/json-migration"
@@ -45,7 +46,11 @@ import { Database } from "./storage/db"
 import { initCyxCode } from "./cyxcode"
 
 // Initialize CyxCode pattern-first skill system
-initCyxCode()
+const argv = hideBin(process.argv)
+const cmd = argv.find((item) => !item.startsWith("-"))
+const cold = ["serve", "web", "workspace-serve"]
+const meta = argv.some((item) => item === "--help" || item === "-h" || item === "--version" || item === "-v")
+if (!meta && !cold.includes(cmd ?? "")) initCyxCode()
 
 process.on("unhandledRejection", (e) => {
   Log.Default.error("rejection", {
@@ -59,7 +64,7 @@ process.on("uncaughtException", (e) => {
   })
 })
 
-let cli = yargs(hideBin(process.argv))
+let cli = yargs(argv)
   .parserConfiguration({ "populate--": true })
   .scriptName("cyxcode")
   .wrap(100)
@@ -163,6 +168,7 @@ let cli = yargs(hideBin(process.argv))
   .command(CommunityCommand)
   .command(WikiCommand)
   .command(GraphCommand)
+  .command(WatchCommand)
 
 if (Installation.isLocal()) {
   cli = cli.command(WorkspaceServeCommand)

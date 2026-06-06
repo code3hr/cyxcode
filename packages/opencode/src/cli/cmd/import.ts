@@ -10,6 +10,7 @@ import { Instance } from "../../project/instance"
 import { ShareNext } from "../../share/share-next"
 import { EOL } from "os"
 import { Filesystem } from "../../util/filesystem"
+import { Http } from "../../util/http"
 
 /** Discriminated union returned by the ShareNext API (GET /api/shares/:id/data) */
 export type ShareData =
@@ -112,12 +113,12 @@ export const ImportCommand = cmd({
         const headers = shouldAttachShareAuthHeaders(args.file, req.baseUrl) ? req.headers : {}
 
         const dataPath = req.api.data(slug)
-        let response = await fetch(`${baseUrl}${dataPath}`, {
+        let response = await Http.fetch(`${baseUrl}${dataPath}`, {
           headers,
         })
 
         if (!response.ok && dataPath !== `/api/share/${slug}/data`) {
-          response = await fetch(`${baseUrl}/api/share/${slug}/data`, {
+          response = await Http.fetch(`${baseUrl}/api/share/${slug}/data`, {
             headers,
           })
         }

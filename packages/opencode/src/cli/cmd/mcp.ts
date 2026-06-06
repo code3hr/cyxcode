@@ -15,6 +15,7 @@ import { Global } from "../../global"
 import { modify, applyEdits } from "jsonc-parser"
 import { Filesystem } from "../../util/filesystem"
 import { Bus } from "../../bus"
+import { Http } from "../../util/http"
 
 function getAuthStatusIcon(status: MCP.AuthStatus): string {
   switch (status) {
@@ -650,24 +651,24 @@ export const McpDebugCommand = cmd({
 
         // Test basic HTTP connectivity first
         try {
-          const response = await fetch(serverConfig.url, {
+          const body = JSON.stringify({
+            jsonrpc: "2.0",
+            method: "initialize",
+            params: {
+              protocolVersion: "2024-11-05",
+              capabilities: {},
+              clientInfo: { name: "opencode-debug", version: Installation.VERSION },
+            },
+            id: 1,
+          })
+          const response = await Http.fetch(serverConfig.url, {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
               Accept: "application/json, text/event-stream",
             },
-            body: JSON.stringify({
-              jsonrpc: "2.0",
-              method: "initialize",
-              params: {
-                protocolVersion: "2024-11-05",
-                capabilities: {},
-                clientInfo: { name: "opencode-debug", version: Installation.VERSION },
-              },
-              id: 1,
-            }),
+            body,
           })
-
           spinner.stop(`HTTP response: ${response.status} ${response.statusText}`)
 
           // Check for WWW-Authenticate header

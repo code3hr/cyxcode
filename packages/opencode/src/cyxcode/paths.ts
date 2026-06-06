@@ -35,6 +35,7 @@ function findProjectRoot(): { root: string; mode: "cyxcode" | "opencode" } {
   let dir = process.cwd()
   let foundOpencode: string | undefined
   let foundCyxcode: string | undefined
+  let foundFirst: { root: string; mode: "cyxcode" | "opencode" } | undefined
 
   for (let i = 0; i < 10; i++) {
     // Check for .cyxcode/ first (higher priority)
@@ -43,6 +44,7 @@ function findProjectRoot(): { root: string; mode: "cyxcode" | "opencode" } {
       try {
         require("fs").accessSync(cyxCandidate)
         foundCyxcode = dir
+        if (!foundFirst) foundFirst = { root: dir, mode: "cyxcode" }
       } catch {}
     }
 
@@ -52,6 +54,7 @@ function findProjectRoot(): { root: string; mode: "cyxcode" | "opencode" } {
       try {
         require("fs").accessSync(ocCandidate)
         foundOpencode = dir
+        if (!foundFirst) foundFirst = { root: dir, mode: "opencode" }
       } catch {}
     }
 
@@ -78,12 +81,9 @@ function findProjectRoot(): { root: string; mode: "cyxcode" | "opencode" } {
   }
 
   // No .git or workspace root found — use whatever we found
-  if (foundCyxcode) {
-    cache.projectRoot = foundCyxcode
-    cache.mode = "cyxcode"
-  } else if (foundOpencode) {
-    cache.projectRoot = foundOpencode
-    cache.mode = "opencode"
+  if (foundFirst) {
+    cache.projectRoot = foundFirst.root
+    cache.mode = foundFirst.mode
   } else {
     // Nothing found — default to cwd with opencode mode
     cache.projectRoot = process.cwd()

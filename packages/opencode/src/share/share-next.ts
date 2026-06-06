@@ -9,6 +9,7 @@ import { MessageV2 } from "@/session/message-v2"
 import { Database, eq } from "@/storage/db"
 import { SessionShareTable } from "./share.sql"
 import { Log } from "@/util/log"
+import { Http } from "@/util/http"
 import type * as SDK from "@cyxcode/sdk/v2"
 
 export namespace ShareNext {
@@ -115,7 +116,7 @@ export namespace ShareNext {
     if (disabled) return { id: "", url: "", secret: "" }
     log.info("creating share", { sessionID })
     const req = await request()
-    const response = await fetch(`${req.baseUrl}${req.api.create}`, {
+    const response = await Http.fetch(`${req.baseUrl}${req.api.create}`, {
       method: "POST",
       headers: { ...req.headers, "Content-Type": "application/json" },
       body: JSON.stringify({ sessionID: sessionID }),
@@ -211,7 +212,7 @@ export namespace ShareNext {
       if (!share) return
 
       const req = await request()
-      const response = await fetch(`${req.baseUrl}${req.api.sync(share.id)}`, {
+      const response = await Http.fetch(`${req.baseUrl}${req.api.sync(share.id)}`, {
         method: "POST",
         headers: { ...req.headers, "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -234,7 +235,7 @@ export namespace ShareNext {
     if (!share) return
 
     const req = await request()
-    const response = await fetch(`${req.baseUrl}${req.api.remove(share.id)}`, {
+    const response = await Http.fetch(`${req.baseUrl}${req.api.remove(share.id)}`, {
       method: "DELETE",
       headers: { ...req.headers, "Content-Type": "application/json" },
       body: JSON.stringify({

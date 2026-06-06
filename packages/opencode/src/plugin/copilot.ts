@@ -1,6 +1,7 @@
 import type { Hooks, PluginInput } from "@cyxcode/plugin"
 import { Installation } from "@/installation"
 import { iife } from "@/util/iife"
+import { Http } from "@/util/http"
 import { setTimeout as sleep } from "node:timers/promises"
 
 const CLIENT_ID = "Ov23li8tweQw6odWQebz"
@@ -63,7 +64,7 @@ export async function CopilotAuthPlugin(input: PluginInput): Promise<Hooks> {
           apiKey: "",
           async fetch(request: RequestInfo | URL, init?: RequestInit) {
             const info = await getAuth()
-            if (info.type !== "oauth") return fetch(request, init)
+            if (info.type !== "oauth") return Http.fetch(request, init)
 
             const url = request instanceof URL ? request.href : request.toString()
             const { isVision, isAgent } = iife(() => {
@@ -134,7 +135,7 @@ export async function CopilotAuthPlugin(input: PluginInput): Promise<Hooks> {
             delete headers["x-api-key"]
             delete headers["authorization"]
 
-            return fetch(request, {
+            return Http.fetch(request, {
               ...init,
               headers,
             })
@@ -193,7 +194,7 @@ export async function CopilotAuthPlugin(input: PluginInput): Promise<Hooks> {
 
             const urls = getUrls(domain)
 
-            const deviceResponse = await fetch(urls.DEVICE_CODE_URL, {
+            const deviceResponse = await Http.fetch(urls.DEVICE_CODE_URL, {
               method: "POST",
               headers: {
                 Accept: "application/json",
@@ -223,7 +224,7 @@ export async function CopilotAuthPlugin(input: PluginInput): Promise<Hooks> {
               method: "auto" as const,
               async callback() {
                 while (true) {
-                  const response = await fetch(urls.ACCESS_TOKEN_URL, {
+                  const response = await Http.fetch(urls.ACCESS_TOKEN_URL, {
                     method: "POST",
                     headers: {
                       Accept: "application/json",

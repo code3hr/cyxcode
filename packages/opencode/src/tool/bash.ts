@@ -18,9 +18,7 @@ import { BashArity } from "@/permission/arity"
 import { Truncate } from "./truncate"
 import { Plugin } from "@/plugin"
 import { getRouter, initCyxCode } from "@/cyxcode"
-
-// Initialize CyxCode skills in this module context
-initCyxCode()
+import { CyxWatch } from "@/cyxcode/watch"
 
 const MAX_METADATA_LENGTH = 30_000
 const DEFAULT_TIMEOUT = Flag.CYXCODE_EXPERIMENTAL_BASH_DEFAULT_TIMEOUT_MS || 2 * 60 * 1000
@@ -80,6 +78,11 @@ export const BashTool = Tool.define("bash", async () => {
         ),
     }),
     async execute(params, ctx) {
+      return await CyxWatch.scope({
+        sessionID: ctx.sessionID,
+        messageID: ctx.messageID,
+        prompt: params.description,
+        fn: async () => {
       const cwd = params.workdir || Instance.directory
       if (params.timeout !== undefined && params.timeout < 0) {
         throw new Error(`Invalid timeout value: ${params.timeout}. Timeout must be a positive number.`)
@@ -263,6 +266,7 @@ export const BashTool = Tool.define("bash", async () => {
       // CyxCode: Pattern-based error recovery
       let cyxMatched = false
       if (proc.exitCode !== 0 && proc.exitCode !== null) {
+        initCyxCode()
         // Ensure learned patterns are loaded before matching
         if ((globalThis as any).__cyxcode_learned_ready) await (globalThis as any).__cyxcode_learned_ready
         const router = getRouter()
@@ -309,6 +313,8 @@ export const BashTool = Tool.define("bash", async () => {
         },
         output,
       }
+        },
+      })
     },
   }
 })

@@ -4,6 +4,7 @@ import type { Agent } from "../agent/agent"
 import type { Permission } from "../permission"
 import type { SessionID, MessageID } from "../session/schema"
 import { Truncate } from "./truncate"
+import { WatchSecret } from "@/cyxcode/watch/secret"
 
 export namespace Tool {
   interface Metadata {
@@ -68,11 +69,27 @@ export namespace Tool {
             )
           }
           const result = await execute(args, ctx)
+          const scan = await WatchSecret.scan({
+            source: `tool:${id}`,
+            text: result.output,
+          })
+          const output = scan.content
           // skip truncation for tools that handle it themselves
           if (result.metadata.truncated !== undefined) {
-            return result
+            return {
+              ...result,
+              output,
+              metadata: {
+                ...result.metadata,
+                ...(scan.redacted && {
+                  cyxwatchSecretRedacted: true,
+                  cyxwatchSecretDetectors: scan.detectors,
+                  cyxwatchSecretCount: scan.count,
+                }),
+              },
+            }
           }
-          const truncated = await Truncate.output(result.output, {}, initCtx?.agent)
+          const truncated = await Truncate.output(output, {}, initCtx?.agent)
           return {
             ...result,
             output: truncated.content,
@@ -80,6 +97,11 @@ export namespace Tool {
               ...result.metadata,
               truncated: truncated.truncated,
               ...(truncated.truncated && { outputPath: truncated.outputPath }),
+              ...(scan.redacted && {
+                cyxwatchSecretRedacted: true,
+                cyxwatchSecretDetectors: scan.detectors,
+                cyxwatchSecretCount: scan.count,
+              }),
             },
           }
         }

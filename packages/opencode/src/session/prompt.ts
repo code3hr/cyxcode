@@ -52,6 +52,8 @@ import { Shell } from "@/shell/shell"
 import { Truncate } from "@/tool/truncate"
 import { decodeDataUrl } from "@/util/data-url"
 import { Process } from "@/util/process"
+import { CyxWatch } from "@/cyxcode/watch"
+import { Config } from "@/config/config"
 
 // @ts-ignore
 globalThis.AI_SDK_LOG_WARNINGS = false
@@ -163,32 +165,45 @@ export namespace SessionPrompt {
   export type PromptInput = z.infer<typeof PromptInput>
 
   export const prompt = fn(PromptInput, async (input) => {
-    const session = await Session.get(input.sessionID)
-    await SessionRevert.cleanup(session)
+    const text = input.parts
+      .flatMap((part) => (part.type === "text" ? [part.text] : []))
+      .join("\n")
+      .trim()
 
-    const message = await createUserMessage(input)
-    await Session.touch(input.sessionID)
+    return await CyxWatch.scope({
+      sessionID: input.sessionID,
+      prompt: text,
+      fn: async () => {
+        const session = await Session.get(input.sessionID)
+        await SessionRevert.cleanup(session)
 
-    // this is backwards compatibility for allowing `tools` to be specified when
-    // prompting
-    const permissions: Permission.Ruleset = []
-    for (const [tool, enabled] of Object.entries(input.tools ?? {})) {
-      permissions.push({
-        permission: tool,
-        action: enabled ? "allow" : "deny",
-        pattern: "*",
-      })
-    }
-    if (permissions.length > 0) {
-      session.permission = permissions
-      await Session.setPermission({ sessionID: session.id, permission: permissions })
-    }
+        await CyxWatch.turn({ text, sessionID: input.sessionID })
+        const message = await createUserMessage(input)
+        CyxWatch.set({ messageID: message.info.id })
+        await Session.touch(input.sessionID)
 
-    if (input.noReply === true) {
-      return message
-    }
+        // this is backwards compatibility for allowing `tools` to be specified when
+        // prompting
+        const permissions: Permission.Ruleset = []
+        for (const [tool, enabled] of Object.entries(input.tools ?? {})) {
+          permissions.push({
+            permission: tool,
+            action: enabled ? "allow" : "deny",
+            pattern: "*",
+          })
+        }
+        if (permissions.length > 0) {
+          session.permission = permissions
+          await Session.setPermission({ sessionID: session.id, permission: permissions })
+        }
 
-    return loop({ sessionID: input.sessionID })
+        if (input.noReply === true) {
+          return message
+        }
+
+        return loop({ sessionID: input.sessionID })
+      },
+    })
   })
 
   export async function resolvePromptParts(template: string): Promise<PromptInput["parts"]> {
@@ -886,6 +901,29 @@ export namespace SessionPrompt {
     using _ = log.time("resolveTools")
     const tools: Record<string, AITool> = {}
 
+    const gate = async (args: Record<string, unknown>, req: Parameters<Tool.Context["ask"]>[0], callID?: string) => {
+      const cfg = await Config.get()
+      if (Governance.isEnabled(cfg.governance)) {
+        const res = await Governance.check(
+          {
+            sessionID: input.session.id,
+            callID: callID ?? "",
+            tool: req.permission,
+            args,
+          },
+          cfg.governance,
+        )
+        if (!res.allowed) throw new Governance.DeniedError(res)
+        if (res.outcome === "allowed") return
+      }
+      await Permission.ask({
+        ...req,
+        sessionID: input.session.id,
+        tool: { messageID: input.processor.message.id, callID: callID ?? "" },
+        ruleset: Permission.merge(input.agent.permission, input.session.permission ?? []),
+      })
+    }
+
     const context = (args: any, options: ToolCallOptions): Tool.Context => ({
       sessionID: input.session.id,
       abort: options.abortSignal!,
@@ -912,12 +950,7 @@ export namespace SessionPrompt {
         }
       },
       async ask(req) {
-        await Permission.ask({
-          ...req,
-          sessionID: input.session.id,
-          tool: { messageID: input.processor.message.id, callID: options.toolCallId },
-          ruleset: Permission.merge(input.agent.permission, input.session.permission ?? []),
-        })
+        await gate(args, req, options.toolCallId)
       },
     })
 
@@ -954,7 +987,16 @@ export namespace SessionPrompt {
             }
             throw err
           }
-          const result = await item.execute(args, ctx)
+          const result = await item.execute(args, ctx).catch((err) => {
+            if (err instanceof Governance.DeniedError) {
+              return {
+                title: "governance denied",
+                output: `[GOVERNANCE DENIED] Tool "${item.id}" was blocked by governance policy.\nReason: ${err.result.reason || "No reason provided"}\nPolicy: ${err.result.matchedPolicy || "scope violation"}`,
+                metadata: { governance: { denied: true, ...err.result } },
+              } as Awaited<ReturnType<typeof item.execute>>
+            }
+            throw err
+          })
           const output = {
             ...result,
             attachments: result.attachments?.map((attachment) => ({
@@ -1016,12 +1058,26 @@ export namespace SessionPrompt {
           throw err
         }
 
-        await ctx.ask({
-          permission: key,
-          metadata: {},
-          patterns: ["*"],
-          always: ["*"],
-        })
+        try {
+          await ctx.ask({
+            permission: key,
+            metadata: {},
+            patterns: ["*"],
+            always: ["*"],
+          })
+        } catch (err) {
+          if (err instanceof Governance.DeniedError) {
+            return {
+              content: [
+                {
+                  type: "text" as const,
+                  text: `[GOVERNANCE DENIED] Tool "${key}" was blocked by governance policy.\nReason: ${err.result.reason || "No reason provided"}\nPolicy: ${err.result.matchedPolicy || "scope violation"}`,
+                },
+              ],
+            }
+          }
+          throw err
+        }
 
         const result = await execute(args, opts)
 

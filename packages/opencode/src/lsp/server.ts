@@ -14,6 +14,7 @@ import { Process } from "../util/process"
 import { which } from "../util/which"
 import { Module } from "@cyxcode/util/module"
 import { spawn } from "./launch"
+import { Http } from "@/util/http"
 
 export namespace LSPServer {
   const log = Log.create({ service: "lsp.server" })
@@ -182,7 +183,7 @@ export namespace LSPServer {
       if (!(await Filesystem.exists(serverPath))) {
         if (Flag.CYXCODE_DISABLE_LSP_DOWNLOAD) return
         log.info("downloading and building VS Code ESLint server")
-        const response = await fetch("https://github.com/microsoft/vscode-eslint/archive/refs/heads/main.zip")
+        const response = await Http.fetch("https://github.com/microsoft/vscode-eslint/archive/refs/heads/main.zip")
         if (!response.ok) return
 
         const zipPath = path.join(Global.Path.bin, "vscode-eslint.zip")
@@ -587,7 +588,7 @@ export namespace LSPServer {
           if (Flag.CYXCODE_DISABLE_LSP_DOWNLOAD) return
           log.info("downloading elixir-ls from GitHub releases")
 
-          const response = await fetch("https://github.com/elixir-lsp/elixir-ls/archive/refs/heads/master.zip")
+          const response = await Http.fetch("https://github.com/elixir-lsp/elixir-ls/archive/refs/heads/master.zip")
           if (!response.ok) return
           const zipPath = path.join(Global.Path.bin, "elixir-ls.zip")
           if (response.body) await Filesystem.writeStream(zipPath, response.body)
@@ -644,7 +645,7 @@ export namespace LSPServer {
         if (Flag.CYXCODE_DISABLE_LSP_DOWNLOAD) return
         log.info("downloading zls from GitHub releases")
 
-        const releaseResponse = await fetch("https://api.github.com/repos/zigtools/zls/releases/latest")
+        const releaseResponse = await Http.fetch("https://api.github.com/repos/zigtools/zls/releases/latest")
         if (!releaseResponse.ok) {
           log.error("Failed to fetch zls release info")
           return
@@ -692,7 +693,7 @@ export namespace LSPServer {
         }
 
         const downloadUrl = asset.browser_download_url
-        const downloadResponse = await fetch(downloadUrl)
+        const downloadResponse = await Http.fetch(downloadUrl)
         if (!downloadResponse.ok) {
           log.error("Failed to download zls")
           return
@@ -937,7 +938,7 @@ export namespace LSPServer {
       if (Flag.CYXCODE_DISABLE_LSP_DOWNLOAD) return
       log.info("downloading clangd from GitHub releases")
 
-      const releaseResponse = await fetch("https://api.github.com/repos/clangd/clangd/releases/latest")
+      const releaseResponse = await Http.fetch("https://api.github.com/repos/clangd/clangd/releases/latest")
       if (!releaseResponse.ok) {
         log.error("Failed to fetch clangd release info")
         return
@@ -983,7 +984,7 @@ export namespace LSPServer {
       }
 
       const name = asset.name
-      const downloadResponse = await fetch(asset.browser_download_url)
+      const downloadResponse = await Http.fetch(asset.browser_download_url)
       if (!downloadResponse.ok) {
         log.error("Failed to download clangd")
         return
@@ -1185,7 +1186,7 @@ export namespace LSPServer {
         const archiveName = "release.tar.gz"
 
         log.info("Downloading JDTLS archive", { url: releaseURL, dest: distPath })
-        const download = await fetch(releaseURL)
+        const download = await Http.fetch(releaseURL)
         if (!download.ok || !download.body) {
           log.error("Failed to download JDTLS", { status: download.status, statusText: download.statusText })
           return
@@ -1278,7 +1279,7 @@ export namespace LSPServer {
         if (Flag.CYXCODE_DISABLE_LSP_DOWNLOAD) return
         log.info("Downloading Kotlin Language Server from GitHub.")
 
-        const releaseResponse = await fetch("https://api.github.com/repos/Kotlin/kotlin-lsp/releases/latest")
+        const releaseResponse = await Http.fetch("https://api.github.com/repos/Kotlin/kotlin-lsp/releases/latest")
         if (!releaseResponse.ok) {
           log.error("Failed to fetch kotlin-lsp release info")
           return
@@ -1318,7 +1319,7 @@ export namespace LSPServer {
 
         await fs.mkdir(distPath, { recursive: true })
         const archivePath = path.join(distPath, "kotlin-ls.zip")
-        const download = await fetch(releaseURL)
+        const download = await Http.fetch(releaseURL)
         if (!download.ok || !download.body) {
           log.error("Failed to download Kotlin Language Server", {
             status: download.status,
@@ -1421,7 +1422,7 @@ export namespace LSPServer {
         if (Flag.CYXCODE_DISABLE_LSP_DOWNLOAD) return
         log.info("downloading lua-language-server from GitHub releases")
 
-        const releaseResponse = await fetch("https://api.github.com/repos/LuaLS/lua-language-server/releases/latest")
+        const releaseResponse = await Http.fetch("https://api.github.com/repos/LuaLS/lua-language-server/releases/latest")
         if (!releaseResponse.ok) {
           log.error("Failed to fetch lua-language-server release info")
           return
@@ -1469,7 +1470,7 @@ export namespace LSPServer {
         }
 
         const downloadUrl = asset.browser_download_url
-        const downloadResponse = await fetch(downloadUrl)
+        const downloadResponse = await Http.fetch(downloadUrl)
         if (!downloadResponse.ok) {
           log.error("Failed to download lua-language-server")
           return
@@ -1692,7 +1693,7 @@ export namespace LSPServer {
         if (Flag.CYXCODE_DISABLE_LSP_DOWNLOAD) return
         log.info("downloading terraform-ls from HashiCorp releases")
 
-        const releaseResponse = await fetch("https://api.releases.hashicorp.com/v1/releases/terraform-ls/latest")
+        const releaseResponse = await Http.fetch("https://api.releases.hashicorp.com/v1/releases/terraform-ls/latest")
         if (!releaseResponse.ok) {
           log.error("Failed to fetch terraform-ls release info")
           return
@@ -1716,7 +1717,7 @@ export namespace LSPServer {
           return
         }
 
-        const downloadResponse = await fetch(build.url)
+        const downloadResponse = await Http.fetch(build.url)
         if (!downloadResponse.ok) {
           log.error("Failed to download terraform-ls")
           return
@@ -1775,7 +1776,7 @@ export namespace LSPServer {
         if (Flag.CYXCODE_DISABLE_LSP_DOWNLOAD) return
         log.info("downloading texlab from GitHub releases")
 
-        const response = await fetch("https://api.github.com/repos/latex-lsp/texlab/releases/latest")
+        const response = await Http.fetch("https://api.github.com/repos/latex-lsp/texlab/releases/latest")
         if (!response.ok) {
           log.error("Failed to fetch texlab release info")
           return
@@ -1806,7 +1807,7 @@ export namespace LSPServer {
           return
         }
 
-        const downloadResponse = await fetch(asset.browser_download_url)
+        const downloadResponse = await Http.fetch(asset.browser_download_url)
         if (!downloadResponse.ok) {
           log.error("Failed to download texlab")
           return
@@ -1974,7 +1975,7 @@ export namespace LSPServer {
         if (Flag.CYXCODE_DISABLE_LSP_DOWNLOAD) return
         log.info("downloading tinymist from GitHub releases")
 
-        const response = await fetch("https://api.github.com/repos/Myriad-Dreamin/tinymist/releases/latest")
+        const response = await Http.fetch("https://api.github.com/repos/Myriad-Dreamin/tinymist/releases/latest")
         if (!response.ok) {
           log.error("Failed to fetch tinymist release info")
           return
@@ -2012,7 +2013,7 @@ export namespace LSPServer {
           return
         }
 
-        const downloadResponse = await fetch(asset.browser_download_url)
+        const downloadResponse = await Http.fetch(asset.browser_download_url)
         if (!downloadResponse.ok) {
           log.error("Failed to download tinymist")
           return

@@ -10,6 +10,7 @@ import { PermissionTable } from "@/session/session.sql"
 import { Database, eq } from "@/storage/db"
 import { Log } from "@/util/log"
 import { Wildcard } from "@/util/wildcard"
+import { CyxWatch } from "@/cyxcode/watch"
 import { Deferred, Effect, Layer, Schema, ServiceMap } from "effect"
 import os from "os"
 import z from "zod"
@@ -166,6 +167,23 @@ export namespace Permission {
       const ask = Effect.fn("Permission.ask")(function* (input: z.infer<typeof AskInput>) {
         const { approved, pending } = yield* InstanceState.get(state)
         const { ruleset, ...request } = input
+        const watch = CyxWatch.classify({
+          permission: request.permission,
+          patterns: request.patterns,
+          metadata: request.metadata,
+        })
+        if (watch.decision === "block") {
+          return yield* new DeniedError({
+            ruleset: [
+              {
+                permission: request.permission,
+                pattern: "*",
+                action: "deny",
+              },
+            ],
+          })
+        }
+        const force = watch.decision === "require-approval"
         let needsAsk = false
 
         for (const pattern of request.patterns) {
@@ -176,7 +194,7 @@ export namespace Permission {
               ruleset: ruleset.filter((rule) => Wildcard.match(request.permission, rule.permission)),
             })
           }
-          if (rule.action === "allow") continue
+          if (rule.action === "allow" && !force) continue
           needsAsk = true
         }
 

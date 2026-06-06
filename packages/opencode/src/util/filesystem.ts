@@ -7,6 +7,16 @@ import { Readable } from "stream"
 import { pipeline } from "stream/promises"
 import { Glob } from "./glob"
 
+async function note(input: { kind: "file.read" | "file.write"; path: string; bytes?: number }) {
+  const { CyxWatch } = await import("@/cyxcode/watch")
+  return CyxWatch.note(input)
+}
+
+async function enforce(input: { permission: string; patterns: string[]; metadata?: Record<string, unknown> }) {
+  const { CyxWatch } = await import("@/cyxcode/watch")
+  return CyxWatch.enforce(input)
+}
+
 export namespace Filesystem {
   // Fast sync version for metadata checks
   export async function exists(p: string): Promise<boolean> {
@@ -31,19 +41,54 @@ export namespace Filesystem {
   }
 
   export async function readText(p: string): Promise<string> {
-    return readFile(p, "utf-8")
+    await enforce({
+      permission: "read",
+      patterns: [p],
+      metadata: {
+        filepath: p,
+      },
+    })
+    const text = await readFile(p, "utf-8")
+    void note({ kind: "file.read", path: p, bytes: Buffer.byteLength(text) })
+    return text
   }
 
   export async function readJson<T = any>(p: string): Promise<T> {
-    return JSON.parse(await readFile(p, "utf-8"))
+    await enforce({
+      permission: "read",
+      patterns: [p],
+      metadata: {
+        filepath: p,
+      },
+    })
+    const text = await readFile(p, "utf-8")
+    void note({ kind: "file.read", path: p, bytes: Buffer.byteLength(text) })
+    return JSON.parse(text)
   }
 
   export async function readBytes(p: string): Promise<Buffer> {
-    return readFile(p)
+    await enforce({
+      permission: "read",
+      patterns: [p],
+      metadata: {
+        filepath: p,
+      },
+    })
+    const buf = await readFile(p)
+    void note({ kind: "file.read", path: p, bytes: buf.byteLength })
+    return buf
   }
 
   export async function readArrayBuffer(p: string): Promise<ArrayBuffer> {
+    await enforce({
+      permission: "read",
+      patterns: [p],
+      metadata: {
+        filepath: p,
+      },
+    })
     const buf = await readFile(p)
+    void note({ kind: "file.read", path: p, bytes: buf.byteLength })
     return buf.buffer.slice(buf.byteOffset, buf.byteOffset + buf.byteLength) as ArrayBuffer
   }
 
@@ -52,12 +97,20 @@ export namespace Filesystem {
   }
 
   export async function write(p: string, content: string | Buffer | Uint8Array, mode?: number): Promise<void> {
+    await enforce({
+      permission: "write",
+      patterns: [p],
+      metadata: {
+        filepath: p,
+      },
+    })
     try {
       if (mode) {
         await writeFile(p, content, { mode })
       } else {
         await writeFile(p, content)
       }
+      void note({ kind: "file.write", path: p, bytes: typeof content === "string" ? Buffer.byteLength(content) : content.byteLength })
     } catch (e) {
       if (isEnoent(e)) {
         await mkdir(dirname(p), { recursive: true })
@@ -66,6 +119,7 @@ export namespace Filesystem {
         } else {
           await writeFile(p, content)
         }
+        void note({ kind: "file.write", path: p, bytes: typeof content === "string" ? Buffer.byteLength(content) : content.byteLength })
         return
       }
       throw e
@@ -93,6 +147,9 @@ export namespace Filesystem {
     if (mode) {
       await chmod(p, mode)
     }
+
+    const s = stat(p)
+    void note({ kind: "file.write", path: p, bytes: s?.size ? Number(s.size) : undefined })
   }
 
   export function mimeType(p: string): string {

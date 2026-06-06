@@ -7,6 +7,7 @@
 import { spawn } from "child_process"
 import { promises as fs } from "fs"
 import { Log } from "../util/log"
+import { Http } from "../util/http"
 import { VoiceTypes } from "./types"
 
 const log = Log.create({ name: "voice-transcriber" })
@@ -61,7 +62,7 @@ export namespace Transcriber {
 
     log.info("Sending audio to Whisper API")
 
-    const response = await fetch("https://api.openai.com/v1/audio/transcriptions", {
+    const response = await Http.fetch("https://api.openai.com/v1/audio/transcriptions", {
       method: "POST",
       headers: {
         "Authorization": `Bearer ${apiKey}`,
@@ -173,7 +174,7 @@ export namespace Transcriber {
     const audioData = await fs.readFile(audioPath)
     const uint8Array = new Uint8Array(audioData)
 
-    const response = await fetch(
+    const response = await Http.fetch(
       `https://api.deepgram.com/v1/listen?language=${config.language}&punctuate=true`,
       {
         method: "POST",

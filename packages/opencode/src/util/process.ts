@@ -1,6 +1,7 @@
 import { type ChildProcess } from "child_process"
 import launch from "cross-spawn"
 import { buffer } from "node:stream/consumers"
+import { CyxWatch } from "@/cyxcode/watch"
 
 export namespace Process {
   export type Stdio = "inherit" | "pipe" | "ignore"
@@ -58,6 +59,13 @@ export namespace Process {
   export function spawn(cmd: string[], opts: Options = {}): Child {
     if (cmd.length === 0) throw new Error("Command is required")
     opts.abort?.throwIfAborted()
+    CyxWatch.enforce({
+      permission: "bash",
+      patterns: [cmd.join(" ")],
+      metadata: {
+        command: cmd.join(" "),
+      },
+    })
 
     const proc = launch(cmd[0], cmd.slice(1), {
       cwd: opts.cwd,
@@ -65,6 +73,12 @@ export namespace Process {
       env: opts.env === null ? {} : opts.env ? { ...process.env, ...opts.env } : undefined,
       stdio: [opts.stdin ?? "ignore", opts.stdout ?? "ignore", opts.stderr ?? "ignore"],
       windowsHide: process.platform === "win32",
+    })
+
+    void CyxWatch.note({
+      kind: "shell.command",
+      cmd: cmd.join(" "),
+      path: opts.cwd,
     })
 
     let closed = false

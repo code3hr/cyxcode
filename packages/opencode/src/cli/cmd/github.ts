@@ -31,6 +31,7 @@ import { SessionPrompt } from "@/session/prompt"
 import { setTimeout as sleep } from "node:timers/promises"
 import { Process } from "@/util/process"
 import { git } from "@/util/git"
+import { Http } from "@/util/http"
 
 type GitHubAuthor = {
   login: string
@@ -362,11 +363,9 @@ export const GithubInstallCommand = cmd({
             s.stop("Installed GitHub app")
 
             async function getInstallation() {
-              return await fetch(
-                `https://api.cyxcode.ai/get_github_app_installation?owner=${app.owner}&repo=${app.repo}`,
-              )
-                .then((res) => res.json())
-                .then((data) => data.installation)
+              const url = `https://api.cyxcode.ai/get_github_app_installation?owner=${app.owner}&repo=${app.repo}`
+              const res = await Http.fetch(url)
+              return await res.json().then((data) => data.installation)
             }
           }
 
@@ -836,7 +835,7 @@ export const GithubRunCommand = cmd({
           const filename = path.basename(url)
 
           // Download image
-          const res = await fetch(url, {
+          const res = await Http.fetch(url, {
             headers: {
               Authorization: `Bearer ${appToken}`,
               Accept: "application/vnd.github.v3+json",
@@ -1038,14 +1037,14 @@ export const GithubRunCommand = cmd({
 
       async function exchangeForAppToken(token: string) {
         const response = token.startsWith("github_pat_")
-          ? await fetch(`${oidcBaseUrl}/exchange_github_app_token_with_pat`, {
+          ? await Http.fetch(`${oidcBaseUrl}/exchange_github_app_token_with_pat`, {
               method: "POST",
               headers: {
                 Authorization: `Bearer ${token}`,
               },
               body: JSON.stringify({ owner, repo }),
             })
-          : await fetch(`${oidcBaseUrl}/exchange_github_app_token`, {
+          : await Http.fetch(`${oidcBaseUrl}/exchange_github_app_token`, {
               method: "POST",
               headers: {
                 Authorization: `Bearer ${token}`,
@@ -1633,7 +1632,7 @@ query($owner: String!, $repo: String!, $number: Int!) {
       async function revokeAppToken() {
         if (!appToken) return
 
-        await fetch("https://api.github.com/installation/token", {
+        await Http.fetch("https://api.github.com/installation/token", {
           method: "DELETE",
           headers: {
             Authorization: `Bearer ${appToken}`,

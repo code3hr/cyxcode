@@ -27,6 +27,8 @@ The Governance Engine is a security layer that intercepts all tool executions be
 - **Policy Rules**: Define what actions to take for specific tools/commands
 - **Audit Logging**: Complete audit trail of all tool executions
 - **Real-time Events**: Bus events for monitoring and alerting
+- **Tool Gate Enforcement**: Apply policy outcomes through the normal permission path
+- **Hard Block Wrapper Guards**: Stop known-blocked process and filesystem write operations at shared wrappers
 
 ### When to Use Governance
 
@@ -472,9 +474,35 @@ const targets = Governance.Matcher.extractTargets("bash", {
 
 ## Integration Guide
 
+### Current Enforcement Status
+
+Governance is now enforced through the session tool permission path. Tools call `ctx.ask(...)`; CyxCode checks governance before falling back to the normal permission system.
+
+Policy outcomes behave as follows:
+
+- `auto-approve`: execute without the normal permission prompt
+- `require-approval`: continue through the normal permission prompt
+- `blocked`: return a governance-denied tool result before execution
+
+CyxWatch also guards selected shared wrappers for hard block decisions. These wrapper guards do not prompt the user; they only stop operations classified as `block`.
+
+Current enforcement files:
+
+- `src/session/prompt.ts`: governance check in the tool permission gate and denied-result handling
+- `src/config/config.ts`: governance schema
+- `src/cyxcode/watch.ts`: CyxWatch classification, enforcement, telemetry, and alerts
+- `src/util/process.ts`: hard block guard before process spawn
+- `src/util/filesystem.ts`: hard block guard before filesystem writes
+
+Verified command:
+
+```bash
+bun test test/governance/governance.test.ts test/cyxcode/watch.test.ts
+```
+
 ### How Governance Integrates with cyxcode
 
-The governance engine hooks into the plugin system:
+Legacy notes below still describe the original plugin-hook design. The current implementation enforces governance first through the session tool permission gate, then preserves plugin before/after hooks around execution:
 
 ```
 User Request → AI generates tool call → Plugin.trigger("tool.execute.before")
