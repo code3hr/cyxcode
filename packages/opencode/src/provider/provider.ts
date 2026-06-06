@@ -18,6 +18,7 @@ import { iife } from "@/util/iife"
 import { Global } from "../global"
 import path from "path"
 import { Filesystem } from "../util/filesystem"
+import { Http } from "@/util/http"
 
 // Direct imports for bundled providers
 import { createAmazonBedrock, type AmazonBedrockProviderSettings } from "@ai-sdk/amazon-bedrock"
@@ -460,7 +461,7 @@ export namespace Provider {
             const headers = new Headers(init?.headers)
             headers.set("Authorization", `Bearer ${token.token}`)
 
-            return fetch(input, { ...init, headers })
+            return Http.fetch(input, { ...init, headers })
           },
         },
         async getModel(sdk: any, modelID: string) {
@@ -1236,7 +1237,7 @@ export namespace Provider {
       const existing = s.sdk.get(key)
       if (existing) return existing
 
-      const customFetch = options["fetch"]
+      const customFetch = options["fetch"] ?? Http.fetch
       const chunkTimeout = options["chunkTimeout"]
       delete options["chunkTimeout"]
 

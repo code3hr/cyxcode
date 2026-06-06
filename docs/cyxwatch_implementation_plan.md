@@ -456,6 +456,7 @@ Current shipped pieces:
 - wiki read/retrieve/send telemetry
 - recall query embed and similarity retrieval telemetry
 - recall sidecar embedding request telemetry
+- provider SDK fetch boundary telemetry through `Http.fetch`
 - focused test coverage for memory read, retrieve, and prompt-context send
 
 Remaining tasks:

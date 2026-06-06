@@ -1,11 +1,14 @@
 import { test, expect } from "bun:test"
 import path from "path"
+import { pathToFileURL } from "url"
 
 import { tmpdir } from "../fixture/fixture"
 import { Instance } from "../../src/project/instance"
 import { Provider } from "../../src/provider/provider"
 import { ProviderID, ModelID } from "../../src/provider/schema"
 import { Env } from "../../src/env"
+import { CyxPaths } from "../../src/cyxcode/paths"
+import { CyxWatch } from "../../src/cyxcode/watch"
 
 test("provider loaded from env variable", async () => {
   await using tmp = await tmpdir({
@@ -715,6 +718,94 @@ test("explicit baseURL overrides api field", async () => {
       expect(providers[ProviderID.make("custom-api")].options.baseURL).toBe("https://custom.override.com/v1")
     },
   })
+})
+
+test("provider SDK fetch uses CyxWatch network boundary", async () => {
+  await using tmp = await tmpdir({
+    init: async (dir) => {
+      const mod = path.join(dir, "boundary-provider.mjs")
+      await Bun.write(
+        mod,
+        `
+export function createBoundary(options) {
+  globalThis.__cyx_provider_fetch = options.fetch
+  return {
+    languageModel(id) {
+      return { id }
+    },
+  }
+}
+`,
+      )
+      await Bun.write(
+        path.join(dir, "opencode.json"),
+        JSON.stringify({
+          $schema: "https://cyxcode.ai/config.json",
+          provider: {
+            boundary: {
+              name: "Boundary Provider",
+              npm: pathToFileURL(mod).toString(),
+              api: "https://provider.example.com/v1",
+              env: [],
+              models: {
+                "model-1": {
+                  name: "Boundary Model",
+                  tool_call: true,
+                  limit: { context: 8000, output: 2000 },
+                },
+              },
+              options: {
+                apiKey: "test-key",
+              },
+            },
+          },
+        }),
+      )
+    },
+  })
+
+  const cwd = process.cwd()
+  const old = globalThis.fetch
+  try {
+    process.chdir(tmp.path)
+    CyxPaths.invalidateCache()
+    CyxWatch.clear()
+    globalThis.fetch = Object.assign(async () => Response.json({ ok: true }), {
+      preconnect: old.preconnect,
+    })
+
+    await Instance.provide({
+      directory: tmp.path,
+      fn: async () => {
+        const model = await Provider.getModel(ProviderID.make("boundary"), ModelID.make("model-1"))
+        await Provider.getLanguage(model)
+        const fn = (globalThis as { __cyx_provider_fetch?: typeof globalThis.fetch }).__cyx_provider_fetch
+        expect(typeof fn).toBe("function")
+
+        const res = await fn!("https://provider.example.com/v1/chat", {
+          method: "POST",
+          body: "hello",
+        })
+        expect(await res.json()).toEqual({ ok: true })
+
+        const rows = await CyxWatch.recent(10)
+        const row = rows.find(
+          (item) => item.kind === "network.outbound" && item.path === "https://provider.example.com/v1/chat",
+        )
+        expect(row).toBeDefined()
+        expect(row!.decision).toBe("allow")
+        expect(row!.host).toBe("provider.example.com")
+        expect(row!.method).toBe("POST")
+        expect(row!.bytes).toBe(5)
+      },
+    })
+  } finally {
+    delete (globalThis as { __cyx_provider_fetch?: typeof globalThis.fetch }).__cyx_provider_fetch
+    globalThis.fetch = old
+    CyxWatch.close()
+    process.chdir(cwd)
+    CyxPaths.invalidateCache()
+  }
 })
 
 test("model inherits properties from existing database model", async () => {

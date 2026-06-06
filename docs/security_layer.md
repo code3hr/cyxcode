@@ -507,6 +507,8 @@ What is done:
   approval for CyxWatch decisions.
 - CyxWatch records internal recall sidecar embedding requests as allowed
   `network.outbound` events with `recall_sidecar` and `internal_network` flags.
+- Provider SDK fetch calls are routed through the shared `Http.fetch` boundary
+  by default, so model-provider traffic is visible to CyxWatch.
 - CyxWatch avoids startup import cycles by lazy-loading `Log` and `Instance`.
 
 Verified:
@@ -516,7 +518,6 @@ Verified:
 
 Next time:
 
-- Continue boundary review for provider SDK injected fetch functions.
 - Add a Memory Firewall view for inspect, export, delete, and reclassify.
 - Add explicit cloud-model disclosure boundaries for memory events.
 - Decide where output redaction lives in the response pipeline and how users can override false positives.
