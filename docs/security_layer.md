@@ -56,7 +56,8 @@ Current state:
 - outbound attempts are checked before execution and logged before the network call
 - remaining raw `fetch()` surfaces are internal server dispatch, browser dashboard
   calls, plugin SDK adapters, and the local recall sidecar
-- WebSocket connections are not monitored
+- WebSocket connections use a shared wrapper and are recorded as persistent
+  outbound-channel events
 
 Required next state:
 
@@ -103,6 +104,14 @@ CyxWatch should treat memory as a protected resource:
 - minimize and redact memory before sending it to cloud models
 - require approval before exposing sensitive memory
 - record which memory was accessed, why, and whether it was sent outward
+
+Current implementation note: CyxWatch now records first-pass memory telemetry
+for project memory, wiki, and recall. The shipped event kinds are
+`memory.read`, `memory.retrieve`, `memory.embed`, `memory.send`, and
+`memory.redact`. These events are local and use the same JSONL and SQLite stores
+as shell, file, network, prompt, and secret telemetry. Classification,
+minimization, approval prompts, encryption, and dashboard memory controls are
+still next-phase work.
 
 The core rule is that the model can request memory, but local policy decides
 what memory can be read or disclosed.
@@ -392,6 +401,7 @@ Current shipped pieces:
 - shell command telemetry from the process wrapper and bash tool
 - outbound request telemetry for URL-based instruction, community, and provider fetches
 - outbound request telemetry for import, MCP, and GitHub helper requests
+- WebSocket outbound telemetry
 - prompt-turn correlation with session and message ids
 - basic policy decisions on events: allow, warn, require-approval, block
 - anomaly alerts and local alert history
@@ -418,6 +428,8 @@ Current shipped pieces:
 - low-level wrapper enforcement for hard block decisions:
   - process wrapper blocks destructive shell commands before spawn
   - filesystem write wrapper runs CyxWatch guard before write
+  - HTTP and WebSocket wrappers block policy-denied outbound targets
+- saved-policy enforcement coverage for shell, file, HTTP, and WebSocket wrappers
 
 ### Phase 3
 
@@ -429,6 +441,9 @@ Current shipped pieces:
 
 - dashboard security page
 - app route: `/dashboard/security` on port `3000`
+- dashboard policy rule editor with add/edit/delete and raw JSON editing
+- dashboard event filters for file, shell, network, memory, secret, and prompt
+  events
 - `cyxcode watch report`
 - `cyxcode watch recent`
 - `cyxcode watch alerts`
@@ -460,13 +475,17 @@ Do not frame it as spyware detection or anti-AI tooling.
 
 ## Current Handoff
 
-Last updated: 2026-05-19.
+Last updated: 2026-06-06.
 
 What is done:
 
-- CyxWatch records prompt turns, file reads/writes, shell commands, selected outbound requests, risk flags, decisions, and alerts.
+- CyxWatch records prompt turns, file reads/writes, shell commands, selected outbound requests, WebSocket connections, risk flags, decisions, and alerts.
+- CyxWatch records first-pass memory firewall events for project memory, wiki,
+  and recall: `memory.read`, `memory.retrieve`, `memory.embed`, `memory.send`,
+  and `memory.redact`.
 - `cyxcode watch report`, `cyxcode watch recent`, and `cyxcode watch alerts` expose the local telemetry.
-- `/dashboard/security` exists in the main app on port `3000`.
+- `/dashboard/security` exists in the main app on port `3000`, including event
+  filters and a project policy rule editor.
 - Governance config supports scope, policy rules, default action, and audit settings.
 - Governance policy decisions are enforced through the tool permission gate:
   - `auto-approve` skips the normal permission prompt
@@ -475,6 +494,10 @@ What is done:
 - CyxWatch now also guards shared lower-level wrappers for hard block decisions:
   - `Process.spawn()` blocks destructive commands before spawn
   - `Filesystem.write()` checks the CyxWatch guard before writing
+  - `Http.fetch()` and `Websocket.connect()` check CyxWatch policy before
+    opening outbound channels
+- CyxWatch policy validation rejects invalid matcher lists, actions, risk, and
+  byte thresholds before saving.
 - CyxWatch avoids startup import cycles by lazy-loading `Log` and `Instance`.
 
 Verified:
@@ -484,12 +507,14 @@ Verified:
 
 Next time:
 
-- Add live-session tests proving configured governance policies block real tool calls end to end.
-- Expand lower-level enforcement to network wrappers and direct fetch paths.
-- Add WebSocket monitoring after the shared HTTP wrapper exists.
+- Add full session-level tests proving configured governance policies block real
+  tool calls end to end.
+- Continue boundary review for provider SDK injected fetch functions and recall
+  sidecar traffic.
+- Add a Memory Firewall view for inspect, export, delete, and reclassify.
+- Add explicit cloud-model disclosure boundaries for memory events.
 - Add env/secret leakage detection for shell commands, `.env` reads, and assistant/tool output.
 - Decide where output redaction lives in the response pipeline and how users can override false positives.
-- Add a UI for viewing/editing governance policy config.
 - Link security incidents into the graph so prompts, files, commands, and alerts are explorable together.
 - Decide whether `require-approval` should ever be handled below the tool layer, or remain only in the permission UI path.
 

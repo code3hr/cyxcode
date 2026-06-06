@@ -1,6 +1,6 @@
 # CyxWatch Implementation Plan
 
-Last updated: 2026-05-21
+Last updated: 2026-06-06
 
 This plan turns the CyxWatch security layer from partial observability into a
 runtime boundary for network exfiltration, sensitive file access, env leakage,
@@ -21,33 +21,42 @@ Shipped:
   guard before sensitive reads and writes.
 - `packages/opencode/src/util/http.ts` wraps runtime HTTP fetch calls and records
   host, method, and request body size before the network call.
+- `packages/opencode/src/util/websocket.ts` wraps WebSocket connections and
+  records persistent outbound-channel telemetry.
 - `packages/opencode/src/cyxcode/watch/policy.ts` loads project-local policy
   rules from `.cyxcode/cyxwatch/policy.json` or `.opencode/cyxwatch/policy.json`.
 - `packages/opencode/src/cyxcode/watch/secret.ts` redacts high-confidence
   secrets from tool output and persisted assistant text.
 - `packages/opencode/src/cyxcode/watch/store.ts` mirrors events and alerts into
   local SQLite while keeping JSONL as the append-only audit trail.
+- `packages/opencode/src/cyxcode/watch.ts` records first-pass memory firewall
+  events: `memory.read`, `memory.retrieve`, `memory.embed`, `memory.send`, and
+  `memory.redact`.
+- `packages/opencode/src/cyxcode/memory.ts`, `packages/opencode/src/cyxcode/wiki.ts`,
+  and `packages/opencode/src/cyxcode/recall/index.ts` emit memory telemetry when
+  project memory, wiki notes, and recall results are read, retrieved, embedded,
+  or sent into prompt context.
 - `packages/opencode/src/session/prompt.ts` creates prompt/session scope.
 - `packages/opencode/src/tool/bash.ts` wraps bash tool execution in CyxWatch
   scope.
 - CLI commands expose `watch report`, `watch recent`, and `watch alerts`.
-- `/dashboard/security` displays the current telemetry.
+- `/dashboard/security` displays current telemetry, alert history, policy rules,
+  policy editing, and event filters for file, shell, network, memory, secret,
+  and prompt events.
 
 Known gaps:
 
-- WebSocket connections are not monitored.
 - Provider SDK injected `fetch` functions and the local recall sidecar still need
   explicit boundary review.
 - `require-approval` blocks at the wrapper layer in headless contexts; it does
   not yet bridge to an interactive approval prompt.
-- Policy matching covers permission, path, command, host, and generic pattern
-  rules; method and byte-threshold rules are still heuristic.
+- Full session-level policy tests are still needed; current coverage proves
+  saved policy blocks wrapper-level shell, file, HTTP, and WebSocket paths.
 - Streaming assistant deltas can still briefly surface before final persisted
   assistant text is redacted.
-- Web dashboard policy editing is API-ready but not designed yet.
-- Persistent memory, recall, wiki, skills, and agent profile files are not yet
-  classified, minimized, permissioned, or encrypted as a dedicated memory
-  firewall.
+- Persistent memory, recall, wiki, skills, and agent profile files now emit
+  first-pass access/send telemetry, but they are not yet classified, minimized,
+  permissioned, or encrypted as a dedicated memory firewall.
 
 ## Design Goals
 
@@ -96,6 +105,11 @@ type WatchEntry = {
     | "network.websocket"
     | "env.access"
     | "output.secret"
+    | "memory.read"
+    | "memory.retrieve"
+    | "memory.embed"
+    | "memory.send"
+    | "memory.redact"
   project?: string
   sessionID?: string
   messageID?: string
@@ -284,6 +298,19 @@ Principle:
 - the local policy layer decides what memory can be read or sent
 - every memory disclosure is auditable
 
+Current shipped pieces:
+
+- `CyxWatch.memory()` records memory-layer telemetry.
+- `memory.read` is emitted when project/global memory or wiki notes are loaded.
+- `memory.retrieve` is emitted when memory, wiki, or recall returns relevant
+  context.
+- `memory.embed` is emitted when recall embeds a similarity query.
+- `memory.send` is emitted when project memory or wiki context is prepared for
+  prompt context.
+- Memory events are included in the same JSONL and SQLite event stores as shell,
+  file, network, prompt, and secret events.
+- Focused coverage lives in `packages/opencode/test/cyxcode/watch.test.ts`.
+
 ## Implementation Phases
 
 ### Phase A: Network Wrapper
@@ -375,13 +402,20 @@ Exit criteria:
 
 Goal: make policy tunable without editing source code.
 
-Tasks:
+Current shipped pieces:
+
+- project-local `policy.json` loading and saving
+- server routes to read and update policy
+- `/dashboard/security` rule editor with add/edit/delete
+- raw JSON policy editor
+- policy validation for matcher lists, actions, risk, and byte thresholds
+- focused coverage for invalid policy saves and saved-policy runtime enforcement
+
+Remaining tasks:
 
 - add `.cyxcode/cyxwatch/policies/default.json`
 - load user policy and merge with defaults
-- add server routes to read/update policy
-- add `/dashboard/security/policy`
-- add validation for patterns, actions, and byte thresholds
+- add full session-level policy enforcement tests
 
 Exit criteria:
 
@@ -411,12 +445,22 @@ Exit criteria:
 Goal: prevent persistent agent memory from becoming invisible behavioral
 surveillance infrastructure.
 
-Tasks:
+Current shipped pieces:
+
+- first-pass memory event types in `WatchKind`
+- `CyxWatch.memory()` helper
+- project memory read/retrieve/send telemetry
+- wiki read/retrieve/send telemetry
+- recall query embed and similarity retrieval telemetry
+- focused test coverage for memory read, retrieve, and prompt-context send
+
+Remaining tasks:
 
 - add memory privacy class metadata
 - default existing memory, wiki, and recall-derived records to `private`
 - add `never_send` path and tag patterns
-- record memory read, retrieve, send, and redact events
+- expand memory event coverage to writes, redactions, minimization, and explicit
+  cloud-model disclosure boundaries
 - add context minimizer before cloud model calls
 - add memory approval prompts
 - encrypt sensitive memory at rest
@@ -439,18 +483,16 @@ Unit tests:
   - env command classification
   - private/unknown host classification
   - large upload classification
-- new `test/util/http.test.ts`
   - logs outbound request
   - blocks private host when policy says block
-  - does not double-wrap internal server fetches
-- new `test/cyxcode/secret.test.ts`
   - detects high-confidence tokens
   - avoids logging raw secret values
   - redacts output deterministically
+  - validates policy saves and wrapper-level policy enforcement
 
 Integration tests:
 
-- session prompt that tries to read `.env` is blocked or requires approval
+- full session prompt that tries to read `.env` is blocked or requires approval
 - shell tool running `printenv` is flagged before execution
 - webfetch to unknown host records outbound event
 - denied wrapper-level approval prevents execution
@@ -460,8 +502,10 @@ Manual verification:
 - run `bun typecheck` from `packages/opencode`
 - run focused tests from `packages/opencode`, not repo root
 - start API and dashboard
-- verify `/dashboard/security` shows shell, file, network, env, and output
-  events
+- verify `/dashboard/security` shows shell, file, network, memory, secret, and
+  prompt events
+- verify policy editing rejects invalid rules and saved rules affect runtime
+  decisions
 
 ## Rollout Strategy
 
