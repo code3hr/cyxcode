@@ -9,12 +9,10 @@
 
 import fs from "fs/promises"
 import path from "path"
-import { Instance } from "@/project/instance"
 import { BaseSkill } from "./base-skill"
 import type { Pattern, Fix } from "./types"
 import { Log } from "@/util/log"
 import { CyxPaths } from "./paths"
-import { CyxAudit } from "./audit"
 
 const log = Log.create({ service: "cyxcode-learned" })
 
@@ -212,10 +210,12 @@ export namespace LearnedPatterns {
     log.info("Approved learned pattern", { id })
 
     // Emit audit event
-    CyxAudit.record("cyxcode.pattern.learned", {
-      patternId: id,
-      message: "Pattern approved via /learn-patterns",
-    }).catch(() => {})
+    import("./audit")
+      .then(({ CyxAudit }) => CyxAudit.record("cyxcode.pattern.learned", {
+        patternId: id,
+        message: "Pattern approved via /learn-patterns",
+      }))
+      .catch(() => {})
 
     return true
   }

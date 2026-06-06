@@ -11,11 +11,7 @@ import fs from "fs/promises"
 import path from "path"
 import { Log } from "@/util/log"
 import { CyxPaths } from "./paths"
-import { Bus } from "@/bus"
-import { SessionCompaction } from "@/session/compaction"
-import { MessageV2 } from "@/session/message-v2"
-import { Session } from "@/session"
-import { CyxAudit } from "./audit"
+import type { MessageV2 } from "@/session/message-v2"
 import { Codegraph } from "./codegraph"
 import { Wiki } from "./wiki"
 import { CyxWatch } from "./watch"
@@ -467,11 +463,13 @@ export namespace Memory {
           bytes: totalChars,
           count: results.length,
         }).catch(() => {})
-        CyxAudit.record("cyxcode.memory.loaded", {
-          memoryId: keywords.slice(0, 3).join("-"),
-          tags: keywords.slice(0, 5),
-          chars: totalChars,
-        }).catch(() => {})
+        import("./audit")
+          .then(({ CyxAudit }) => CyxAudit.record("cyxcode.memory.loaded", {
+            memoryId: keywords.slice(0, 3).join("-"),
+            tags: keywords.slice(0, 5),
+            chars: totalChars,
+          }))
+          .catch(() => {})
       }
 
       return results
@@ -558,6 +556,7 @@ function extractKeywords(msgs: MessageV2.WithParts[]): string[] {
 
 async function captureFromCompaction(sessionID: string) {
   try {
+    const { MessageV2 } = await import("@/session/message-v2")
     const msgs: MessageV2.WithParts[] = []
     for await (const msg of MessageV2.stream(sessionID as any)) {
       msgs.push(msg)
@@ -718,10 +717,14 @@ function hash(str: string): string {
 // --- Init ---
 
 export function initMemoryCapture() {
-  Bus.subscribe(SessionCompaction.Event.Compacted, async (event) => {
-    await captureFromCompaction(event.properties.sessionID)
-  })
+  void Promise.all([import("@/bus"), import("@/session/compaction")])
+    .then(([{ Bus }, { SessionCompaction }]) => {
+      Bus.subscribe(SessionCompaction.Event.Compacted, async (event) => {
+        await captureFromCompaction(event.properties.sessionID)
+      })
+    })
+    .catch(() => {})
 
   // Prune on startup
-  Memory.prune()
+  void Memory.prune()
 }

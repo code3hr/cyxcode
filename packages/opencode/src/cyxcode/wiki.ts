@@ -5,7 +5,6 @@ import { Log } from "@/util/log"
 import { Hash } from "@/util/hash"
 import { ConfigMarkdown } from "@/config/markdown"
 import { CyxPaths } from "./paths"
-import { redactSecrets } from "./audit"
 import { CyxWatch } from "./watch"
 import { embedBatch, isDisabled } from "./recall/embedder"
 import { upsertVector, bumpAccessBySourceId } from "./recall/db"
@@ -446,6 +445,7 @@ export namespace Wiki {
       return { pages: pages.length, indexed: 0, links: [...links.values()].reduce((n, set) => n + set.size, 0), errors }
     }
 
+    const { redactSecrets } = await import("./audit")
     const texts = changed.map((page) => {
       const body = redactSecrets(
         [

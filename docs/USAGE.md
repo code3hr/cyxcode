@@ -500,19 +500,45 @@ cyxcode watch policy --json
 
 ### Web Dashboard
 
-Launch the web server to access the dashboard:
+For an installed CLI, launch web mode:
 
 ```bash
-# Start web mode (opens browser automatically)
 cyxcode web
-
-# Or start server mode (headless)
-cyxcode serve --port 4096
-
-# Then open in browser
-open http://localhost:3000/dashboard/reports
-open http://localhost:3000/dashboard/security
 ```
+
+For local development from this repository, start the backend, main web app, and
+dashboard dev app separately:
+
+```powershell
+# Terminal 1: backend/API
+cd D:\Dev\Failed\cyxcode\packages\opencode
+bun run --conditions=browser ./src/index.ts serve --hostname 127.0.0.1 --port 4096
+
+# Terminal 2: main CyxCode web app
+cd D:\Dev\Failed\cyxcode\packages\app
+bun run dev -- --host 127.0.0.1 --port 3000
+
+# Terminal 3: dashboard graph/wiki UI
+cd D:\Dev\Failed\cyxcode\packages\opencode\src\dashboard
+npm run dev -- --host 127.0.0.1 --port 3002
+```
+
+Open the main local web app:
+
+```text
+http://127.0.0.1:3000/
+http://127.0.0.1:3000/dashboard/
+http://127.0.0.1:3000/dashboard/security
+http://127.0.0.1:3000/dashboard/reports
+```
+
+The dashboard dev app is also directly available at
+`http://127.0.0.1:3002/dashboard/`. The backend/API is available at
+`http://127.0.0.1:4096/`.
+
+The split local setup is temporary. `docs/TOFIX-web-entrypoint.md` tracks the
+remaining work to make `cyxcode web --hostname 127.0.0.1 --port 4096` serve the
+app and dashboard consistently as one local web entrypoint.
 
 The app dashboard pages at `/dashboard/reports` and `/dashboard/security` show:
 - report generation and previews
