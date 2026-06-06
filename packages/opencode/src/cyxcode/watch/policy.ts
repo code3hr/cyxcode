@@ -16,6 +16,11 @@ const Rule = z.object({
   path: z.array(z.string()).optional(),
   host: z.array(z.string()).optional(),
   cmd: z.array(z.string()).optional(),
+  method: z.array(z.string()).optional(),
+  bytes_gt: z.number().int().min(0).optional(),
+  bytes_gte: z.number().int().min(0).optional(),
+  bytes_lt: z.number().int().min(0).optional(),
+  bytes_lte: z.number().int().min(0).optional(),
   decision: Decision,
   risk: z.number().int().min(0).max(100).optional(),
   flags: z.array(z.string()).optional(),
@@ -66,7 +71,13 @@ export namespace WatchPolicy {
       const value = meta[key]
       return typeof value === "string" ? value : undefined
     }
+    const num = (key: string) => {
+      const value = meta[key]
+      return typeof value === "number" && Number.isFinite(value) ? value : undefined
+    }
     const url = str("url") ?? input.patterns[0]
+    const method = str("method")
+    const bytes = num("bytes")
     const host = (() => {
       if (!url) return undefined
       try {
@@ -81,6 +92,7 @@ export namespace WatchPolicy {
       str("command"),
       url,
       host,
+      method,
     ].filter((item): item is string => !!item)
 
     const cfg = (() => {
@@ -100,6 +112,12 @@ export namespace WatchPolicy {
       if (rule.cmd?.length && !rule.cmd.some((pat) => Wildcard.match(str("command") ?? "", pat))) return false
       if (rule.host?.length && !host) return false
       if (rule.host?.length && !rule.host.some((pat) => Wildcard.match(host ?? "", pat))) return false
+      if (rule.method?.length && !method) return false
+      if (rule.method?.length && !rule.method.some((pat) => Wildcard.match(method ?? "", pat))) return false
+      if (rule.bytes_gt !== undefined && (bytes === undefined || bytes <= rule.bytes_gt)) return false
+      if (rule.bytes_gte !== undefined && (bytes === undefined || bytes < rule.bytes_gte)) return false
+      if (rule.bytes_lt !== undefined && (bytes === undefined || bytes >= rule.bytes_lt)) return false
+      if (rule.bytes_lte !== undefined && (bytes === undefined || bytes > rule.bytes_lte)) return false
       return true
     })
   }

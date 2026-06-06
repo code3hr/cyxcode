@@ -215,6 +215,54 @@ describe("CyxWatch", () => {
     }
   })
 
+  test("matches outbound policy by method and byte threshold", async () => {
+    await CyxWatch.savePolicy({
+      version: 2,
+      rules: [
+        {
+          id: "large-post",
+          permission: ["webfetch"],
+          host: ["example.com"],
+          method: ["POST"],
+          bytes_gt: 4,
+          decision: "warn",
+          risk: 22,
+          flags: ["large_post"],
+        },
+      ],
+    })
+
+    const miss = CyxWatch.classify({
+      permission: "webfetch",
+      patterns: ["https://example.com/api"],
+      metadata: { url: "https://example.com/api", method: "GET", bytes: 5 },
+    })
+    expect(miss.decision).toBe("allow")
+
+    const old = globalThis.fetch
+    globalThis.fetch = Object.assign(async () => new Response("ok"), {
+      preconnect: old.preconnect,
+    })
+    try {
+      const res = await Http.fetch("https://example.com/api", {
+        method: "POST",
+        body: "hello",
+      })
+      expect(await res.text()).toBe("ok")
+      await sleep(250)
+
+      const rows = await CyxWatch.recent(10)
+      const row = rows.find((item) => item.kind === "network.outbound" && item.path === "https://example.com/api")
+      expect(row).toBeDefined()
+      expect(row!.decision).toBe("warn")
+      expect(row!.risk).toBe(22)
+      expect(row!.flags).toContain("large_post")
+      expect(row!.flags).toContain("policy_large-post")
+    } finally {
+      globalThis.fetch = old
+    }
+  })
+
   test("blocks dangerous process wrapper commands before spawn", async () => {
     await expect(Process.run(["rm", "-rf", "/"], { nothrow: true })).rejects.toThrow("CyxWatch blocked operation")
   })
