@@ -303,7 +303,7 @@ export const reportsApi = {
 export interface WatchEvent {
   id: string
   ts: number
-  kind: "file.read" | "file.write" | "shell.command" | "network.outbound" | "network.websocket" | "prompt.turn" | "output.secret" | "memory.read" | "memory.retrieve" | "memory.embed" | "memory.send" | "memory.redact"
+  kind: "file.read" | "file.write" | "shell.command" | "network.outbound" | "network.websocket" | "prompt.turn" | "output.secret" | "memory.read" | "memory.write" | "memory.retrieve" | "memory.embed" | "memory.send" | "memory.redact"
   project?: string
   sessionID?: string
   messageID?: string

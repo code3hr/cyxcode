@@ -226,6 +226,13 @@ export namespace Memory {
     }).catch(e => log.warn("Failed to write memory index", { error: e }))
     await writeLock
 
+    void CyxWatch.memory({
+      action: "write",
+      source: path.join(dir, file),
+      bytes: Buffer.byteLength(content),
+      count: 1,
+    }).catch(() => {})
+
     log.debug("Saved memory", { id, tags, scope })
   }
 
@@ -300,6 +307,12 @@ export namespace Memory {
     }
     idx.entries[pos] = next
     await writeIndex(idx)
+    void CyxWatch.memory({
+      action: "write",
+      source: path.join(basePath(), next.file),
+      bytes: Buffer.byteLength(JSON.stringify(next)),
+      count: 1,
+    }).catch(() => {})
     return next
   }
 
@@ -309,6 +322,12 @@ export namespace Memory {
     if (!entry) return false
     await fs.unlink(path.join(basePath(), entry.file)).catch(() => {})
     await writeIndex({ version: 1, entries: idx.entries.filter((item) => item.id !== id) })
+    void CyxWatch.memory({
+      action: "write",
+      source: path.join(basePath(), entry.file),
+      bytes: 0,
+      count: 1,
+    }).catch(() => {})
     return true
   }
 

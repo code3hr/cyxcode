@@ -8,6 +8,7 @@ import { CyxWatch } from "../../src/cyxcode/watch"
 import { CyxPaths } from "../../src/cyxcode/paths"
 import { WatchSecret } from "../../src/cyxcode/watch/secret"
 import { Memory } from "../../src/cyxcode/memory"
+import { Wiki } from "../../src/cyxcode/wiki"
 import { Filesystem } from "../../src/util/filesystem"
 import { Http } from "../../src/util/http"
 import { Process } from "../../src/util/process"
@@ -977,6 +978,20 @@ describe("CyxWatch", () => {
     expect(sent!.flags).toContain("memory_disclosure")
     expect(sent!.text).toContain("<project-memory>")
     expect(sent!.text).toContain("auth uses jwt middleware")
+  })
+
+  test("records memory and wiki writes", async () => {
+    await Memory.save("write-note", ["write"], "write note", "write memory body")
+    await Wiki.create({
+      title: "Write Note",
+      body: "write wiki body",
+      tags: ["write"],
+    })
+    await sleep(250)
+
+    const rows = await CyxWatch.recent(20)
+    expect(rows.some((item) => item.kind === "memory.write" && item.path?.replaceAll("\\", "/").includes("/memory/write-note.md"))).toBe(true)
+    expect(rows.some((item) => item.kind === "memory.write" && item.path?.replaceAll("\\", "/").includes("/wiki/write-note.md"))).toBe(true)
   })
 
   test("excludes never_send memory before prompt context", async () => {

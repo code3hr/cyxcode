@@ -30,6 +30,7 @@ export type WatchKind =
   | "prompt.turn"
   | "output.secret"
   | "memory.read"
+  | "memory.write"
   | "memory.retrieve"
   | "memory.embed"
   | "memory.send"
@@ -950,7 +951,7 @@ export namespace CyxWatch {
   }
 
   export async function memory(input: {
-    action: "read" | "retrieve" | "embed" | "send" | "redact"
+    action: "read" | "write" | "retrieve" | "embed" | "send" | "redact"
     source: string
     text?: string
     summary?: string

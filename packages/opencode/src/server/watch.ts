@@ -11,6 +11,7 @@ const kinds: WatchKind[] = [
   "prompt.turn",
   "output.secret",
   "memory.read",
+  "memory.write",
   "memory.retrieve",
   "memory.embed",
   "memory.send",

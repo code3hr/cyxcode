@@ -475,6 +475,7 @@ Current shipped pieces:
 - existing memory, wiki, and recall-derived records default to `private`
 - high-confidence memory, wiki, and recall path/tag patterns are classified as
   `never_send`
+- memory and wiki note writes emit `memory.write` telemetry
 - project memory read/retrieve/send telemetry
 - wiki read/retrieve/send telemetry
 - recall query embed and similarity retrieval telemetry
@@ -485,7 +486,6 @@ Current shipped pieces:
 
 Remaining tasks:
 
-- expand memory event coverage to writes
 - add memory approval prompts
 - encrypt sensitive memory at rest
 

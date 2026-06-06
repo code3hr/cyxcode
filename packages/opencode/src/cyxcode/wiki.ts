@@ -594,7 +594,14 @@ export namespace Wiki {
 
   export async function create(opts: WikiCreate): Promise<WikiPage> {
     const file = await note(opts.title)
-    await fs.writeFile(file, render(opts))
+    const text = render(opts)
+    await fs.writeFile(file, text)
+    void CyxWatch.memory({
+      action: "write",
+      source: file,
+      bytes: Buffer.byteLength(text),
+      count: 1,
+    }).catch(() => {})
     await rebuild({ force: true })
 
     const page = await get(rootId(file))
@@ -622,7 +629,14 @@ export namespace Wiki {
     }
 
     const file = full(page)
-    await fs.writeFile(file, render(opts))
+    const text = render(opts)
+    await fs.writeFile(file, text)
+    void CyxWatch.memory({
+      action: "write",
+      source: file,
+      bytes: Buffer.byteLength(text),
+      count: 1,
+    }).catch(() => {})
     await rebuild({ force: true })
 
     const next = await get(id)
@@ -646,7 +660,14 @@ export namespace Wiki {
       ? md?.data?.tags.filter((tag): tag is string => typeof tag === "string")
       : page.tags
 
-    await fs.writeFile(file, render({ title, body, tags }))
+    const text = render({ title, body, tags })
+    await fs.writeFile(file, text)
+    void CyxWatch.memory({
+      action: "write",
+      source: file,
+      bytes: Buffer.byteLength(text),
+      count: 1,
+    }).catch(() => {})
     await rebuild({ force: true })
 
     const next = await get(id)
@@ -669,6 +690,12 @@ export namespace Wiki {
 
     const file = full(page)
     await fs.unlink(file).catch(() => {})
+    void CyxWatch.memory({
+      action: "write",
+      source: file,
+      bytes: 0,
+      count: 1,
+    }).catch(() => {})
     await rebuild({ force: true })
   }
 }
