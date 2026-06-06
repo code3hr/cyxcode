@@ -362,6 +362,31 @@ Minimum dashboard views:
 - tag events with `sessionID`, `messageID`, and prompt text
 - surface memory events in `/dashboard/security`
 
+Current status:
+
+- shipped first-pass `WatchKind` support for `memory.read`, `memory.retrieve`,
+  `memory.embed`, `memory.send`, and `memory.redact`
+- added `CyxWatch.memory()` for memory-layer telemetry
+- project memory entries now carry a privacy class, defaulting to `private`
+- `/dashboard/memory` can inspect, export, delete, and reclassify project
+  memory records, including marking entries as `never_send`
+- project memory records file reads, relevance retrieval, and prompt-context send
+- wiki records note reads, relevance retrieval, and prompt-context send
+- recall records query embedding and similarity retrieval
+- sensitive and `never_send` project memory and wiki note bodies are encrypted
+  at rest with AES-256-GCM and a project-local key
+- memory events are stored in the same local JSONL and SQLite CyxWatch stores as
+  shell, file, network, prompt, and secret events
+- focused tests cover memory read, retrieve, prompt-context send, approval, and
+  encryption-at-rest paths
+
+Remaining M2 work:
+
+- add dashboard filtering and dedicated memory-event views
+- record explicit cloud-model disclosure boundaries, not only prompt-context
+  preparation
+- extend coverage to redaction/minimization output
+
 ### Phase M3: Context Minimizer
 
 - build local summarizer/redactor before cloud model calls

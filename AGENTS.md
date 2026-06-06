@@ -134,3 +134,8 @@ const table = sqliteTable("session", {
 ## Type Checking
 
 - Always run `bun typecheck` from package directories (e.g., `packages/opencode`), never `tsc` directly.
+
+## Memory
+
+- `.opencode/memory/index.json` is the lookup source of truth; add or update the matching `.md` file and the index entry together so saved memories stay discoverable.
+- Security pattern notes live in `packages/opencode/src/cyxcode/skills/security/patterns/`; `auth.ts` is the current JWT and malformed-token reference.
