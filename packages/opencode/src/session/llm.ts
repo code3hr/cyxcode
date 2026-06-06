@@ -23,6 +23,7 @@ import { SystemPrompt } from "./system"
 import { Flag } from "@/flag/flag"
 import { Permission } from "@/permission"
 import { Auth } from "@/auth"
+import { CyxWatch } from "@/cyxcode/watch"
 
 export namespace LLM {
   const log = Log.create({ service: "llm" })
@@ -44,6 +45,10 @@ export namespace LLM {
   }
 
   export type StreamOutput = StreamTextResult<ToolSet, unknown>
+
+  export function context(system: string[]) {
+    return system.filter((item) => /<(project-memory|global-memory|wiki-note)\b/.test(item))
+  }
 
   export async function stream(input: StreamInput) {
     const l = log
@@ -127,6 +132,20 @@ export namespace LLM {
             ),
             ...input.messages,
           ]
+
+    const ctx = context(input.system)
+    if (ctx.length > 0) {
+      const text = ctx.join("\n\n")
+      void CyxWatch.memory({
+        action: "send",
+        source: `provider:${provider.id}:${input.model.id}`,
+        text,
+        sessionID: input.sessionID,
+        messageID: input.user.id,
+        bytes: Buffer.byteLength(text),
+        count: ctx.length,
+      }).catch(() => {})
+    }
 
     const params = await Plugin.trigger(
       "chat.params",

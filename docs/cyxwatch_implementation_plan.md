@@ -463,6 +463,8 @@ Current shipped pieces:
   emits `memory.redact` telemetry
 - `/cyxwatch/context` and `/dashboard/security` expose prepared memory context
   from `memory.send` events
+- `LLM.stream` records memory/wiki context present at provider-call boundaries
+  as `memory.send` events with `provider:<provider>:<model>` sources
 - project memory read/retrieve/send telemetry
 - wiki read/retrieve/send telemetry
 - recall query embed and similarity retrieval telemetry
@@ -475,12 +477,11 @@ Remaining tasks:
 
 - default existing memory, wiki, and recall-derived records to `private`
 - add `never_send` path and tag patterns outside project/global memory indexes
-- expand memory event coverage to writes, minimization, and explicit cloud-model
-  disclosure boundaries
+- expand memory event coverage to writes and minimization
 - add context minimizer before cloud model calls
 - add memory approval prompts
 - encrypt sensitive memory at rest
-- add Memory Firewall policy presets and context-sent provider boundary views
+- add Memory Firewall policy presets and provider boundary filters
 
 Exit criteria:
 

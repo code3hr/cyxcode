@@ -102,6 +102,22 @@ describe("session.llm.hasToolCalls", () => {
   })
 })
 
+describe("session.llm.context", () => {
+  test("extracts only memory context sections", () => {
+    const out = LLM.context([
+      "plain system",
+      "<project-memory>\nauth detail\n</project-memory>",
+      "<wiki-note path=\"docs/a.md\" title=\"A\">\nwiki detail\n</wiki-note>",
+      "<codegraph>\ncode detail\n</codegraph>",
+    ])
+
+    expect(out).toHaveLength(2)
+    expect(out.join("\n")).toContain("auth detail")
+    expect(out.join("\n")).toContain("wiki detail")
+    expect(out.join("\n")).not.toContain("code detail")
+  })
+})
+
 type Capture = {
   url: URL
   headers: Headers

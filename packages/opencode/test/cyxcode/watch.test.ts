@@ -1002,4 +1002,22 @@ describe("CyxWatch", () => {
     expect(out.events[0].kind).toBe("memory.send")
     expect(out.events[0].text).toContain("route auth context")
   })
+
+  test("records provider boundary memory context with explicit session", async () => {
+    await CyxWatch.memory({
+      action: "send",
+      source: "provider:openai:gpt-test",
+      text: "<project-memory>\nprovider context\n</project-memory>",
+      sessionID: "ses_provider",
+      messageID: "msg_provider",
+      bytes: 49,
+      count: 1,
+    })
+
+    const rows = await CyxWatch.context({ limit: 5, sessionID: "ses_provider" })
+    expect(rows).toHaveLength(1)
+    expect(rows[0]!.path).toBe("provider:openai:gpt-test")
+    expect(rows[0]!.messageID).toBe("msg_provider")
+    expect(rows[0]!.text).toContain("provider context")
+  })
 })

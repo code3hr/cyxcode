@@ -952,6 +952,8 @@ export namespace CyxWatch {
     action: "read" | "retrieve" | "embed" | "send" | "redact"
     source: string
     text?: string
+    sessionID?: string
+    messageID?: string
     bytes?: number
     count?: number
     redactions?: string[]
@@ -970,8 +972,8 @@ export namespace CyxWatch {
       ts,
       kind,
       project: await project(),
-      sessionID: scope?.sessionID,
-      messageID: scope?.messageID,
+      sessionID: input.sessionID ?? scope?.sessionID,
+      messageID: input.messageID ?? scope?.messageID,
       prompt: scope?.prompt,
       text: input.text,
       path: input.source,
