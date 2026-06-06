@@ -18,7 +18,6 @@ const kinds: WatchKind[] = [
   "memory.redact",
 ]
 
-
 export function createWatchRoutes(): Hono {
   const app = new Hono()
 
@@ -100,6 +99,32 @@ export function createWatchRoutes(): Hono {
     const { CyxWatch } = await import("../cyxcode/watch")
     const policy = await CyxWatch.savePolicy(parsed.policy)
     return c.json({ policy })
+  })
+
+  app.get("/cyxcode/report", async (c) => {
+    const query = c.req.query()
+    const period = query.period && ["1h", "1d", "7d", "30d", "all"].includes(query.period)
+      ? (query.period as "1h" | "1d" | "7d" | "30d" | "all")
+      : "7d"
+    const { CyxReport } = await import("../cyxcode/report")
+    const report = await CyxReport.generate(period)
+    return c.json({ report })
+  })
+
+  app.get("/cyxcode/audit", async (c) => {
+    const query = c.req.query()
+    const limit = query.limit ? Math.max(1, Math.min(200, parseInt(query.limit, 10) || 50)) : 50
+    const since = (() => {
+      const now = Date.now()
+      if (query.last === "1h") return now - 60 * 60 * 1000
+      if (query.last === "1d") return now - 24 * 60 * 60 * 1000
+      if (query.last === "7d") return now - 7 * 24 * 60 * 60 * 1000
+      if (query.last === "30d") return now - 30 * 24 * 60 * 60 * 1000
+      return 0
+    })()
+    const { CyxAudit } = await import("../cyxcode/audit")
+    const entries = await CyxAudit.list({ since, limit })
+    return c.json({ entries, total: entries.length })
   })
 
   return app

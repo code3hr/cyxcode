@@ -15,6 +15,7 @@ const Graph = lazy(() => import("./pages/Graph"))
 const Codegraph = lazy(() => import("./pages/Codegraph"))
 const Memory = lazy(() => import("./pages/Memory"))
 const Tokens = lazy(() => import("./pages/Tokens"))
+const Security = lazy(() => import("./pages/Security"))
 
 const Loading: Component = () => (
   <div class="flex items-center justify-center h-64">
@@ -61,6 +62,7 @@ export const App: Component = () => {
       <Route path="/memory" component={Memory} />
       <Route path="/wiki" component={Wiki} />
       <Route path="/tokens" component={Tokens} />
+      <Route path="/security" component={Security} />
     </Router>
   )
 }

@@ -153,12 +153,12 @@ const Memory: Component = () => {
     <div class="space-y-6">
       <div class="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
         <div>
-          <h1 class="text-2xl font-bold text-gray-100">Memory Explorer</h1>
-          <p class="text-gray-400 mt-1">Browse project memories and inspect their source content</p>
+          <h1 class="text-2xl font-bold text-gray-100">Memory</h1>
+          <p class="text-gray-400 mt-1">Saved project context and recalled source notes</p>
         </div>
 
         <div class="flex flex-wrap gap-3">
-          <div class="px-4 py-3 rounded-lg bg-gray-800 border border-gray-700 min-w-72">
+          <div class="stat-card min-w-72">
             <div class="text-xs uppercase tracking-wide text-gray-500 mb-2">Policy preset</div>
             <div class="flex flex-wrap gap-2">
               <select class="select text-sm" value={preset()} onChange={(e) => setPreset(e.currentTarget.value as MemoryPreset["id"])}>
@@ -170,18 +170,18 @@ const Memory: Component = () => {
             </div>
             <div class="mt-2 text-xs text-gray-500">{presets().find((item) => item.id === preset())?.description ?? ""}</div>
           </div>
-          <div class="px-4 py-3 rounded-lg bg-gray-800 border border-gray-700">
+          <div class="stat-card">
             <div class="text-xs uppercase tracking-wide text-gray-500">Entries</div>
             <div class="text-lg font-semibold text-gray-100">{items().length}</div>
           </div>
           <A class="btn btn-secondary" href="/dashboard/graph">
-            Back to graph
+            Graph
           </A>
         </div>
       </div>
 
       <Show when={err()}>
-        <div class="bg-red-900/50 border border-red-700 rounded-lg p-4 text-red-200">{err()}</div>
+        <div class="bg-red-900/50 border border-red-700 rounded p-4 text-red-200">{err()}</div>
       </Show>
       <Show when={msg()}>
         <div class="bg-cyan-950/50 border border-cyan-800 rounded p-3 text-sm text-cyan-200">{msg()}</div>
@@ -197,7 +197,7 @@ const Memory: Component = () => {
                 {(item) => (
                   <button
                     onClick={() => pick(item.id)}
-                    class={`w-full text-left rounded-lg border p-3 transition-colors ${
+                    class={`w-full text-left rounded border p-3 transition-colors ${
                       cur()?.id === item.id ? "bg-amber-900/30 border-amber-700" : "bg-gray-800 border-gray-700 hover:border-gray-600"
                     }`}
                   >
@@ -216,7 +216,7 @@ const Memory: Component = () => {
 
         <div class="xl:col-span-8 card">
           <div class="card-header">Details</div>
-          <Show when={cur()} fallback={<div class="text-sm text-gray-500">Select a memory to inspect its content.</div>}>
+          <Show when={cur()} fallback={<div class="text-sm text-gray-500">No memory selected.</div>}>
             <div class="space-y-4">
               <div>
                 <div class="text-xl font-semibold text-gray-100">{cur()!.summary}</div>
@@ -232,7 +232,7 @@ const Memory: Component = () => {
 
               <div class="flex flex-wrap gap-2">
                 <A class="btn btn-secondary text-xs" href={`/dashboard/graph?id=${encodeURIComponent(cur()!.id)}`}>
-                  Back to graph
+                  Graph
                 </A>
                 <button class="btn btn-secondary text-xs" onClick={download} disabled={busy()}>
                   Export
@@ -263,7 +263,7 @@ const Memory: Component = () => {
 
               <div>
                 <div class="text-sm text-gray-400 mb-2">Content</div>
-                <pre class="max-h-[60vh] overflow-y-auto rounded-lg bg-gray-900 border border-gray-700 p-3 text-xs text-gray-300 whitespace-pre-wrap break-words">
+                <pre class="max-h-[60vh] overflow-y-auto rounded bg-gray-900 border border-gray-700 p-3 text-xs text-gray-300 whitespace-pre-wrap break-words">
                   {text().slice(0, 5000)}
                 </pre>
               </div>

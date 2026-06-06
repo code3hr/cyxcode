@@ -1,6 +1,6 @@
 import { Component, createSignal, createEffect, onCleanup, Show } from "solid-js"
 import { A } from "@solidjs/router"
-import { statsApi, type OverviewStats, type TrendData } from "../api/client"
+import { cyxApi, statsApi, watchApi, type OverviewStats, type TokenReport, type TrendData, type WatchReport } from "../api/client"
 import { SeverityPie } from "../components/charts/SeverityPie"
 import { TrendLine } from "../components/charts/TrendLine"
 import { StatusBar } from "../components/charts/StatusBar"
@@ -9,6 +9,8 @@ import { sseClient } from "../api/sse"
 const Dashboard: Component = () => {
   const [stats, setStats] = createSignal<OverviewStats | null>(null)
   const [trends, setTrends] = createSignal<TrendData[]>([])
+  const [watch, setWatch] = createSignal<WatchReport | null>(null)
+  const [token, setToken] = createSignal<TokenReport | null>(null)
   const [loading, setLoading] = createSignal(true)
   const [error, setError] = createSignal<string | null>(null)
 
@@ -16,9 +18,11 @@ const Dashboard: Component = () => {
     setLoading(true)
     setError(null)
 
-    const [statsResult, trendsResult] = await Promise.all([
+    const [statsResult, trendsResult, watchResult, tokenResult] = await Promise.all([
       statsApi.overview(),
       statsApi.trends(30),
+      watchApi.report("7d"),
+      cyxApi.report("7d"),
     ])
 
     if (statsResult.error) {
@@ -29,6 +33,14 @@ const Dashboard: Component = () => {
 
     if (trendsResult.data) {
       setTrends(trendsResult.data.trends)
+    }
+
+    if (watchResult.data) {
+      setWatch(watchResult.data.report)
+    }
+
+    if (tokenResult.data) {
+      setToken(tokenResult.data.report)
     }
 
     setLoading(false)
@@ -60,8 +72,8 @@ const Dashboard: Component = () => {
       {/* Page header */}
       <div class="flex items-center justify-between">
         <div>
-          <h1 class="text-2xl font-bold text-gray-100">Security Dashboard</h1>
-          <p class="text-gray-400 mt-1">Overview of your security posture</p>
+          <h1 class="text-2xl font-bold text-gray-100">CyxCode Overview</h1>
+          <p class="text-gray-400 mt-1">Runtime security, assessments, and project intelligence</p>
         </div>
         <button
           onClick={fetchData}
@@ -89,7 +101,7 @@ const Dashboard: Component = () => {
 
       <Show when={stats()}>
         {/* Stats cards */}
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
           <div class="stat-card">
             <div class="flex items-center justify-between">
               <div>
@@ -143,6 +155,66 @@ const Dashboard: Component = () => {
               <div class="w-12 h-12 bg-green-900/50 rounded-lg flex items-center justify-center">
                 <svg class="w-6 h-6 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
+          <div class="stat-card">
+            <div class="flex items-center justify-between">
+              <div>
+                <div class={`stat-value ${(watch()?.alerts ?? 0) > 0 ? "text-orange-300" : "text-green-300"}`}>
+                  {watch()?.alerts ?? 0}
+                </div>
+                <div class="stat-label">CyxWatch Alerts</div>
+              </div>
+              <div class="w-12 h-12 bg-orange-950/50 rounded flex items-center justify-center">
+                <svg class="w-6 h-6 text-orange-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 2l7 4v6c0 5.25-3.438 9.75-7 10-3.562-.25-7-4.75-7-10V6l7-4z" />
+                </svg>
+              </div>
+            </div>
+          </div>
+
+          <div class="stat-card">
+            <div class="flex items-center justify-between">
+              <div>
+                <div class="stat-value text-red-300">{watch()?.decisions.block ?? 0}</div>
+                <div class="stat-label">Blocked Actions</div>
+              </div>
+              <div class="w-12 h-12 bg-red-950/50 rounded flex items-center justify-center">
+                <svg class="w-6 h-6 text-red-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 6L6 18M6 6l12 12" />
+                </svg>
+              </div>
+            </div>
+          </div>
+
+          <div class="stat-card">
+            <div class="flex items-center justify-between">
+              <div>
+                <div class="stat-value text-cyan-300">{token()?.tokens.savingsPercent.toFixed(1) ?? "0.0"}%</div>
+                <div class="stat-label">Token Efficiency</div>
+              </div>
+              <div class="w-12 h-12 bg-cyan-950/50 rounded flex items-center justify-center">
+                <svg class="w-6 h-6 text-cyan-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                </svg>
+              </div>
+            </div>
+          </div>
+
+          <div class="stat-card">
+            <div class="flex items-center justify-between">
+              <div>
+                <div class="stat-value text-emerald-300">{(token()?.tokens.saved ?? 0).toLocaleString()}</div>
+                <div class="stat-label">Tokens Saved</div>
+              </div>
+              <div class="w-12 h-12 bg-emerald-950/50 rounded flex items-center justify-center">
+                <svg class="w-6 h-6 text-emerald-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8V7m0 9v1" />
                 </svg>
               </div>
             </div>

@@ -242,7 +242,8 @@ bun install
 bun run dev
 ```
 
-Development server runs at: `http://localhost:5173/dashboard/`
+Legacy dashboard dev server runs at: `http://localhost:5173/dashboard/`
+User-facing routes now live in the main app at `http://localhost:3000/dashboard/security` and `http://localhost:3000/dashboard/reports`
 
 ### Build for Production
 ```bash
@@ -258,7 +259,7 @@ Build output (~140 kB total):
 
 ### Access Dashboard (Production)
 ```
-http://localhost:4096/dashboard
+http://localhost:3000/dashboard
 ```
 
 Requires the main opencode server to be running to serve the API endpoints.

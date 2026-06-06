@@ -358,16 +358,16 @@ const Wiki: Component = () => {
     <div class="space-y-6">
       <div class="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
         <div>
-          <h1 class="text-2xl font-bold text-gray-100">Wiki Explorer</h1>
-          <p class="text-gray-400 mt-1">Browse notes, links, and backlinks from the CyxCode knowledge index</p>
+          <h1 class="text-2xl font-bold text-gray-100">Wiki</h1>
+          <p class="text-gray-400 mt-1">Notes, links, backlinks, and generated project docs</p>
         </div>
 
         <div class="flex flex-wrap gap-3">
-          <div class="px-4 py-3 rounded-lg bg-gray-800 border border-gray-700">
+          <div class="stat-card">
             <div class="text-xs uppercase tracking-wide text-gray-500">Notes</div>
             <div class="text-lg font-semibold text-gray-100">{pages().length}</div>
           </div>
-          <div class="px-4 py-3 rounded-lg bg-gray-800 border border-gray-700">
+          <div class="stat-card">
             <div class="text-xs uppercase tracking-wide text-gray-500">Links</div>
             <div class="text-lg font-semibold text-gray-100">{links().size}</div>
           </div>
@@ -381,76 +381,80 @@ const Wiki: Component = () => {
       </div>
 
       <Show when={err()}>
-        <div class="bg-red-900/50 border border-red-700 rounded-lg p-4 text-red-200">{err()}</div>
+        <div class="bg-red-900/50 border border-red-700 rounded p-4 text-red-200">{err()}</div>
       </Show>
 
       <Show when={msg()}>
-        <div class="bg-blue-900/40 border border-blue-700 rounded-lg p-4 text-blue-200">{msg()}</div>
+        <div class="bg-blue-900/40 border border-blue-700 rounded p-4 text-blue-200">{msg()}</div>
       </Show>
 
       <div class="grid grid-cols-1 xl:grid-cols-12 gap-6">
-        <div class="xl:col-span-4 card">
-          <div class="card-header">New Note</div>
-          <div class="grid gap-3 mt-4">
-            <input class="input" type="text" placeholder="Title" value={nTitle()} onInput={(e) => setNTitle(e.currentTarget.value)} />
-            <textarea
-              class="input min-h-28"
-              placeholder="Body"
-              value={nBody()}
-              onInput={(e) => setNBody(e.currentTarget.value)}
-            />
-            <input class="input" type="text" placeholder="Tags, comma separated" value={nTags()} onInput={(e) => setNTags(e.currentTarget.value)} />
-            <button onClick={create} class="btn btn-primary" disabled={busy()}>
-              Create Note
-            </button>
-          </div>
-
-          <div class="flex items-center justify-between gap-3 mb-4">
-            <div>
-              <div class="card-header">Pages</div>
-              <div class="text-xs text-gray-500">{pages().length} results</div>
+        <div class="xl:col-span-4 space-y-5">
+          <section class="card">
+            <div class="card-header">New Note</div>
+            <div class="grid gap-3">
+              <input class="input" type="text" placeholder="Title" value={nTitle()} onInput={(e) => setNTitle(e.currentTarget.value)} />
+              <textarea
+                class="input min-h-28"
+                placeholder="Body"
+                value={nBody()}
+                onInput={(e) => setNBody(e.currentTarget.value)}
+              />
+              <input class="input" type="text" placeholder="Tags, comma separated" value={nTags()} onInput={(e) => setNTags(e.currentTarget.value)} />
+              <button onClick={create} class="btn btn-primary" disabled={busy()}>
+                Create Note
+              </button>
             </div>
-            <input
-              class="input max-w-44"
-              type="text"
-              placeholder="Search..."
-              value={term()}
-              onInput={(e) => setTerm(e.currentTarget.value)}
-            />
-          </div>
+          </section>
 
-          <div class="space-y-2 max-h-[72vh] overflow-y-auto pr-1">
-            <Show when={!load() || pages().length > 0} fallback={<div class="text-sm text-gray-500">Loading wiki index...</div>}>
-              <For each={pages()}>
-                {(item) => (
-                  <button
-                    onClick={() => pick(item.id)}
-                    class={`w-full text-left rounded-lg border p-3 transition-colors ${
-                      sel() === item.id ? "bg-blue-900/30 border-blue-700" : "bg-gray-800 border-gray-700 hover:border-gray-600"
-                    }`}
-                  >
-                    <div class="flex items-start justify-between gap-3">
-                      <div class="min-w-0">
-                        <div class="font-medium text-gray-100 truncate">{item.title}</div>
-                        <div class="text-xs text-gray-500 truncate">{item.path}</div>
+          <section class="card">
+            <div class="flex items-center justify-between gap-3 mb-4">
+              <div>
+                <div class="card-header mb-0">Pages</div>
+                <div class="text-xs text-gray-500">{pages().length} results</div>
+              </div>
+              <input
+                class="input max-w-44"
+                type="text"
+                placeholder="Search..."
+                value={term()}
+                onInput={(e) => setTerm(e.currentTarget.value)}
+              />
+            </div>
+
+            <div class="space-y-2 max-h-[54vh] overflow-y-auto pr-1">
+              <Show when={!load() || pages().length > 0} fallback={<div class="text-sm text-gray-500">Loading wiki index...</div>}>
+                <For each={pages()}>
+                  {(item) => (
+                    <button
+                      onClick={() => pick(item.id)}
+                      class={`w-full text-left rounded border p-3 transition-colors ${
+                        sel() === item.id ? "bg-blue-900/30 border-blue-700" : "bg-gray-800 border-gray-700 hover:border-gray-600"
+                      }`}
+                    >
+                      <div class="flex items-start justify-between gap-3">
+                        <div class="min-w-0">
+                          <div class="font-medium text-gray-100 truncate">{item.title}</div>
+                          <div class="text-xs text-gray-500 truncate">{item.path}</div>
+                        </div>
+                        <span class={`badge ${item.kind === "wiki" ? "bg-blue-900/40 text-blue-300" : "bg-gray-700 text-gray-300"}`}>
+                          {item.kind}
+                        </span>
                       </div>
-                      <span class={`badge ${item.kind === "wiki" ? "bg-blue-900/40 text-blue-300" : "bg-gray-700 text-gray-300"}`}>
-                        {item.kind}
-                      </span>
-                    </div>
-                    <div class="mt-2 text-sm text-gray-400 max-h-12 overflow-hidden">{item.summary || "No summary"}</div>
-                    <div class="mt-3 flex items-center gap-2 text-xs text-gray-500">
-                      <span>{item.links.length} links</span>
-                      <span>|</span>
-                      <span>{item.backlinks.length} backlinks</span>
-                      <span>|</span>
-                      <span>{new Date(item.modified).toLocaleDateString()}</span>
-                    </div>
-                  </button>
-                )}
-              </For>
-            </Show>
-          </div>
+                      <div class="mt-2 text-sm text-gray-400 max-h-12 overflow-hidden">{item.summary || "No summary"}</div>
+                      <div class="mt-3 flex items-center gap-2 text-xs text-gray-500">
+                        <span>{item.links.length} links</span>
+                        <span>|</span>
+                        <span>{item.backlinks.length} backlinks</span>
+                        <span>|</span>
+                        <span>{new Date(item.modified).toLocaleDateString()}</span>
+                      </div>
+                    </button>
+                  )}
+                </For>
+              </Show>
+            </div>
+          </section>
         </div>
 
         <div class="xl:col-span-5 card">
@@ -462,7 +466,7 @@ const Wiki: Component = () => {
             <div class="text-xs text-gray-500">{data().nodes.length} nodes</div>
           </div>
 
-          <div class="rounded-xl border border-gray-700 bg-gray-900/80 overflow-hidden">
+          <div class="rounded border border-gray-700 bg-gray-900/80 overflow-hidden">
             <svg class="w-full h-[72vh]" viewBox="0 0 640 520" role="img" aria-label="Wiki graph">
               <defs>
                 <linearGradient id="line" x1="0%" y1="0%" x2="100%" y2="0%">
@@ -515,7 +519,7 @@ const Wiki: Component = () => {
         <div class="xl:col-span-3 card">
           <div class="card-header">Details</div>
 
-          <Show when={cur()} fallback={<div class="text-sm text-gray-500">Select a note to inspect its content.</div>}>
+          <Show when={cur()} fallback={<div class="text-sm text-gray-500">No note selected.</div>}>
             <div class="space-y-4">
               <div>
                 <div class="text-xl font-semibold text-gray-100">{cur()!.title}</div>
@@ -557,9 +561,9 @@ const Wiki: Component = () => {
                 <div class="text-sm text-gray-400 mb-2">Content</div>
                 <Show
                   when={!note()}
-                  fallback={<div class="bg-red-900/40 border border-red-700 rounded-lg p-3 text-sm text-red-200">{note()}</div>}
+                  fallback={<div class="bg-red-900/40 border border-red-700 rounded p-3 text-sm text-red-200">{note()}</div>}
                 >
-                  <pre class="max-h-80 overflow-y-auto rounded-lg bg-gray-900 border border-gray-700 p-3 text-xs text-gray-300 whitespace-pre-wrap break-words">
+                  <pre class="max-h-80 overflow-y-auto rounded bg-gray-900 border border-gray-700 p-3 text-xs text-gray-300 whitespace-pre-wrap break-words">
                     {text().slice(0, 3000)}
                   </pre>
                 </Show>

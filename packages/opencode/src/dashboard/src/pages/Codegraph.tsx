@@ -220,12 +220,12 @@ const Codegraph: Component = () => {
     <div class="space-y-6">
       <div class="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
         <div>
-          <h1 class="text-2xl font-bold text-gray-100">Code Explorer</h1>
-          <p class="text-gray-400 mt-1">Inspect code files, imports, symbols, and symbol usage</p>
+          <h1 class="text-2xl font-bold text-gray-100">Code Graph</h1>
+          <p class="text-gray-400 mt-1">Files, imports, symbols, and usage links</p>
         </div>
 
         <div class="flex flex-wrap gap-3">
-          <div class="px-4 py-3 rounded-lg bg-gray-800 border border-gray-700">
+          <div class="stat-card">
             <div class="text-xs uppercase tracking-wide text-gray-500">Files</div>
             <div class="text-lg font-semibold text-gray-100">{files().length}</div>
           </div>
@@ -236,11 +236,11 @@ const Codegraph: Component = () => {
       </div>
 
       <Show when={err()}>
-        <div class="bg-red-900/50 border border-red-700 rounded-lg p-4 text-red-200">{err()}</div>
+        <div class="bg-red-900/50 border border-red-700 rounded p-4 text-red-200">{err()}</div>
       </Show>
 
       <Show when={msg()}>
-        <div class="bg-blue-900/40 border border-blue-700 rounded-lg p-4 text-blue-200">{msg()}</div>
+        <div class="bg-blue-900/40 border border-blue-700 rounded p-4 text-blue-200">{msg()}</div>
       </Show>
 
       <div class="grid grid-cols-1 xl:grid-cols-12 gap-6">
@@ -252,7 +252,7 @@ const Codegraph: Component = () => {
               {(item) => (
                 <button
                   onClick={() => pick(item.id)}
-                  class={`w-full text-left rounded-lg border p-3 transition-colors ${
+                  class={`w-full text-left rounded border p-3 transition-colors ${
                     sel() === item.id ? "bg-emerald-900/30 border-emerald-700" : "bg-gray-800 border-gray-700 hover:border-gray-600"
                   }`}
                 >
@@ -276,7 +276,7 @@ const Codegraph: Component = () => {
             <div class="text-xs text-gray-500">{data().nodes.length} nodes</div>
           </div>
 
-          <div class="rounded-xl border border-gray-700 bg-gray-900/80 overflow-hidden">
+          <div class="rounded border border-gray-700 bg-gray-900/80 overflow-hidden">
             <svg class="w-full h-[72vh]" viewBox="0 0 640 520" role="img" aria-label="Code graph">
               <defs>
                 <linearGradient id="line" x1="0%" y1="0%" x2="100%" y2="0%">
@@ -328,7 +328,7 @@ const Codegraph: Component = () => {
 
         <div class="xl:col-span-3 card">
           <div class="card-header">Details</div>
-          <Show when={cur()} fallback={<div class="text-sm text-gray-500">Select a file to inspect its content.</div>}>
+          <Show when={cur()} fallback={<div class="text-sm text-gray-500">No file selected.</div>}>
             <div class="space-y-4">
               <div>
                 <div class="text-xl font-semibold text-gray-100">{cur()!.title}</div>
@@ -343,7 +343,7 @@ const Codegraph: Component = () => {
 
               <div class="flex flex-wrap gap-2">
                 <A class="btn btn-secondary text-xs" href={`/dashboard/graph?id=${encodeURIComponent(cur()!.id)}`}>
-                  Back to graph
+                  Graph
                 </A>
               </div>
 
@@ -376,7 +376,7 @@ const Codegraph: Component = () => {
 
               <div>
                 <div class="text-sm text-gray-400 mb-2">Content</div>
-                <pre class="max-h-80 overflow-y-auto rounded-lg bg-gray-900 border border-gray-700 p-3 text-xs text-gray-300 whitespace-pre-wrap break-words">
+                <pre class="max-h-80 overflow-y-auto rounded bg-gray-900 border border-gray-700 p-3 text-xs text-gray-300 whitespace-pre-wrap break-words">
                   {text().slice(0, 5000)}
                 </pre>
               </div>

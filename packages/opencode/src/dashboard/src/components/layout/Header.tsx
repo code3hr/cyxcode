@@ -6,10 +6,9 @@ interface HeaderProps {
 
 export const Header: Component<HeaderProps> = (props) => {
   return (
-    <header class="h-16 bg-gray-800 border-b border-gray-700 flex items-center justify-between px-6">
-      {/* Left side - Page title could go here */}
+    <header class="h-16 bg-gray-900 border-b border-gray-800 flex items-center justify-between px-6">
       <div class="flex items-center gap-4">
-        <h1 class="text-lg font-semibold text-gray-100">Security Dashboard</h1>
+        <h1 class="text-lg font-semibold text-gray-100">CyxCode Console</h1>
       </div>
 
       {/* Right side */}

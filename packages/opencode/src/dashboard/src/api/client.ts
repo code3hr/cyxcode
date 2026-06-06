@@ -425,6 +425,63 @@ export const watchApi = {
 }
 
 // ============================================================================
+// CyxCode Audit API
+// ============================================================================
+
+export interface TokenReport {
+  period: { name: "1h" | "1d" | "7d" | "30d" | "all"; start: string; end: string }
+  tokens: { saved: number; used: number; savingsPercent: number; costSaved: number }
+  patterns: {
+    matches: number
+    misses: number
+    hitRate: number
+    learned: number
+    top: Array<{ id: string; matches: number; tokensSaved: number }>
+  }
+  corrections: {
+    added: number
+    reinforced: number
+    promoted: number
+    driftEvents: number
+    complianceRate: number
+  }
+  memory: { loaded: number; totalChars: number }
+  sessions: number
+}
+
+export interface AuditEntry {
+  id: string
+  timestamp: number
+  type: string
+  sessionID?: string
+  data: {
+    patternId?: string
+    skill?: string
+    tokensSaved?: number
+    tokensUsed?: number
+    errorOutput?: string
+    correctionId?: string
+    rule?: string
+    strength?: number
+    memoryId?: string
+    tags?: string[]
+    chars?: number
+    commitHash?: string
+    trigger?: string
+    fixId?: string
+    command?: string
+    success?: boolean
+    exitCode?: number
+    message?: string
+  }
+}
+
+export const cyxApi = {
+  report: (period = "7d") => request<{ report: TokenReport }>(`/cyxcode/report?period=${period}`),
+  audit: (last = "7d", limit = 50) => request<{ entries: AuditEntry[]; total: number }>(`/cyxcode/audit?last=${last}&limit=${limit}`),
+}
+
+// ============================================================================
 // Compliance API
 // ============================================================================
 

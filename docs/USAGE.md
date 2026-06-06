@@ -510,15 +510,15 @@ cyxcode web
 cyxcode serve --port 4096
 
 # Then open in browser
-open http://localhost:4096/dashboard/tokens
+open http://localhost:3000/dashboard/reports
+open http://localhost:3000/dashboard/security
 ```
 
-The Tokens page at `/dashboard/tokens` shows:
-- Token savings cards (saved, cost, hit rate)
-- Pattern statistics (matches, misses, learned)
-- Correction statistics (added, promoted, drift)
-- Top performing patterns
-- Recent audit events
+The app dashboard pages at `/dashboard/reports` and `/dashboard/security` show:
+- report generation and previews
+- runtime observability metrics
+- alert history
+- recent audit events
 
 The CyxWatch layer records runtime telemetry locally and is surfaced through:
 - `cyxcode watch recent`
@@ -534,6 +534,13 @@ It currently tracks:
 - file reads and writes
 - basic risk flags for sensitive paths and risky shell strings
 - basic policy decisions: allow, warn, require-approval, block
+
+When governance is enabled in config, policy decisions are enforced through the tool permission gate:
+- `auto-approve` allows the matching operation without a prompt
+- `require-approval` uses the normal permission prompt
+- `blocked` stops the tool call before it executes
+
+CyxWatch also guards shared lower-level wrappers for hard block decisions. This catches destructive process-wrapper commands before spawn and checks filesystem writes before writing. Interactive approval remains in the normal tool permission path.
 
 ### Event Types
 
