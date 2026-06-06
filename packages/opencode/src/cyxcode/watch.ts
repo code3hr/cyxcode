@@ -26,6 +26,7 @@ export type WatchKind =
   | "file.write"
   | "shell.command"
   | "network.outbound"
+  | "network.websocket"
   | "prompt.turn"
   | "output.secret"
   | "memory.read"
@@ -294,7 +295,7 @@ function decide(input: { kind: WatchKind; path?: string; cmd?: string; bytes?: n
     if (flags.includes("sensitive_path")) return "require-approval"
   }
 
-  if (input.kind === "network.outbound") {
+  if (input.kind === "network.outbound" || input.kind === "network.websocket") {
     if (input.bytes && input.bytes > 5 * 1024 * 1024) return "require-approval"
     if (risk > 0) return "warn"
   }
@@ -363,7 +364,7 @@ function detect(entry: WatchEntry, list: WatchEntry[]) {
     add("sensitive_access", Math.max(entry.risk, 40), [...entry.flags])
   }
 
-  if (entry.kind === "network.outbound") {
+  if (entry.kind === "network.outbound" || entry.kind === "network.websocket") {
     const privateNet = entry.host ? privateHost(entry.host) : false
     if ((entry.bytes ?? 0) > 5 * 1024 * 1024 || privateNet) {
       add("network_exfil", Math.max(entry.risk, 30), [...entry.flags, privateNet ? "private_network" : "large_payload"])
@@ -429,10 +430,11 @@ function guard(input: { permission: string; patterns: string[]; metadata?: Recor
     })
   }
 
-  if (input.permission === "webfetch") {
+  if (input.permission === "webfetch" || input.permission === "websocket") {
     const url = pick("url") ?? input.patterns[0]
     const bytes = typeof meta.bytes === "number" ? meta.bytes : undefined
-    const out = score({ kind: "network.outbound", bytes })
+    const kind = input.permission === "websocket" ? "network.websocket" : "network.outbound"
+    const out = score({ kind, bytes })
     const privateNet = url ? privateHost(url) : false
     if (privateNet) {
       return apply({
@@ -442,7 +444,7 @@ function guard(input: { permission: string; patterns: string[]; metadata?: Recor
         reason: "private or local network target",
       })
     }
-    const decision = decide({ kind: "network.outbound", bytes }, out.flags, out.risk)
+    const decision = decide({ kind, bytes }, out.flags, out.risk)
     return apply({
       decision,
       risk: out.risk,
@@ -493,10 +495,10 @@ function entry(input: { permission: string; patterns: string[]; metadata?: Recor
       decision: out.decision,
     }
   }
-  if (input.permission === "webfetch") {
+  if (input.permission === "webfetch" || input.permission === "websocket") {
     const url = str("url") ?? input.patterns[0]
     return {
-      kind: "network.outbound",
+      kind: input.permission === "websocket" ? "network.websocket" : "network.outbound",
       path: url,
       host: (() => {
         try {
@@ -787,6 +789,43 @@ export namespace CyxWatch {
     })
   }
 
+  export async function socket(input: { url: string; sessionID?: string; messageID?: string; guard?: WatchGuard }) {
+    const out = score({
+      kind: "network.websocket",
+    })
+    const flags = input.guard?.flags ?? out.flags
+    const risk = input.guard?.risk ?? out.risk
+    const decision = input.guard?.decision ?? decide(
+      {
+        kind: "network.websocket",
+      },
+      flags,
+      risk,
+    )
+    const { ts, id } = now()
+    return await persist({
+      id,
+      ts,
+      kind: "network.websocket",
+      project: await project(),
+      sessionID: input.sessionID ?? current()?.sessionID,
+      messageID: input.messageID ?? current()?.messageID,
+      prompt: current()?.prompt,
+      path: input.url,
+      host: (() => {
+        try {
+          return new URL(input.url).host
+        } catch {
+          return input.url
+        }
+      })(),
+      method: "WEBSOCKET",
+      risk,
+      flags,
+      decision,
+    })
+  }
+
   export function classify(input: { permission: string; patterns: string[]; metadata?: Record<string, unknown> }): WatchGuard {
     return guard(input)
   }
@@ -833,7 +872,7 @@ export namespace CyxWatch {
     const shell = rows.filter((entry) => entry.kind === "shell.command").length
     const readCount = rows.filter((entry) => entry.kind === "file.read").length
     const write = rows.filter((entry) => entry.kind === "file.write").length
-    const network = rows.filter((entry) => entry.kind === "network.outbound").length
+    const network = rows.filter((entry) => entry.kind.startsWith("network.")).length
     const risky = rows.filter((entry) => entry.risk > 0).length
     const risk = rows.reduce((sum, entry) => sum + entry.risk, 0)
     const decisions = {

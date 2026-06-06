@@ -11,6 +11,7 @@ import { Memory } from "../../src/cyxcode/memory"
 import { Filesystem } from "../../src/util/filesystem"
 import { Http } from "../../src/util/http"
 import { Process } from "../../src/util/process"
+import { Websocket } from "../../src/util/websocket"
 import { Tool } from "../../src/tool/tool"
 
 let dir: string
@@ -260,6 +261,80 @@ describe("CyxWatch", () => {
       expect(row!.flags).toContain("policy_large-post")
     } finally {
       globalThis.fetch = old
+    }
+  })
+
+  test("records websocket connections through wrapper", async () => {
+    await CyxWatch.savePolicy({
+      version: 2,
+      rules: [
+        {
+          id: "socket-warn",
+          permission: ["websocket"],
+          host: ["socket.example.com"],
+          decision: "warn",
+          risk: 31,
+          flags: ["socket_policy"],
+        },
+      ],
+    })
+
+    const old = globalThis.WebSocket
+    const list: string[] = []
+    const fake = class {
+      constructor(url: string | URL) {
+        list.push(url.toString())
+      }
+      static readonly CONNECTING = 0
+      static readonly OPEN = 1
+      static readonly CLOSING = 2
+      static readonly CLOSED = 3
+    }
+    globalThis.WebSocket = fake as unknown as typeof WebSocket
+    try {
+      Websocket.connect("wss://socket.example.com/live")
+      expect(list).toEqual(["wss://socket.example.com/live"])
+      await sleep(250)
+
+      const rows = await CyxWatch.recent(10)
+      const row = rows.find((item) => item.kind === "network.websocket" && item.path === "wss://socket.example.com/live")
+      expect(row).toBeDefined()
+      expect(row!.host).toBe("socket.example.com")
+      expect(row!.method).toBe("WEBSOCKET")
+      expect(row!.decision).toBe("warn")
+      expect(row!.risk).toBe(31)
+      expect(row!.flags).toContain("socket_policy")
+      expect(row!.flags).toContain("policy_socket-warn")
+    } finally {
+      globalThis.WebSocket = old
+    }
+  })
+
+  test("blocks private websocket targets before connecting", async () => {
+    let called = false
+    const old = globalThis.WebSocket
+    const fake = class {
+      constructor() {
+        called = true
+      }
+      static readonly CONNECTING = 0
+      static readonly OPEN = 1
+      static readonly CLOSING = 2
+      static readonly CLOSED = 3
+    }
+    globalThis.WebSocket = fake as unknown as typeof WebSocket
+    try {
+      expect(() => Websocket.connect("ws://127.0.0.1:8080/live")).toThrow("CyxWatch blocked operation")
+      expect(called).toBe(false)
+      await sleep(250)
+
+      const rows = await CyxWatch.recent(10)
+      const row = rows.find((item) => item.kind === "network.websocket" && item.path === "ws://127.0.0.1:8080/live")
+      expect(row).toBeDefined()
+      expect(row!.decision).toBe("require-approval")
+      expect(row!.flags).toContain("private_network")
+    } finally {
+      globalThis.WebSocket = old
     }
   })
 
