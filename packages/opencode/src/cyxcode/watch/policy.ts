@@ -63,6 +63,59 @@ const Config = z.object({
   rules: z.array(Rule).default([]),
 })
 
+const Starter: z.infer<typeof Config> = {
+  version: 2,
+  rules: [
+    {
+      id: "default-private-key-block",
+      description: "Block direct reads and writes of private key material",
+      permission: ["read", "write", "edit"],
+      path: ["*/.ssh/id_*", "*/*_rsa", "*/*_dsa", "*/*_ecdsa", "*/*_ed25519", "*.p12", "*.pfx"],
+      decision: "block",
+      risk: 95,
+      flags: ["private_key", "starter_policy"],
+    },
+    {
+      id: "default-browser-credential-block",
+      description: "Block browser credential store access",
+      permission: ["read", "write", "edit"],
+      path: [
+        "*/Google/Chrome/User Data/*/Login Data",
+        "*/Microsoft/Edge/User Data/*/Login Data",
+        "*/Mozilla/Firefox/Profiles/*/logins.json",
+        "*/Mozilla/Firefox/Profiles/*/key4.db",
+        "*/.config/google-chrome/*/Login Data",
+        "*/.mozilla/firefox/*/logins.json",
+        "*/.mozilla/firefox/*/key4.db",
+        "*/Library/Application Support/Google/Chrome/*/Login Data",
+        "*/Library/Application Support/Firefox/Profiles/*/logins.json",
+      ],
+      decision: "block",
+      risk: 95,
+      flags: ["credential_store", "starter_policy"],
+    },
+    {
+      id: "default-metadata-service-block",
+      description: "Block cloud instance metadata endpoints",
+      permission: ["webfetch", "websocket"],
+      host: ["169.254.169.254", "metadata.google.internal"],
+      decision: "block",
+      risk: 90,
+      flags: ["metadata_service", "starter_policy"],
+    },
+    {
+      id: "default-large-upload-approval",
+      description: "Require approval before large outbound uploads",
+      permission: ["webfetch"],
+      method: ["POST", "PUT", "PATCH"],
+      bytes_gt: 5242880,
+      decision: "require-approval",
+      risk: 60,
+      flags: ["large_upload", "starter_policy"],
+    },
+  ],
+}
+
 type Input = {
   permission: string
   patterns: string[]
@@ -87,6 +140,10 @@ export namespace WatchPolicy {
       version: 2,
       rules: [],
     }
+  }
+
+  export function starter(): Config {
+    return Starter
   }
 
   export function parse(cfg: unknown): Config {
@@ -130,7 +187,7 @@ export namespace WatchPolicy {
     const user = optional(file())
     return {
       version: 2,
-      rules: [...user.rules, ...base.rules],
+      rules: [...user.rules, ...base.rules, ...starter().rules],
     }
   }
 

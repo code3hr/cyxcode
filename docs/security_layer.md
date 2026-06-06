@@ -483,7 +483,8 @@ What is done:
 - CyxWatch records first-pass memory firewall events for project memory, wiki,
   and recall: `memory.read`, `memory.retrieve`, `memory.embed`, `memory.send`,
   and `memory.redact`.
-- `cyxcode watch report`, `cyxcode watch recent`, and `cyxcode watch alerts` expose the local telemetry.
+- `cyxcode watch report`, `cyxcode watch recent`, `cyxcode watch alerts`, and
+  `cyxcode watch policy` expose the local telemetry and policy state.
 - `/dashboard/security` exists in the main app on port `3000`, including event
   filters and a project policy rule editor.
 - Governance config supports scope, policy rules, default action, and audit settings.
@@ -498,6 +499,10 @@ What is done:
     opening outbound channels
 - CyxWatch policy validation rejects invalid matcher lists, actions, risk, and
   byte thresholds before saving.
+- CyxWatch includes packaged starter policy defaults for private keys, browser
+  credential stores, cloud metadata endpoints, and large upload approval.
+- CyxWatch blocks env enumeration commands before spawn and redacts
+  high-confidence secrets from tool output and assistant output telemetry.
 - CyxWatch avoids startup import cycles by lazy-loading `Log` and `Instance`.
 
 Verified:
@@ -513,7 +518,6 @@ Next time:
   sidecar traffic.
 - Add a Memory Firewall view for inspect, export, delete, and reclassify.
 - Add explicit cloud-model disclosure boundaries for memory events.
-- Add env/secret leakage detection for shell commands, `.env` reads, and assistant/tool output.
 - Decide where output redaction lives in the response pipeline and how users can override false positives.
 - Link security incidents into the graph so prompts, files, commands, and alerts are explorable together.
 - Decide whether `require-approval` should ever be handled below the tool layer, or remain only in the permission UI path.

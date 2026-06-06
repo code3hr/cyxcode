@@ -402,6 +402,32 @@ describe("CyxWatch", () => {
     expect(CyxWatch.policy().rules.map((rule) => rule.id)).toEqual(["user-warn"])
   })
 
+  test("loads packaged starter default rules", () => {
+    expect(CyxWatch.policy()).toEqual({ version: 2, rules: [] })
+
+    const ids = CyxWatch.effectivePolicy().rules.map((rule) => rule.id)
+    expect(ids).toContain("default-private-key-block")
+    expect(ids).toContain("default-browser-credential-block")
+    expect(ids).toContain("default-metadata-service-block")
+    expect(ids).toContain("default-large-upload-approval")
+  })
+
+  test("starter policy blocks private key reads", async () => {
+    const file = path.join(dir, ".ssh", "id_ed25519")
+    await fs.mkdir(path.dirname(file), { recursive: true })
+    await fs.writeFile(file, "private key")
+
+    await expect(Filesystem.readText(file)).rejects.toThrow("CyxWatch blocked operation")
+    await sleep(250)
+
+    const rows = await CyxWatch.recent(10)
+    const row = rows.find((item) => item.kind === "file.read" && item.path === file)
+    expect(row).toBeDefined()
+    expect(row!.decision).toBe("block")
+    expect(row!.flags).toContain("private_key")
+    expect(row!.flags).toContain("policy_default-private-key-block")
+  })
+
   test("policy route rejects invalid policy with bad request", async () => {
     const app = createWatchRoutes()
     const bad = await app.request("/cyxwatch/policy", {
@@ -475,7 +501,9 @@ describe("CyxWatch", () => {
     expect(user.status).toBe(200)
     expect(effective.status).toBe(200)
     expect((await user.json()).policy.rules.map((rule: WatchPolicy.Rule) => rule.id)).toEqual(["user-block"])
-    expect((await effective.json()).policy.rules.map((rule: WatchPolicy.Rule) => rule.id)).toEqual(["user-block", "default-warn"])
+    const ids = (await effective.json()).policy.rules.map((rule: WatchPolicy.Rule) => rule.id)
+    expect(ids.slice(0, 2)).toEqual(["user-block", "default-warn"])
+    expect(ids).toContain("default-private-key-block")
   })
 
   test("saved policy blocks shell wrapper commands before spawn", async () => {

@@ -415,11 +415,11 @@ Current shipped pieces:
 - raw JSON policy editor
 - policy validation for matcher lists, actions, risk, and byte thresholds
 - focused coverage for invalid policy saves and saved-policy runtime enforcement
+- packaged starter default rules for private keys, browser credential stores,
+  metadata service endpoints, and large upload approval
 
 Remaining tasks:
 
-- add `.cyxcode/cyxwatch/policies/default.json`
-- decide the packaged starter default rules
 - add full session-level policy enforcement tests
 
 Exit criteria:
