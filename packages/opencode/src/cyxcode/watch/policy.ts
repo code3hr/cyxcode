@@ -7,23 +7,55 @@ import { Wildcard } from "../../util/wildcard"
 
 const Decision = z.enum(["allow", "warn", "require-approval", "block"])
 
+const List = z.array(z.string().trim().min(1)).min(1)
+
 const Rule = z.object({
-  id: z.string().optional(),
-  description: z.string().optional(),
+  id: z.string().trim().min(1).optional(),
+  description: z.string().trim().min(1).optional(),
   enabled: z.boolean().optional(),
-  permission: z.array(z.string()).optional(),
-  pattern: z.array(z.string()).optional(),
-  path: z.array(z.string()).optional(),
-  host: z.array(z.string()).optional(),
-  cmd: z.array(z.string()).optional(),
-  method: z.array(z.string()).optional(),
+  permission: List.optional(),
+  pattern: List.optional(),
+  path: List.optional(),
+  host: List.optional(),
+  cmd: List.optional(),
+  method: List.optional(),
   bytes_gt: z.number().int().min(0).optional(),
   bytes_gte: z.number().int().min(0).optional(),
   bytes_lt: z.number().int().min(0).optional(),
   bytes_lte: z.number().int().min(0).optional(),
   decision: Decision,
   risk: z.number().int().min(0).max(100).optional(),
-  flags: z.array(z.string()).optional(),
+  flags: List.optional(),
+}).superRefine((rule, ctx) => {
+  const has = [
+    rule.permission,
+    rule.pattern,
+    rule.path,
+    rule.host,
+    rule.cmd,
+    rule.method,
+    rule.bytes_gt,
+    rule.bytes_gte,
+    rule.bytes_lt,
+    rule.bytes_lte,
+  ].some((item) => item !== undefined)
+
+  if (!has) {
+    ctx.addIssue({
+      code: "custom",
+      message: "rule must include at least one matcher",
+    })
+  }
+
+  const min = Math.max(rule.bytes_gt === undefined ? 0 : rule.bytes_gt + 1, rule.bytes_gte ?? 0)
+  const max = Math.min(rule.bytes_lt === undefined ? Number.MAX_SAFE_INTEGER : rule.bytes_lt - 1, rule.bytes_lte ?? Number.MAX_SAFE_INTEGER)
+  if (min > max) {
+    ctx.addIssue({
+      code: "custom",
+      message: "byte thresholds cannot overlap to an impossible range",
+      path: ["bytes_gt"],
+    })
+  }
 })
 
 const Config = z.object({
@@ -53,13 +85,26 @@ export namespace WatchPolicy {
     }
   }
 
+  export function parse(cfg: unknown): Config {
+    const out = Config.safeParse(cfg)
+    if (out.success) return out.data
+    const text = out.error.issues
+      .map((issue) => `${issue.path.join(".") || "policy"}: ${issue.message}`)
+      .join("; ")
+    throw new Error(`Invalid CyxWatch policy: ${text}`)
+  }
+
   export function load(): Config {
     if (!fs.existsSync(file())) return blank()
-    return Config.parse(JSON.parse(fs.readFileSync(file(), "utf-8")))
+    try {
+      return parse(JSON.parse(fs.readFileSync(file(), "utf-8")))
+    } catch {
+      return blank()
+    }
   }
 
   export async function save(cfg: Config) {
-    const out = Config.parse(cfg)
+    const out = parse(cfg)
     await fsp.mkdir(path.dirname(file()), { recursive: true })
     await fsp.writeFile(file(), `${JSON.stringify(out, null, 2)}\n`)
     return out

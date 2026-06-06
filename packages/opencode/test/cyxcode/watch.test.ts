@@ -13,6 +13,7 @@ import { Http } from "../../src/util/http"
 import { Process } from "../../src/util/process"
 import { Websocket } from "../../src/util/websocket"
 import { Tool } from "../../src/tool/tool"
+import { WatchPolicy } from "../../src/cyxcode/watch/policy"
 
 let dir: string
 let cwd: string
@@ -262,6 +263,60 @@ describe("CyxWatch", () => {
     } finally {
       globalThis.fetch = old
     }
+  })
+
+  test("rejects invalid policy rules before saving", async () => {
+    await expect(CyxWatch.savePolicy({
+      version: 2,
+      rules: [
+        {
+          decision: "block",
+        },
+      ],
+    })).rejects.toThrow("rule must include at least one matcher")
+
+    await expect(CyxWatch.savePolicy({
+      version: 2,
+      rules: [
+        {
+          permission: [""],
+          decision: "warn",
+        },
+      ],
+    })).rejects.toThrow("Too small")
+
+    await expect(CyxWatch.savePolicy({
+      version: 2,
+      rules: [
+        {
+          permission: ["webfetch"],
+          bytes_gt: 10,
+          bytes_lt: 5,
+          decision: "warn",
+        },
+      ],
+    })).rejects.toThrow("byte thresholds")
+  })
+
+  test("falls back to blank policy when saved policy file is invalid", async () => {
+    await fs.mkdir(path.dirname(WatchPolicy.file()), { recursive: true })
+    await fs.writeFile(WatchPolicy.file(), JSON.stringify({
+      version: 2,
+      rules: [
+        {
+          permission: ["webfetch"],
+          decision: "bogus",
+        },
+      ],
+    }))
+
+    expect(CyxWatch.policy()).toEqual({ version: 2, rules: [] })
+    const out = CyxWatch.classify({
+      permission: "webfetch",
+      patterns: ["https://example.com/api"],
+      metadata: { url: "https://example.com/api" },
+    })
+    expect(out.decision).toBe("allow")
   })
 
   test("records websocket connections through wrapper", async () => {
