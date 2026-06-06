@@ -1,147 +1,6 @@
 import { Component, For, Show, createEffect, createMemo, createSignal, onCleanup } from "solid-js"
-import { useSearchParams } from "@solidjs/router"
-import { wikiApi, type WikiEdge, type WikiGraph, type WikiPage } from "../api/client"
-
-type Pos = {
-  id: string
-  x: number
-  y: number
-  r: number
-  act: boolean
-  hit: boolean
-  kind: "doc" | "wiki"
-  title: string
-  path: string
-  deg: number
-}
-
-type Ed = WikiEdge & {
-  a: Pos
-  b: Pos
-  on: boolean
-}
-
-type View = {
-  nodes: Pos[]
-  edges: Ed[]
-  act: string
-}
-
-function deg(id: string, edges: WikiEdge[]) {
-  let n = 0
-  for (const edge of edges) {
-    if (edge.from === id || edge.to === id) n++
-  }
-  return n
-}
-
-function place(
-  ids: string[],
-  gap: number,
-  cx: number,
-  cy: number,
-  map: Map<string, WikiPage>,
-  sel: string,
-  edges: WikiEdge[],
-  hit: Set<string>,
-) {
-  const out: Pos[] = []
-  const step = (Math.PI * 2) / Math.max(1, ids.length)
-  const start = -Math.PI / 2
-
-  for (let i = 0; i < ids.length; i++) {
-    const id = ids[i]!
-    const page = map.get(id)
-    if (!page) continue
-
-    const ang = start + step * i
-    out.push({
-      id,
-      x: cx + Math.cos(ang) * gap,
-      y: cy + Math.sin(ang) * gap,
-      r: id === sel ? 20 : 13,
-      act: id === sel,
-      hit: hit.has(id),
-      kind: page.kind,
-      title: page.title,
-      path: page.path,
-      deg: deg(id, edges),
-    })
-  }
-
-  return out
-}
-
-function layout(graph: WikiGraph, pages: WikiPage[], sel: string, q: string): View {
-  const map = new Map(pages.map((page) => [page.id, page]))
-  const low = q.toLowerCase()
-  const hit = new Set(
-    pages
-      .filter((page) => {
-        if (!low) return true
-        return (
-          page.title.toLowerCase().includes(low) ||
-          page.path.toLowerCase().includes(low) ||
-          page.summary.toLowerCase().includes(low) ||
-          page.tags.some((tag) => tag.includes(low))
-        )
-      })
-      .map((page) => page.id),
-  )
-
-  const adj = new Map<string, Set<string>>()
-  for (const edge of graph.edges) {
-    const a = adj.get(edge.from) ?? new Set<string>()
-    a.add(edge.to)
-    adj.set(edge.from, a)
-
-    const b = adj.get(edge.to) ?? new Set<string>()
-    b.add(edge.from)
-    adj.set(edge.to, b)
-  }
-
-  const ids = pages
-    .filter((page) => hit.has(page.id) || page.id === sel)
-    .sort((a, b) => {
-      const da = deg(a.id, graph.edges)
-      const db = deg(b.id, graph.edges)
-      return db - da || a.title.localeCompare(b.title)
-    })
-    .map((page) => page.id)
-
-  const act = sel && map.has(sel) ? sel : ids[0] ?? ""
-  const near = [...(adj.get(act) ?? new Set<string>())]
-    .filter((id) => map.has(id) && id !== act)
-    .sort((a, b) => (map.get(a)?.title ?? "").localeCompare(map.get(b)?.title ?? ""))
-  const rest = ids.filter((id) => id !== act && !near.includes(id))
-
-  const cx = 320
-  const cy = 250
-  const ring = Math.max(150, 28 + near.length * 10)
-  const outer = Math.max(250, 46 + rest.length * 8)
-
-  const nodes = [
-    ...place(act ? [act] : [], 0, cx, cy, map, act, graph.edges, hit),
-    ...place(near, ring, cx, cy, map, act, graph.edges, hit),
-    ...place(rest, outer, cx, cy, map, act, graph.edges, hit),
-  ]
-
-  const pos = new Map(nodes.map((node) => [node.id, node]))
-  const edges = graph.edges
-    .filter((edge) => pos.has(edge.from) && pos.has(edge.to))
-    .map((edge) => {
-      const a = pos.get(edge.from)!
-      const b = pos.get(edge.to)!
-      return {
-        ...edge,
-        a,
-        b,
-        on: edge.from === act || edge.to === act || a.hit || b.hit,
-      }
-    })
-
-  return { nodes, edges, act }
-}
+import { A, useSearchParams } from "@solidjs/router"
+import { wikiApi, type WikiPage } from "../api/client"
 
 function body(text: string) {
   return text
@@ -154,7 +13,6 @@ const Wiki: Component = () => {
   const [search, setSearch] = useSearchParams()
   const [term, setTerm] = createSignal("")
   const [pages, setPages] = createSignal<WikiPage[]>([])
-  const [graph, setGraph] = createSignal<WikiGraph>({ nodes: [], edges: [] })
   const [sel, setSel] = createSignal("")
   const [page, setPage] = createSignal<WikiPage | null>(null)
   const [text, setText] = createSignal("")
@@ -174,15 +32,10 @@ const Wiki: Component = () => {
     setLoad(true)
     setErr(null)
 
-    const [list, tree] = await Promise.all([
-      wikiApi.list({ search: q || undefined, limit: 100 }),
-      wikiApi.graph(),
-    ])
+    const list = await wikiApi.list({ search: q || undefined, limit: 100 })
 
     if (list.error) setErr(list.error)
     if (list.data) setPages(list.data.pages)
-    if (tree.error) setErr(tree.error)
-    if (tree.data) setGraph(tree.data)
 
     setLoad(false)
   }
@@ -345,7 +198,6 @@ const Wiki: Component = () => {
     setBusy(false)
   }
 
-  const data = createMemo(() => layout(graph(), pages(), sel(), term().trim()))
   const cur = createMemo(() => page() ?? pages().find((item) => item.id === sel()) ?? null)
   const links = createMemo(() => new Set(pages().flatMap((item) => item.links)))
 
@@ -457,66 +309,7 @@ const Wiki: Component = () => {
           </section>
         </div>
 
-        <div class="xl:col-span-5 card">
-          <div class="flex items-center justify-between mb-4">
-            <div>
-              <div class="card-header">Graph</div>
-              <div class="text-xs text-gray-500">Focused around {cur()?.title || "current page"}</div>
-            </div>
-            <div class="text-xs text-gray-500">{data().nodes.length} nodes</div>
-          </div>
-
-          <div class="rounded border border-gray-700 bg-gray-900/80 overflow-hidden">
-            <svg class="w-full h-[72vh]" viewBox="0 0 640 520" role="img" aria-label="Wiki graph">
-              <defs>
-                <linearGradient id="line" x1="0%" y1="0%" x2="100%" y2="0%">
-                  <stop offset="0%" stop-color="#374151" />
-                  <stop offset="100%" stop-color="#60a5fa" />
-                </linearGradient>
-              </defs>
-              <g opacity="0.3">
-                <circle cx="320" cy="250" r="98" fill="none" stroke="#1f2937" />
-                <circle cx="320" cy="250" r="170" fill="none" stroke="#1f2937" stroke-dasharray="5 10" />
-              </g>
-              <For each={data().edges}>
-                {(edge) => (
-                  <line
-                    x1={edge.a.x}
-                    y1={edge.a.y}
-                    x2={edge.b.x}
-                    y2={edge.b.y}
-                    stroke={edge.on ? "url(#line)" : "#374151"}
-                    stroke-width={edge.on ? "2.5" : "1.5"}
-                    opacity={edge.on ? "0.9" : "0.35"}
-                  />
-                )}
-              </For>
-              <For each={data().nodes}>
-                {(node) => (
-                  <g transform={`translate(${node.x}, ${node.y})`} class="cursor-pointer" onClick={() => pick(node.id)}>
-                    <circle
-                      r={node.r + 8}
-                      fill={node.act ? "rgba(37,99,235,0.16)" : node.hit ? "rgba(59,130,246,0.12)" : "rgba(17,24,39,0.9)"}
-                      stroke={node.act ? "#60a5fa" : node.hit ? "#3b82f6" : "#374151"}
-                      stroke-width={node.act ? "2.5" : "1.5"}
-                    />
-                    <circle
-                      r={node.r}
-                      fill={node.kind === "wiki" ? "#1d4ed8" : "#334155"}
-                      stroke={node.act ? "#93c5fd" : "#475569"}
-                      stroke-width="1.5"
-                    />
-                    <text y={node.r + 14} text-anchor="middle" class="fill-gray-300 text-[10px]">
-                      {node.title.length > 16 ? `${node.title.slice(0, 15)}...` : node.title}
-                    </text>
-                  </g>
-                )}
-              </For>
-            </svg>
-          </div>
-        </div>
-
-        <div class="xl:col-span-3 card">
+        <div class="xl:col-span-8 card">
           <div class="card-header">Details</div>
 
           <Show when={cur()} fallback={<div class="text-sm text-gray-500">No note selected.</div>}>
@@ -532,6 +325,12 @@ const Wiki: Component = () => {
                 </span>
                 <span class="badge bg-gray-700 text-gray-300">{cur()!.links.length} links</span>
                 <span class="badge bg-gray-700 text-gray-300">{cur()!.backlinks.length} backlinks</span>
+              </div>
+
+              <div class="flex flex-wrap gap-2">
+                <A class="btn btn-secondary text-xs" href={`/dashboard/graph?id=${encodeURIComponent(cur()!.id)}`}>
+                  Open in Graph
+                </A>
               </div>
 
               <div>

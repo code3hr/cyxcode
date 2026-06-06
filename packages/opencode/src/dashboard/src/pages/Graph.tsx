@@ -1,31 +1,10 @@
-import { MultiDirectedGraph } from "graphology"
-import Sigma from "sigma"
+import cytoscape from "cytoscape"
 import { Component, For, Show, createEffect, createMemo, createSignal, onCleanup } from "solid-js"
 import { A, useSearchParams } from "@solidjs/router"
 import { graphApi, type GraphData, type GraphEdge, type GraphNode } from "../api/client"
 
-type NodeAttr = {
-  x: number
-  y: number
-  size: number
-  label: string
-  color: string
-  kind: GraphNode["kind"]
-  act: boolean
-  hit: boolean
-  hop: number
-}
-
-type EdgeAttr = {
-  size: number
-  color: string
-  on: boolean
-}
-
 type Pos = {
   id: string
-  x: number
-  y: number
   r: number
   act: boolean
   hit: boolean
@@ -37,8 +16,6 @@ type Pos = {
 }
 
 type Ed = GraphEdge & {
-  a: Pos
-  b: Pos
   on: boolean
 }
 
@@ -48,14 +25,8 @@ type View = {
   act: string
 }
 
-type Dot = Pos & {
-  vx: number
-  vy: number
-}
-
 const max = 180
 const scan = max * 3
-const ticks = 70
 const kinds: GraphNode["kind"][] = ["wiki", "code", "symbol", "memory", "learned", "concept", "cyxwatch"]
 const base = kinds.filter((kind) => kind !== "symbol")
 
@@ -69,15 +40,6 @@ const colors: Record<GraphNode["kind"], { fill: string; stroke: string; glow: st
   cyxwatch: { fill: "#991b1b", stroke: "#f87171", glow: "rgba(153,27,27,0.16)" },
 }
 
-function hash(text: string) {
-  let h = 2166136261
-  for (let i = 0; i < text.length; i++) {
-    h ^= text.charCodeAt(i)
-    h = Math.imul(h, 16777619)
-  }
-  return (h >>> 0) / 4294967295
-}
-
 function has(node: GraphNode, q: string) {
   if (!q) return false
   const meta = node.meta ? JSON.stringify(node.meta) : ""
@@ -89,87 +51,6 @@ function has(node: GraphNode, q: string) {
     (node.tags ?? []).some((tag) => tag.toLowerCase().includes(q)) ||
     meta.toLowerCase().includes(q)
   )
-}
-
-function force(list: Pos[], edges: GraphEdge[], act: string) {
-  const dots: Dot[] = list.map((node, i) => {
-    const a = hash(`${node.id}:a`) * Math.PI * 2
-    const ring = node.hop === 0 ? 0 : 0.38 + node.hop * 0.32
-    const off = (hash(`${node.id}:r`) - 0.5) * 0.18
-    return {
-      ...node,
-      x: node.hop === 0 ? 0 : Math.cos(a + i * 0.17) * (ring + off),
-      y: node.hop === 0 ? 0 : Math.sin(a + i * 0.17) * (ring + off),
-      vx: 0,
-      vy: 0,
-    }
-  })
-  const idx = new Map(dots.map((node, i) => [node.id, i]))
-  const wire = edges.flatMap((edge) => {
-    const a = idx.get(edge.from)
-    const b = idx.get(edge.to)
-    return a === undefined || b === undefined ? [] : [{ a, b }]
-  })
-
-  for (let t = 0; t < ticks; t++) {
-    for (let i = 0; i < dots.length; i++) {
-      for (let j = i + 1; j < dots.length; j++) {
-        const a = dots[i]!
-        const b = dots[j]!
-        const dx = a.x - b.x || 0.001
-        const dy = a.y - b.y || 0.001
-        const d2 = Math.max(0.01, dx * dx + dy * dy)
-        const d = Math.sqrt(d2)
-        const f = Math.min(0.05, 0.018 / d2)
-        const fx = (dx / d) * f
-        const fy = (dy / d) * f
-        a.vx += fx
-        a.vy += fy
-        b.vx -= fx
-        b.vy -= fy
-      }
-    }
-
-    for (const edge of wire) {
-      const a = dots[edge.a]!
-      const b = dots[edge.b]!
-      const dx = b.x - a.x || 0.001
-      const dy = b.y - a.y || 0.001
-      const d = Math.sqrt(dx * dx + dy * dy)
-      const want = a.hop === b.hop ? 0.34 : 0.28
-      const f = (d - want) * 0.024
-      const fx = (dx / d) * f
-      const fy = (dy / d) * f
-      a.vx += fx
-      a.vy += fy
-      b.vx -= fx
-      b.vy -= fy
-    }
-
-    for (const node of dots) {
-      const pull = node.id === act ? 0.12 : node.hit ? 0.014 : 0.007
-      node.vx -= node.x * pull
-      node.vy -= node.y * pull
-      node.vx *= 0.82
-      node.vy *= 0.82
-      node.x += node.vx
-      node.y += node.vy
-    }
-  }
-
-  return dots.map((node) => ({
-    id: node.id,
-    x: node.x,
-    y: node.y,
-    r: node.r,
-    act: node.act,
-    hit: node.hit,
-    kind: node.kind,
-    title: node.title,
-    path: node.path,
-    deg: node.deg,
-    hop: node.hop,
-  }))
 }
 
 function layout(data: GraphData, sel: string, q: string, allow: Set<GraphNode["kind"]>, hop: number): View {
@@ -228,8 +109,6 @@ function layout(data: GraphData, sel: string, q: string, allow: Set<GraphNode["k
       const n = degree.get(id) ?? 0
       return {
         id,
-        x: 0,
-        y: 0,
         r: id === act ? 18 : node.kind === "wiki" ? 12 : Math.min(11, 7 + Math.sqrt(n) * 0.2),
         act: id === act,
         hit: hit.has(id),
@@ -249,22 +128,13 @@ function layout(data: GraphData, sel: string, q: string, allow: Set<GraphNode["k
 
   const keep = new Set(raw.map((node) => node.id))
   const linked = data.edges.filter((edge) => keep.has(edge.from) && keep.has(edge.to))
-  const placed = force(raw, linked, act)
-  const pos = new Map(placed.map((node) => [node.id, node]))
-  const edges = linked
-    .filter((edge) => pos.has(edge.from) && pos.has(edge.to))
-    .map((edge) => {
-      const a = pos.get(edge.from)!
-      const b = pos.get(edge.to)!
-      return {
-        ...edge,
-        a,
-        b,
-        on: edge.from === act || edge.to === act || a.hit || b.hit,
-      }
-    })
+  const pos = new Map(raw.map((node) => [node.id, node]))
+  const edges = linked.map((edge) => ({
+    ...edge,
+    on: edge.from === act || edge.to === act || !!pos.get(edge.from)?.hit || !!pos.get(edge.to)?.hit,
+  }))
 
-  return { nodes: placed, edges, act }
+  return { nodes: raw, edges, act }
 }
 
 const Graph: Component = () => {
@@ -277,6 +147,7 @@ const Graph: Component = () => {
   const [allow, setAllow] = createSignal<Set<GraphNode["kind"]>>(new Set(base))
   const [hop, setHop] = createSignal(2)
   const [fit, setFit] = createSignal(0)
+  const [full, setFull] = createSignal(false)
 
   const fetchGraph = async () => {
     setLoad(true)
@@ -360,10 +231,21 @@ const Graph: Component = () => {
 
   const pick = (id: string) => setSel(id)
 
-  const label = (text: string) => {
-    if (text.length <= 16) return text
-    return `${text.slice(0, 15)}...`
+  const toggleFull = () => {
+    setFull((value) => !value)
+    setFit((n) => n + 1)
   }
+
+  createEffect(() => {
+    if (!full()) return
+    const close = (event: KeyboardEvent) => {
+      if (event.key !== "Escape") return
+      setFull(false)
+      setFit((n) => n + 1)
+    }
+    window.addEventListener("keydown", close)
+    onCleanup(() => window.removeEventListener("keydown", close))
+  })
 
   const href = (node: GraphNode | null) => {
     if (!node) return ""
@@ -500,11 +382,17 @@ const Graph: Component = () => {
               <button class="btn btn-secondary text-xs" onClick={() => setFit((n) => n + 1)} disabled={view().nodes.length === 0}>
                 Fit
               </button>
+              <button class="btn btn-secondary text-xs inline-flex items-center gap-2" onClick={toggleFull} disabled={view().nodes.length === 0}>
+                <Icon path="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5" />
+                Fullscreen
+              </button>
             </div>
           </div>
 
           <div class="relative rounded border border-gray-700 bg-gray-900/80 overflow-hidden">
-            <SigmaGraph view={view()} hop={hop()} fit={fit()} label={label} pick={pick} />
+            <Show when={!full()}>
+              <CyGraph view={view()} hop={hop()} fit={fit()} full={false} pick={pick} />
+            </Show>
             <Show when={load()}>
               <div class="absolute inset-0 grid place-items-center bg-gray-950/70 text-sm text-gray-300">Loading graph...</div>
             </Show>
@@ -602,140 +490,225 @@ const Graph: Component = () => {
           </Show>
         </div>
       </div>
+
+      <Show when={full()}>
+        <div class="fixed inset-0 z-50 flex flex-col bg-gray-950">
+          <div class="flex flex-wrap items-center justify-between gap-3 border-b border-gray-800 bg-gray-950/95 px-4 py-3">
+            <div class="min-w-0">
+              <div class="text-sm font-semibold text-gray-100 truncate">Knowledge Graph</div>
+              <div class="text-xs text-gray-500 truncate">
+                {view().nodes.length} nodes, {view().edges.length} edges, focused on {cur()?.title || "current node"}
+              </div>
+            </div>
+            <div class="flex items-center gap-2">
+              <button class="btn btn-secondary text-xs" onClick={() => setFit((n) => n + 1)} disabled={view().nodes.length === 0}>
+                Fit
+              </button>
+              <button class="btn btn-secondary text-xs inline-flex items-center gap-2" onClick={toggleFull}>
+                <Icon path="M9 4v5H4M15 4v5h5M9 20v-5H4M15 20v-5h5" />
+                Exit
+              </button>
+            </div>
+          </div>
+          <div class="relative min-h-0 flex-1">
+            <CyGraph view={view()} hop={hop()} fit={fit()} full={true} pick={pick} />
+            <Show when={load()}>
+              <div class="absolute inset-0 grid place-items-center bg-gray-950/70 text-sm text-gray-300">Loading graph...</div>
+            </Show>
+            <Show when={!load() && view().nodes.length === 0}>
+              <div class="absolute inset-0 grid place-items-center bg-gray-950/70 text-sm text-gray-400">No matching graph nodes.</div>
+            </Show>
+          </div>
+        </div>
+      </Show>
     </div>
   )
 }
 
-function SigmaGraph(props: { view: View; hop: number; fit: number; label: (text: string) => string; pick: (id: string) => void }) {
+function CyGraph(props: { view: View; hop: number; fit: number; full: boolean; pick: (id: string) => void }) {
   let el: HTMLDivElement | undefined
 
   createEffect(() => {
     const root = el
     if (!root) return
     props.fit
-    let drag = ""
-    let moved = false
-    let skip = false
 
-    const graph = new MultiDirectedGraph<NodeAttr, EdgeAttr>()
-    for (const node of props.view.nodes) {
+    const nodes = props.view.nodes.map((node) => {
       const c = colors[node.kind]
-      graph.addNode(node.id, {
-        x: node.x,
-        y: node.y,
-        size: node.r,
-        label: node.hop > props.hop ? `${props.label(node.title)}*` : props.label(node.title),
-        color: c.fill,
-        kind: node.kind,
-        act: node.act,
-        hit: node.hit,
-        hop: node.hop,
-      })
-    }
-
-    props.view.edges.forEach((edge, i) => {
-      if (!graph.hasNode(edge.from) || !graph.hasNode(edge.to)) return
-      graph.addDirectedEdgeWithKey(`${edge.from}->${edge.to}:${edge.type}:${i}`, edge.from, edge.to, {
-        size: edge.on ? 2.4 : 1,
-        color: edge.on ? "#60a5fa" : "#374151",
-        on: edge.on,
-      })
-    })
-
-    const sigma = new Sigma<NodeAttr, EdgeAttr>(graph, root, {
-      autoCenter: true,
-      autoRescale: true,
-      defaultEdgeType: "line",
-      defaultNodeType: "circle",
-      enableEdgeEvents: false,
-      hideEdgesOnMove: true,
-      hideLabelsOnMove: false,
-      itemSizesReference: "positions",
-      labelColor: { color: "#d1d5db" },
-      labelDensity: 0.08,
-      labelFont: "Inter, ui-sans-serif, system-ui",
-      labelRenderedSizeThreshold: 10,
-      labelSize: 11,
-      minCameraRatio: 0.08,
-      maxCameraRatio: 8,
-      nodeReducer: (_id, data) => ({
-        color: data.act ? colors[data.kind].stroke : data.hit ? "#3b82f6" : data.color,
-        forceLabel: data.act || data.hit,
-        highlighted: data.act,
-        size: data.act ? data.size + 5 : data.hit ? data.size + 2 : data.size,
-        zIndex: data.act ? 3 : data.hit ? 2 : 1,
-      }),
-      edgeReducer: (_id, data) => ({
-        color: data.color,
-        hidden: !data.on && props.view.nodes.length > 140,
-        size: data.size,
-      }),
-      renderEdgeLabels: false,
-      renderLabels: true,
-      stagePadding: 24,
-      zIndex: true,
-    })
-
-    const camera = sigma.getCamera()
-    const mouse = sigma.getMouseCaptor()
-    const resize = new ResizeObserver(() => {
-      sigma.resize()
-      sigma.scheduleRender()
-    })
-
-    sigma.on("downNode", (event) => {
-      drag = event.node
-      moved = false
-      event.preventSigmaDefault()
-      event.event.preventSigmaDefault()
-      camera.disable()
-      root.style.cursor = "grabbing"
-    })
-    mouse.on("mousemovebody", (event) => {
-      if (!drag) return
-      moved = true
-      const pos = sigma.viewportToGraph({ x: event.x, y: event.y })
-      graph.setNodeAttribute(drag, "x", pos.x)
-      graph.setNodeAttribute(drag, "y", pos.y)
-      sigma.refresh({ partialGraph: { nodes: [drag] }, skipIndexation: false })
-    })
-    mouse.on("mouseup", () => {
-      if (!drag) return
-      skip = moved
-      drag = ""
-      camera.enable()
-      root.style.cursor = "default"
-    })
-    mouse.on("mouseleave", () => {
-      if (!drag) return
-      skip = moved
-      drag = ""
-      camera.enable()
-      root.style.cursor = "default"
-    })
-    sigma.on("clickNode", (event) => {
-      if (skip) {
-        skip = false
-        return
+      return {
+        group: "nodes" as const,
+        data: {
+          id: node.id,
+          label: node.hop > props.hop ? `${short(node.title)}*` : short(node.title),
+          kind: node.kind,
+          size: node.r * 2,
+          fill: node.act ? c.stroke : node.hit ? "#3b82f6" : c.fill,
+          border: node.act ? "#f9fafb" : c.stroke,
+          glow: c.glow,
+          act: node.act,
+          hit: node.hit,
+          dim: !node.act && !node.hit && props.view.nodes.length > 120,
+        },
+        classes: [node.kind, node.act ? "act" : "", node.hit ? "hit" : ""].filter(Boolean).join(" "),
       }
-      props.pick(event.node)
+    }) satisfies cytoscape.ElementDefinition[]
+
+    const edges = props.view.edges.map((edge, i) => ({
+      group: "edges" as const,
+      data: {
+        id: `${edge.from}->${edge.to}:${edge.type}:${i}`,
+        source: edge.from,
+        target: edge.to,
+        type: edge.type,
+        on: edge.on,
+        width: edge.on ? 2.2 : 1,
+        color: edge.on ? "#60a5fa" : "#374151",
+        opacity: edge.on ? 0.86 : props.view.nodes.length > 120 ? 0.12 : 0.34,
+      },
+      classes: edge.on ? "on" : "",
+    })) satisfies cytoscape.ElementDefinition[]
+
+    const cy = cytoscape({
+      container: root,
+      elements: [...nodes, ...edges],
+      autoungrabify: false,
+      boxSelectionEnabled: false,
+      maxZoom: 4,
+      minZoom: 0.08,
+      wheelSensitivity: 0.18,
+      style: [
+        {
+          selector: "core",
+          style: {
+            "active-bg-color": "#1f2937",
+            "active-bg-opacity": 0.28,
+            "selection-box-color": "#60a5fa",
+            "selection-box-opacity": 0.12,
+          },
+        },
+        {
+          selector: "node",
+          style: {
+            "background-color": "data(fill)",
+            "border-color": "data(border)",
+            "border-width": 1.4,
+            color: "#d1d5db",
+            content: "data(label)",
+            "font-family": "Inter, ui-sans-serif, system-ui",
+            "font-size": 10,
+            height: "data(size)",
+            label: "data(label)",
+            "min-zoomed-font-size": 7,
+            opacity: "data(dim)",
+            "overlay-color": "#60a5fa",
+            "overlay-opacity": 0,
+            "text-background-color": "#111827",
+            "text-background-opacity": 0.72,
+            "text-background-padding": 2,
+            "text-margin-y": 8,
+            "text-outline-color": "#111827",
+            "text-outline-width": 1.5,
+            width: "data(size)",
+          },
+        },
+        {
+          selector: "node[dim]",
+          style: {
+            opacity: 0.62,
+          },
+        },
+        {
+          selector: "node.act",
+          style: {
+            "border-width": 3,
+            "font-size": 12,
+            height: 42,
+            opacity: 1,
+            "text-background-opacity": 0.9,
+            width: 42,
+            "z-index": 20,
+          },
+        },
+        {
+          selector: "node.hit",
+          style: {
+            "border-width": 2.4,
+            opacity: 1,
+            "z-index": 15,
+          },
+        },
+        {
+          selector: "edge",
+          style: {
+            "curve-style": "bezier",
+            "line-color": "data(color)",
+            opacity: "data(opacity)",
+            "target-arrow-color": "data(color)",
+            "target-arrow-shape": "triangle",
+            "target-arrow-width": 4,
+            width: "data(width)",
+          },
+        },
+        {
+          selector: "edge.on",
+          style: {
+            "z-index": 10,
+          },
+        },
+      ],
+      layout: {
+        name: "cose",
+        animate: false,
+        componentSpacing: 88,
+        edgeElasticity: 110,
+        fit: true,
+        gravity: 0.32,
+        idealEdgeLength: 92,
+        nestingFactor: 1.15,
+        nodeOverlap: 18,
+        nodeRepulsion: 7600,
+        numIter: props.view.nodes.length > 120 ? 650 : 950,
+        padding: 36,
+        randomize: true,
+      },
     })
-    sigma.on("enterNode", () => {
+
+    cy.on("tap", "node", (event) => {
+      props.pick(event.target.id())
+    })
+    cy.on("mouseover", "node", () => {
       root.style.cursor = "pointer"
     })
-    sigma.on("leaveNode", () => {
-      if (!drag) root.style.cursor = "default"
+    cy.on("mouseout", "node", () => {
+      root.style.cursor = "default"
     })
-    sigma.getCamera().animatedReset({ duration: 250 })
+
+    const resize = new ResizeObserver(() => {
+      cy.resize()
+      cy.fit(undefined, 36)
+    })
     resize.observe(root)
 
     onCleanup(() => {
       resize.disconnect()
-      sigma.kill()
+      cy.destroy()
     })
   })
 
-  return <div ref={el} class="h-[72vh] w-full" role="img" aria-label="Knowledge graph" />
+  return <div ref={el} class={props.full ? "h-full w-full" : "h-[72vh] w-full"} role="img" aria-label="Knowledge graph" />
+}
+
+function short(text: string) {
+  if (text.length <= 18) return text
+  return `${text.slice(0, 17)}...`
+}
+
+function Icon(props: { path: string }) {
+  return (
+    <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path d={props.path} stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" />
+    </svg>
+  )
 }
 
 function kindClass(kind: GraphNode["kind"]) {

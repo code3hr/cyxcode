@@ -128,7 +128,7 @@ export namespace Project {
           return { code, text, stderr } satisfies GitResult
         },
         Effect.scoped,
-        Effect.catch(() => Effect.succeed({ code: 1, text: "", stderr: "" } satisfies GitResult)),
+        Effect.catchCause(() => Effect.succeed({ code: 1, text: "", stderr: "" } satisfies GitResult)),
       )
 
       const db = <T>(fn: (d: Parameters<typeof Database.use>[0] extends (trx: infer D) => any ? D : never) => T) =>
@@ -245,7 +245,9 @@ export namespace Project {
         })
 
         // Phase 2: upsert
-        const row = yield* db((d) => d.select().from(ProjectTable).where(eq(ProjectTable.id, data.id)).get())
+        const row = yield* db((d) => d.select().from(ProjectTable).where(eq(ProjectTable.id, data.id)).get()).pipe(
+          Effect.catchCause(() => Effect.succeed(undefined)),
+        )
         const existing = row
           ? fromRow(row)
           : {
@@ -308,7 +310,7 @@ export namespace Project {
               },
             })
             .run(),
-        )
+        ).pipe(Effect.catchCause(() => Effect.void))
 
         if (data.id !== ProjectID.global) {
           yield* db((d) =>
@@ -317,7 +319,7 @@ export namespace Project {
               .set({ project_id: data.id })
               .where(and(eq(SessionTable.project_id, ProjectID.global), eq(SessionTable.directory, data.worktree)))
               .run(),
-          )
+          ).pipe(Effect.catchCause(() => Effect.void))
         }
 
         yield* emitUpdated(result)

@@ -10,8 +10,7 @@
   },
   "dependencies": {
     "@solidjs/router": "^0.15.3",
-    "graphology": "^0.26.0",
-    "sigma": "^3.0.3",
+    "cytoscape": "^3.34.0",
     "solid-js": "^1.9.4"
   },
   "devDependencies": {

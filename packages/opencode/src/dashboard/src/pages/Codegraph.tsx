@@ -1,11 +1,10 @@
+import cytoscape from "cytoscape"
 import { Component, For, Show, createEffect, createMemo, createSignal, onCleanup } from "solid-js"
 import { useSearchParams, A } from "@solidjs/router"
 import { codegraphApi, type CodeEdge, type CodeGraph, type CodeFile } from "../api/client"
 
 type Pos = {
   id: string
-  x: number
-  y: number
   r: number
   act: boolean
   hit: boolean
@@ -16,8 +15,6 @@ type Pos = {
 }
 
 type Ed = CodeEdge & {
-  a: Pos
-  b: Pos
   on: boolean
 }
 
@@ -27,40 +24,18 @@ type View = {
   act: string
 }
 
+const colors = {
+  fill: "#0f766e",
+  stroke: "#6ee7b7",
+  hit: "#22c55e",
+}
+
 function deg(id: string, edges: CodeEdge[]) {
   let n = 0
   for (const edge of edges) {
     if (edge.from === id || edge.to === id) n++
   }
   return n
-}
-
-function place(ids: string[], gap: number, cx: number, cy: number, map: Map<string, CodeFile>, sel: string, edges: CodeEdge[], hit: Set<string>) {
-  const out: Pos[] = []
-  const step = (Math.PI * 2) / Math.max(1, ids.length)
-  const start = -Math.PI / 2
-
-  for (let i = 0; i < ids.length; i++) {
-    const id = ids[i]!
-    const node = map.get(id)
-    if (!node) continue
-
-    const ang = start + step * i
-    out.push({
-      id,
-      x: cx + Math.cos(ang) * gap,
-      y: cy + Math.sin(ang) * gap,
-      r: id === sel ? 20 : 12,
-      act: id === sel,
-      hit: hit.has(id),
-      kind: "file",
-      title: node.title,
-      path: node.path,
-      deg: deg(id, edges),
-    })
-  }
-
-  return out
 }
 
 function layout(graph: CodeGraph, files: CodeFile[], sel: string, q: string): View {
@@ -100,35 +75,30 @@ function layout(graph: CodeGraph, files: CodeFile[], sel: string, q: string): Vi
     .map((file) => file.id)
 
   const act = sel && map.has(sel) ? sel : ids[0] ?? ""
-  const near = [...(adj.get(act) ?? new Set<string>())]
-    .filter((id) => map.has(id) && id !== act)
-    .sort((a, b) => (map.get(a)?.title ?? "").localeCompare(map.get(b)?.title ?? ""))
-  const rest = ids.filter((id) => id !== act && !near.includes(id))
-
-  const cx = 320
-  const cy = 250
-  const ring = Math.max(150, 28 + near.length * 10)
-  const outer = Math.max(250, 46 + rest.length * 8)
-
-  const nodes = [
-    ...place(act ? [act] : [], 0, cx, cy, map, act, graph.edges, hit),
-    ...place(near, ring, cx, cy, map, act, graph.edges, hit),
-    ...place(rest, outer, cx, cy, map, act, graph.edges, hit),
-  ]
-
-  const pos = new Map(nodes.map((node) => [node.id, node]))
-  const edges = graph.edges
-    .filter((edge) => pos.has(edge.from) && pos.has(edge.to))
-    .map((edge) => {
-      const a = pos.get(edge.from)!
-      const b = pos.get(edge.to)!
+  const near = new Set([act, ...(adj.get(act) ?? new Set<string>())].filter(Boolean))
+  const nodes = ids
+    .filter((id) => near.has(id) || hit.has(id))
+    .slice(0, 140)
+    .map((id) => {
+      const file = map.get(id)!
+      const n = deg(id, graph.edges)
       return {
-        ...edge,
-        a,
-        b,
-        on: edge.from === act || edge.to === act || a.hit || b.hit,
+        id,
+        r: id === act ? 19 : Math.min(15, 10 + Math.sqrt(n) * 0.5),
+        act: id === act,
+        hit: hit.has(id),
+        kind: "file" as const,
+        title: file.title,
+        path: file.path,
+        deg: n,
       }
     })
+
+  const pos = new Map(nodes.map((node) => [node.id, node]))
+  const edges = graph.edges.filter((edge) => pos.has(edge.from) && pos.has(edge.to)).map((edge) => ({
+    ...edge,
+    on: edge.from === act || edge.to === act || !!pos.get(edge.from)?.hit || !!pos.get(edge.to)?.hit,
+  }))
 
   return { nodes, edges, act }
 }
@@ -145,6 +115,8 @@ const Codegraph: Component = () => {
   const [busy, setBusy] = createSignal(false)
   const [err, setErr] = createSignal<string | null>(null)
   const [msg, setMsg] = createSignal<string | null>(null)
+  const [fit, setFit] = createSignal(0)
+  const [full, setFull] = createSignal(false)
 
   const fetchList = async (q = "") => {
     setLoad(true)
@@ -216,6 +188,22 @@ const Codegraph: Component = () => {
     setSearch({ id })
   }
 
+  const toggleFull = () => {
+    setFull((value) => !value)
+    setFit((n) => n + 1)
+  }
+
+  createEffect(() => {
+    if (!full()) return
+    const close = (event: KeyboardEvent) => {
+      if (event.key !== "Escape") return
+      setFull(false)
+      setFit((n) => n + 1)
+    }
+    window.addEventListener("keydown", close)
+    onCleanup(() => window.removeEventListener("keydown", close))
+  })
+
   return (
     <div class="space-y-6">
       <div class="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
@@ -273,56 +261,28 @@ const Codegraph: Component = () => {
               <div class="card-header">Graph</div>
               <div class="text-xs text-gray-500">Focused around {cur()?.title || "current file"}</div>
             </div>
-            <div class="text-xs text-gray-500">{data().nodes.length} nodes</div>
+            <div class="flex items-center gap-3">
+              <div class="text-xs text-gray-500">{data().nodes.length} nodes</div>
+              <button class="btn btn-secondary text-xs" onClick={() => setFit((n) => n + 1)} disabled={data().nodes.length === 0}>
+                Fit
+              </button>
+              <button class="btn btn-secondary text-xs inline-flex items-center gap-2" onClick={toggleFull} disabled={data().nodes.length === 0}>
+                <Icon path="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5" />
+                Fullscreen
+              </button>
+            </div>
           </div>
 
-          <div class="rounded border border-gray-700 bg-gray-900/80 overflow-hidden">
-            <svg class="w-full h-[72vh]" viewBox="0 0 640 520" role="img" aria-label="Code graph">
-              <defs>
-                <linearGradient id="line" x1="0%" y1="0%" x2="100%" y2="0%">
-                  <stop offset="0%" stop-color="#374151" />
-                  <stop offset="100%" stop-color="#34d399" />
-                </linearGradient>
-              </defs>
-              <g opacity="0.3">
-                <circle cx="320" cy="250" r="98" fill="none" stroke="#1f2937" />
-                <circle cx="320" cy="250" r="170" fill="none" stroke="#1f2937" stroke-dasharray="5 10" />
-              </g>
-              <For each={data().edges}>
-                {(edge) => (
-                  <line
-                    x1={edge.a.x}
-                    y1={edge.a.y}
-                    x2={edge.b.x}
-                    y2={edge.b.y}
-                    stroke={edge.on ? "url(#line)" : "#374151"}
-                    stroke-width={edge.on ? "2.5" : "1.5"}
-                    opacity={edge.on ? "0.9" : "0.35"}
-                  />
-                )}
-              </For>
-              <For each={data().nodes}>
-                {(node) => (
-                  <g transform={`translate(${node.x}, ${node.y})`} class="cursor-pointer" onClick={() => pick(node.id)}>
-                    <circle
-                      r={node.r + 8}
-                      fill={node.act ? "rgba(16,185,129,0.16)" : node.hit ? "rgba(34,197,94,0.12)" : "rgba(17,24,39,0.9)"}
-                      stroke={node.act ? "#34d399" : node.hit ? "#22c55e" : "#374151"}
-                      stroke-width={node.act ? "2.5" : "1.5"}
-                    />
-                    <circle
-                      r={node.r}
-                      fill="#0f766e"
-                      stroke={node.act ? "#6ee7b7" : "#14b8a6"}
-                      stroke-width="1.5"
-                    />
-                    <text y={node.r + 14} text-anchor="middle" class="fill-gray-300 text-[10px]">
-                      {node.title.length > 16 ? `${node.title.slice(0, 15)}...` : node.title}
-                    </text>
-                  </g>
-                )}
-              </For>
-            </svg>
+          <div class="relative rounded border border-gray-700 bg-gray-900/80 overflow-hidden">
+            <Show when={!full()}>
+              <CodeGraphView view={data()} fit={fit()} full={false} pick={pick} />
+            </Show>
+            <Show when={load()}>
+              <div class="absolute inset-0 grid place-items-center bg-gray-950/70 text-sm text-gray-300">Loading graph...</div>
+            </Show>
+            <Show when={!load() && data().nodes.length === 0}>
+              <div class="absolute inset-0 grid place-items-center bg-gray-950/70 text-sm text-gray-400">No matching code graph nodes.</div>
+            </Show>
           </div>
         </div>
 
@@ -384,7 +344,214 @@ const Codegraph: Component = () => {
           </Show>
         </div>
       </div>
+
+      <Show when={full()}>
+        <div class="fixed inset-0 z-50 flex flex-col bg-gray-950">
+          <div class="flex flex-wrap items-center justify-between gap-3 border-b border-gray-800 bg-gray-950/95 px-4 py-3">
+            <div class="min-w-0">
+              <div class="text-sm font-semibold text-gray-100 truncate">Code Graph</div>
+              <div class="text-xs text-gray-500 truncate">
+                {data().nodes.length} nodes, {data().edges.length} links, focused on {cur()?.title || "current file"}
+              </div>
+            </div>
+            <div class="flex items-center gap-2">
+              <button class="btn btn-secondary text-xs" onClick={() => setFit((n) => n + 1)} disabled={data().nodes.length === 0}>
+                Fit
+              </button>
+              <button class="btn btn-secondary text-xs inline-flex items-center gap-2" onClick={toggleFull}>
+                <Icon path="M9 4v5H4M15 4v5h5M9 20v-5H4M15 20v-5h5" />
+                Exit
+              </button>
+            </div>
+          </div>
+          <div class="relative min-h-0 flex-1">
+            <CodeGraphView view={data()} fit={fit()} full={true} pick={pick} />
+            <Show when={load()}>
+              <div class="absolute inset-0 grid place-items-center bg-gray-950/70 text-sm text-gray-300">Loading graph...</div>
+            </Show>
+            <Show when={!load() && data().nodes.length === 0}>
+              <div class="absolute inset-0 grid place-items-center bg-gray-950/70 text-sm text-gray-400">No matching code graph nodes.</div>
+            </Show>
+          </div>
+        </div>
+      </Show>
     </div>
+  )
+}
+
+function CodeGraphView(props: { view: View; fit: number; full: boolean; pick: (id: string) => void }) {
+  let el: HTMLDivElement | undefined
+
+  createEffect(() => {
+    const root = el
+    if (!root) return
+    props.fit
+
+    const nodes = props.view.nodes.map((node) => ({
+      group: "nodes" as const,
+      data: {
+        id: node.id,
+        label: short(node.title),
+        size: node.r * 2,
+        fill: node.act ? colors.stroke : node.hit ? colors.hit : colors.fill,
+        border: node.act ? "#f9fafb" : colors.stroke,
+        dim: !node.act && !node.hit && props.view.nodes.length > 90,
+      },
+      classes: [node.kind, node.act ? "act" : "", node.hit ? "hit" : ""].filter(Boolean).join(" "),
+    })) satisfies cytoscape.ElementDefinition[]
+
+    const edges = props.view.edges.map((edge, i) => ({
+      group: "edges" as const,
+      data: {
+        id: `${edge.from}->${edge.to}:${edge.type}:${i}`,
+        source: edge.from,
+        target: edge.to,
+        color: edge.on ? "#34d399" : "#374151",
+        opacity: edge.on ? 0.85 : props.view.nodes.length > 90 ? 0.14 : 0.34,
+        width: edge.on ? 2.2 : 1,
+      },
+      classes: edge.on ? "on" : "",
+    })) satisfies cytoscape.ElementDefinition[]
+
+    const cy = cytoscape({
+      container: root,
+      elements: [...nodes, ...edges],
+      autoungrabify: false,
+      boxSelectionEnabled: false,
+      maxZoom: 4,
+      minZoom: 0.08,
+      wheelSensitivity: 0.18,
+      style: [
+        {
+          selector: "core",
+          style: {
+            "active-bg-color": "#1f2937",
+            "active-bg-opacity": 0.28,
+            "selection-box-color": "#34d399",
+            "selection-box-opacity": 0.12,
+          },
+        },
+        {
+          selector: "node",
+          style: {
+            "background-color": "data(fill)",
+            "border-color": "data(border)",
+            "border-width": 1.4,
+            color: "#d1d5db",
+            content: "data(label)",
+            "font-family": "Inter, ui-sans-serif, system-ui",
+            "font-size": 10,
+            height: "data(size)",
+            "min-zoomed-font-size": 7,
+            opacity: "data(dim)",
+            "overlay-color": "#34d399",
+            "overlay-opacity": 0,
+            "text-background-color": "#111827",
+            "text-background-opacity": 0.72,
+            "text-background-padding": 2,
+            "text-margin-y": 8,
+            "text-outline-color": "#111827",
+            "text-outline-width": 1.5,
+            width: "data(size)",
+          },
+        },
+        {
+          selector: "node[dim]",
+          style: {
+            opacity: 0.62,
+          },
+        },
+        {
+          selector: "node.act",
+          style: {
+            "border-width": 3,
+            "font-size": 12,
+            height: 42,
+            opacity: 1,
+            "text-background-opacity": 0.9,
+            width: 42,
+            "z-index": 20,
+          },
+        },
+        {
+          selector: "node.hit",
+          style: {
+            "border-width": 2.4,
+            opacity: 1,
+            "z-index": 15,
+          },
+        },
+        {
+          selector: "edge",
+          style: {
+            "curve-style": "bezier",
+            "line-color": "data(color)",
+            opacity: "data(opacity)",
+            "target-arrow-color": "data(color)",
+            "target-arrow-shape": "triangle",
+            "target-arrow-width": 4,
+            width: "data(width)",
+          },
+        },
+        {
+          selector: "edge.on",
+          style: {
+            "z-index": 10,
+          },
+        },
+      ],
+      layout: {
+        name: "cose",
+        animate: false,
+        componentSpacing: 78,
+        edgeElasticity: 110,
+        fit: true,
+        gravity: 0.34,
+        idealEdgeLength: 86,
+        nestingFactor: 1.15,
+        nodeOverlap: 18,
+        nodeRepulsion: 7000,
+        numIter: props.view.nodes.length > 90 ? 620 : 900,
+        padding: 34,
+        randomize: true,
+      },
+    })
+
+    cy.on("tap", "node", (event) => {
+      props.pick(event.target.id())
+    })
+    cy.on("mouseover", "node", () => {
+      root.style.cursor = "pointer"
+    })
+    cy.on("mouseout", "node", () => {
+      root.style.cursor = "default"
+    })
+
+    const resize = new ResizeObserver(() => {
+      cy.resize()
+      cy.fit(undefined, 34)
+    })
+    resize.observe(root)
+
+    onCleanup(() => {
+      resize.disconnect()
+      cy.destroy()
+    })
+  })
+
+  return <div ref={el} class={props.full ? "h-full w-full" : "h-[72vh] w-full"} role="img" aria-label="Code graph" />
+}
+
+function short(text: string) {
+  if (text.length <= 18) return text
+  return `${text.slice(0, 17)}...`
+}
+
+function Icon(props: { path: string }) {
+  return (
+    <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path d={props.path} stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" />
+    </svg>
   )
 }
 

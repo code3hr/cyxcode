@@ -88,7 +88,11 @@ export namespace Database {
     db.run("PRAGMA busy_timeout = 5000")
     db.run("PRAGMA cache_size = -64000")
     db.run("PRAGMA foreign_keys = ON")
-    db.run("PRAGMA wal_checkpoint(PASSIVE)")
+    try {
+      db.run("PRAGMA wal_checkpoint(PASSIVE)")
+    } catch (err) {
+      log.warn("wal checkpoint skipped", { error: err instanceof Error ? err.message : String(err) })
+    }
 
     // Apply schema migrations
     const entries =
