@@ -144,6 +144,37 @@ describe("Wiki", () => {
     expect(out).toEqual([])
   })
 
+  test("encrypts protected wiki bodies at rest", async () => {
+    const page = await Wiki.create({
+      title: "Sensitive Notes",
+      body: "wiki protected body",
+      tags: ["wiki"],
+    })
+    const idx = await Wiki.readIndex()
+    await Wiki.writeIndex({
+      version: 1,
+      pages: idx.pages.map((item) => item.id === page.id ? { ...item, privacy: "sensitive" } : item),
+    })
+
+    const raw = await fs.readFile(Wiki.file(page), "utf-8")
+    expect(raw).toContain("cyxmem:v1.")
+    expect(raw).not.toContain("wiki protected body")
+
+    const out = await Wiki.relevant([
+      {
+        info: { role: "user" },
+        parts: [{ type: "text", text: "sensitive notes", synthetic: false }],
+      },
+    ] as Parameters<typeof Wiki.relevant>[0])
+    expect(out.join("\n")).toContain("wiki protected body")
+
+    await Wiki.writeIndex({
+      version: 1,
+      pages: (await Wiki.readIndex()).pages.map((item) => item.id === page.id ? { ...item, privacy: "private" } : item),
+    })
+    expect(await fs.readFile(Wiki.file(page), "utf-8")).toContain("wiki protected body")
+  })
+
   test("upsert updates an existing note by title", async () => {
     const first = await Wiki.upsert({
       title: "Rolling Note",

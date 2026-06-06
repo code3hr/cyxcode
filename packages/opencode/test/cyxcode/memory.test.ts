@@ -2,9 +2,11 @@ import { describe, expect, test, beforeEach, afterEach } from "bun:test"
 import fs from "fs/promises"
 import os from "os"
 import path from "path"
+import { setTimeout as sleep } from "node:timers/promises"
 import { Memory, type MemoryEntry, type MemoryIndex } from "../../src/cyxcode/memory"
 import { CyxPaths } from "../../src/cyxcode/paths"
 import { MemoryRoutes } from "../../src/server/routes/memory"
+import { CyxWatch } from "../../src/cyxcode/watch"
 
 /**
  * Memory System Tests
@@ -325,6 +327,8 @@ describe("Memory controls", () => {
   })
 
   afterEach(async () => {
+    await sleep(250)
+    CyxWatch.close()
     process.chdir(cwd)
     CyxPaths.invalidateCache()
     await fs.rm(dir, { recursive: true, force: true })
@@ -351,6 +355,19 @@ describe("Memory controls", () => {
 
     const next = await Memory.update("token-note", { privacy: "public" })
     expect(next?.privacy).toBe("never_send")
+  })
+
+  test("encrypts protected memory files at rest", async () => {
+    await Memory.save("secure-note", ["docs"], "Secure memory", "plain secret body")
+    await Memory.update("secure-note", { privacy: "sensitive" })
+
+    const raw = await fs.readFile(path.join(Memory.getBasePath(), "secure-note.md"), "utf-8")
+    expect(raw).toStartWith("cyxmem:v1.")
+    expect(raw).not.toContain("plain secret body")
+    expect((await Memory.get("secure-note"))?.content).toBe("plain secret body")
+
+    await Memory.update("secure-note", { privacy: "private" })
+    expect(await fs.readFile(path.join(Memory.getBasePath(), "secure-note.md"), "utf-8")).toBe("plain secret body")
   })
 
   test("applies memory privacy presets conservatively", async () => {

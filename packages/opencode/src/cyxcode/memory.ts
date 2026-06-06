@@ -20,6 +20,7 @@ import { Codegraph } from "./codegraph"
 import { Wiki } from "./wiki"
 import { CyxWatch } from "./watch"
 import { MemoryPrivacy, type MemoryApproval, type Privacy } from "./memory/privacy"
+import { MemoryCrypto } from "./memory/crypto"
 
 const log = Log.create({ service: "cyxcode-memory" })
 
@@ -117,6 +118,23 @@ function approval(source: string, dir: string, entries: MemoryEntry[]): MemoryAp
   }
 }
 
+async function readContent(file: string): Promise<string> {
+  return await MemoryCrypto.open(await fs.readFile(file, "utf-8"))
+}
+
+async function storeContent(file: string, content: string, privacy?: Privacy): Promise<void> {
+  await fs.writeFile(file, await MemoryCrypto.store(content, privacy))
+}
+
+async function syncContent(dir: string, entries: MemoryEntry[]): Promise<void> {
+  await Promise.all(entries.map(async (entry) => {
+    const file = path.join(dir, entry.file)
+    const text = await fs.readFile(file, "utf-8").catch(() => undefined)
+    if (text === undefined) return
+    await storeContent(file, text, norm(entry).privacy)
+  }))
+}
+
 // --- File path resolution (centralized in CyxPaths) ---
 
 function basePath(): string {
@@ -157,6 +175,7 @@ export namespace Memory {
     const idx = await readIndex()
     const entries = idx.entries.map((entry) => preset(entry, id))
     const updated = entries.filter((entry, i) => entry.privacy !== norm(idx.entries[i]!).privacy).length
+    await syncContent(basePath(), entries)
     await writeIndex({ version: 1, entries })
     return {
       preset: presets().find((item) => item.id === id)!,
@@ -208,7 +227,7 @@ export namespace Memory {
     if (existing) return
 
     const file = id + ".md"
-    const entry: MemoryEntry = {
+    const entry = norm({
       id,
       file,
       tags,
@@ -217,11 +236,11 @@ export namespace Memory {
       accessed: new Date().toISOString().slice(0, 10),
       accessCount: 0,
       privacy: "private",
-    }
+    })
 
     // Write memory file
     await fs.mkdir(dir, { recursive: true })
-    await fs.writeFile(path.join(dir, file), content)
+    await storeContent(path.join(dir, file), content, entry.privacy)
 
     data.entries.push(entry)
 
@@ -278,7 +297,7 @@ export namespace Memory {
     for (const entry of safe(entries, "memory:project")) {
       if (total >= MAX_LOAD_CHARS) break
       try {
-        const content = await fs.readFile(path.join(basePath(), entry.file), "utf-8")
+        const content = await readContent(path.join(basePath(), entry.file))
         const trimmed = content.trim()
         if (total + trimmed.length > MAX_LOAD_CHARS) {
           parts.push(trimmed.slice(0, MAX_LOAD_CHARS - total))
@@ -302,7 +321,7 @@ export namespace Memory {
     const idx = await readIndex()
     const entry = idx.entries.find((item) => item.id === id)
     if (!entry) return undefined
-    const content = await fs.readFile(path.join(basePath(), entry.file), "utf-8").catch(() => "")
+    const content = await readContent(path.join(basePath(), entry.file)).catch(() => "")
     return { entry, content }
   }
 
@@ -318,6 +337,7 @@ export namespace Memory {
       summary: input.summary ?? entry.summary,
     }
     idx.entries[pos] = next
+    await syncContent(basePath(), [next])
     await writeIndex(idx)
     void CyxWatch.memory({
       action: "write",
@@ -361,7 +381,7 @@ export namespace Memory {
     for (const entry of safe(entries, dir === basePath() ? "memory:project" : "memory:global")) {
       if (total >= MAX_LOAD_CHARS) break
       try {
-        const content = await fs.readFile(path.join(dir, entry.file), "utf-8")
+        const content = await readContent(path.join(dir, entry.file))
         const trimmed = content.trim()
         if (total + trimmed.length > MAX_LOAD_CHARS) {
           parts.push(trimmed.slice(0, MAX_LOAD_CHARS - total))

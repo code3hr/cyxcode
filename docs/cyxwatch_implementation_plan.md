@@ -55,8 +55,8 @@ Known gaps:
 - Streaming assistant deltas can still briefly surface before final persisted
   assistant text is redacted.
 - Persistent memory, recall, wiki, skills, and agent profile files now emit
-  first-pass access/send telemetry, but they are not yet classified, minimized,
-  permissioned, or encrypted as a dedicated memory firewall.
+  first-pass access/send telemetry, with project memory and wiki notes covered
+  by the first dedicated memory firewall controls.
 
 ## Design Goals
 
@@ -478,6 +478,8 @@ Current shipped pieces:
 - memory and wiki note writes emit `memory.write` telemetry
 - sensitive memory and wiki relevance can trigger the existing session
   permission prompt before context is loaded
+- sensitive and `never_send` project memory and wiki note bodies are encrypted
+  at rest with AES-256-GCM using a project-local key
 - project memory read/retrieve/send telemetry
 - wiki read/retrieve/send telemetry
 - recall query embed and similarity retrieval telemetry
@@ -488,7 +490,7 @@ Current shipped pieces:
 
 Remaining tasks:
 
-- encrypt sensitive memory at rest
+- none for the current Memory Firewall roadmap slice
 
 Exit criteria:
 

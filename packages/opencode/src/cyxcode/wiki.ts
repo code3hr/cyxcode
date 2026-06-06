@@ -10,6 +10,7 @@ import { CyxWatch } from "./watch"
 import { embedBatch, isDisabled } from "./recall/embedder"
 import { upsertVector, bumpAccessBySourceId } from "./recall/db"
 import { MemoryPrivacy, type MemoryApproval, type Privacy } from "./memory/privacy"
+import { MemoryCrypto } from "./memory/crypto"
 import type { MessageV2 } from "@/session/message-v2"
 
 const log = Log.create({ service: "cyxcode-wiki" })
@@ -121,14 +122,16 @@ async function note(title: string): Promise<string> {
   return file
 }
 
-function render(opts: WikiCreate) {
-  return matter.stringify(
-    [`# ${opts.title}`, opts.body?.trim() || ""].filter(Boolean).join("\n\n"),
-    {
-      title: opts.title,
-      tags: opts.tags ?? [],
-    },
-  )
+async function renderStore(opts: WikiCreate, privacy?: Privacy) {
+  const body = [`# ${opts.title}`, opts.body?.trim() || ""].filter(Boolean).join("\n\n")
+  return matter.stringify(await MemoryCrypto.store(body, privacy), {
+    title: opts.title,
+    tags: opts.tags ?? [],
+  })
+}
+
+async function plain(text: string) {
+  return await MemoryCrypto.open(text)
 }
 
 function strip(text: string): string {
@@ -323,7 +326,7 @@ async function read(file: string, prev?: WikiPage): Promise<WikiPage | null> {
   const md = await ConfigMarkdown.parse(file).catch(() => undefined)
   if (!md) return null
 
-  const text = md.content.trim()
+  const text = (await plain(md.content)).trim()
   const id = rootId(file)
   const rel = path.relative(CyxPaths.projectRoot(), file).replaceAll("\\", "/")
   const p = rel.startsWith(".cyxcode/") ? rel.slice(".cyxcode/".length) : rel.startsWith(".opencode/") ? rel.slice(".opencode/".length) : rel
@@ -349,12 +352,25 @@ async function read(file: string, prev?: WikiPage): Promise<WikiPage | null> {
 }
 
 async function write(idx: WikiIndex): Promise<void> {
+  await sync(idx)
   await syncLock(
     writeLock.then(async () => {
       await fs.mkdir(base(), { recursive: true })
       await fs.writeFile(indexPath(), JSON.stringify(idx, null, 2))
     }).catch((err) => log.warn("Failed to write wiki index", { error: err })),
   )
+}
+
+async function sync(idx: WikiIndex): Promise<void> {
+  await Promise.all(idx.pages.filter((page) => page.kind === "wiki").map(async (page) => {
+    const file = full(page)
+    const md = await ConfigMarkdown.parse(file).catch(() => undefined)
+    if (!md) return
+    const text = await plain(md.content)
+    const title = typeof md.data.title === "string" ? md.data.title : page.title
+    const tags = Array.isArray(md.data.tags) ? md.data.tags.filter((tag): tag is string => typeof tag === "string") : page.tags
+    await fs.writeFile(file, await renderStore({ title, body: strip(text), tags }, MemoryPrivacy.classify(page)))
+  }))
 }
 
 export namespace Wiki {
@@ -545,7 +561,10 @@ export namespace Wiki {
     const now = Date.now()
 
     for (const page of allowed.slice(0, MAX_CTX)) {
-      const text = await fs.readFile(full(page), "utf-8").catch(() => "")
+      const text = await fs.readFile(full(page), "utf-8").then(async (raw) => {
+        const md = matter(raw)
+        return matter.stringify(await plain(md.content), md.data)
+      }).catch(() => "")
       const body = text.trim().slice(0, MAX_TEXT)
       if (!body) continue
       void CyxWatch.memory({
@@ -603,7 +622,7 @@ export namespace Wiki {
 
   export async function create(opts: WikiCreate): Promise<WikiPage> {
     const file = await note(opts.title)
-    const text = render(opts)
+    const text = await renderStore(opts)
     await fs.writeFile(file, text)
     void CyxWatch.memory({
       action: "write",
@@ -638,7 +657,7 @@ export namespace Wiki {
     }
 
     const file = full(page)
-    const text = render(opts)
+    const text = await renderStore(opts, page.privacy)
     await fs.writeFile(file, text)
     void CyxWatch.memory({
       action: "write",
@@ -664,12 +683,12 @@ export namespace Wiki {
 
     const file = full(page)
     const md = await ConfigMarkdown.parse(file).catch(() => undefined)
-    const body = strip(md?.content ?? "")
+    const body = strip(await plain(md?.content ?? ""))
     const tags = Array.isArray(md?.data?.tags)
       ? md?.data?.tags.filter((tag): tag is string => typeof tag === "string")
       : page.tags
 
-    const text = render({ title, body, tags })
+    const text = await renderStore({ title, body, tags }, page.privacy)
     await fs.writeFile(file, text)
     void CyxWatch.memory({
       action: "write",

@@ -370,13 +370,13 @@ Minimum dashboard views:
 
 ### Phase M4: Approval Bridge
 
-- add memory permission prompts
+- memory permission prompts - shipped for sensitive memory/wiki relevance
 - support allow once, allow session, deny
 - fail closed in headless mode for sensitive memory
 
 ### Phase M5: Encrypted Vault
 
-- encrypt sensitive memory at rest
+- encrypt sensitive memory at rest - shipped for project memory and wiki bodies
 - store keys locally using OS secure storage
 - add optional passphrase mode
 - document recovery and key rotation
@@ -402,4 +402,3 @@ The safest architecture is:
 
 > local memory first, encrypted at rest, minimized before disclosure, permissioned
 > before use, and audited after every access.
-
