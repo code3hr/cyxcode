@@ -58,6 +58,9 @@ const Security: Component = () => {
   const [cmd, setCmd] = createSignal("")
   const [method, setMethod] = createSignal("")
   const [bytesGt, setBytesGt] = createSignal("")
+  const [bytesGte, setBytesGte] = createSignal("")
+  const [bytesLt, setBytesLt] = createSignal("")
+  const [bytesLte, setBytesLte] = createSignal("")
   const [risk, setRisk] = createSignal("")
   const [flags, setFlags] = createSignal("")
   const [decision, setDecision] = createSignal<Rule["decision"]>("warn")
@@ -129,6 +132,9 @@ const Security: Component = () => {
     setCmd("")
     setMethod("")
     setBytesGt("")
+    setBytesGte("")
+    setBytesLt("")
+    setBytesLte("")
     setRisk("")
     setFlags("")
     setDecision("warn")
@@ -146,6 +152,9 @@ const Security: Component = () => {
     setCmd(join(rule.cmd))
     setMethod(join(rule.method))
     setBytesGt(rule.bytes_gt === undefined ? "" : String(rule.bytes_gt))
+    setBytesGte(rule.bytes_gte === undefined ? "" : String(rule.bytes_gte))
+    setBytesLt(rule.bytes_lt === undefined ? "" : String(rule.bytes_lt))
+    setBytesLte(rule.bytes_lte === undefined ? "" : String(rule.bytes_lte))
     setRisk(rule.risk === undefined ? "" : String(rule.risk))
     setFlags(join(rule.flags))
     setDecision(rule.decision)
@@ -165,6 +174,9 @@ const Security: Component = () => {
     if (split(cmd()).length > 0) out.cmd = split(cmd())
     if (split(method()).length > 0) out.method = split(method())
     if (num(bytesGt()) !== undefined) out.bytes_gt = num(bytesGt())
+    if (num(bytesGte()) !== undefined) out.bytes_gte = num(bytesGte())
+    if (num(bytesLt()) !== undefined) out.bytes_lt = num(bytesLt())
+    if (num(bytesLte()) !== undefined) out.bytes_lte = num(bytesLte())
     if (num(risk()) !== undefined) out.risk = num(risk())
     if (split(flags()).length > 0) out.flags = split(flags())
     return out
@@ -456,6 +468,18 @@ const Security: Component = () => {
               <label class="space-y-1">
                 <div class="text-xs text-gray-500">Bytes greater than</div>
                 <input class="input w-full" value={bytesGt()} onInput={(e) => setBytesGt(e.currentTarget.value)} inputmode="numeric" />
+              </label>
+              <label class="space-y-1">
+                <div class="text-xs text-gray-500">Bytes at least</div>
+                <input class="input w-full" value={bytesGte()} onInput={(e) => setBytesGte(e.currentTarget.value)} inputmode="numeric" />
+              </label>
+              <label class="space-y-1">
+                <div class="text-xs text-gray-500">Bytes less than</div>
+                <input class="input w-full" value={bytesLt()} onInput={(e) => setBytesLt(e.currentTarget.value)} inputmode="numeric" />
+              </label>
+              <label class="space-y-1">
+                <div class="text-xs text-gray-500">Bytes at most</div>
+                <input class="input w-full" value={bytesLte()} onInput={(e) => setBytesLte(e.currentTarget.value)} inputmode="numeric" />
               </label>
               <label class="space-y-1">
                 <div class="text-xs text-gray-500">Risk</div>
