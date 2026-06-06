@@ -343,6 +343,21 @@ describe("Memory controls", () => {
     expect(idx.entries.find((entry) => entry.id === "control")?.privacy).toBe("never_send")
   })
 
+  test("applies memory privacy presets conservatively", async () => {
+    await Memory.save("auth-note", ["auth"], "Auth memory", "jwt middleware")
+    await Memory.save("readme-note", ["docs"], "Readme memory", "project readme")
+    await Memory.update("readme-note", { privacy: "never_send" })
+
+    const balanced = await Memory.applyPreset("balanced")
+    expect(balanced?.updated).toBe(1)
+    expect(balanced?.entries.find((entry) => entry.id === "auth-note")?.privacy).toBe("sensitive")
+    expect(balanced?.entries.find((entry) => entry.id === "readme-note")?.privacy).toBe("never_send")
+
+    const open = await Memory.applyPreset("public")
+    expect(open?.entries.find((entry) => entry.id === "auth-note")?.privacy).toBe("sensitive")
+    expect(open?.entries.find((entry) => entry.id === "readme-note")?.privacy).toBe("never_send")
+  })
+
   test("deletes memory index entry and backing file", async () => {
     await Memory.save("remove-me", ["cleanup"], "Remove memory", "delete this")
     const saved = await Memory.get("remove-me")
@@ -368,6 +383,18 @@ describe("Memory controls", () => {
     })
     expect(patch.status).toBe(200)
     expect((await patch.json()).entry.privacy).toBe("sensitive")
+
+    const presets = await app.request("/presets")
+    expect(presets.status).toBe(200)
+    expect((await presets.json()).presets.map((item: { id: string }) => item.id)).toContain("balanced")
+
+    const preset = await app.request("/preset", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id: "strict" }),
+    })
+    expect(preset.status).toBe(200)
+    expect((await preset.json()).entries[0].privacy).toBe("sensitive")
 
     const del = await app.request("/page?id=route-memory", { method: "DELETE" })
     expect(del.status).toBe(200)

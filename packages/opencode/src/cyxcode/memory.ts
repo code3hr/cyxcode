@@ -27,6 +27,21 @@ const MAX_LOAD_CHARS = 2000
 const PRUNE_DAYS = 30
 const PRUNE_MIN_ACCESS = 3
 const classes = new Set(["public", "private", "sensitive", "never_send"])
+const presetIDs = ["balanced", "strict", "public"] as const
+const terms = [
+  "auth",
+  "bearer",
+  "client",
+  "credential",
+  "jwt",
+  "key",
+  "oauth",
+  "password",
+  "private",
+  "secret",
+  "security",
+  "token",
+]
 
 // --- Types ---
 
@@ -44,6 +59,12 @@ export type MemoryEntry = {
 export type MemoryIndex = {
   version: 1
   entries: MemoryEntry[]
+}
+
+export type MemoryPreset = {
+  id: (typeof presetIDs)[number]
+  name: string
+  description: string
 }
 
 function norm(entry: MemoryEntry): MemoryEntry {
@@ -66,6 +87,24 @@ function safe(entries: MemoryEntry[], source: string): MemoryEntry[] {
   return entries.map(norm).filter((entry) => entry.privacy !== "never_send")
 }
 
+function risky(entry: MemoryEntry): boolean {
+  const text = `${entry.id} ${entry.file} ${entry.summary} ${entry.tags.join(" ")}`.toLowerCase()
+  return terms.some((term) => text.includes(term))
+}
+
+function preset(entry: MemoryEntry, id: MemoryPreset["id"]): MemoryEntry {
+  const item = norm(entry)
+  if (item.privacy === "never_send") return item
+  if (id === "strict") {
+    return { ...item, privacy: risky(item) ? "never_send" : "sensitive" }
+  }
+  if (id === "public") {
+    if (item.privacy === "sensitive") return item
+    return { ...item, privacy: "public" }
+  }
+  return { ...item, privacy: risky(item) ? "sensitive" : "private" }
+}
+
 // --- File path resolution (centralized in CyxPaths) ---
 
 function basePath(): string {
@@ -81,6 +120,39 @@ function indexPath(): string {
 let writeLock: Promise<void> = Promise.resolve()
 
 export namespace Memory {
+  export function presets(): MemoryPreset[] {
+    return [
+      {
+        id: "balanced",
+        name: "Balanced",
+        description: "Private by default; auth, secret, token, client, and security memories become sensitive.",
+      },
+      {
+        id: "strict",
+        name: "Strict",
+        description: "Sensitive by default; auth, secret, token, client, and security memories become never_send.",
+      },
+      {
+        id: "public",
+        name: "Public",
+        description: "Marks ordinary memories public while preserving sensitive and never_send entries.",
+      },
+    ]
+  }
+
+  export async function applyPreset(id: MemoryPreset["id"]) {
+    if (!presetIDs.includes(id)) return undefined
+    const idx = await readIndex()
+    const entries = idx.entries.map((entry) => preset(entry, id))
+    const updated = entries.filter((entry, i) => entry.privacy !== norm(idx.entries[i]!).privacy).length
+    await writeIndex({ version: 1, entries })
+    return {
+      preset: presets().find((item) => item.id === id)!,
+      updated,
+      entries,
+    }
+  }
+
   export async function readIndex(): Promise<MemoryIndex> {
     try {
       const content = await fs.readFile(indexPath(), "utf-8")

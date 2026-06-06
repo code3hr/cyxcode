@@ -666,6 +666,12 @@ export interface MemoryList {
   total: number
 }
 
+export interface MemoryPreset {
+  id: "balanced" | "strict" | "public"
+  name: string
+  description: string
+}
+
 export const memoryApi = {
   list: (opts?: { search?: string; limit?: number }) => {
     const params = new URLSearchParams()
@@ -678,6 +684,14 @@ export const memoryApi = {
   get: (id: string) => request<{ entry: MemoryEntry; content: string }>(`/experimental/memory/page?id=${encodeURIComponent(id)}`),
 
   export: (id: string) => request<{ entry: MemoryEntry; content: string }>(`/experimental/memory/export?id=${encodeURIComponent(id)}`),
+
+  presets: () => request<{ presets: MemoryPreset[] }>(`/experimental/memory/presets`),
+
+  applyPreset: (id: MemoryPreset["id"]) =>
+    request<{ preset: MemoryPreset; updated: number; entries: MemoryEntry[] }>(`/experimental/memory/preset`, {
+      method: "POST",
+      body: JSON.stringify({ id }),
+    }),
 
   update: (id: string, data: Partial<Pick<MemoryEntry, "privacy" | "tags" | "summary">>) =>
     request<{ entry: MemoryEntry }>(`/experimental/memory/page?id=${encodeURIComponent(id)}`, {

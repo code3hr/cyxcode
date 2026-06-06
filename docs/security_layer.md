@@ -527,6 +527,8 @@ What is done:
   secrets before prompt construction and records `memory.redact` telemetry.
 - `/cyxwatch/context` supports session, source, provider, and model filters for
   provider-bound memory disclosure review.
+- `/dashboard/memory` exposes Memory Firewall policy presets for balanced,
+  strict, and public privacy postures.
 - CyxWatch avoids startup import cycles by lazy-loading `Log` and `Instance`.
 
 Verified:
@@ -536,7 +538,6 @@ Verified:
 
 Next time:
 
-- Add Memory Firewall policy presets.
 - Add structured minimizer summaries for provider-bound memory context.
 - Decide where output redaction lives in the response pipeline and how users can override false positives.
 - Add saved graph query shortcuts for common incident investigations.

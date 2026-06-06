@@ -6,6 +6,7 @@ import { lazy } from "../../util/lazy"
 import { errors } from "../error"
 
 const privacy = z.enum(["public", "private", "sensitive", "never_send"])
+const preset = z.enum(["balanced", "strict", "public"])
 
 const item = z.object({
   id: z.string(),
@@ -16,6 +17,12 @@ const item = z.object({
   accessed: z.string(),
   accessCount: z.number(),
   privacy: privacy.optional(),
+})
+
+const presetItem = z.object({
+  id: preset,
+  name: z.string(),
+  description: z.string(),
 })
 
 export const MemoryRoutes = lazy(() =>
@@ -65,6 +72,61 @@ export const MemoryRoutes = lazy(() =>
           )
         })
         return c.json({ entries: entries.slice(0, query.limit ?? 50), total: entries.length })
+      },
+    )
+    .get(
+      "/presets",
+      describeRoute({
+        summary: "List memory policy presets",
+        description: "List built-in Memory Firewall privacy presets.",
+        operationId: "memory.presets",
+        responses: {
+          200: {
+            description: "Memory policy presets",
+            content: {
+              "application/json": {
+                schema: resolver(z.object({ presets: z.array(presetItem) })),
+              },
+            },
+          },
+        },
+      }),
+      async (c) => c.json({ presets: Memory.presets() }),
+    )
+    .post(
+      "/preset",
+      describeRoute({
+        summary: "Apply memory policy preset",
+        description: "Apply a built-in Memory Firewall privacy preset to project memory entries.",
+        operationId: "memory.applyPreset",
+        responses: {
+          200: {
+            description: "Memory policy preset result",
+            content: {
+              "application/json": {
+                schema: resolver(
+                  z.object({
+                    preset: presetItem,
+                    updated: z.number(),
+                    entries: z.array(item),
+                  }),
+                ),
+              },
+            },
+          },
+          ...errors(404),
+        },
+      }),
+      validator(
+        "json",
+        z.object({
+          id: preset,
+        }),
+      ),
+      async (c) => {
+        const out = await Memory.applyPreset(c.req.valid("json").id)
+        if (!out) return c.json({ error: "Memory preset not found" }, 404)
+        return c.json(out)
       },
     )
     .get(

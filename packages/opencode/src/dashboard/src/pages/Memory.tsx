@@ -1,6 +1,6 @@
-import { Component, For, Show, createEffect, createSignal, onCleanup } from "solid-js"
+import { Component, For, Show, createEffect, createSignal, onCleanup, onMount } from "solid-js"
 import { useSearchParams, A } from "@solidjs/router"
-import { memoryApi, type MemoryEntry } from "../api/client"
+import { memoryApi, type MemoryEntry, type MemoryPreset } from "../api/client"
 
 const classes: Array<NonNullable<MemoryEntry["privacy"]>> = ["public", "private", "sensitive", "never_send"]
 
@@ -11,6 +11,8 @@ const Memory: Component = () => {
   const [cur, setCur] = createSignal<MemoryEntry | null>(null)
   const [text, setText] = createSignal("")
   const [privacy, setPrivacy] = createSignal<NonNullable<MemoryEntry["privacy"]>>("private")
+  const [presets, setPresets] = createSignal<MemoryPreset[]>([])
+  const [preset, setPreset] = createSignal<MemoryPreset["id"]>("balanced")
   const [load, setLoad] = createSignal(true)
   const [busy, setBusy] = createSignal(false)
   const [err, setErr] = createSignal<string | null>(null)
@@ -27,6 +29,11 @@ const Memory: Component = () => {
     }
     if (res.data) setItems(res.data.entries)
     setLoad(false)
+  }
+
+  const fetchPresets = async () => {
+    const res = await memoryApi.presets()
+    if (res.data) setPresets(res.data.presets)
   }
 
   const fetchPage = async (id: string) => {
@@ -48,6 +55,8 @@ const Memory: Component = () => {
     const timer = window.setTimeout(() => void fetchList(q), 180)
     onCleanup(() => window.clearTimeout(timer))
   })
+
+  onMount(() => void fetchPresets())
 
   createEffect(() => {
     const id = search.id || items()[0]?.id || ""
@@ -79,6 +88,25 @@ const Memory: Component = () => {
       setCur(res.data.entry)
       setItems(items().map((entry) => entry.id === res.data!.entry.id ? res.data!.entry : entry))
       setMsg("Memory updated")
+    }
+    setBusy(false)
+  }
+
+  const apply = async () => {
+    setBusy(true)
+    setErr(null)
+    setMsg(null)
+    const res = await memoryApi.applyPreset(preset())
+    if (res.error) setErr(res.error)
+    if (res.data) {
+      setItems(res.data.entries)
+      const item = cur()
+      const next = item ? res.data.entries.find((entry) => entry.id === item.id) : undefined
+      if (next) {
+        setCur(next)
+        setPrivacy(next.privacy ?? "private")
+      }
+      setMsg(`${res.data.preset.name} preset updated ${res.data.updated} memories`)
     }
     setBusy(false)
   }
@@ -130,6 +158,18 @@ const Memory: Component = () => {
         </div>
 
         <div class="flex flex-wrap gap-3">
+          <div class="px-4 py-3 rounded-lg bg-gray-800 border border-gray-700 min-w-72">
+            <div class="text-xs uppercase tracking-wide text-gray-500 mb-2">Policy preset</div>
+            <div class="flex flex-wrap gap-2">
+              <select class="select text-sm" value={preset()} onChange={(e) => setPreset(e.currentTarget.value as MemoryPreset["id"])}>
+                <For each={presets()}>{(item) => <option value={item.id}>{item.name}</option>}</For>
+              </select>
+              <button class="btn btn-primary text-sm" onClick={apply} disabled={busy() || presets().length === 0}>
+                Apply
+              </button>
+            </div>
+            <div class="mt-2 text-xs text-gray-500">{presets().find((item) => item.id === preset())?.description ?? ""}</div>
+          </div>
           <div class="px-4 py-3 rounded-lg bg-gray-800 border border-gray-700">
             <div class="text-xs uppercase tracking-wide text-gray-500">Entries</div>
             <div class="text-lg font-semibold text-gray-100">{items().length}</div>
