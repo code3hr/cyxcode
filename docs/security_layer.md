@@ -523,6 +523,8 @@ What is done:
 - `LLM.stream` records memory/wiki context present at model-provider call
   boundaries as `memory.send` events with `provider:<provider>:<model>`
   sources.
+- Provider-bound memory/wiki context is locally redacted for high-confidence
+  secrets before prompt construction and records `memory.redact` telemetry.
 - CyxWatch avoids startup import cycles by lazy-loading `Log` and `Instance`.
 
 Verified:
@@ -533,7 +535,7 @@ Verified:
 Next time:
 
 - Add Memory Firewall policy presets and provider boundary filters.
-- Add minimization telemetry for provider-bound memory context.
+- Add structured minimizer summaries for provider-bound memory context.
 - Decide where output redaction lives in the response pipeline and how users can override false positives.
 - Add saved graph query shortcuts for common incident investigations.
 - Decide whether `require-approval` should ever be handled below the tool layer, or remain only in the permission UI path.

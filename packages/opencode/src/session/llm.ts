@@ -24,6 +24,7 @@ import { Flag } from "@/flag/flag"
 import { Permission } from "@/permission"
 import { Auth } from "@/auth"
 import { CyxWatch } from "@/cyxcode/watch"
+import { WatchSecret } from "@/cyxcode/watch/secret"
 
 export namespace LLM {
   const log = Log.create({ service: "llm" })
@@ -50,6 +51,20 @@ export namespace LLM {
     return system.filter((item) => /<(project-memory|global-memory|wiki-note)\b/.test(item))
   }
 
+  export function minimize(system: string[]) {
+    const rows = system.map((item) => {
+      if (!context([item]).length) return { text: item, scan: undefined }
+      const scan = WatchSecret.redact(item)
+      return { text: scan.content, scan }
+    })
+    return {
+      system: rows.map((item) => item.text),
+      redactions: [...new Set(rows.flatMap((item) => item.scan?.detectors ?? []))],
+      bytesIn: Buffer.byteLength(system.join("\n\n")),
+      bytesOut: Buffer.byteLength(rows.map((item) => item.text).join("\n\n")),
+    }
+  }
+
   export async function stream(input: StreamInput) {
     const l = log
       .clone()
@@ -72,13 +87,26 @@ export namespace LLM {
     // TODO: move this to a proper hook
     const isOpenaiOauth = provider.id === "openai" && auth?.type === "oauth"
 
+    const min = minimize(input.system)
+    if (min.redactions.length > 0) {
+      void CyxWatch.memory({
+        action: "redact",
+        source: `provider:${provider.id}:${input.model.id}`,
+        sessionID: input.sessionID,
+        messageID: input.user.id,
+        bytes: min.bytesIn,
+        count: min.redactions.length,
+        redactions: min.redactions,
+      }).catch(() => {})
+    }
+
     const system: string[] = []
     system.push(
       [
         // use agent prompt otherwise provider prompt
         ...(input.agent.prompt ? [input.agent.prompt] : SystemPrompt.provider(input.model)),
         // any custom prompt passed into this call
-        ...input.system,
+        ...min.system,
         // any custom prompt from last user message
         ...(input.user.system ? [input.user.system] : []),
       ]
@@ -133,7 +161,7 @@ export namespace LLM {
             ...input.messages,
           ]
 
-    const ctx = context(input.system)
+    const ctx = context(min.system)
     if (ctx.length > 0) {
       const text = ctx.join("\n\n")
       void CyxWatch.memory({

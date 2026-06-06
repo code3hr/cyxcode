@@ -465,6 +465,8 @@ Current shipped pieces:
   from `memory.send` events
 - `LLM.stream` records memory/wiki context present at provider-call boundaries
   as `memory.send` events with `provider:<provider>:<model>` sources
+- provider-bound memory/wiki context is locally redacted for high-confidence
+  secrets before prompt construction and records `memory.redact` telemetry
 - project memory read/retrieve/send telemetry
 - wiki read/retrieve/send telemetry
 - recall query embed and similarity retrieval telemetry
@@ -477,8 +479,8 @@ Remaining tasks:
 
 - default existing memory, wiki, and recall-derived records to `private`
 - add `never_send` path and tag patterns outside project/global memory indexes
-- expand memory event coverage to writes and minimization
-- add context minimizer before cloud model calls
+- expand memory event coverage to writes
+- add structured context minimizer summaries before cloud model calls
 - add memory approval prompts
 - encrypt sensitive memory at rest
 - add Memory Firewall policy presets and provider boundary filters

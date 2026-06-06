@@ -116,6 +116,19 @@ describe("session.llm.context", () => {
     expect(out.join("\n")).toContain("wiki detail")
     expect(out.join("\n")).not.toContain("code detail")
   })
+
+  test("minimizes secrets only in memory context sections", () => {
+    const out = LLM.minimize([
+      "plain system AKIA1234567890ABCDEF",
+      "<project-memory>\nkey AKIA1234567890ABCDEF\n</project-memory>",
+    ])
+
+    expect(out.system[0]).toContain("AKIA1234567890ABCDEF")
+    expect(out.system[1]).toContain("[REDACTED:aws_access_key:1]")
+    expect(out.system[1]).not.toContain("AKIA1234567890ABCDEF")
+    expect(out.redactions).toEqual(["aws_access_key"])
+    expect(out.bytesOut).toBeGreaterThan(0)
+  })
 })
 
 type Capture = {
