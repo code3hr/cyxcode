@@ -509,6 +509,9 @@ What is done:
   `network.outbound` events with `recall_sidecar` and `internal_network` flags.
 - Provider SDK fetch calls are routed through the shared `Http.fetch` boundary
   by default, so model-provider traffic is visible to CyxWatch.
+- The unified graph includes CyxWatch event and alert nodes linked to sessions,
+  prompt turns, touched files, commands, hosts, and matching code/wiki graph
+  nodes.
 - CyxWatch avoids startup import cycles by lazy-loading `Log` and `Instance`.
 
 Verified:
@@ -521,7 +524,7 @@ Next time:
 - Add a Memory Firewall view for inspect, export, delete, and reclassify.
 - Add explicit cloud-model disclosure boundaries for memory events.
 - Decide where output redaction lives in the response pipeline and how users can override false positives.
-- Link security incidents into the graph so prompts, files, commands, and alerts are explorable together.
+- Add saved graph queries for sessions by path, host, flag, and decision.
 - Decide whether `require-approval` should ever be handled below the tool layer, or remain only in the permission UI path.
 
 ## Summary

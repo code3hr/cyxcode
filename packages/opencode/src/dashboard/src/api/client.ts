@@ -530,7 +530,7 @@ export interface WikiWrite {
 
 export interface GraphNode {
   id: string
-  kind: "wiki" | "code" | "symbol" | "memory" | "learned" | "concept"
+  kind: "wiki" | "code" | "symbol" | "memory" | "learned" | "concept" | "cyxwatch"
   title: string
   path?: string
   summary?: string
@@ -553,6 +553,7 @@ export interface GraphData {
     memory: number
     learned: number
     facts: number
+    cyxwatch: number
   }
 }
 

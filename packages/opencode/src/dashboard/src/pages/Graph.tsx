@@ -56,7 +56,7 @@ type Dot = Pos & {
 const max = 180
 const scan = max * 3
 const ticks = 70
-const kinds: GraphNode["kind"][] = ["wiki", "code", "symbol", "memory", "learned", "concept"]
+const kinds: GraphNode["kind"][] = ["wiki", "code", "symbol", "memory", "learned", "concept", "cyxwatch"]
 const base = kinds.filter((kind) => kind !== "symbol")
 
 const colors: Record<GraphNode["kind"], { fill: string; stroke: string; glow: string }> = {
@@ -66,6 +66,7 @@ const colors: Record<GraphNode["kind"], { fill: string; stroke: string; glow: st
   memory: { fill: "#92400e", stroke: "#fbbf24", glow: "rgba(146,64,14,0.16)" },
   learned: { fill: "#7c2d12", stroke: "#fb7185", glow: "rgba(124,45,18,0.16)" },
   concept: { fill: "#334155", stroke: "#64748b", glow: "rgba(51,65,85,0.16)" },
+  cyxwatch: { fill: "#991b1b", stroke: "#f87171", glow: "rgba(153,27,27,0.16)" },
 }
 
 function hash(text: string) {
@@ -268,7 +269,7 @@ function layout(data: GraphData, sel: string, q: string, allow: Set<GraphNode["k
 
 const Graph: Component = () => {
   const [search, setSearch] = useSearchParams()
-  const [data, setData] = createSignal<GraphData>({ nodes: [], edges: [], stats: { wiki: 0, code: 0, memory: 0, learned: 0, facts: 0 } })
+  const [data, setData] = createSignal<GraphData>({ nodes: [], edges: [], stats: { wiki: 0, code: 0, memory: 0, learned: 0, facts: 0, cyxwatch: 0 } })
   const [sel, setSel] = createSignal("")
   const [term, setTerm] = createSignal("")
   const [load, setLoad] = createSignal(true)
@@ -369,6 +370,7 @@ const Graph: Component = () => {
     if (node.kind === "wiki") return `/dashboard/wiki?id=${encodeURIComponent(node.id)}`
     if (node.kind === "memory") return `/dashboard/memory?id=${encodeURIComponent(node.id)}`
     if (node.kind === "code") return `/dashboard/codegraph?id=${encodeURIComponent(node.id)}`
+    if (node.kind === "cyxwatch") return "/dashboard/security"
     if (node.kind === "symbol") {
       const fileId = typeof node.meta?.fileId === "string" ? node.meta.fileId : ""
       return fileId ? `/dashboard/codegraph?id=${encodeURIComponent(fileId)}` : ""
@@ -381,7 +383,7 @@ const Graph: Component = () => {
       <div class="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
         <div>
           <h1 class="text-2xl font-bold text-gray-100">Knowledge Graph</h1>
-          <p class="text-gray-400 mt-1">Wiki, code, memory, learned patterns, and semantic links</p>
+          <p class="text-gray-400 mt-1">Wiki, code, memory, learned patterns, security signals, and semantic links</p>
         </div>
 
         <div class="flex flex-wrap gap-3">
@@ -400,6 +402,10 @@ const Graph: Component = () => {
           <div class="stat-card">
             <div class="text-xs uppercase tracking-wide text-gray-500">Facts</div>
             <div class="text-lg font-semibold text-gray-100">{data().stats.facts}</div>
+          </div>
+          <div class="stat-card">
+            <div class="text-xs uppercase tracking-wide text-gray-500">Watch</div>
+            <div class="text-lg font-semibold text-gray-100">{data().stats.cyxwatch}</div>
           </div>
           <button onClick={fetchGraph} class="btn btn-primary" disabled={load()}>
             Refresh
@@ -746,6 +752,8 @@ function kindClass(kind: GraphNode["kind"]) {
       return "bg-rose-900/40 text-rose-300"
     case "concept":
       return "bg-gray-700 text-gray-300"
+    case "cyxwatch":
+      return "bg-red-950/60 text-red-300"
   }
 }
 

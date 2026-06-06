@@ -6,6 +6,7 @@ import { Graph } from "../../src/cyxcode/graph"
 import { Wiki } from "../../src/cyxcode/wiki"
 import { Codegraph } from "../../src/cyxcode/codegraph"
 import { CyxPaths } from "../../src/cyxcode/paths"
+import { CyxWatch } from "../../src/cyxcode/watch"
 import { recordFact } from "../../src/cyxcode/recall/facts"
 import { close as closeDb, setDbPathOverride } from "../../src/cyxcode/recall/db"
 
@@ -23,12 +24,15 @@ describe("Graph", () => {
     process.chdir(dir)
     CyxPaths.invalidateCache()
     setDbPathOverride(path.join(dir, "recall.sqlite"))
+    CyxWatch.clear()
     stub = (globalThis as any).__cyxcode_recall_embedder_stub
     ;(globalThis as any).__cyxcode_recall_embedder_stub = async (texts: string[]) =>
       texts.map(() => Float32Array.from({ length: 384 }, () => 0))
   })
 
   afterEach(async () => {
+    CyxWatch.clear()
+    CyxWatch.close()
     closeDb()
     setDbPathOverride(null)
     process.chdir(cwd)
@@ -122,10 +126,11 @@ describe("Graph", () => {
         sourceEvent: "graph-test",
       },
     )
+    CyxWatch.clear()
 
     const graph = await Graph.build()
 
-    expect(graph.stats).toEqual({
+    expect(graph.stats).toMatchObject({
       wiki: 2,
       code: 2,
       memory: 1,
@@ -148,6 +153,57 @@ describe("Graph", () => {
         { from: "mem-1", to: "wiki/core-notes", type: "tag" },
         { from: "learn-1", to: "concept:shell", type: "category" },
         { from: "wiki/core-notes", to: "concept:utility", type: "relates_to" },
+      ]),
+    )
+  })
+
+  test("links CyxWatch incidents to prompts, sessions, files, and hosts", async () => {
+    await fs.writeFile(
+      path.join(dir, "src", "secret.ts"),
+      ["export const secret = 1", ""].join("\n"),
+    )
+    await Codegraph.rebuild()
+
+    await CyxWatch.turn({
+      text: "Check the secret handling path.",
+      sessionID: "ses_graph",
+      messageID: "msg_graph",
+    })
+
+    await CyxWatch.scope({
+      sessionID: "ses_graph",
+      messageID: "msg_graph",
+      prompt: "Check the secret handling path.",
+      fn: async () => {
+        await CyxWatch.note({ kind: "file.read", path: path.join(dir, "src", "secret.ts") })
+        await CyxWatch.request({
+          url: "https://api.example.test/upload",
+          method: "POST",
+          bytes: 8 * 1024 * 1024,
+        })
+      },
+    })
+
+    const graph = await Graph.build({ symbols: false })
+
+    expect(graph.stats.cyxwatch).toBeGreaterThanOrEqual(3)
+    expect(graph.nodes).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ id: "cyxwatch:session:ses_graph", kind: "cyxwatch" }),
+        expect.objectContaining({ id: "cyxwatch:prompt:msg_graph", kind: "cyxwatch" }),
+        expect.objectContaining({ id: "src/secret", kind: "code" }),
+      ]),
+    )
+    expect(graph.nodes.some((node) => node.id.startsWith("cyxwatch:alert:") && node.kind === "cyxwatch")).toBe(true)
+    expect(graph.nodes.some((node) => node.id.startsWith("cyxwatch:host:") && node.summary === "api.example.test")).toBe(true)
+
+    expect(graph.edges).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ to: "cyxwatch:session:ses_graph", type: "in_session" }),
+        expect.objectContaining({ to: "cyxwatch:prompt:msg_graph", type: "from_prompt" }),
+        expect.objectContaining({ to: "src/secret", type: "touches" }),
+        expect.objectContaining({ type: "contacts" }),
+        expect.objectContaining({ type: "raised_from" }),
       ]),
     )
   })

@@ -7,7 +7,7 @@ import { Graph } from "../../cyxcode/graph"
 
 const node = z.object({
   id: z.string(),
-  kind: z.enum(["wiki", "code", "symbol", "memory", "learned", "concept"]),
+  kind: z.enum(["wiki", "code", "symbol", "memory", "learned", "concept", "cyxwatch"]),
   title: z.string(),
   path: z.string().optional(),
   summary: z.string().optional(),
@@ -43,6 +43,7 @@ export const GraphRoutes = lazy(() =>
                     memory: z.number(),
                     learned: z.number(),
                     facts: z.number(),
+                    cyxwatch: z.number(),
                   }),
                 }),
               ),

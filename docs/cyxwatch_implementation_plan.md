@@ -432,16 +432,18 @@ Goal: make history queryable and connected to project intelligence.
 
 Tasks:
 
-- keep JSONL as append-only source of truth
+- keep JSONL as append-only source of truth - shipped
 - add SQLite projection for events, alerts, prompts, paths, hosts, and decisions
+  - shipped
 - link alerts to sessions, messages, files, commands, hosts, and graph nodes
+  - shipped through the unified `/experimental/graph` data
 - add queries for "show sessions where agent accessed X" and "show all unknown
   outbound hosts"
 
 Exit criteria:
 
 - dashboard can filter by session, host, path, flag, and decision
-- graph can answer incident-to-prompt and incident-to-file questions
+- graph can answer incident-to-prompt and incident-to-file questions - shipped
 
 ### Phase M: Memory Firewall
 

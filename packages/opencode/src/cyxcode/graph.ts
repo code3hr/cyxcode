@@ -7,8 +7,9 @@ import { Memory } from "./memory"
 import { Wiki } from "./wiki"
 import { CyxPaths } from "./paths"
 import { listFacts } from "./recall/facts"
+import { CyxWatch, type WatchAlert, type WatchEntry } from "./watch"
 
-export type GraphKind = "wiki" | "code" | "symbol" | "memory" | "learned" | "concept"
+export type GraphKind = "wiki" | "code" | "symbol" | "memory" | "learned" | "concept" | "cyxwatch"
 
 export type GraphNode = {
   id: string
@@ -35,6 +36,7 @@ export type GraphData = {
     memory: number
     learned: number
     facts: number
+    cyxwatch: number
   }
 }
 
@@ -123,6 +125,15 @@ function by(alias: Alias, text: string): string | undefined {
 
 function aliasify(text: string): string {
   return text.trim().toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "")
+}
+
+function digest(text: string): string {
+  let hash = 2166136261
+  for (let i = 0; i < text.length; i++) {
+    hash ^= text.charCodeAt(i)
+    hash = Math.imul(hash, 16777619)
+  }
+  return (hash >>> 0).toString(36)
 }
 
 function concept(text: string): Item {
@@ -232,6 +243,131 @@ function uniq(edges: GraphEdge[]) {
   })
 }
 
+function label(text: string, max = 96): string {
+  const clean = text.replace(/\s+/g, " ").trim()
+  if (clean.length <= max) return clean
+  return `${clean.slice(0, max - 3)}...`
+}
+
+function title(entry: WatchEntry) {
+  if (entry.path) return label(entry.path)
+  if (entry.cmd) return label(entry.cmd)
+  if (entry.host) return entry.host
+  if (entry.prompt) return label(entry.prompt)
+  return entry.kind
+}
+
+function target(raw: string, alias: Alias, nodes: GraphNode[], kind: string) {
+  for (const k of key(raw)) {
+    const hit = alias.get(k)
+    if (hit && nodes.find((node) => node.id === hit)?.kind !== "cyxwatch") return hit
+  }
+  const id = `cyxwatch:${kind}:${digest(raw)}`
+  if (!nodes.some((node) => node.id === id)) {
+    add(alias, {
+      id,
+      kind: "cyxwatch",
+      title: kind === "path" ? path.basename(raw) || label(raw) : label(raw),
+      path: kind === "path" ? raw : undefined,
+      summary: raw,
+      tags: [kind],
+      meta: { kind },
+    }, nodes)
+  }
+  return id
+}
+
+function watch(events: WatchEntry[], alerts: WatchAlert[], alias: Alias, nodes: GraphNode[], edges: GraphEdge[]) {
+  const seen = new Set(nodes.map((node) => node.id))
+  const put = (item: Item) => {
+    if (seen.has(item.id)) return item.id
+    seen.add(item.id)
+    add(alias, item, nodes)
+    return item.id
+  }
+
+  for (const entry of events) {
+    const id = put({
+      id: `cyxwatch:event:${entry.id}`,
+      kind: "cyxwatch",
+      title: entry.kind,
+      summary: title(entry),
+      tags: [entry.kind, entry.decision ?? "allow", ...entry.flags],
+      meta: {
+        eventID: entry.id,
+        ts: entry.ts,
+        risk: entry.risk,
+        decision: entry.decision,
+        bytes: entry.bytes,
+        method: entry.method,
+      },
+    })
+
+    if (entry.sessionID) {
+      const ses = put({
+        id: `cyxwatch:session:${entry.sessionID}`,
+        kind: "cyxwatch",
+        title: `Session ${entry.sessionID}`,
+        summary: entry.prompt,
+        tags: ["session"],
+        meta: { sessionID: entry.sessionID },
+      })
+      edges.push({ from: id, to: ses, type: "in_session" })
+    }
+
+    if (entry.messageID) {
+      const msg = put({
+        id: `cyxwatch:prompt:${entry.messageID}`,
+        kind: "cyxwatch",
+        title: "Prompt turn",
+        summary: entry.prompt ?? entry.text,
+        tags: ["prompt"],
+        meta: {
+          sessionID: entry.sessionID,
+          messageID: entry.messageID,
+        },
+      })
+      edges.push({ from: id, to: msg, type: "from_prompt" })
+      if (entry.sessionID) edges.push({ from: msg, to: `cyxwatch:session:${entry.sessionID}`, type: "in_session" })
+    }
+
+    if (entry.path && !entry.kind.startsWith("network.")) {
+      edges.push({ from: id, to: target(entry.path, alias, nodes, "path"), type: "touches" })
+    }
+
+    if (entry.cmd) {
+      edges.push({ from: id, to: target(entry.cmd, alias, nodes, "command"), type: "runs" })
+    }
+
+    if (entry.host) {
+      edges.push({ from: id, to: target(entry.host, alias, nodes, "host"), type: "contacts" })
+    }
+  }
+
+  for (const note of alerts) {
+    const id = put({
+      id: `cyxwatch:alert:${note.id}`,
+      kind: "cyxwatch",
+      title: note.title,
+      summary: note.summary,
+      tags: [note.kind, note.decision, ...note.flags],
+      meta: {
+        alertID: note.id,
+        eventID: note.eventID,
+        ts: note.ts,
+        risk: note.risk,
+        decision: note.decision,
+      },
+    })
+    edges.push({ from: id, to: `cyxwatch:event:${note.eventID}`, type: "raised_from" })
+    if (note.sessionID) edges.push({ from: id, to: `cyxwatch:session:${note.sessionID}`, type: "in_session" })
+    if (note.messageID) edges.push({ from: id, to: `cyxwatch:prompt:${note.messageID}`, type: "from_prompt" })
+    if (note.path) edges.push({ from: id, to: target(note.path, alias, nodes, "path"), type: "touches" })
+    if (note.cmd) edges.push({ from: id, to: target(note.cmd, alias, nodes, "command"), type: "runs" })
+    if (note.host) edges.push({ from: id, to: target(note.host, alias, nodes, "host"), type: "contacts" })
+  }
+}
+
 function links(data: GraphData, id: string): Link[] {
   const ref = new Map(data.nodes.map((node) => [node.id, node] as const))
   const out: Link[] = []
@@ -246,12 +382,14 @@ function links(data: GraphData, id: string): Link[] {
 
 export namespace Graph {
   export async function build(opts: GraphOpts = {}): Promise<GraphData> {
-    const [wi, ci, mi, li, fa] = await Promise.all([
+    const [wi, ci, mi, li, fa, ev, wa] = await Promise.all([
       Wiki.readIndex(),
       Codegraph.readIndex(),
       Memory.readIndex(),
       LearnedPatterns.read(),
       Promise.resolve(listFacts()),
+      CyxWatch.recent(120),
+      CyxWatch.alerts(120),
     ])
 
     const alias: Alias = new Map()
@@ -385,6 +523,8 @@ export namespace Graph {
       edges.push({ from: a, to: b, type: fact.predicate })
     }
 
+    watch(ev, wa, alias, nodes, edges)
+
     for (const page of wi.pages) {
       const text = await body(page)
       if (!text) continue
@@ -407,6 +547,7 @@ export namespace Graph {
         memory: mi.entries.length,
         learned: li.approved.length,
         facts: fa.length,
+        cyxwatch: ev.length + wa.length,
       },
     }
   }

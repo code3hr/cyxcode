@@ -196,12 +196,12 @@ CyxCode also keeps markdown notes as a local wiki.
 
 ## Knowledge Graph
 
-CyxCode also exposes a unified graph over wiki notes, code files, memories, learned patterns, and semantic facts.
+CyxCode also exposes a unified graph over wiki notes, code files, memories, learned patterns, semantic facts, and CyxWatch security signals.
 
 ### How to use it
 
 - Open the graph tab on `/:dir/knowledge`
-- Use the filters to focus on wiki, code, memory, learned, or concept nodes
+- Use the filters to focus on wiki, code, memory, learned, concept, or CyxWatch nodes
 - Use the hop controls to expand the graph one, two, three, or four steps out from the selected node
 - Click a node to inspect incoming and outgoing relationships
 - Jump into the linked wiki note or source detail view from a node
@@ -214,6 +214,8 @@ CyxCode also exposes a unified graph over wiki notes, code files, memories, lear
 - memory entries and their tags
 - approved learned patterns and their categories
 - semantic facts from the recall store
+- CyxWatch events and alerts linked to sessions, prompt turns, files, commands,
+  and outbound hosts
 - graph context from nearby linked nodes when the AI builds its prompt
 
 ### Current API
