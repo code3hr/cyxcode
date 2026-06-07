@@ -26,8 +26,8 @@ function db() {
   if (hit) return hit
   fs.mkdirSync(path.dirname(p), { recursive: true })
   const next = new Database(p, { create: true })
-  next.exec("PRAGMA journal_mode = WAL")
-  next.exec("PRAGMA synchronous = NORMAL")
+  safe(() => next.exec("PRAGMA journal_mode = WAL"), undefined)
+  safe(() => next.exec("PRAGMA synchronous = NORMAL"), undefined)
   next.exec(`
     CREATE TABLE IF NOT EXISTS watch_event (
       id TEXT PRIMARY KEY,

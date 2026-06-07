@@ -45,6 +45,14 @@ export namespace Database {
 
   type Journal = { sql: string; timestamp: number; name: string }[]
 
+  function pragma(db: Client, sql: string) {
+    try {
+      db.run(sql)
+    } catch (err) {
+      log.warn("sqlite pragma skipped", { sql, error: err instanceof Error ? err.message : String(err) })
+    }
+  }
+
   function time(tag: string) {
     const match = /^(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})/.exec(tag)
     if (!match) return 0
@@ -83,16 +91,12 @@ export namespace Database {
 
     const db = init(Path)
 
-    db.run("PRAGMA journal_mode = WAL")
-    db.run("PRAGMA synchronous = NORMAL")
-    db.run("PRAGMA busy_timeout = 5000")
-    db.run("PRAGMA cache_size = -64000")
-    db.run("PRAGMA foreign_keys = ON")
-    try {
-      db.run("PRAGMA wal_checkpoint(PASSIVE)")
-    } catch (err) {
-      log.warn("wal checkpoint skipped", { error: err instanceof Error ? err.message : String(err) })
-    }
+    pragma(db, "PRAGMA journal_mode = WAL")
+    pragma(db, "PRAGMA synchronous = NORMAL")
+    pragma(db, "PRAGMA busy_timeout = 5000")
+    pragma(db, "PRAGMA cache_size = -64000")
+    pragma(db, "PRAGMA foreign_keys = ON")
+    pragma(db, "PRAGMA wal_checkpoint(PASSIVE)")
 
     // Apply schema migrations
     const entries =

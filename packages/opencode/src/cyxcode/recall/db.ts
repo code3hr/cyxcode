@@ -23,7 +23,13 @@ export function setDbPathOverride(p: string | null) {
 }
 
 function applyPragmasAndSchema(d: Database): void {
-  for (const p of PRAGMAS) d.run(p)
+  for (const p of PRAGMAS) {
+    try {
+      d.run(p)
+    } catch (e) {
+      log.warn("recall: sqlite pragma skipped", { pragma: p, error: e instanceof Error ? e.message : String(e) })
+    }
+  }
   d.exec(SCHEMA_SQL)
 }
 
