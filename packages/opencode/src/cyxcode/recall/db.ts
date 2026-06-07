@@ -24,6 +24,10 @@ export function setDbPathOverride(p: string | null) {
 
 function applyPragmasAndSchema(d: Database): void {
   for (const p of PRAGMAS) {
+    if (process.platform === "win32" && p === "PRAGMA journal_mode = WAL") {
+      log.warn("recall: sqlite wal skipped on windows")
+      continue
+    }
     try {
       d.run(p)
     } catch (e) {

@@ -53,6 +53,14 @@ export namespace Database {
     }
   }
 
+  function wal(db: Client) {
+    if (process.platform === "win32") {
+      log.warn("sqlite wal skipped on windows")
+      return
+    }
+    pragma(db, "PRAGMA journal_mode = WAL")
+  }
+
   function time(tag: string) {
     const match = /^(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})/.exec(tag)
     if (!match) return 0
@@ -91,7 +99,7 @@ export namespace Database {
 
     const db = init(Path)
 
-    pragma(db, "PRAGMA journal_mode = WAL")
+    wal(db)
     pragma(db, "PRAGMA synchronous = NORMAL")
     pragma(db, "PRAGMA busy_timeout = 5000")
     pragma(db, "PRAGMA cache_size = -64000")
