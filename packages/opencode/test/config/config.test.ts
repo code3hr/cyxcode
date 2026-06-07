@@ -1613,7 +1613,7 @@ test("project config overrides remote well-known config", async () => {
   const originalFetch = globalThis.fetch
   let fetchedUrl: string | undefined
   const mockFetch = mock((url: string | URL | Request) => {
-    const urlStr = url.toString()
+    const urlStr = url instanceof Request ? url.url : url.toString()
     if (urlStr.includes(".well-known/opencode")) {
       fetchedUrl = urlStr
       return Promise.resolve(
@@ -1688,7 +1688,7 @@ test("wellknown URL with trailing slash is normalized", async () => {
   const originalFetch = globalThis.fetch
   let fetchedUrl: string | undefined
   const mockFetch = mock((url: string | URL | Request) => {
-    const urlStr = url.toString()
+    const urlStr = url instanceof Request ? url.url : url.toString()
     if (urlStr.includes(".well-known/opencode")) {
       fetchedUrl = urlStr
       return Promise.resolve(
