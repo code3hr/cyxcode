@@ -46,12 +46,10 @@ export namespace JsonMigration {
     const db = drizzle({ client: sqlite })
 
     // Optimize SQLite for bulk inserts
-    if (process.platform !== "win32") {
-      try {
-        sqlite.exec("PRAGMA journal_mode = WAL")
-      } catch (e) {
-        log.warn("json migration wal pragma skipped", { error: e instanceof Error ? e.message : String(e) })
-      }
+    try {
+      sqlite.exec(process.platform === "win32" ? "PRAGMA journal_mode = MEMORY" : "PRAGMA journal_mode = WAL")
+    } catch (e) {
+      log.warn("json migration journal pragma skipped", { error: e instanceof Error ? e.message : String(e) })
     }
     sqlite.exec("PRAGMA synchronous = OFF")
     sqlite.exec("PRAGMA cache_size = 10000")

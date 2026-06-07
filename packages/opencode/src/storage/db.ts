@@ -55,7 +55,7 @@ export namespace Database {
 
   function wal(db: Client) {
     if (process.platform === "win32") {
-      log.warn("sqlite wal skipped on windows")
+      pragma(db, "PRAGMA journal_mode = MEMORY")
       return
     }
     pragma(db, "PRAGMA journal_mode = WAL")
