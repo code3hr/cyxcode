@@ -22,6 +22,7 @@ a.out
 target
 .scripts
 .direnv/
+.release-smoke/
 
 # CyxCode state versioning (private per-machine)
 .opencode/history/
