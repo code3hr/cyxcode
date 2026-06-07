@@ -342,15 +342,22 @@ export namespace Config {
       return false
     }
 
+    const pkg = path.join(dir, "package.json")
+    const parsed = await Filesystem.readJson<{ dependencies?: Record<string, string> }>(pkg).catch(() => null)
+    const dependencies = parsed?.dependencies ?? {}
+    const extra = Object.keys(dependencies).some((dep) => dep !== "@cyxcode/plugin")
+    const local = await hasExt(dir)
+    if (!local && !extra) {
+      log.debug("config dir has no local extensions, skipping dependency install", { dir })
+      return false
+    }
+
     const nodeModules = path.join(dir, "node_modules")
     if (!existsSync(nodeModules)) return true
 
-    const pkg = path.join(dir, "package.json")
     const pkgExists = await Filesystem.exists(pkg)
     if (!pkgExists) return true
 
-    const parsed = await Filesystem.readJson<{ dependencies?: Record<string, string> }>(pkg).catch(() => null)
-    const dependencies = parsed?.dependencies ?? {}
     const depVersion = dependencies["@cyxcode/plugin"]
     if (!depVersion) return true
 
@@ -366,6 +373,16 @@ export namespace Config {
     }
     if (depVersion === targetVersion) return false
     return true
+  }
+
+  async function hasExt(dir: string) {
+    const files = await Glob.scan("{plugin,plugins,tool,tools}/*.{ts,js}", {
+      cwd: dir,
+      absolute: true,
+      dot: true,
+      symlink: true,
+    })
+    return files.length > 0
   }
 
   function rel(item: string, patterns: string[]) {

@@ -735,7 +735,7 @@ test("does not try to install dependencies in read-only CYXCODE_CONFIG_DIR", asy
   }
 })
 
-test("installs dependencies in writable CYXCODE_CONFIG_DIR", async () => {
+test("skips dependency install in empty writable CYXCODE_CONFIG_DIR", async () => {
   await using tmp = await tmpdir<string>({
     init: async (dir) => {
       const cfg = path.join(dir, "configdir")
@@ -756,12 +756,34 @@ test("installs dependencies in writable CYXCODE_CONFIG_DIR", async () => {
       },
     })
 
-    expect(await Filesystem.exists(path.join(tmp.extra, "package.json"))).toBe(true)
-    expect(await Filesystem.exists(path.join(tmp.extra, ".gitignore"))).toBe(true)
+    expect(await Filesystem.exists(path.join(tmp.extra, "package.json"))).toBe(false)
+    expect(await Filesystem.exists(path.join(tmp.extra, ".gitignore"))).toBe(false)
   } finally {
     if (prev === undefined) delete process.env.CYXCODE_CONFIG_DIR
     else process.env.CYXCODE_CONFIG_DIR = prev
   }
+})
+
+test("needs dependency install for local config extensions", async () => {
+  await using tmp = await tmpdir({
+    init: async (dir) => {
+      const plugins = path.join(dir, ".opencode", "plugins")
+      await fs.mkdir(plugins, { recursive: true })
+      await Filesystem.write(path.join(plugins, "test.ts"), "export default async () => ({})\n")
+    },
+  })
+
+  expect(await Config.needsInstall(path.join(tmp.path, ".opencode"))).toBe(true)
+})
+
+test("needs dependency install for package dependencies", async () => {
+  await using tmp = await tmpdir({
+    init: async (dir) => {
+      await Filesystem.write(path.join(dir, "package.json"), JSON.stringify({ dependencies: { zod: "latest" } }))
+    },
+  })
+
+  expect(await Config.needsInstall(tmp.path)).toBe(true)
 })
 
 test("serializes concurrent config dependency installs", async () => {
