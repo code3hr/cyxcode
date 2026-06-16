@@ -932,7 +932,7 @@ export const GithubRunCommand = cmd({
       }
 
       async function chat(message: string, files: PromptFiles = []) {
-        console.log("Sending message to opencode...")
+        console.log("Sending message to CyxCode...")
 
         const result = await SessionPrompt.prompt({
           sessionID: session.id,
