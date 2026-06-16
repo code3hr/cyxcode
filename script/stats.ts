@@ -123,7 +123,7 @@ function calculate(releases: Release[]) {
 }
 
 async function save(githubTotal: number, npmDownloads: number) {
-  const file = "docs/DOWNLOAD-STATS.md"
+  const file = "docs/local/DOWNLOAD-STATS.md"
   const date = new Date().toISOString().split("T")[0]
   const total = githubTotal + npmDownloads
 
@@ -180,6 +180,8 @@ async function save(githubTotal: number, npmDownloads: number) {
       "# Download Stats\n\n| Date | GitHub Downloads | npm Downloads | Total |\n|------|------------------|---------------|-------|\n"
   }
 
+  const fs = await import("node:fs/promises")
+  await fs.mkdir("docs/local", { recursive: true })
   await Bun.write(file, content + line)
   await Bun.spawn(["bunx", "prettier", "--write", file]).exited
 
