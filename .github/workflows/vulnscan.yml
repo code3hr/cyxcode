@@ -1,0 +1,79 @@
+name: vulnscan
+
+on:
+  push:
+    branches: [dev]
+  pull_request:
+    branches: [dev]
+  workflow_dispatch:
+    inputs:
+      code_only:
+        description: "Skip dependency scanner and scan code/config CVE indicators only"
+        required: true
+        default: "true"
+        type: choice
+        options:
+          - "true"
+          - "false"
+      min_severity:
+        description: "Minimum scanner severity"
+        required: true
+        default: high
+        type: choice
+        options:
+          - critical
+          - high
+          - medium
+          - low
+      fail_on:
+        description: "Fail when findings meet this severity or higher"
+        required: true
+        default: high
+        type: choice
+        options:
+          - critical
+          - high
+          - medium
+          - low
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  gate:
+    runs-on: blacksmith-4vcpu-ubuntu-2404
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: ./.github/actions/setup-bun
+
+      - name: Run vulnerability gate
+        working-directory: packages/opencode
+        shell: bash
+        env:
+          TARGET: ${{ github.workspace }}
+          OUT: ${{ github.workspace }}/vulnscan-artifacts
+          CODE_ONLY: ${{ github.event.inputs.code_only || 'true' }}
+          MIN_SEVERITY: ${{ github.event.inputs.min_severity || 'high' }}
+          FAIL_ON: ${{ github.event.inputs.fail_on || 'high' }}
+        run: |
+          args=(--root "$TARGET" --min-severity "$MIN_SEVERITY" --fail-on "$FAIL_ON" --artifact-dir "$OUT")
+          if [ "$CODE_ONLY" = "true" ]; then
+            args+=(--code-only)
+          fi
+          bun run script/vulnscan-gate.ts "${args[@]}"
+
+      - name: Upload vulnerability artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: vulnscan-${{ github.run_attempt }}
+          path: vulnscan-artifacts
+          if-no-files-found: ignore
+          retention-days: 14

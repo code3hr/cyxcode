@@ -1,25 +1,25 @@
 ---
 title: TUI
-description: OpenCode ターミナルユーザーインターフェイスの使用。
+description: Using the CyxCode terminal user interface.
 ---
 
 import { Tabs, TabItem } from "@astrojs/starlight/components"
 
-OpenCode は、LLM を使用してプロジェクトを作業するための対話型ターミナルインターフェイスまたは TUI を提供します。
+CyxCode provides an interactive terminal interface or TUI for working on your projects with an LLM.
 
-OpenCode を実行すると、現在のディレクトリの TUI が開始されます。
-
-```bash
-opencode
-```
-
-または、特定の作業ディレクトリに対して起動することもできます。
+Running CyxCode starts the TUI for the current directory.
 
 ```bash
-opencode /path/to/project
+cyxcode
 ```
 
-TUI に入ったら、メッセージを表示することができます。
+Or you can start it for a specific working directory.
+
+```bash
+cyxcode /path/to/project
+```
+
+Once you're in the TUI, you can prompt it with a message.
 
 ```text
 Give me a quick summary of the codebase.
@@ -27,51 +27,51 @@ Give me a quick summary of the codebase.
 
 ---
 
-## ファイル参照
+## File references
 
-`@` を使用してメッセージ内のファイルを参照できます。これにより、現在の作業ディレクトリ内であいまいなファイル検索が行われます。
+You can reference files in your messages using `@`. This does a fuzzy file search in the current working directory.
 
 :::tip
-`@` を使用してメッセージ内のファイルを参照することもできます。
+You can also use `@` to reference files in your messages.
 :::
 
 ```text "@packages/functions/src/api/index.ts"
 How is auth handled in @packages/functions/src/api/index.ts?
 ```
 
-ファイルの内容は会話に自動的に追加されます。
+The content of the file is added to the conversation automatically.
 
 ---
 
-## Bash コマンド
+## Bash commands
 
-メッセージを `!` で開始して、シェルコマンドを実行します。
+Start a message with `!` to run a shell command.
 
 ```bash frame="none"
 !ls -la
 ```
 
-コマンドの出力は、ツールの結果として会話に追加されます。
+The output of the command is added to the conversation as a tool result.
 
 ---
 
-## コマンド
+## Commands
 
-OpenCode TUI を使用する場合、「`/`」に続いてコマンド名を入力すると、アクションをすばやく実行できます。例えば：
+When using the CyxCode TUI, you can type `/` followed by a command name to quickly execute actions. For example:
 
 ```bash frame="none"
 /help
 ```
 
-ほとんどのコマンドには、`ctrl+x` をリーダーキーとして使用するキーバインドもあります。`ctrl+x` がデフォルトのリーダーキーです。 [詳細はこちら](/docs/keybinds)。
+Most commands also have keybind using `ctrl+x` as the leader key, where `ctrl+x` is the default leader key. [Learn more](/docs/keybinds).
 
-利用可能なすべてのスラッシュコマンドは次のとおりです。
+Here are all available slash commands:
 
 ---
 
-### 接続
+### connect
 
-OpenCode にプロバイダーを追加します。利用可能なプロバイダーから選択し、その API キーを追加できます。
+Add a provider to CyxCode. Allows you to select from available providers and add their API keys.
 
 ```bash frame="none"
 /connect
@@ -79,173 +79,175 @@ OpenCode にプロバイダーを追加します。利用可能なプロバイ�
 
 ---
 
-### コンパクト
+### compact
 
-現在のセッションを圧縮します。 _別名_: `/summarize`
+Compact the current session. _Alias_: `/summarize`
 
 ```bash frame="none"
 /compact
 ```
 
-**キーバインド:** `ctrl+x c`
+**Keybind:** `ctrl+x c`
 
 ---
 
-### 詳細
+### details
 
-ツール実行の詳細を切り替えます。
+Toggle tool execution details.
 
 ```bash frame="none"
 /details
 ```
 
-**キーバインド:** `ctrl+x d`
+**Keybind:** `ctrl+x d`
 
 ---
 
-### エディタ
+### editor
 
-メッセージを作成するために外部エディタを開きます。 `EDITOR` 環境変数に設定されたエディタを使用します。 [詳細はこちら](#editor-setup)。
+Open external editor for composing messages. Uses the editor set in your `EDITOR` environment variable. [Learn more](#editor-setup).
 
 ```bash frame="none"
 /editor
 ```
 
-**キーバインド:** `ctrl+x e`
+**Keybind:** `ctrl+x e`
 
 ---
 
-### 終了
+### exit
 
-OpenCode を終了します。 _エイリアス_: `/quit`、`/q`
+Exit CyxCode. _Aliases_: `/quit`, `/q`
 
 ```bash frame="none"
 /exit
 ```
 
-**キーバインド:** `ctrl+x q`
+**Keybind:** `ctrl+x q`
 
 ---
 
-### エクスポート
+### export
 
-現在の会話を Markdown にエクスポートし、デフォルトのエディターで開きます。 `EDITOR` 環境変数に設定されたエディタを使用します。 [詳細はこちら](#editor-setup)。
+Export current conversation to Markdown and open in your default editor. Uses the editor set in your `EDITOR` environment variable. [Learn more](#editor-setup).
 
 ```bash frame="none"
 /export
 ```
 
-**キーバインド:** `ctrl+x x`
+**Keybind:** `ctrl+x x`
 
 ---
 
-### ヘルプ
+### help
 
-ヘルプダイアログを表示します。
+Show the help dialog.
 
 ```bash frame="none"
 /help
 ```
 
-**キーバインド:** `ctrl+x h`
+**Keybind:** `ctrl+x h`
 
 ---
 
-### 初期化
+### init
 
-`AGENTS.md` ファイルを作成または更新します。 [詳細はこちら](/docs/rules)。
+Create or update `AGENTS.md` file. [Learn more](/docs/rules).
 
 ```bash frame="none"
 /init
 ```
 
-**キーバインド:** `ctrl+x i`
+**Keybind:** `ctrl+x i`
 
 ---
 
-### モデル
+### models
 
-利用可能なモデルをリストします。
+List available models.
 
 ```bash frame="none"
 /models
 ```
 
-**キーバインド:** `ctrl+x m`
+**Keybind:** `ctrl+x m`
 
 ---
 
-### 新規セッション
+### new
 
-新しいセッションを開始します。 _別名_: `/clear`
+Start a new session. _Alias_: `/clear`
 
 ```bash frame="none"
 /new
 ```
 
-**キーバインド:** `ctrl+x n`
+**Keybind:** `ctrl+x n`
 
 ---
 
-### やり直し
+### redo
 
-以前に取り消したメッセージをやり直します。 `/undo` を使用した後にのみ使用できます。
+Redo a previously undone message. Only available after using `/undo`.
 
 :::tip
-ファイルの変更も復元されます。
+Any file changes will also be restored.
 :::
-内部的には、`undo` を使用してファイルの変更を管理します。したがって、あなたのプロジェクトは **Git リポジトリ** である必要があります。
+
+Internally, this uses Git to manage the file changes. So your project **needs to
+be a Git repository**.
 
 ```bash frame="none"
 /redo
 ```
 
-**キーバインド:** `ctrl+x r`
+**Keybind:** `ctrl+x r`
 
 ---
 
-### セッション
+### sessions
 
-セッションを一覧表示して切り替えます。 _エイリアス_: `/resume`、`/continue`
+List and switch between sessions. _Aliases_: `/resume`, `/continue`
 
 ```bash frame="none"
 /sessions
 ```
 
-**キーバインド:** `ctrl+x l`
+**Keybind:** `ctrl+x l`
 
 ---
 
-### 共有
+### share
 
-現在のセッションを共有します。 [詳細はこちら](/docs/share)。
+Share current session. [Learn more](/docs/share).
 
 ```bash frame="none"
 /share
 ```
 
-**キーバインド:** `ctrl+x s`
+**Keybind:** `ctrl+x s`
 
 ---
 
-### テーマ
+### themes
 
-利用可能なテーマをリストします。
+List available themes.
 
 ```bash frame="none"
-/theme
+/themes
 ```
 
-**キーバインド:** `ctrl+x t`
+**Keybind:** `ctrl+x t`
 
 ---
 
-### 思考
+### thinking
 
-会話内の思考/推論ブロックの表示を切り替えます。有効にすると、拡張思考をサポートするモデルの推論プロセスを確認できます。
+Toggle the visibility of thinking/reasoning blocks in the conversation. When enabled, you can see the model's reasoning process for models that support extended thinking.
 
 :::note
-このコマンドは、思考ブロックを**表示**するかどうかのみを制御します。モデルの推論機能を有効または無効にすることはありません。実際の推論機能を切り替えるには、`ctrl+t` を使用してモデルバリアントを循環させます。
+This command only controls whether thinking blocks are **displayed** - it does not enable or disable the model's reasoning capabilities. To toggle actual reasoning capabilities, use `ctrl+t` to cycle through model variants.
 :::
 
 ```bash frame="none"
@@ -254,26 +256,28 @@ OpenCode を終了します。 _エイリアス_: `/quit`、`/q`
 
 ---
 
-### 元に戻す
+### undo
 
-会話の最後のメッセージを元に戻します。最新のユーザーメッセージ、その後のすべての応答、およびファイルの変更を削除します。
+Undo last message in the conversation. Removes the most recent user message, all subsequent responses, and any file changes.
 
 :::tip
-加えられたファイルの変更も元に戻されます。
+Any file changes made will also be reverted.
 :::
-内部的には、`undo` を使用してファイルの変更を管理します。したがって、あなたのプロジェクトは **Git リポジトリ** である必要があります。
+
+Internally, this uses Git to manage the file changes. So your project **needs to
+be a Git repository**.
 
 ```bash frame="none"
 /undo
 ```
 
-**キーバインド:** `ctrl+x u`
+**Keybind:** `ctrl+x u`
 
 ---
 
-### 共有の解除
+### unshare
 
-現在のセッションの共有を解除します。 [詳細はこちら](/docs/share#un-sharing)。
+Unshare current session. [Learn more](/docs/share#un-sharing).
 
 ```bash frame="none"
 /unshare
@@ -281,9 +285,9 @@ OpenCode を終了します。 _エイリアス_: `/quit`、`/q`
 
 ---
 
-## エディタのセットアップ
+## Editor setup
 
-`/editor` および `/export` コマンドはどちらも、`EDITOR` 環境変数で指定されたエディターを使用します。
+Both the `/editor` and `/export` commands use the editor specified in your `EDITOR` environment variable.
 
 <Tabs>
   <TabItem label="Linux/macOS">
@@ -297,8 +301,8 @@ OpenCode を終了します。 _エイリアス_: `/quit`、`/q`
     export EDITOR="code --wait"
     ```
 
-これを永続的にするには、これをシェルプロファイルに追加します。
-`~/.bashrc`、`~/.zshrc`など
+    To make it permanent, add this to your shell profile;
+    `~/.bashrc`, `~/.zshrc`, etc.
 
   </TabItem>
 
@@ -311,7 +315,8 @@ OpenCode を終了します。 _エイリアス_: `/quit`、`/q`
     set EDITOR=code --wait
     ```
 
-これを永続的にするには、**システムプロパティ** > **環境変数**を使用します。
+    To make it permanent, use **System Properties** > **Environment
+    Variables**.
 
   </TabItem>
 
@@ -324,37 +329,38 @@ OpenCode を終了します。 _エイリアス_: `/quit`、`/q`
     $env:EDITOR = "code --wait"
     ```
 
-これを永続的にするには、これを PowerShell プロファイルに追加します。
+    To make it permanent, add this to your PowerShell profile.
 
   </TabItem>
 </Tabs>
 
-一般的なエディターオプションには次のものがあります。
+Popular editor options include:
 
-- `code` - VS Code
+- `code` - Visual Studio Code
 - `cursor` - Cursor
 - `windsurf` - Windsurf
-- `nvim` - Neovim エディター
-- `vim` - Vim エディター
-- `nano` - ナノエディター
-- `notepad` - Windows メモ帳
+- `nvim` - Neovim editor
+- `vim` - Vim editor
+- `nano` - Nano editor
+- `notepad` - Windows Notepad
 - `subl` - Sublime Text
 
 :::note
-VS Code などの一部のエディターは、`--wait` フラグを使用して起動する必要があります。
+Some editors like VS Code need to be started with the `--wait` flag.
 :::
-一部のモードでは実行にコマンドライン引数が必要です。`--wait` フラグを使うと、エディターが閉じるまでプロセスが待機します。
+
+Some editors need command-line arguments to run in blocking mode. The `--wait` flag makes the editor process block until closed.
 
 ---
 
-## 設定
+## Configure
 
-`tui.json` (または `tui.jsonc`) ファイルを通じて TUI の動作をカスタマイズできます。
+You can customize TUI behavior through `tui.json` (or `tui.jsonc`).
 
 ```json title="tui.json"
 {
-  "$schema": "https://opencode.ai/tui.json",
-  "theme": "opencode",
+  "$schema": "https://cyxcode.ai/tui.json",
+  "theme": "CyxCode",
   "keybinds": {
     "leader": "ctrl+x"
   },
@@ -366,29 +372,29 @@ VS Code などの一部のエディターは、`--wait` フラグを使用して
 }
 ```
 
-これは、サーバー/ランタイムの動作を構成する `opencode.json` とは別です。
+This is separate from `opencode.json`, which configures server/runtime behavior.
 
-### オプション
+### Options
 
-- `theme` - UI テーマを設定します。[詳細はこちら](/docs/themes)。
-- `keybinds` - キーボードショートカットをカスタマイズします。[詳細はこちら](/docs/keybinds)。
-- `scroll_acceleration.enabled` - macOS スタイルのスクロールアクセラレーションを有効にして、スムーズで自然なスクロールを実現します。有効にすると、高速スクロールジェスチャではスクロール速度が向上し、ゆっくりとした動きでは正確なままになります。 **この設定は `scroll_speed` よりも優先され、有効になっている場合は上書きされます。**
-- `scroll_speed` - スクロールコマンドを使用するときに TUI がスクロールする速度を制御します (最小: `0.001`、小数をサポート)。デフォルトは `3` です。 **注: `scroll_acceleration.enabled` が `true` に設定されている場合、これは無視されます。**
-- `diff_style` - 差分レンダリングを制御します。 `"auto"` はターミナルの幅に適応し、`"stacked"` は常に 1 列のレイアウトを表示します。
+- `theme` - Sets your UI theme. [Learn more](/docs/themes).
+- `keybinds` - Customizes keyboard shortcuts. [Learn more](/docs/keybinds).
+- `scroll_acceleration.enabled` - Enable macOS-style scroll acceleration for smooth, natural scrolling. When enabled, scroll speed increases with rapid scrolling gestures and stays precise for slower movements. **This setting takes precedence over `scroll_speed` and overrides it when enabled.**
+- `scroll_speed` - Controls how fast the TUI scrolls when using scroll commands (minimum: `0.001`, supports decimal values). Defaults to `3`. **Note: This is ignored if `scroll_acceleration.enabled` is set to `true`.**
+- `diff_style` - Controls diff rendering. `"auto"` adapts to terminal width, `"stacked"` always shows a single-column layout.
 
-カスタム TUI 設定パスをロードするには、`OPENCODE_TUI_CONFIG` を使用します。
-
----
-
-## カスタマイズ
-
-コマンドパレット (`ctrl+x h` または `/help`) を使用して、TUI ビューのさまざまな側面をカスタマイズできます。これらの設定は再起動後も維持されます。
+Use `OPENCODE_TUI_CONFIG` to load a custom TUI config path.
 
 ---
 
-#### ユーザー名の表示
+## Customization
 
-チャットメッセージにユーザー名を表示するかどうかを切り替えます。これには次の方法でアクセスします。
+You can customize various aspects of the TUI view using the command palette (`ctrl+x h` or `/help`). These settings persist across restarts.
 
-- コマンドパレット:「ユーザー名」または「ユーザー名を隠す」を検索します。
-- 設定は自動的に保持され、TUI セッション全体で記憶されます。
+---
+
+#### Username display
+
+Toggle whether your username appears in chat messages. Access this through:
+
+- Command palette: Search for "username" or "hide username"
+- The setting persists automatically and will be remembered across TUI sessions

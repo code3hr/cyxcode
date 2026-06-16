@@ -1,165 +1,170 @@
 ---
-title: Za preduzeća
-description: Sigurno korištenje OpenCode u vašoj organizaciji.
+title: Enterprise
+description: Using CyxCode securely in your organization.
 ---
 
 import config from "../../../../config.mjs"
 export const email = `mailto:${config.email}`
 
-OpenCode Enterprise je za organizacije koje žele osigurati da njihov kod i podaci nikada ne napuštaju njihovu infrastrukturu. To omogućava centralizovana konfiguracija koja se integriše s vašim SSO-om i internim AI gateway-om.
+CyxCode Enterprise is for organizations that want to ensure that their code and data never leaves their infrastructure. It can do this by using a centralized config that integrates with your SSO and internal AI gateway.
 
 :::note
-OpenCode ne pohranjuje nijedan vaš kod ili kontekstualne podatke.
+CyxCode does not store any of your code or context data.
 :::
 
-Da započnete s OpenCode Enterprise:
+To get started with CyxCode Enterprise:
 
-1. Uradite interni probni period sa svojim timom.
-2. **<a href={email}>Kontaktirajte nas</a>** da razgovaramo o cijenama i opcijama implementacije.
-
----
-
-## Proba
-
-OpenCode je otvorenog koda i ne pohranjuje vaš kod niti kontekstualne podatke, tako da vaši developeri mogu jednostavno [započeti](/docs/) i provesti probu.
+1. Do a trial internally with your team.
+2. **<a href={email}>Contact us</a>** to discuss pricing and implementation options.
 
 ---
 
-### Rukovanje podacima
+## Trial
 
-**OpenCode ne pohranjuje vaš kod ni kontekstualne podatke.** Sva obrada se odvija lokalno ili putem direktnih API poziva vašem AI provajderu.
-
-To znači da, sve dok koristite provajdera kojem vjerujete ili interni AI gateway, OpenCode možete koristiti sigurno.
-
-Jedina iznimka je opcionalna funkcija `/share`.
+CyxCode is open source and does not store any of your code or context data, so your developers can simply [get started](/docs/) and carry out a trial.
 
 ---
 
-#### Dijeljenje razgovora
+### Data handling
 
-Ako korisnik uključi funkciju `/share`, razgovor i povezani podaci šalju se servisu koji koristimo za hosting ovih share stranica na opencode.ai.
+**CyxCode does not store your code or context data.** All processing happens locally or through direct API calls to your AI provider.
 
-Podaci se trenutno serviraju kroz edge mrežu našeg CDN-a i keširaju se blizu korisnika.
+This means that as long as you are using a provider you trust, or an internal
+AI gateway, you can use CyxCode securely.
 
-Preporučujemo da ovo onemogućite tokom probe.
+The only caveat here is the optional `/share` feature.
+
+---
+
+#### Sharing conversations
+
+If a user enables the `/share` feature, the conversation and the data associated with it are sent to the service we use to host these share pages at cyxcode.ai.
+
+The data is currently served through our CDN's edge network, and is cached on the edge near your users.
+
+We recommend you disable this for your trial.
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "share": "disabled"
 }
 ```
 
-[Saznajte više o dijeljenju](/docs/share).
+[Learn more about sharing](/docs/share).
 
 ---
 
-### Vlasništvo koda
+### Code ownership
 
-**Vi posjedujete sav kod koji OpenCode proizvede.** Nema ograničenja licenciranja niti zahtjeva za vlasništvo.
-
----
-
-## Cijene
-
-Koristimo model naplate po sjedištu za OpenCode Enterprise. Ako imate vlastiti LLM gateway, ne naplaćujemo korištene tokene. Za više detalja o cijenama i opcijama implementacije, **<a href={email}>kontaktirajte nas</a>**.
+**You own all code produced by CyxCode.** There are no licensing restrictions or ownership claims.
 
 ---
 
-## Postavljanje
+## Pricing
 
-Nakon što završite probni period i spremni ste koristiti OpenCode u svojoj organizaciji, možete **<a href={email}>kontaktirati nas</a>** da razgovaramo o cijenama i opcijama implementacije.
-
----
-
-### Centralna konfiguracija
-
-Možemo postaviti OpenCode da koristi jednu centralnu konfiguraciju za cijelu organizaciju.
-
-Ta centralizovana konfiguracija može se integrisati s vašim SSO provajderom i osigurava da svi korisnici pristupaju samo vašem internom AI gateway-u.
+We use a per-seat model for CyxCode Enterprise. If you have your own LLM gateway, we do not charge for tokens used. For further details about pricing and implementation options, **<a href={email}>contact us</a>**.
 
 ---
 
-### SSO integracija
+## Deployment
 
-Kroz centralnu konfiguraciju, OpenCode se može integrisati sa SSO provajderom vaše organizacije za autentifikaciju.
-
-To omogućava OpenCode da dobije vjerodajnice za interni AI gateway kroz vaš postojeći sistem upravljanja identitetom.
-
----
-
-### Interni AI gateway
-
-Uz centralnu konfiguraciju, OpenCode se može podesiti da koristi samo vaš interni AI gateway.
-
-Također možete onemogućiti sve druge AI provajdere, čime osiguravate da svi zahtjevi prolaze kroz odobrenu infrastrukturu vaše organizacije.
+Once you have completed your trial and you are ready to use CyxCode at
+your organization, you can **<a href={email}>contact us</a>** to discuss
+pricing and implementation options.
 
 ---
 
-### Samostalno hostovanje
+### Central Config
 
-Iako preporučujemo onemogućavanje share stranica kako biste osigurali da podaci nikada ne napuštaju vašu organizaciju, možemo vam pomoći i da ih samostalno hostujete na vlastitoj infrastrukturi.
+We can set up CyxCode to use a single central config for your entire organization.
 
-Ovo je trenutno na našoj mapi puta. Ako ste zainteresovani, **<a href={email}>javite nam</a>**.
+This centralized config can integrate with your SSO provider and ensures all users access only your internal AI gateway.
 
 ---
 
-## Često postavljana pitanja
+### SSO integration
+
+Through the central config, CyxCode can integrate with your organization's SSO provider for authentication.
+
+This allows CyxCode to obtain credentials for your internal AI gateway through your existing identity management system.
+
+---
+
+### Internal AI gateway
+
+With the central config, CyxCode can also be configured to use only your internal AI gateway.
+
+You can also disable all other AI providers, ensuring all requests go through your organization's approved infrastructure.
+
+---
+
+### Self-hosting
+
+While we recommend disabling the share pages to ensure your data never leaves
+your organization, we can also help you self-host them on your infrastructure.
+
+This is currently on our roadmap. If you're interested, **<a href={email}>let us know</a>**.
+
+---
+
+## FAQ
 
 <details>
-<summary>Šta je OpenCode Enterprise?</summary>
+<summary>What is CyxCode Enterprise?</summary>
 
-OpenCode Enterprise je za organizacije koje žele osigurati da njihov kod i podaci nikada ne napuštaju njihovu infrastrukturu. To omogućava centralizovana konfiguracija koja se integriše s vašim SSO-om i internim AI gateway-om.
+CyxCode Enterprise is for organizations that want to ensure that their code and data never leaves their infrastructure. It can do this by using a centralized config that integrates with your SSO and internal AI gateway.
 
 </details>
 
 <details>
-<summary>Kako započeti s OpenCode Enterprise?</summary>
+<summary>How do I get started with CyxCode Enterprise?</summary>
 
-Jednostavno započnite internu probu sa svojim timom. OpenCode po defaultu ne pohranjuje vaš kod ni kontekstualne podatke, što olakšava početak.
+Simply start with an internal trial with your team. CyxCode by default does not store your code or context data, making it easy to get started.
 
-Zatim **<a href={email}>kontaktirajte nas</a>** da razgovaramo o cijenama i opcijama implementacije.
-
-</details>
-
-<details>
-<summary>Kako funkcionišu enterprise cijene?</summary>
-
-Nudimo enterprise cijene po sjedištu. Ako imate vlastiti LLM gateway, ne naplaćujemo korištene tokene. Za više detalja, **<a href={email}>kontaktirajte nas</a>** za prilagođenu ponudu prema potrebama vaše organizacije.
+Then **<a href={email}>contact us</a>** to discuss pricing and implementation options.
 
 </details>
 
 <details>
-<summary>Jesu li moji podaci sigurni uz OpenCode Enterprise?</summary>
+<summary>How does enterprise pricing work?</summary>
 
-Da. OpenCode ne pohranjuje vaš kod niti kontekstualne podatke. Sva obrada se odvija lokalno ili putem direktnih API poziva vašem AI provajderu. Uz centralnu konfiguraciju i SSO integraciju, vaši podaci ostaju sigurni unutar infrastrukture vaše organizacije.
+We offer per-seat enterprise pricing. If you have your own LLM gateway, we do not charge for tokens used. For further details, **<a href={email}>contact us</a>** for a custom quote based on your organization's needs.
 
 </details>
 
 <details>
-<summary>Možemo li koristiti vlastiti privatni NPM registar?</summary>
+<summary>Is my data secure with CyxCode Enterprise?</summary>
 
-OpenCode podržava privatne npm registre kroz Bunovu izvornu podršku za `.npmrc` datoteku. Ako vaša organizacija koristi privatni registar, kao što je JFrog Artifactory, Nexus ili slično, osigurajte da su developeri autentifikovani prije pokretanja OpenCode.
+Yes. CyxCode does not store your code or context data. All processing happens locally or through direct API calls to your AI provider. With central config and SSO integration, your data remains secure within your organization's infrastructure.
 
-Da postavite autentifikaciju s privatnim registrom:
+</details>
+
+<details>
+<summary>Can we use our own private NPM registry?</summary>
+
+CyxCode supports private npm registries through Bun's native `.npmrc` file support. If your organization uses a private registry, such as JFrog Artifactory, Nexus, or similar, ensure developers are authenticated before running CyxCode.
+
+To set up authentication with your private registry:
 
 ```bash
 npm login --registry=https://your-company.jfrog.io/api/npm/npm-virtual/
 ```
 
-Ovo kreira `~/.npmrc` s detaljima za autentifikaciju. OpenCode će to automatski prepoznati.
+This creates `~/.npmrc` with authentication details. CyxCode will automatically
+pick this up.
 
 :::caution
-Morate biti prijavljeni na privatni registar prije pokretanja OpenCode.
+You must be logged into the private registry before running CyxCode.
 :::
 
-Alternativno, možete ručno konfigurisati `.npmrc` datoteku:
+Alternatively, you can manually configure a `.npmrc` file:
 
 ```bash title="~/.npmrc"
 registry=https://your-company.jfrog.io/api/npm/npm-virtual/
 //your-company.jfrog.io/api/npm/npm-virtual/:_authToken=${NPM_AUTH_TOKEN}
 ```
 
-Developeri moraju biti prijavljeni na privatni registar prije pokretanja OpenCode kako bi se paketi mogli instalirati iz vašeg enterprise registra.
+Developers must be logged into the private registry before running CyxCode to ensure packages can be installed from your enterprise registry.
 
 </details>

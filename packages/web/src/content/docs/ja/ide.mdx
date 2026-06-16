@@ -1,48 +1,48 @@
 ---
 title: IDE
-description: VS Code、Cursor、およびその他の IDE 用の OpenCode 拡張機能
+description: The CyxCode extension for VS Code, Cursor, and other IDEs
 ---
 
-OpenCode は、VS Code、Cursor、またはターミナルをサポートする任意の IDE と統合します。開始するには、ターミナルで `opencode` を実行するだけです。
-
----
-
-## 使用法
-
-- **クイック起動**: `Cmd+Esc` (Mac) または `Ctrl+Esc` (Windows/Linux) を使用して、分割ターミナルビューで OpenCode を開くか、既存のターミナルセッションが既に実行されている場合はそれにフォーカスします。
-- **新しいセッション**: すでに開いている場合でも、`Cmd+Shift+Esc` (Mac) または `Ctrl+Shift+Esc` (Windows/Linux) を使用して、新しい OpenCode ターミナルセッションを開始します。 UI の [OpenCode] ボタンをクリックすることもできます。
-- **コンテキスト認識**: 現在の選択またはタブを OpenCode と自動的に共有します。
-- **ファイル参照のショートカット**: ファイル参照を挿入するには、`Cmd+Option+K` (Mac) または `Alt+Ctrl+K` (Linux/Windows) を使用します。たとえば、`@File#L37-42`。
+CyxCode integrates with VS Code, Cursor, or any IDE that supports a terminal. Just run `cyxcode` in the terminal to get started.
 
 ---
 
-## インストール
+## Usage
 
-OpenCode を VS Code および Cursor、Windsurf、VSCodium などの一般的なフォークにインストールするには:
-
-1. VS Code を開く
-2. 統合ターミナルを開きます
-3. `opencode` を実行します - 拡張機能は自動的にインストールされます
-
-一方、TUI から `/editor` または `/export` を実行するときに独自の IDE を使用したい場合は、`export EDITOR="code --wait"` を設定する必要があります。 [詳細はこちら](/docs/tui/#editor-setup)。
+- **Quick Launch**: Use `Cmd+Esc` (Mac) or `Ctrl+Esc` (Windows/Linux) to open CyxCode in a split terminal view, or focus an existing terminal session if one is already running.
+- **New Session**: Use `Cmd+Shift+Esc` (Mac) or `Ctrl+Shift+Esc` (Windows/Linux) to start a new CyxCode terminal session, even if one is already open. You can also click the CyxCode button in the UI.
+- **Context Awareness**: Automatically share your current selection or tab with CyxCode.
+- **File Reference Shortcuts**: Use `Cmd+Option+K` (Mac) or `Alt+Ctrl+K` (Linux/Windows) to insert file references. For example, `@File#L37-42`.
 
 ---
 
-### 手動インストール
+## Installation
 
-Extension Marketplace で **OpenCode** を検索し、**インストール** をクリックします。
+To install CyxCode on VS Code and popular forks like Cursor, Windsurf, VSCodium:
+
+1. Open VS Code
+2. Open the integrated terminal
+3. Run `cyxcode` - the extension installs automatically
+
+If on the other hand you want to use your own IDE when you run `/editor` or `/export` from the TUI, you'll need to set `export EDITOR="code --wait"`. [Learn more](/docs/tui/#editor-setup).
 
 ---
 
-### トラブルシューティング
+### Manual Install
 
-拡張機能が自動的にインストールされない場合:
+Search for **CyxCode** in the Extension Marketplace and click **Install**.
 
-- 統合ターミナルで `opencode` を実行していることを確認してください。
-- IDE の CLI がインストールされていることを確認します。
-  - VS Code の場合: `code` コマンド
-  - Cursor の場合: `cursor` コマンド
-  - Windsurf の場合: `windsurf` コマンド
-  - VSCodium の場合: `codium` コマンド
-  - そうでない場合は、`Cmd+Shift+P` (Mac) または `Ctrl+Shift+P` (Windows/Linux) を実行し、「Shell Command: Install 'code' command in PATH」(または IDE の同等のコマンド) を検索します。
-- VS Code に拡張機能をインストールする権限があることを確認してください
+---
+
+### Troubleshooting
+
+If the extension fails to install automatically:
+
+- Ensure you’re running `cyxcode` in the integrated terminal.
+- Confirm the CLI for your IDE is installed:
+  - For VS Code: `code` command
+  - For Cursor: `cursor` command
+  - For Windsurf: `windsurf` command
+  - For VSCodium: `codium` command
+  - If not, run `Cmd+Shift+P` (Mac) or `Ctrl+Shift+P` (Windows/Linux) and search for "Shell Command: Install 'code' command in PATH" (or the equivalent for your IDE)
+- Ensure VS Code has permission to install extensions

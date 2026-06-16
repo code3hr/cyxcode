@@ -19,7 +19,7 @@ Można przełączać się między trybami podczas sesji lub konfigurować je w p
 
 ## Wbudowane
 
-opencode ma dwa puste tryby.
+cyxcode ma dwa puste tryby.
 
 ---
 
@@ -60,7 +60,7 @@ Skonfiguruj tryb w pliku konfiguracyjnym `opencode.json`:
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "mode": {
     "build": {
       "model": "anthropic/claude-sonnet-4-20250514",
@@ -249,7 +249,7 @@ Możesz stworzyć własny tryb prywatny, dodając je do konfiguracji. Oto zastos
 
 ```json title="opencode.json" {4-14}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "mode": {
     "docs": {
       "prompt": "{file:./prompts/documentation.txt}",

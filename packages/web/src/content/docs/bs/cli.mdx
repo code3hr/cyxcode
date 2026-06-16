@@ -1,601 +1,604 @@
 ---
 title: CLI
-description: OpenCode CLI opcije i naredbe.
+description: CyxCode CLI options and commands.
 ---
 
 import { Tabs, TabItem } from "@astrojs/starlight/components"
 
-OpenCode CLI po defaultu pokreće [TUI](/docs/tui) kada se pokrene bez ikakvih argumenata.
+The CyxCode CLI by default starts the [TUI](/docs/tui) when run without any arguments.
 
 ```bash
-opencode
+cyxcode
 ```
 
-Ali takođe prihvata naredbe kao što je dokumentovano na ovoj stranici. Ovo vam omogućava programsku interakciju sa OpenCode.
+But it also accepts commands as documented on this page. This allows you to interact with CyxCode programmatically.
 
 ```bash
-opencode run "Explain how closures work in JavaScript"
+cyxcode run "Explain how closures work in JavaScript"
 ```
 
 ---
 
 ### tui
 
-Pokrenite OpenCode terminalski korisnički interfejs.
+Start the CyxCode terminal user interface.
 
 ```bash
-opencode [project]
+cyxcode [project]
 ```
 
-#### Opcije
+#### Flags
 
-| Opcija       | Kratko | Opis                                                                     |
-| ------------ | ------ | ------------------------------------------------------------------------ |
-| `--continue` | `-c`   | Nastavite posljednju sesiju                                              |
-| `--session`  | `-s`   | ID sesije za nastavak                                                    |
-| `--fork`     |        | Forkujte sesiju pri nastavku (koristiti sa `--continue` ili `--session`) |
-| `--prompt`   |        | Prompt za upotrebu                                                       |
-| `--model`    | `-m`   | Model za korištenje u obliku provider/model                              |
-| `--agent`    |        | Agent za korištenje                                                      |
-| `--port`     |        | Port na kojem treba slušati                                              |
-| `--hostname` |        | Hostname na kojem treba slušati                                          |
+| Flag         | Short | Description                                                             |
+| ------------ | ----- | ----------------------------------------------------------------------- |
+| `--continue` | `-c`  | Continue the last session                                               |
+| `--session`  | `-s`  | Session ID to continue                                                  |
+| `--fork`     |       | Fork the session when continuing (use with `--continue` or `--session`) |
+| `--prompt`   |       | Prompt to use                                                           |
+| `--model`    | `-m`  | Model to use in the form of provider/model                              |
+| `--agent`    |       | Agent to use                                                            |
+| `--port`     |       | Port to listen on                                                       |
+| `--hostname` |       | Hostname to listen on                                                   |
 
 ---
 
-## Naredbe
+## Commands
 
-OpenCode CLI takođe ima sljedeće naredbe.
+The CyxCode CLI also has the following commands.
 
 ---
 
 ### agent
 
-Upravljajte OpenCode agentima.
+Manage agents for CyxCode.
 
 ```bash
-opencode agent [command]
+cyxcode agent [command]
 ```
 
 ---
 
 ### attach
 
-Priključite terminal na već pokrenut OpenCode backend server pokrenut putem `serve` ili `web` naredbi.
+Attach a terminal to an already running CyxCode backend server started via `serve` or `web` commands.
 
 ```bash
-opencode attach [url]
+cyxcode attach [url]
 ```
 
-Ovo omogućava korištenje TUI-ja sa udaljenim OpenCode backend-om. Na primjer:
+This allows using the TUI with a remote CyxCode backend. For example:
 
 ```bash
 # Start the backend server for web/mobile access
-opencode web --port 4096 --hostname 0.0.0.0
+cyxcode web --port 4096 --hostname 0.0.0.0
 
 # In another terminal, attach the TUI to the running backend
-opencode attach http://10.20.30.40:4096
+cyxcode attach http://10.20.30.40:4096
 ```
 
-#### Opcije
+#### Flags
 
-| Opcija      | Kratko | Opis                                 |
-| ----------- | ------ | ------------------------------------ |
-| `--dir`     |        | Radni direktorij za pokretanje TUI-a |
-| `--session` | `-s`   | ID sesije za nastavak                |
+| Flag        | Short | Description                       |
+| ----------- | ----- | --------------------------------- |
+| `--dir`     |       | Working directory to start TUI in |
+| `--session` | `-s`  | Session ID to continue            |
 
 ---
 
 #### create
 
-Kreirajte novog agenta s prilagođenom konfiguracijom.
+Create a new agent with custom configuration.
 
 ```bash
-opencode agent create
+cyxcode agent create
 ```
 
-Ova naredba će vas voditi kroz kreiranje novog agenta sa prilagođenim sistemskim promptom i konfiguracijom alata.
+This command will guide you through creating a new agent with a custom system prompt and tool configuration.
 
 ---
 
 #### list
 
-Navedite sve dostupne agente.
+List all available agents.
 
 ```bash
-opencode agent list
+cyxcode agent list
 ```
 
 ---
 
 ### auth
 
-Naredba za upravljanje vjerodajnicama i prijavom za provajdere.
+Command to manage credentials and login for providers.
 
 ```bash
-opencode auth [command]
+cyxcode auth [command]
 ```
 
 ---
 
 #### login
 
-OpenCode pokreće lista provajdera na [Models.dev](https://models.dev), tako da možete koristiti `opencode auth login` da konfigurirate API ključeve za bilo kojeg provajdera kojeg želite koristiti. Ovo je pohranjeno u `~/.local/share/opencode/auth.json`.
+CyxCode is powered by the provider list at [Models.dev](https://models.dev), so you can use `cyxcode auth login` to configure API keys for any provider you'd like to use. This is stored in `~/.local/share/opencode/auth.json`.
 
 ```bash
-opencode auth login
+cyxcode auth login
 ```
 
-Kada se OpenCode pokrene, učitava dobavljače iz datoteke vjerodajnica. I ako postoje neki ključevi definirani u vašim okruženjima ili `.env` fajl u vašem projektu.
+When CyxCode starts up it loads the providers from the credentials file. And if there are any keys defined in your environments or a `.env` file in your project.
 
 ---
 
 #### list
 
-Navodi sve autentifikovane dobavljače pohranjene u datoteci vjerodajnica.
+Lists all the authenticated providers as stored in the credentials file.
 
 ```bash
-opencode auth list
+cyxcode auth list
 ```
 
-Ili kratka verzija.
+Or the short version.
 
 ```bash
-opencode auth ls
+cyxcode auth ls
 ```
 
 ---
 
 #### logout
 
-Odjavljuje vas s provajdera tako što ga briše iz datoteke vjerodajnica.
+Logs you out of a provider by clearing it from the credentials file.
 
 ```bash
-opencode auth logout
+cyxcode auth logout
 ```
 
 ---
 
 ### github
 
-Upravljajte GitHub agentom za automatizaciju repozitorija.
+Manage the GitHub agent for repository automation.
 
 ```bash
-opencode github [command]
+cyxcode github [command]
 ```
 
 ---
 
 #### install
 
-Instalirajte GitHub agenta u svoj repozitorij.
+Install the GitHub agent in your repository.
 
 ```bash
-opencode github install
+cyxcode github install
 ```
 
-Ovo postavlja neophodni tok rada GitHub Actions i vodi vas kroz proces konfiguracije. [Saznajte više](/docs/github).
+This sets up the necessary GitHub Actions workflow and guides you through the configuration process. [Learn more](/docs/github).
 
 ---
 
 #### run
 
-Pokrenite GitHub agent. Ovo se obično koristi u GitHub Actions.
+Run the GitHub agent. This is typically used in GitHub Actions.
 
 ```bash
-opencode github run
+cyxcode github run
 ```
 
-##### Opcije
+##### Flags
 
-| Opcija    | Opis                                   |
+| Flag      | Description                            |
 | --------- | -------------------------------------- |
-| `--event` | GitHub mock event za pokretanje agenta |
-| `--token` | GitHub Personal Access Token           |
+| `--event` | GitHub mock event to run the agent for |
+| `--token` | GitHub personal access token           |
 
 ---
 
 ### mcp
 
-Upravljajte Model Context Protocol (MCP) serverima.
+Manage Model Context Protocol servers.
 
 ```bash
-opencode mcp [command]
+cyxcode mcp [command]
 ```
 
 ---
 
 #### add
 
-Dodajte MCP server svojoj konfiguraciji.
+Add an MCP server to your configuration.
 
 ```bash
-opencode mcp add
+cyxcode mcp add
 ```
 
-Ova naredba će vas voditi kroz dodavanje lokalnog ili udaljenog MCP servera.
+This command will guide you through adding either a local or remote MCP server.
 
 ---
 
 #### list
 
-Navedite sve konfigurirane MCP servere i njihov status veze.
+List all configured MCP servers and their connection status.
 
 ```bash
-opencode mcp list
+cyxcode mcp list
 ```
 
-Ili koristite kratku verziju.
+Or use the short version.
 
 ```bash
-opencode mcp ls
+cyxcode mcp ls
 ```
 
 ---
 
 #### auth
 
-Autentifikujte se sa MCP serverom koji je omogućen za OAuth.
+Authenticate with an OAuth-enabled MCP server.
 
 ```bash
-opencode mcp auth [name]
+cyxcode mcp auth [name]
 ```
 
-Ako ne navedete ime servera, od vas će biti zatraženo da izaberete neki od dostupnih servera koji podržavaju OAuth.
-Također možete navesti servere koji podržavaju OAuth i njihov status autentifikacije.
+If you don't provide a server name, you'll be prompted to select from available OAuth-capable servers.
+
+You can also list OAuth-capable servers and their authentication status.
 
 ```bash
-opencode mcp auth list
+cyxcode mcp auth list
 ```
 
-Ili koristite kratku verziju.
+Or use the short version.
 
 ```bash
-opencode mcp auth ls
+cyxcode mcp auth ls
 ```
 
 ---
 
 #### logout
 
-Uklonite OAuth vjerodajnice za MCP server.
+Remove OAuth credentials for an MCP server.
 
 ```bash
-opencode mcp logout [name]
+cyxcode mcp logout [name]
 ```
 
 ---
 
 #### debug
 
-Otklanjanje grešaka (debug) OAuth veze sa MCP serverom.
+Debug OAuth connection issues for an MCP server.
 
 ```bash
-opencode mcp debug <name>
+cyxcode mcp debug <name>
 ```
 
 ---
 
 ### models
 
-Navedite sve dostupne modele konfiguriranih provajdera.
+List all available models from configured providers.
 
 ```bash
-opencode models [provider]
+cyxcode models [provider]
 ```
 
-Ova naredba prikazuje sve modele dostupne kod vaših konfiguriranih provajdera u formatu `provider/model`.
-Ovo je korisno za pronalaženje tačnog naziva modela za korištenje u [vašoj konfiguraciji](/docs/config/).
-Opciono možete proslijediti ID provajdera za filtriranje modela po tom dobavljaču.
+This command displays all models available across your configured providers in the format `provider/model`.
+
+This is useful for figuring out the exact model name to use in [your config](/docs/config/).
+
+You can optionally pass a provider ID to filter models by that provider.
 
 ```bash
-opencode models anthropic
+cyxcode models anthropic
 ```
 
-#### Opcije
+#### Flags
 
-| Opcija      | Opis                                                                     |
-| ----------- | ------------------------------------------------------------------------ |
-| `--refresh` | Osvježite keš modela sa models.dev                                       |
-| `--verbose` | Koristite detaljniji izlaz modela (uključuje metapodatke poput troškova) |
+| Flag        | Description                                                  |
+| ----------- | ------------------------------------------------------------ |
+| `--refresh` | Refresh the models cache from models.dev                     |
+| `--verbose` | Use more verbose model output (includes metadata like costs) |
 
-Koristite `--refresh` zastavicu da ažurirate keširanu listu modela. Ovo je korisno kada su novi modeli dodani provajderu i želite da ih vidite u OpenCode.
+Use the `--refresh` flag to update the cached model list. This is useful when new models have been added to a provider and you want to see them in CyxCode.
 
 ```bash
-opencode models --refresh
+cyxcode models --refresh
 ```
 
 ---
 
 ### run
 
-Pokrenite OpenCode u neinteraktivnom modu tako što ćete direktno proslijediti prompt.
+Run CyxCode in non-interactive mode by passing a prompt directly.
 
 ```bash
-opencode run [message..]
+cyxcode run [message..]
 ```
 
-Ovo je korisno za skriptiranje, automatizaciju ili kada želite brz odgovor bez pokretanja punog TUI-ja. Na primjer:
+This is useful for scripting, automation, or when you want a quick answer without launching the full TUI. For example.
 
-```bash "opencode run"
-opencode run Explain the use of context in Go
+```bash "cyxcode run"
+cyxcode run Explain the use of context in Go
 ```
 
-Također možete priključiti pokrenutu `opencode serve` instancu kako biste izbjegli vrijeme hladnog pokretanja MCP servera pri svakom pokretanju:
+You can also attach to a running `cyxcode serve` instance to avoid MCP server cold boot times on every run:
 
 ```bash
 # Start a headless server in one terminal
-opencode serve
+cyxcode serve
 
 # In another terminal, run commands that attach to it
-opencode run --attach http://localhost:4096 "Explain async/await in JavaScript"
+cyxcode run --attach http://localhost:4096 "Explain async/await in JavaScript"
 ```
 
-#### Opcije
+#### Flags
 
-| Opcija       | Kratko | Opis                                                                     |
-| ------------ | ------ | ------------------------------------------------------------------------ |
-| `--command`  |        | Naredba za pokretanje, koristite poruku za argumente                     |
-| `--continue` | `-c`   | Nastavite posljednju sesiju                                              |
-| `--session`  | `-s`   | ID sesije za nastavak                                                    |
-| `--fork`     |        | Forkujte sesiju pri nastavku (koristiti sa `--continue` ili `--session`) |
-| `--share`    |        | Podijelite sesiju                                                        |
-| `--model`    | `-m`   | Model za korištenje u obliku provider/model                              |
-| `--agent`    |        | Agent za korištenje                                                      |
-| `--file`     | `-f`   | Fajlovi koje treba priložiti poruci                                      |
-| `--format`   |        | Format: default (formatiran) ili json (sirovi JSON događaji)             |
-| `--title`    |        | Naslov sesije (koristi skraćeni prompt ako nije navedena vrijednost)     |
-| `--attach`   |        | Priključite na pokrenuti OpenCode server (npr. http://localhost:4096)    |
-| `--port`     |        | Port za lokalni server (zadano na nasumični port)                        |
+| Flag         | Short | Description                                                             |
+| ------------ | ----- | ----------------------------------------------------------------------- |
+| `--command`  |       | The command to run, use message for args                                |
+| `--continue` | `-c`  | Continue the last session                                               |
+| `--session`  | `-s`  | Session ID to continue                                                  |
+| `--fork`     |       | Fork the session when continuing (use with `--continue` or `--session`) |
+| `--share`    |       | Share the session                                                       |
+| `--model`    | `-m`  | Model to use in the form of provider/model                              |
+| `--agent`    |       | Agent to use                                                            |
+| `--file`     | `-f`  | File(s) to attach to message                                            |
+| `--format`   |       | Format: default (formatted) or json (raw JSON events)                   |
+| `--title`    |       | Title for the session (uses truncated prompt if no value provided)      |
+| `--attach`   |       | Attach to a running cyxcode server (e.g., http://localhost:4096)       |
+| `--port`     |       | Port for the local server (defaults to random port)                     |
 
 ---
 
 ### serve
 
-Pokrenite OpenCode headless server za API pristup. Pogledajte [server docs](/docs/server) za kompletan HTTP interfejs.
+Start a headless CyxCode server for API access. Check out the [server docs](/docs/server) for the full HTTP interface.
 
 ```bash
-opencode serve
+cyxcode serve
 ```
 
-Ovo pokreće HTTP server koji pruža API pristup funkcionalnosti OpenCode-a bez TUI interfejsa. Postavite `OPENCODE_SERVER_PASSWORD` da omogućite HTTP osnovnu auth (korisničko ime je zadano na `opencode`).
+This starts an HTTP server that provides API access to CyxCode functionality without the TUI interface. Set `OPENCODE_SERVER_PASSWORD` to enable HTTP basic auth (username defaults to `opencode`).
 
-#### Opcije
+#### Flags
 
-| Opcija       | Opis                                                  |
-| ------------ | ----------------------------------------------------- |
-| `--port`     | Port na kojem treba slušati                           |
-| `--hostname` | Hostname na kojem treba slušati                       |
-| `--mdns`     | Omogući mDNS otkrivanje                               |
-| `--cors`     | Dodatni origin(i) pretraživača koji dozvoljavaju CORS |
+| Flag         | Description                                |
+| ------------ | ------------------------------------------ |
+| `--port`     | Port to listen on                          |
+| `--hostname` | Hostname to listen on                      |
+| `--mdns`     | Enable mDNS discovery                      |
+| `--cors`     | Additional browser origin(s) to allow CORS |
 
 ---
 
 ### session
 
-Upravljajte OpenCode sesijama.
+Manage CyxCode sessions.
 
 ```bash
-opencode session [command]
+cyxcode session [command]
 ```
 
 ---
 
 #### list
 
-Navedite sve OpenCode sesije.
+List all CyxCode sessions.
 
 ```bash
-opencode session list
+cyxcode session list
 ```
 
-##### Opcije
+##### Flags
 
-| Opcija        | Kratko | Opis                                   |
-| ------------- | ------ | -------------------------------------- |
-| `--max-count` | `-n`   | Ograničenje na N najnovijih sesija     |
-| `--format`    |        | Izlazni format: table ili json (table) |
+| Flag          | Short | Description                          |
+| ------------- | ----- | ------------------------------------ |
+| `--max-count` | `-n`  | Limit to N most recent sessions      |
+| `--format`    |       | Output format: table or json (table) |
 
 ---
 
 ### stats
 
-Prikaži statistiku upotrebe tokena i troškova za vaše OpenCode sesije.
+Show token usage and cost statistics for your CyxCode sessions.
 
 ```bash
-opencode stats
+cyxcode stats
 ```
 
-#### Opcije
+#### Flags
 
-| Opcija      | Opis                                                                                                       |
-| ----------- | ---------------------------------------------------------------------------------------------------------- |
-| `--days`    | Prikaži statistiku za zadnjih N dana (sva vremena)                                                         |
-| `--tools`   | Broj alata za prikaz (svi)                                                                                 |
-| `--models`  | Prikaži raščlambu korištenja modela (skriveno prema zadanim postavkama). Proslijedite broj za prikaz top N |
-| `--project` | Filtriraj po projektu (svi projekti, prazan niz: trenutni projekt)                                         |
+| Flag        | Description                                                                 |
+| ----------- | --------------------------------------------------------------------------- |
+| `--days`    | Show stats for the last N days (all time)                                   |
+| `--tools`   | Number of tools to show (all)                                               |
+| `--models`  | Show model usage breakdown (hidden by default). Pass a number to show top N |
+| `--project` | Filter by project (all projects, empty string: current project)             |
 
 ---
 
 ### export
 
-Izvezite podatke sesije kao JSON.
+Export session data as JSON.
 
 ```bash
-opencode export [sessionID]
+cyxcode export [sessionID]
 ```
 
-Ako ne unesete ID sesije, od vas će biti zatraženo da odaberete neku od dostupnih sesija.
+If you don't provide a session ID, you'll be prompted to select from available sessions.
 
 ---
 
 ### import
 
-Uvezite podatke sesije iz JSON datoteke ili OpenCode dijeljenog URL-a.
+Import session data from a JSON file or CyxCode share URL.
 
 ```bash
-opencode import <file>
+cyxcode import <file>
 ```
 
-Možete uvesti iz lokalne datoteke ili OpenCode dijeljenog URL-a.
+You can import from a local file or an CyxCode share URL.
 
 ```bash
-opencode import session.json
-opencode import https://opncd.ai/s/abc123
+cyxcode import session.json
+cyxcode import https://opncd.ai/s/abc123
 ```
 
 ---
 
 ### web
 
-Pokrenite OpenCode headless server sa web interfejsom.
+Start a headless CyxCode server with a web interface.
 
 ```bash
-opencode web
+cyxcode web
 ```
 
-Ovo pokreće HTTP server i otvara web pretraživač za pristup OpenCode-u preko web interfejsa. Postavite `OPENCODE_SERVER_PASSWORD` da omogućite HTTP osnovnu auth (korisničko ime je zadano na `opencode`).
+This starts an HTTP server and opens a web browser to access CyxCode through a web interface. Set `OPENCODE_SERVER_PASSWORD` to enable HTTP basic auth (username defaults to `opencode`).
 
-#### Opcije
+#### Flags
 
-| Opcija       | Opis                                                  |
-| ------------ | ----------------------------------------------------- |
-| `--port`     | Port na kojem treba slušati                           |
-| `--hostname` | Hostname na kojem treba slušati                       |
-| `--mdns`     | Omogući mDNS otkrivanje                               |
-| `--cors`     | Dodatni origin(i) pretraživača koji dozvoljavaju CORS |
+| Flag         | Description                                |
+| ------------ | ------------------------------------------ |
+| `--port`     | Port to listen on                          |
+| `--hostname` | Hostname to listen on                      |
+| `--mdns`     | Enable mDNS discovery                      |
+| `--cors`     | Additional browser origin(s) to allow CORS |
 
 ---
 
 ### acp
 
-Pokrenite ACP (Agent Client Protocol) server.
+Start an ACP (Agent Client Protocol) server.
 
 ```bash
-opencode acp
+cyxcode acp
 ```
 
-Ova naredba pokreće ACP server koji komunicira preko stdin/stdout koristeći nd-JSON.
+This command starts an ACP server that communicates via stdin/stdout using nd-JSON.
 
-#### Opcije
+#### Flags
 
-| Opcija       | Opis                        |
-| ------------ | --------------------------- |
-| `--cwd`      | Radni direktorij            |
-| `--port`     | Port na kojem treba slušati |
-| `--hostname` | Hostname na kojem slušati   |
+| Flag         | Description           |
+| ------------ | --------------------- |
+| `--cwd`      | Working directory     |
+| `--port`     | Port to listen on     |
+| `--hostname` | Hostname to listen on |
 
 ---
 
 ### uninstall
 
-Deinstalirajte OpenCode i uklonite sve povezane datoteke.
+Uninstall CyxCode and remove all related files.
 
 ```bash
-opencode uninstall
+cyxcode uninstall
 ```
 
-#### Opcije
+#### Flags
 
-| Opcija          | Kratko | Opis                                          |
-| --------------- | ------ | --------------------------------------------- |
-| `--keep-config` | `-c`   | Sačuvajte konfiguracijske datoteke            |
-| `--keep-data`   | `-d`   | Sačuvajte podatke i snimke sesije             |
-| `--dry-run`     |        | Pokažite šta bi bilo uklonjeno bez uklanjanja |
-| `--force`       | `-f`   | Preskoči upite za potvrdu                     |
+| Flag            | Short | Description                                 |
+| --------------- | ----- | ------------------------------------------- |
+| `--keep-config` | `-c`  | Keep configuration files                    |
+| `--keep-data`   | `-d`  | Keep session data and snapshots             |
+| `--dry-run`     |       | Show what would be removed without removing |
+| `--force`       | `-f`  | Skip confirmation prompts                   |
 
 ---
 
 ### upgrade
 
-Ažurira OpenCode na najnoviju verziju ili određenu verziju.
+Updates CyxCode to the latest version or a specific version.
 
 ```bash
-opencode upgrade [target]
+cyxcode upgrade [target]
 ```
 
-Za nadogradnju na najnoviju verziju.
+To upgrade to the latest version.
 
 ```bash
-opencode upgrade
+cyxcode upgrade
 ```
 
-Za nadogradnju na određenu verziju.
+To upgrade to a specific version.
 
 ```bash
-opencode upgrade v0.1.48
+cyxcode upgrade v0.1.48
 ```
 
-#### Opcije
+#### Flags
 
-| Opcija     | Kratko | Opis                                                    |
-| ---------- | ------ | ------------------------------------------------------- |
-| `--method` | `-m`   | Korišteni način instalacije; curl, npm, pnpm, bun, brew |
+| Flag       | Short | Description                                                       |
+| ---------- | ----- | ----------------------------------------------------------------- |
+| `--method` | `-m`  | The installation method that was used; curl, npm, pnpm, bun, brew |
 
 ---
 
-## Globalne opcije
+## Global Flags
 
-OpenCode CLI prihvata sljedeće globalne zastavice.
+The CyxCode CLI takes the following global flags.
 
-| Opcija         | Kratko | Opis                                      |
-| -------------- | ------ | ----------------------------------------- |
-| `--help`       | `-h`   | Prikaži pomoć                             |
-| `--version`    | `-v`   | Ispiši broj verzije                       |
-| `--print-logs` |        | Ispis logova u stderr                     |
-| `--log-level`  |        | Nivo logovanja (DEBUG, INFO, WARN, ERROR) |
-
----
-
-## Varijable okruženja
-
-OpenCode se može konfigurirati pomoću varijabli okruženja.
-
-| Varijabla                             | Tip     | Opis                                                               |
-| ------------------------------------- | ------- | ------------------------------------------------------------------ |
-| `OPENCODE_AUTO_SHARE`                 | boolean | Automatski dijeli sesije                                           |
-| `OPENCODE_GIT_BASH_PATH`              | string  | Putanja do Git Bash izvršne datoteke na Windows-u                  |
-| `OPENCODE_CONFIG`                     | string  | Putanja do konfiguracijskog fajla                                  |
-| `OPENCODE_TUI_CONFIG`                 | string  | Putanja do TUI konfiguracijskog fajla                              |
-| `OPENCODE_CONFIG_DIR`                 | string  | Putanja do konfiguracijskog direktorija                            |
-| `OPENCODE_CONFIG_CONTENT`             | string  | Inline json konfiguracijski sadržaj                                |
-| `OPENCODE_DISABLE_AUTOUPDATE`         | boolean | Onemogući automatske provjere ažuriranja                           |
-| `OPENCODE_DISABLE_PRUNE`              | boolean | Onemogući brisanje (pruning) starih podataka                       |
-| `OPENCODE_DISABLE_TERMINAL_TITLE`     | boolean | Onemogući automatsko ažuriranje naslova terminala                  |
-| `OPENCODE_PERMISSION`                 | string  | Inline json konfiguracija dozvola                                  |
-| `OPENCODE_DISABLE_DEFAULT_PLUGINS`    | boolean | Onemogući podrazumijevane dodatke (plugins)                        |
-| `OPENCODE_DISABLE_LSP_DOWNLOAD`       | boolean | Onemogući automatsko preuzimanje LSP servera                       |
-| `OPENCODE_ENABLE_EXPERIMENTAL_MODELS` | boolean | Omogući eksperimentalne modele                                     |
-| `OPENCODE_DISABLE_AUTOCOMPACT`        | boolean | Onemogući automatsko sažimanje konteksta                           |
-| `OPENCODE_DISABLE_CLAUDE_CODE`        | boolean | Onemogući čitanje iz `.claude` (prompt + vještine)                 |
-| `OPENCODE_DISABLE_CLAUDE_CODE_PROMPT` | boolean | Onemogući čitanje `~/.claude/CLAUDE.md`                            |
-| `OPENCODE_DISABLE_CLAUDE_CODE_SKILLS` | boolean | Onemogući učitavanje `.claude/skills`                              |
-| `OPENCODE_DISABLE_MODELS_FETCH`       | boolean | Onemogući dohvaćanje modela iz udaljenih izvora                    |
-| `OPENCODE_FAKE_VCS`                   | string  | Lažni VCS provajder za potrebe testiranja                          |
-| `OPENCODE_DISABLE_FILETIME_CHECK`     | boolean | Onemogući provjeru vremena datoteke radi optimizacije              |
-| `OPENCODE_CLIENT`                     | string  | Identifikator klijenta (zadano na `cli`)                           |
-| `OPENCODE_ENABLE_EXA`                 | boolean | Omogući Exa alate za web pretraživanje                             |
-| `OPENCODE_SERVER_PASSWORD`            | string  | Omogući osnovnu autentifikaciju za `serve`/`web`                   |
-| `OPENCODE_SERVER_USERNAME`            | string  | Poništi osnovno korisničko ime autentifikacije (zadano `opencode`) |
-| `OPENCODE_MODELS_URL`                 | string  | Prilagođeni URL za dohvaćanje konfiguracije modela                 |
+| Flag           | Short | Description                          |
+| -------------- | ----- | ------------------------------------ |
+| `--help`       | `-h`  | Display help                         |
+| `--version`    | `-v`  | Print version number                 |
+| `--print-logs` |       | Print logs to stderr                 |
+| `--log-level`  |       | Log level (DEBUG, INFO, WARN, ERROR) |
 
 ---
 
-### Eksperimentalno
+## Environment variables
 
-Ove varijable okruženja omogućavaju eksperimentalne karakteristike koje se mogu promijeniti ili ukloniti.
+CyxCode can be configured using environment variables.
 
-| Varijabla                                       | Tip     | Opis                                              |
-| ----------------------------------------------- | ------- | ------------------------------------------------- |
-| `OPENCODE_EXPERIMENTAL`                         | boolean | Omogući sve eksperimentalne funkcije              |
-| `OPENCODE_EXPERIMENTAL_ICON_DISCOVERY`          | boolean | Omogući otkrivanje ikona                          |
-| `OPENCODE_EXPERIMENTAL_DISABLE_COPY_ON_SELECT`  | boolean | Onemogući kopiranje pri odabiru u TUI             |
-| `OPENCODE_EXPERIMENTAL_BASH_DEFAULT_TIMEOUT_MS` | number  | Zadano vremensko ograničenje za bash naredbe u ms |
-| `OPENCODE_EXPERIMENTAL_OUTPUT_TOKEN_MAX`        | number  | Maksimalni izlazni tokeni za LLM odgovore         |
-| `OPENCODE_EXPERIMENTAL_FILEWATCHER`             | boolean | Omogući praćenje datoteka za cijeli direktorij    |
-| `OPENCODE_EXPERIMENTAL_OXFMT`                   | boolean | Omogući oxfmt formatter                           |
-| `OPENCODE_EXPERIMENTAL_LSP_TOOL`                | boolean | Omogući eksperimentalni LSP alat                  |
-| `OPENCODE_EXPERIMENTAL_DISABLE_FILEWATCHER`     | boolean | Onemogući praćenje datoteka                       |
-| `OPENCODE_EXPERIMENTAL_EXA`                     | boolean | Omogući eksperimentalne Exa funkcije              |
-| `OPENCODE_EXPERIMENTAL_LSP_TY`                  | boolean | Omogući TY LSP za python datoteke                 |
-| `OPENCODE_EXPERIMENTAL_MARKDOWN`                | boolean | Omogući eksperimentalne Markdown funkcije         |
-| `OPENCODE_EXPERIMENTAL_PLAN_MODE`               | boolean | Omogući Plan mod                                  |
+| Variable                              | Type    | Description                                       |
+| ------------------------------------- | ------- | ------------------------------------------------- |
+| `OPENCODE_AUTO_SHARE`                 | boolean | Automatically share sessions                      |
+| `OPENCODE_GIT_BASH_PATH`              | string  | Path to Git Bash executable on Windows            |
+| `OPENCODE_CONFIG`                     | string  | Path to config file                               |
+| `OPENCODE_TUI_CONFIG`                 | string  | Path to TUI config file                           |
+| `OPENCODE_CONFIG_DIR`                 | string  | Path to config directory                          |
+| `OPENCODE_CONFIG_CONTENT`             | string  | Inline json config content                        |
+| `OPENCODE_DISABLE_AUTOUPDATE`         | boolean | Disable automatic update checks                   |
+| `OPENCODE_DISABLE_PRUNE`              | boolean | Disable pruning of old data                       |
+| `OPENCODE_DISABLE_TERMINAL_TITLE`     | boolean | Disable automatic terminal title updates          |
+| `OPENCODE_PERMISSION`                 | string  | Inlined json permissions config                   |
+| `OPENCODE_DISABLE_DEFAULT_PLUGINS`    | boolean | Disable default plugins                           |
+| `OPENCODE_DISABLE_LSP_DOWNLOAD`       | boolean | Disable automatic LSP server downloads            |
+| `OPENCODE_ENABLE_EXPERIMENTAL_MODELS` | boolean | Enable experimental models                        |
+| `OPENCODE_DISABLE_AUTOCOMPACT`        | boolean | Disable automatic context compaction              |
+| `OPENCODE_DISABLE_CLAUDE_CODE`        | boolean | Disable reading from `.claude` (prompt + skills)  |
+| `OPENCODE_DISABLE_CLAUDE_CODE_PROMPT` | boolean | Disable reading `~/.claude/CLAUDE.md`             |
+| `OPENCODE_DISABLE_CLAUDE_CODE_SKILLS` | boolean | Disable loading `.claude/skills`                  |
+| `OPENCODE_DISABLE_MODELS_FETCH`       | boolean | Disable fetching models from remote sources       |
+| `OPENCODE_FAKE_VCS`                   | string  | Fake VCS provider for testing purposes            |
+| `OPENCODE_DISABLE_FILETIME_CHECK`     | boolean | Disable file time checking for optimization       |
+| `OPENCODE_CLIENT`                     | string  | Client identifier (defaults to `cli`)             |
+| `OPENCODE_ENABLE_EXA`                 | boolean | Enable Exa web search tools                       |
+| `OPENCODE_SERVER_PASSWORD`            | string  | Enable basic auth for `serve`/`web`               |
+| `OPENCODE_SERVER_USERNAME`            | string  | Override basic auth username (default `opencode`) |
+| `OPENCODE_MODELS_URL`                 | string  | Custom URL for fetching models configuration      |
+
+---
+
+### Experimental
+
+These environment variables enable experimental features that may change or be removed.
+
+| Variable                                        | Type    | Description                             |
+| ----------------------------------------------- | ------- | --------------------------------------- |
+| `OPENCODE_EXPERIMENTAL`                         | boolean | Enable all experimental features        |
+| `OPENCODE_EXPERIMENTAL_ICON_DISCOVERY`          | boolean | Enable icon discovery                   |
+| `OPENCODE_EXPERIMENTAL_DISABLE_COPY_ON_SELECT`  | boolean | Disable copy on select in TUI           |
+| `OPENCODE_EXPERIMENTAL_BASH_DEFAULT_TIMEOUT_MS` | number  | Default timeout for bash commands in ms |
+| `OPENCODE_EXPERIMENTAL_OUTPUT_TOKEN_MAX`        | number  | Max output tokens for LLM responses     |
+| `OPENCODE_EXPERIMENTAL_FILEWATCHER`             | boolean | Enable file watcher for entire dir      |
+| `OPENCODE_EXPERIMENTAL_OXFMT`                   | boolean | Enable oxfmt formatter                  |
+| `OPENCODE_EXPERIMENTAL_LSP_TOOL`                | boolean | Enable experimental LSP tool            |
+| `OPENCODE_EXPERIMENTAL_DISABLE_FILEWATCHER`     | boolean | Disable file watcher                    |
+| `OPENCODE_EXPERIMENTAL_EXA`                     | boolean | Enable experimental Exa features        |
+| `OPENCODE_EXPERIMENTAL_LSP_TY`                  | boolean | Enable TY LSP for python files          |
+| `OPENCODE_EXPERIMENTAL_MARKDOWN`                | boolean | Enable experimental markdown features   |
+| `OPENCODE_EXPERIMENTAL_PLAN_MODE`               | boolean | Enable plan mode                        |

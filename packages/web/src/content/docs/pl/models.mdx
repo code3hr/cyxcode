@@ -3,7 +3,7 @@ title: Modele
 description: Konfigurowanie dostawcy i modelu LLM.
 ---
 
-opencode używa [AI SDK](https://ai-sdk.dev/) i [Models.dev](https://models.dev) do obsługi **ponad 75 dostawców LLM** i obsługi uruchamiania modeli pierwszych.
+cyxcode używa [AI SDK](https://ai-sdk.dev/) i [Models.dev](https://models.dev) do obsługi **ponad 75 dostawców LLM** i obsługi uruchamiania modeli pierwszych.
 
 ---
 
@@ -49,16 +49,16 @@ Oto kilka modeli, które dobrze współpracują z opencode, w kolejności. (Nie 
 ## Ustaw wartość domyślną
 
 Aby zainstalować jeden z nich jako model domyślny, możesz zainstalować klucz `model` w swoim
-opencode konfiguracja
+cyxcode konfiguracja
 
 ```json title="opencode.json" {3}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "model": "lmstudio/google/gemma-3n-e4b"
 }
 ```
 
-Tutaj pełny identyfikator do `provider_id/model_id`. Na przykład, użycie [OpenCode Zen](/docs/zen), przestrzeganie `opencode/gpt-5.1-codex` dla Kodeksu GPT 5.1.
+Tutaj pełny identyfikator do `provider_id/model_id`. Na przykład, użycie [CyxCode Zen](/docs/zen), przestrzeganie `opencode/gpt-5.1-codex` dla Kodeksu GPT 5.1.
 
 Jeśli skonfigurowałeś [dostawcę zwykłegogo] (./providers#custom), `provider_id` jest kluczem z części `provider` twojej konfiguracji, a `model_id` jest kluczem z `provider.models`.
 
@@ -70,7 +70,7 @@ Można globalnie skorzystać z opcji modelu poprzez plik config.
 
 ```jsonc title="opencode.jsonc" {7-12,19-24}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "provider": {
     "openai": {
       "models": {
@@ -109,7 +109,7 @@ Można również zastosować alternatywne warianty, które wykluczają. Warianty
 
 ```jsonc title="opencode.jsonc" {6-21}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "provider": {
     "opencode": {
       "models": {
@@ -141,7 +141,7 @@ Wiele modeli obsługuje wiele wariantów lub różnych wybranych. opencode jest 
 
 ### Wbudowane warianty
 
-opencode jest dostarczany z domyślnymi wariantami dla wielu dostawców:
+cyxcode jest dostarczany z domyślnymi wariantami dla wielu dostawców:
 
 **Antropiczny**:
 
@@ -174,7 +174,7 @@ Można uwzględnić warianty lub dodać własne:
 
 ```jsonc title="opencode.jsonc" {7-18}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "provider": {
     "openai": {
       "models": {
@@ -211,7 +211,7 @@ Po uruchomieniu opencode sprawdzanie modeli w następującej kolejności:
 
    ```json title="opencode.json"
    {
-     "$schema": "https://opencode.ai/config.json",
+     "$schema": "https://cyxcode.ai/config.json",
      "model": "anthropic/claude-sonnet-4-20250514"
    }
    ```

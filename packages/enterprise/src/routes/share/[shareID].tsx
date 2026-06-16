@@ -171,9 +171,9 @@ export default function () {
           return (
             <>
               <Show when={info().title}>
-                <Title>{info().title} | OpenCode</Title>
+                <Title>{info().title} | CyxCode</Title>
               </Show>
-              <Meta name="description" content="opencode - The AI coding agent built for the terminal." />
+              <Meta name="description" content="CyxCode - The AI coding agent built for the terminal." />
               <Meta property="og:image" content={ogImage()} />
               <Meta name="twitter:image" content={ogImage()} />
               <ClientOnlyWorkerPoolProvider>

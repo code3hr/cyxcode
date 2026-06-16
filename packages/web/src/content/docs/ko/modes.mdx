@@ -11,7 +11,7 @@ description: 다양한 사용 사례를 위한 다양한 모드.
 opencode의 모드는 다른 사용 사례에 대한 행동, 도구 및 프롬프트를 사용자 정의 할 수 있습니다.
 
 그것은 두 개의 내장 모드와 함께 제공됩니다 : ** 빌드 ** 및 ** 계획 **. 사용자 정의 할 수 있습니다.
-opencode config를 통해 자체를 구성합니다.
+cyxcode config를 통해 자체를 구성합니다.
 
 세션 중에 모드를 전환하거나 구성 파일에서 구성할 수 있습니다.
 
@@ -60,7 +60,7 @@ Tab 키를 사용하여 세션 중에 모드를 전환할 수 있습니다. 또�
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "mode": {
     "build": {
       "model": "anthropic/claude-sonnet-4-20250514",
@@ -248,7 +248,7 @@ Markdown 파일 이름은 모드 이름 (예 : `review.md`는 `review` 모드를
 
 ```json title="opencode.json" {4-14}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "mode": {
     "docs": {
       "prompt": "{file:./prompts/documentation.txt}",

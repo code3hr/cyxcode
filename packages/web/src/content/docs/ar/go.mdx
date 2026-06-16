@@ -7,15 +7,15 @@ import config from "../../../../config.mjs"
 export const console = config.console
 export const email = `mailto:${config.email}`
 
-OpenCode Go هو اشتراك منخفض التكلفة — **5 دولارات للشهر الأول**، ثم **10 دولارات/شهريًا** — يمنحك وصولًا موثوقًا إلى نماذج البرمجة المفتوحة الشهيرة.
+CyxCode Go هو اشتراك منخفض التكلفة — **5 دولارات للشهر الأول**، ثم **10 دولارات/شهريًا** — يمنحك وصولًا موثوقًا إلى نماذج البرمجة المفتوحة الشهيرة.
 
 :::note
-OpenCode Go حاليًا في المرحلة التجريبية (beta).
+CyxCode Go حاليًا في المرحلة التجريبية (beta).
 :::
 
-يعمل Go مثل أي مزود آخر في OpenCode. أنت تشترك في OpenCode Go و
+يعمل Go مثل أي مزود آخر في CyxCode. أنت تشترك في CyxCode Go و
 تحصل على مفتاح API الخاص بك. إنه **اختياري تمامًا** ولا تحتاج إلى استخدامه
-لاستخدام OpenCode.
+لاستخدام CyxCode.
 
 تم تصميمه بشكل أساسي للمستخدمين الدوليين، مع نماذج مستضافة في الولايات المتحدة، والاتحاد الأوروبي، وسنغافورة من أجل وصول عالمي مستقر.
 
@@ -31,7 +31,7 @@ OpenCode Go حاليًا في المرحلة التجريبية (beta).
 في الجودة والتوافر.
 
 :::tip
-لقد اختبرنا مجموعة مختارة من النماذج والمزودين الذين يعملون بشكل جيد مع OpenCode.
+لقد اختبرنا مجموعة مختارة من النماذج والمزودين الذين يعملون بشكل جيد مع CyxCode.
 :::
 
 لحل هذه المشكلة، قمنا ببعض الأشياء:
@@ -43,22 +43,22 @@ OpenCode Go حاليًا في المرحلة التجريبية (beta).
 3. أخيرًا، قمنا بعمل تقييم لأداء (benchmarked) الجمع بين النموذج/المزود وتوصلنا
    إلى قائمة نشعر بالرضا في التوصية بها.
 
-يمنحك OpenCode Go الوصول إلى هذه النماذج مقابل **5 دولارات لشهرك الأول**، ثم **10 دولارات/شهريًا**.
+يمنحك CyxCode Go الوصول إلى هذه النماذج مقابل **5 دولارات لشهرك الأول**، ثم **10 دولارات/شهريًا**.
 
 ---
 
 ## كيف يعمل
 
-يعمل OpenCode Go مثل أي مزود آخر في OpenCode.
+يعمل CyxCode Go مثل أي مزود آخر في CyxCode.
 
-1. تقوم بتسجيل الدخول إلى **<a href={console}>OpenCode Zen</a>**، وتشترك في Go، و
+1. تقوم بتسجيل الدخول إلى **<a href={console}>CyxCode Zen</a>**، وتشترك في Go، و
    تنسخ مفتاح API الخاص بك.
-2. تقوم بتشغيل الأمر `/connect` في الـ TUI، وتختار `OpenCode Go`، وتلصق
+2. تقوم بتشغيل الأمر `/connect` في الـ TUI، وتختار `CyxCode Go`، وتلصق
    مفتاح API الخاص بك.
 3. قم بتشغيل `/models` في الـ TUI لرؤية قائمة النماذج المتاحة عبر Go.
 
 :::note
-يمكن لعضو واحد فقط لكل مساحة عمل (workspace) الاشتراك في OpenCode Go.
+يمكن لعضو واحد فقط لكل مساحة عمل (workspace) الاشتراك في CyxCode Go.
 :::
 
 تتضمن القائمة الحالية للنماذج:
@@ -74,7 +74,7 @@ OpenCode Go حاليًا في المرحلة التجريبية (beta).
 
 ## حدود الاستخدام
 
-يتضمن OpenCode Go الحدود التالية:
+يتضمن CyxCode Go الحدود التالية:
 
 - **حد الـ 5 ساعات** — 12 دولارًا من الاستخدام
 - **الحد الأسبوعي** — 30 دولارًا من الاستخدام
@@ -120,12 +120,12 @@ OpenCode Go حاليًا في المرحلة التجريبية (beta).
 
 | Model        | Model ID     | Endpoint                                         | AI SDK Package              |
 | ------------ | ------------ | ------------------------------------------------ | --------------------------- |
-| GLM-5        | glm-5        | `https://opencode.ai/zen/go/v1/chat/completions` | `@ai-sdk/openai-compatible` |
-| Kimi K2.5    | kimi-k2.5    | `https://opencode.ai/zen/go/v1/chat/completions` | `@ai-sdk/openai-compatible` |
-| MiniMax M2.7 | minimax-m2.7 | `https://opencode.ai/zen/go/v1/messages`         | `@ai-sdk/anthropic`         |
-| MiniMax M2.5 | minimax-m2.5 | `https://opencode.ai/zen/go/v1/messages`         | `@ai-sdk/anthropic`         |
+| GLM-5        | glm-5        | `https://cyxcode.ai/zen/go/v1/chat/completions` | `@ai-sdk/openai-compatible` |
+| Kimi K2.5    | kimi-k2.5    | `https://cyxcode.ai/zen/go/v1/chat/completions` | `@ai-sdk/openai-compatible` |
+| MiniMax M2.7 | minimax-m2.7 | `https://cyxcode.ai/zen/go/v1/messages`         | `@ai-sdk/anthropic`         |
+| MiniMax M2.5 | minimax-m2.5 | `https://cyxcode.ai/zen/go/v1/messages`         | `@ai-sdk/anthropic`         |
 
-يستخدم [معرف النموذج (model id)](/docs/config/#models) في إعدادات (config) OpenCode
+يستخدم [معرف النموذج (model id)](/docs/config/#models) في إعدادات (config) CyxCode
 الخاصة بك التنسيق `opencode-go/<model-id>`. على سبيل المثال، بالنسبة لـ Kimi K2.5، ستستخدم
 `opencode-go/kimi-k2.5` في الـ config الخاص بك.
 
@@ -141,9 +141,9 @@ OpenCode Go حاليًا في المرحلة التجريبية (beta).
 
 ## الأهداف
 
-لقد أنشأنا OpenCode Go من أجل:
+لقد أنشأنا CyxCode Go من أجل:
 
 1. جعل البرمجة بالذكاء الاصطناعي **متاحة** لعدد أكبر من الأشخاص باشتراك منخفض التكلفة.
 2. توفير وصول **موثوق** إلى أفضل نماذج البرمجة المفتوحة.
 3. تنسيق النماذج **المختبرة والمقيمة** (benchmarked) للاستخدام مع وكلاء البرمجة (coding agents).
-4. **عدم تقييدك** (no lock-in) من خلال السماح لك باستخدام أي مزود آخر مع OpenCode أيضًا.
+4. **عدم تقييدك** (no lock-in) من خلال السماح لك باستخدام أي مزود آخر مع CyxCode أيضًا.

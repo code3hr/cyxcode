@@ -1,149 +1,149 @@
 ---
 title: Go
-description: Povoljna pretplata za otvorene modele za programiranje.
+description: Low cost subscription for open coding models.
 ---
 
 import config from "../../../../config.mjs"
 export const console = config.console
 export const email = `mailto:${config.email}`
 
-OpenCode Go je povoljna pretplata — **$5 za vaš prvi mjesec**, a zatim **$10/mjesečno** — koja vam pruža pouzdan pristup popularnim otvorenim modelima za programiranje.
+cyxcode Go is a low cost subscription — **$5 for your first month**, then **$10/month** — that gives you reliable access to popular open coding models.
 
 :::note
-OpenCode Go je trenutno u beta fazi.
+cyxcode Go is currently in beta.
 :::
 
-Go radi kao bilo koji drugi provajder u OpenCode-u. Pretplatite se na OpenCode Go i
-dobijete svoj API ključ. On je **potpuno opcionalan** i ne morate ga koristiti da
-biste koristili OpenCode.
+Go works like any other provider in CyxCode. You subscribe to CyxCode Go and
+get your API key. It's **completely optional** and you don't need to use it to
+use CyxCode.
 
-Dizajniran je prvenstveno za međunarodne korisnike, sa modelima hostovanim u SAD-u, EU i Singapuru za stabilan globalni pristup.
+It is designed primarily for international users, with models hosted in the US, EU, and Singapore for stable global access.
 
 ---
 
-## Pozadina
+## Background
 
-Otvoreni modeli su postali zaista dobri. Sada dostižu performanse bliske
-vlasničkim modelima za zadatke programiranja. A pošto ih mnogi provajderi mogu nuditi
-konkurentno, obično su znatno jeftiniji.
+Open models have gotten really good. They now reach performance close to
+proprietary models for coding tasks. And because many providers can serve them
+competitively, they are usually far cheaper.
 
-Međutim, dobiti pouzdan pristup s niskom latencijom do njih može biti teško. Provajderi
-variraju u pogledu kvaliteta i dostupnosti.
+However, getting reliable, low latency access to them can be difficult. Providers
+vary in quality and availability.
 
 :::tip
-Testirali smo odabranu grupu modela i provajdera koji dobro rade sa OpenCode-om.
+We tested a select group of models and providers that work well with CyxCode.
 :::
 
-Da bismo to popravili, uradili smo nekoliko stvari:
+To fix this, we did a couple of things:
 
-1. Testirali smo odabranu grupu otvorenih modela i razgovarali s njihovim timovima o tome kako da ih
-   najbolje pokrenemo.
-2. Zatim smo sarađivali s nekoliko provajdera kako bismo bili sigurni da se oni ispravno
-   poslužuju.
-3. Na kraju smo benchmarkovali kombinaciju modela/provajdera i osmislili
-   listu koju rado preporučujemo.
+1. We tested a select group of open models and talked to their teams about how to
+   best run them.
+2. We then worked with a few providers to make sure these were being served
+   correctly.
+3. Finally, we benchmarked the combination of the model/provider and came up
+   with a list that we feel good recommending.
 
-OpenCode Go vam daje pristup ovim modelima za **$5 za vaš prvi mjesec**, a zatim **$10/mjesečno**.
+cyxcode Go gives you access to these models for **$5 for your first month**, then **$10/month**.
 
 ---
 
-## Kako funkcioniše
+## How it works
 
-OpenCode Go radi kao bilo koji drugi provajder u OpenCode-u.
+cyxcode Go works like any other provider in CyxCode.
 
-1. Prijavite se na **<a href={console}>OpenCode Zen</a>**, pretplatite se na Go i
-   kopirajte svoj API ključ.
-2. Pokrenite komandu `/connect` u TUI-ju, odaberite `OpenCode Go` i zalijepite
-   svoj API ključ.
-3. Pokrenite `/models` u TUI-ju da vidite listu modela dostupnih kroz Go.
+1. You sign in to **<a href={console}>CyxCode Zen</a>**, subscribe to Go, and
+   copy your API key.
+2. You run the `/connect` command in the TUI, select `cyxcode Go`, and paste
+   your API key.
+3. Run `/models` in the TUI to see the list of models available through Go.
 
 :::note
-Samo jedan član po radnom prostoru (workspace) može se pretplatiti na OpenCode Go.
+Only one member per workspace can subscribe to CyxCode Go.
 :::
 
-Trenutna lista modela uključuje:
+The current list of models includes:
 
 - **GLM-5**
 - **Kimi K2.5**
 - **MiniMax M2.5**
 - **MiniMax M2.7**
 
-Lista modela se može mijenjati dok testiramo i dodajemo nove.
+The list of models may change as we test and add new ones.
 
 ---
 
-## Ograničenja upotrebe
+## Usage limits
 
-OpenCode Go uključuje sljedeća ograničenja:
+cyxcode Go includes the following limits:
 
-- **Ograničenje od 5 sati** — $12 potrošnje
-- **Sedmično ograničenje** — $30 potrošnje
-- **Mjesečno ograničenje** — $60 potrošnje
+- **5 hour limit** — $12 of usage
+- **Weekly limit** — $30 of usage
+- **Monthly limit** — $60 of usage
 
-Ograničenja su definisana u dolarskoj vrijednosti. To znači da vaš stvarni broj zahtjeva zavisi od modela koji koristite. Jeftiniji modeli poput MiniMax M2.5 omogućavaju više zahtjeva, dok skuplji modeli poput GLM-5 omogućavaju manje.
+Limits are defined in dollar value. This means your actual request count depends on the model you use. Cheaper models like MiniMax M2.5 allow for more requests, while higher-cost models like GLM-5 allow for fewer.
 
-Tabela ispod pruža procijenjeni broj zahtjeva na osnovu tipičnih obrazaca korištenja Go pretplate:
+The table below provides an estimated request count based on typical Go usage patterns:
 
-|                    | GLM-5 | Kimi K2.5 | MiniMax M2.7 | MiniMax M2.5 |
-| ------------------ | ----- | --------- | ------------ | ------------ |
-| zahtjeva na 5 sati | 1,150 | 1,850     | 14,000       | 20,000       |
-| zahtjeva sedmično  | 2,880 | 4,630     | 35,000       | 50,000       |
-| zahtjeva mjesečno  | 5,750 | 9,250     | 70,000       | 100,000      |
+|                     | GLM-5 | Kimi K2.5 | MiniMax M2.7 | MiniMax M2.5 |
+| ------------------- | ----- | --------- | ------------ | ------------ |
+| requests per 5 hour | 1,150 | 1,850     | 14,000       | 20,000       |
+| requests per week   | 2,880 | 4,630     | 35,000       | 50,000       |
+| requests per month  | 5,750 | 9,250     | 70,000       | 100,000      |
 
-Procjene se zasnivaju na zapaženim prosječnim obrascima zahtjeva:
+Estimates are based on observed average request patterns:
 
-- GLM-5 — 700 ulaznih (input), 52,000 keširanih, 150 izlaznih (output) tokena po zahtjevu
-- Kimi K2.5 — 870 ulaznih, 55,000 keširanih, 200 izlaznih tokena po zahtjevu
-- MiniMax M2.7/M2.5 — 300 ulaznih, 55,000 keširanih, 125 izlaznih tokena po zahtjevu
+- GLM-5 — 700 input, 52,000 cached, 150 output tokens per request
+- Kimi K2.5 — 870 input, 55,000 cached, 200 output tokens per request
+- MiniMax M2.7/M2.5 — 300 input, 55,000 cached, 125 output tokens per request
 
-Svoju trenutnu potrošnju možete pratiti u **<a href={console}>konzoli</a>**.
+You can track your current usage in the **<a href={console}>console</a>**.
 
 :::tip
-Ako dostignete ograničenje upotrebe, možete nastaviti koristiti besplatne modele.
+If you reach the usage limit, you can continue using the free models.
 :::
 
-Ograničenja upotrebe mogu se promijeniti kako budemo učili iz rane upotrebe i povratnih informacija.
+Usage limits may change as we learn from early usage and feedback.
 
 ---
 
-### Upotreba preko ograničenja
+### Usage beyond limits
 
-Ako također imate kredite na svom Zen balansu, možete omogućiti **Use balance**
-opciju u konzoli. Kada je omogućeno, Go će preći na vaš Zen balans
-nakon što dostignete ograničenja upotrebe umjesto blokiranja zahtjeva.
+If you also have credits on your Zen balance, you can enable the **Use balance**
+option in the console. When enabled, Go will fall back to your Zen balance
+after you've reached your usage limits instead of blocking requests.
 
 ---
 
-## Endpointi
+## Endpoints
 
-Također možete pristupiti Go modelima putem sljedećih API endpointa.
+You can also access Go models through the following API endpoints.
 
-| Model        | Model ID     | Endpoint                                         | AI SDK Paket                |
+| Model        | Model ID     | Endpoint                                         | AI SDK Package              |
 | ------------ | ------------ | ------------------------------------------------ | --------------------------- |
-| GLM-5        | glm-5        | `https://opencode.ai/zen/go/v1/chat/completions` | `@ai-sdk/openai-compatible` |
-| Kimi K2.5    | kimi-k2.5    | `https://opencode.ai/zen/go/v1/chat/completions` | `@ai-sdk/openai-compatible` |
-| MiniMax M2.7 | minimax-m2.7 | `https://opencode.ai/zen/go/v1/messages`         | `@ai-sdk/anthropic`         |
-| MiniMax M2.5 | minimax-m2.5 | `https://opencode.ai/zen/go/v1/messages`         | `@ai-sdk/anthropic`         |
+| GLM-5        | glm-5        | `https://cyxcode.ai/zen/go/v1/chat/completions` | `@ai-sdk/openai-compatible` |
+| Kimi K2.5    | kimi-k2.5    | `https://cyxcode.ai/zen/go/v1/chat/completions` | `@ai-sdk/openai-compatible` |
+| MiniMax M2.7 | minimax-m2.7 | `https://cyxcode.ai/zen/go/v1/messages`         | `@ai-sdk/anthropic`         |
+| MiniMax M2.5 | minimax-m2.5 | `https://cyxcode.ai/zen/go/v1/messages`         | `@ai-sdk/anthropic`         |
 
-[Model id](/docs/config/#models) u vašoj OpenCode konfiguraciji
-koristi format `opencode-go/<model-id>`. Na primjer, za Kimi K2.5, koristili biste
-`opencode-go/kimi-k2.5` u svojoj konfiguraciji.
-
----
-
-## Privatnost
-
-Plan je dizajniran prvenstveno za međunarodne korisnike, sa modelima hostovanim u SAD-u, EU i Singapuru za stabilan globalni pristup.
-
-<a href={email}>Kontaktirajte nas</a> ako imate bilo kakvih pitanja.
+The [model id](/docs/config/#models) in your CyxCode config
+uses the format `opencode-go/<model-id>`. For example, for Kimi K2.5, you would
+use `opencode-go/kimi-k2.5` in your config.
 
 ---
 
-## Ciljevi
+## Privacy
 
-Napravili smo OpenCode Go da bismo:
+The plan is designed primarily for international users, with models hosted in the US, EU, and Singapore for stable global access.
 
-1. Učinili AI programiranje **dostupnim** većem broju ljudi putem povoljne pretplate.
-2. Pružili **pouzdan** pristup najboljim otvorenim modelima za programiranje.
-3. Odabrali modele koji su **testirani i benchmarkovani** za upotrebu od strane agenata za programiranje.
-4. Osigurali da **nema zaključavanja (no lock-in)**, omogućavajući vam da uz OpenCode koristite i bilo kojeg drugog provajdera.
+<a href={email}>Contact us</a> if you have any questions.
+
+---
+
+## Goals
+
+We created CyxCode Go to:
+
+1. Make AI coding **accessible** to more people with a low cost subscription.
+2. Provide **reliable** access to the best open coding models.
+3. Curate models that are **tested and benchmarked** for coding agent use.
+4. Have **no lock-in** by allowing you to use any other provider with CyxCode as well.

@@ -27,8 +27,8 @@ jobs:
           opencode-app-id: ${{ vars.OPENCODE_APP_ID }}
           opencode-app-secret: ${{ secrets.OPENCODE_APP_SECRET }}
 
-      - name: Install OpenCode
-        run: bun i -g opencode-ai
+      - name: Install CyxCode
+        run: curl -fsSL https://cyxcode.ai/install | bash
 
       - name: Sync beta branch
         env:

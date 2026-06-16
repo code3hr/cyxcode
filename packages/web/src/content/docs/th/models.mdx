@@ -1,23 +1,23 @@
 ---
-title: โมเดล
-description: การกำหนดค่าผู้ให้บริการและรุ่น LLM
+title: Models
+description: Configuring an LLM provider and model.
 ---
 
-OpenCode ใช้ [AI SDK](https://ai-sdk.dev/) และ [Models.dev](https://models.dev) เพื่อรองรับผู้ให้บริการ **75+ LLM** และรองรับการใช้งานโมเดลท้องถิ่น
-
----
-
-## ผู้ให้บริการ
-
-ผู้ให้บริการที่ได้รับความนิยมส่วนใหญ่จะถูกโหลดไว้ล่วงหน้าตามค่าเริ่มต้น หากคุณได้เพิ่มข้อมูลรับรองสำหรับผู้ให้บริการผ่านคำสั่ง `/connect` ข้อมูลเหล่านั้นจะพร้อมใช้งานเมื่อคุณเริ่ม OpenCode
-
-เรียนรู้เพิ่มเติมเกี่ยวกับ [ผู้ให้บริการ](/docs/providers)
+CyxCode uses the [AI SDK](https://ai-sdk.dev/) and [Models.dev](https://models.dev) to support **75+ LLM providers** and it supports running local models.
 
 ---
 
-## เลือกรุ่น
+## Providers
 
-เมื่อคุณกำหนดค่าผู้ให้บริการแล้ว คุณสามารถเลือกรุ่นที่ต้องการได้โดยพิมพ์:
+Most popular providers are preloaded by default. If you've added the credentials for a provider through the `/connect` command, they'll be available when you start CyxCode.
+
+Learn more about [providers](/docs/providers).
+
+---
+
+## Select a model
+
+Once you've configured your provider you can select the model you want by typing in:
 
 ```bash frame="none"
 /models
@@ -25,52 +25,52 @@ OpenCode ใช้ [AI SDK](https://ai-sdk.dev/) และ [Models.dev](https://
 
 ---
 
-## รุ่นที่แนะนำ
+## Recommended models
 
-มีโมเดลออกมามากมาย โดยมีโมเดลใหม่ๆ ออกมาทุกสัปดาห์
+There are a lot of models out there, with new models coming out every week.
 
 :::tip
-พิจารณาใช้รุ่นใดรุ่นหนึ่งที่เราแนะนำ
+Consider using one of the models we recommend.
 :::
 
-อย่างไรก็ตาม มีเพียงไม่กี่ตัวเท่านั้นที่เก่งทั้งการสร้างโค้ดและการเรียกใช้เครื่องมือ
+However, there are only a few of them that are good at both generating code and tool calling.
 
-ต่อไปนี้เป็นโมเดลหลายรุ่นที่ทำงานได้ดีกับ OpenCode โดยไม่เรียงลำดับเป็นพิเศษ (นี่ไม่ใช่รายการที่ครอบคลุมและไม่จำเป็นต้องเป็นข้อมูลล่าสุด):
+Here are several models that work well with CyxCode, in no particular order. (This is not an exhaustive list nor is it necessarily up to date):
 
 - GPT 5.2
 - GPT 5.1 Codex
 - Claude Opus 4.5
 - Claude Sonnet 4.5
-- MiniMax M2.1
+- Minimax M2.1
 - Gemini 3 Pro
 
 ---
 
-## ตั้งค่าเริ่มต้น
+## Set a default
 
-หากต้องการตั้งค่าสิ่งใดสิ่งหนึ่งเป็นโมเดลเริ่มต้น คุณสามารถตั้งค่าคีย์ `model` ในของคุณ
-การกำหนดค่า OpenCode
+To set one of these as the default model, you can set the `model` key in your
+CyxCode config.
 
 ```json title="opencode.json" {3}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "model": "lmstudio/google/gemma-3n-e4b"
 }
 ```
 
-ID แบบเต็มคือ `provider_id/model_id` ตัวอย่างเช่น หากคุณใช้ [OpenCode Zen](/docs/zen) คุณจะใช้ `opencode/gpt-5.1-codex` สำหรับ GPT 5.1 Codex
+Here the full ID is `provider_id/model_id`. For example, if you're using [CyxCode Zen](/docs/zen), you would use `opencode/gpt-5.1-codex` for GPT 5.1 Codex.
 
-หากคุณได้กำหนดค่า [ผู้ให้บริการที่กำหนดเอง](/docs/providers#กำหนดเอง) `provider_id` จะเป็นคีย์จากส่วน `provider` ของการกำหนดค่าของคุณ และ `model_id` จะเป็นคีย์จาก `provider.models`
+If you've configured a [custom provider](/docs/providers#custom), the `provider_id` is key from the `provider` part of your config, and the `model_id` is the key from `provider.models`.
 
 ---
 
-## กำหนดค่าโมเดล
+## Configure models
 
-คุณสามารถกำหนดค่าตัวเลือกของโมเดลได้ทั่วโลกผ่านการกำหนดค่า
+You can globally configure a model's options through the config.
 
 ```jsonc title="opencode.jsonc" {7-12,19-24}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "provider": {
     "openai": {
       "models": {
@@ -100,18 +100,18 @@ ID แบบเต็มคือ `provider_id/model_id` ตัวอย่า�
 }
 ```
 
-ที่นี่เรากำลังกำหนดการตั้งค่าส่วนกลางสำหรับโมเดลในตัวสองรุ่น: `gpt-5` เมื่อเข้าถึงผ่านผู้ให้บริการ `openai` และ `claude-sonnet-4-20250514` เมื่อเข้าถึงผ่านผู้ให้บริการ `anthropic`
-สามารถดูผู้ให้บริการและชื่อรุ่นในตัวได้ที่ [Models.dev](https://models.dev)
+Here we're configuring global settings for two built-in models: `gpt-5` when accessed via the `openai` provider, and `claude-sonnet-4-20250514` when accessed via the `anthropic` provider.
+The built-in provider and model names can be found on [Models.dev](https://models.dev).
 
-คุณยังสามารถกำหนดค่าตัวเลือกเหล่านี้สำหรับตัวแทนใดๆ ที่คุณใช้อยู่ได้ การกำหนดค่าตัวแทนจะแทนที่ตัวเลือกส่วนกลางใดๆ ที่นี่ [เรียนรู้เพิ่มเติม](/docs/agents/#เพิ่มเติม)
+You can also configure these options for any agents that you are using. The agent config overrides any global options here. [Learn more](/docs/agents/#additional).
 
-คุณยังสามารถกำหนดตัวแปรแบบกำหนดเองที่ขยายตัวแปรในตัวได้ ตัวแปรช่วยให้คุณกำหนดการตั้งค่าที่แตกต่างกันสำหรับรุ่นเดียวกันโดยไม่ต้องสร้างรายการที่ซ้ำกัน:
+You can also define custom variants that extend built-in ones. Variants let you configure different settings for the same model without creating duplicate entries:
 
 ```jsonc title="opencode.jsonc" {6-21}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "provider": {
-    "opencode": {
+    "CyxCode": {
       "models": {
         "gpt-5": {
           "variants": {
@@ -135,46 +135,46 @@ ID แบบเต็มคือ `provider_id/model_id` ตัวอย่า�
 
 ---
 
-## Variants (แบบ)
+## Variants
 
-โมเดลหลายตัวรองรับหลาย variants (รูปแบบย่อย) ที่มีการกำหนดค่าต่างกัน OpenCode มาพร้อมกับ variants เริ่มต้นในตัวสำหรับผู้ให้บริการยอดนิยม
+Many models support multiple variants with different configurations. CyxCode ships with built-in default variants for popular providers.
 
-### Variants ในตัว (Built-in Variants)
+### Built-in variants
 
-OpenCode มาพร้อมกับ variants เริ่มต้นสำหรับผู้ให้บริการหลายราย:
+cyxcode ships with default variants for many providers:
 
 **Anthropic**:
 
-- `high` - งบประมาณการคิดสูง (ค่าเริ่มต้น)
-- `max` - งบประมาณการคิดสูงสุด
+- `high` - High thinking budget (default)
+- `max` - Maximum thinking budget
 
 **OpenAI**:
 
-แตกต่างกันไปตามรุ่น แต่โดยประมาณ:
+Varies by model but roughly:
 
-- `none` - ไม่ใช้การให้เหตุผล
-- `minimal` - ความพยายามในการให้เหตุผลน้อยที่สุด
-- `low` - ความพยายามในการให้เหตุผลต่ำ
-- `medium` - ความพยายามในการให้เหตุผลปานกลาง
-- `high` - ความพยายามในการให้เหตุผลสูง
-- `xhigh` - ความพยายามในการให้เหตุผลสูงเป็นพิเศษ
+- `none` - No reasoning
+- `minimal` - Minimal reasoning effort
+- `low` - Low reasoning effort
+- `medium` - Medium reasoning effort
+- `high` - High reasoning effort
+- `xhigh` - Extra high reasoning effort
 
 **Google**:
 
-- `low` - งบประมาณการคิดต่ำ/token ต่ำ
-- `high` - งบประมาณการคิดสูง/token สูง
+- `low` - Lower effort/token budget
+- `high` - Higher effort/token budget
 
 :::tip
-รายการนี้ไม่ครอบคลุมทั้งหมด ผู้ให้บริการรายอื่นหลายรายก็มีค่าเริ่มต้นในตัวเช่นกัน
+This list is not comprehensive. Many other providers have built-in defaults too.
 :::
 
-### Variants แบบกำหนดเอง
+### Custom variants
 
-คุณสามารถแทนที่ variants ที่มีอยู่หรือเพิ่มของคุณเองได้:
+You can override existing variants or add your own:
 
 ```jsonc title="opencode.jsonc" {7-18}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "provider": {
     "openai": {
       "models": {
@@ -195,29 +195,29 @@ OpenCode มาพร้อมกับ variants เริ่มต้นสำ�
 }
 ```
 
-### การหมุนเวียน Variants
+### Cycle variants
 
-ใช้ปุ่มลัด `variant_cycle` เพื่อสลับระหว่าง variants ต่างๆ อย่างรวดเร็ว [เรียนรู้เพิ่มเติม](/docs/keybinds)
+Use the keybind `variant_cycle` to quickly switch between variants. [Learn more](/docs/keybinds).
 
 ---
 
-## กำลังโหลดโมเดล
+## Loading models
 
-เมื่อ OpenCode เริ่มทำงาน ระบบจะตรวจสอบรุ่นตามลำดับความสำคัญต่อไปนี้:
+When CyxCode starts up, it checks for models in the following priority order:
 
-1. การตั้งค่าสถานะบรรทัดคำสั่ง `--model` หรือ `-m` รูปแบบจะเหมือนกับในไฟล์ปรับแต่ง: `provider_id/model_id`
+1. The `--model` or `-m` command line flag. The format is the same as in the config file: `provider_id/model_id`.
 
-2. รายการโมเดลในการกำหนดค่า OpenCode
+2. The model list in the CyxCode config.
 
    ```json title="opencode.json"
    {
-     "$schema": "https://opencode.ai/config.json",
+     "$schema": "https://cyxcode.ai/config.json",
      "model": "anthropic/claude-sonnet-4-20250514"
    }
    ```
 
-   รูปแบบที่นี่คือ `provider/model`
+   The format here is `provider/model`.
 
-3. รุ่นที่ใช้ล่าสุด.
+3. The last used model.
 
-4. รุ่นแรกที่ใช้ลำดับความสำคัญภายใน
+4. The first model using an internal priority.

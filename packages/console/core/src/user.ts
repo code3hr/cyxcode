@@ -141,7 +141,7 @@ export namespace User {
         const { InviteEmail } = await import("@cyxcode/console-mail/InviteEmail.jsx")
         await AWS.sendEmail({
           to: email,
-          subject: `You've been invited to join the ${emailInfo.workspaceName} workspace on OpenCode`,
+          subject: `You've been invited to join the ${emailInfo.workspaceName} workspace on CyxCode`,
           body: render(
             // @ts-ignore
             InviteEmail({

@@ -1,31 +1,31 @@
 ---
-title: สิทธิ์
-description: ควบคุมการดำเนินการที่ต้องได้รับการอนุมัติจึงจะรันได้
+title: Permissions
+description: Control which actions require approval to run.
 ---
 
-OpenCode ใช้การกำหนดค่า `permission` เพื่อตัดสินใจว่าการดำเนินการที่กำหนดควรทำงานโดยอัตโนมัติ แจ้งให้คุณทราบ หรือถูกบล็อก
+CyxCode uses the `permission` config to decide whether a given action should run automatically, prompt you, or be blocked.
 
-ตั้งแต่ `v1.1.1` การกำหนดค่าบูลีนแบบเดิม `tools` เลิกใช้แล้วและได้รวมเข้ากับ `permission` แล้ว การกำหนดค่า `tools` แบบเก่ายังคงรองรับความเข้ากันได้แบบย้อนหลัง
-
----
-
-## การดำเนินการ
-
-กฎการอนุญาตแต่ละข้อจะแก้ไขเป็นข้อใดข้อหนึ่งต่อไปนี้
-
-- `"allow"` — ทำงานโดยไม่ได้รับการอนุมัติ
-- `"ask"` — พร้อมท์สำหรับการอนุมัติ
-- `"deny"` — บล็อกการกระทำ
+As of `v1.1.1`, the legacy `tools` boolean config is deprecated and has been merged into `permission`. The old `tools` config is still supported for backwards compatibility.
 
 ---
 
-## การกำหนดค่า
+## Actions
 
-คุณสามารถตั้งค่าการอนุญาตทั่วโลก (ด้วย `*`) และแทนที่เครื่องมือเฉพาะ
+Each permission rule resolves to one of:
+
+- `"allow"` — run without approval
+- `"ask"` — prompt for approval
+- `"deny"` — block the action
+
+---
+
+## Configuration
+
+You can set permissions globally (with `*`), and override specific tools.
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "permission": {
     "*": "ask",
     "bash": "allow",
@@ -34,24 +34,24 @@ OpenCode ใช้การกำหนดค่า `permission` เพื่อ
 }
 ```
 
-คุณยังสามารถตั้งค่าการอนุญาตทั้งหมดพร้อมกันได้:
+You can also set all permissions at once:
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "permission": "allow"
 }
 ```
 
 ---
 
-## กฎแบบละเอียด (ไวยากรณ์ของวัตถุ)
+## Granular Rules (Object Syntax)
 
-สำหรับการอนุญาตส่วนใหญ่ คุณสามารถใช้ออบเจ็กต์เพื่อปรับใช้การดำเนินการต่างๆ ตามอินพุตของเครื่องมือได้
+For most permissions, you can use an object to apply different actions based on the tool input.
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "permission": {
     "bash": {
       "*": "ask",
@@ -68,35 +68,35 @@ OpenCode ใช้การกำหนดค่า `permission` เพื่อ
 }
 ```
 
-กฎจะได้รับการประเมินโดยการจับคู่รูปแบบ โดย **กฎการจับคู่สุดท้ายจะชนะ** รูปแบบทั่วไปคือการใส่กฎ catch-all `"*"` ก่อน และใส่กฎที่เฉพาะเจาะจงมากขึ้นหลังจากนั้น
+Rules are evaluated by pattern match, with the **last matching rule winning**. A common pattern is to put the catch-all `"*"` rule first, and more specific rules after it.
 
-### สัญลักษณ์แทน
+### Wildcards
 
-รูปแบบการอนุญาตใช้การจับคู่ไวด์การ์ดแบบง่าย:
+Permission patterns use simple wildcard matching:
 
-- `*` จับคู่อักขระใดๆ ตั้งแต่ศูนย์ขึ้นไป
-- `?` ตรงกับอักขระหนึ่งตัวเท่านั้น
-- อักขระอื่นๆ ทั้งหมดตรงกันอย่างแท้จริง
+- `*` matches zero or more of any character
+- `?` matches exactly one character
+- All other characters match literally
 
-### การขยายโฮมไดเร็กทอรี
+### Home Directory Expansion
 
-คุณสามารถใช้ `~` หรือ `$HOME` ที่จุดเริ่มต้นของรูปแบบเพื่ออ้างอิงโฮมไดเร็กตอรี่ของคุณ สิ่งนี้มีประโยชน์อย่างยิ่งสำหรับกฎของ [`external_directory`](#external-directories)
+You can use `~` or `$HOME` at the start of a pattern to reference your home directory. This is particularly useful for [`external_directory`](#external-directories) rules.
 
 - `~/projects/*` -> `/Users/username/projects/*`
 - `$HOME/projects/*` -> `/Users/username/projects/*`
 - `~` -> `/Users/username`
 
-### ไดเรกทอรีภายนอก
+### External Directories
 
-ใช้ `external_directory` เพื่ออนุญาตการเรียกใช้เครื่องมือที่สัมผัสเส้นทางนอกไดเร็กทอรีการทำงานที่ OpenCode เริ่มทำงาน สิ่งนี้ใช้ได้กับเครื่องมือใดๆ ที่ใช้เส้นทางเป็นอินพุต (เช่น `read`, `edit`, `list`, `glob`, `grep` และคำสั่ง `bash` จำนวนมาก)
+Use `external_directory` to allow tool calls that touch paths outside the working directory where CyxCode was started. This applies to any tool that takes a path as input (for example `read`, `edit`, `list`, `glob`, `grep`, and many `bash` commands).
 
-การขยายบ้าน (เช่น `~/...`) ส่งผลต่อวิธีการเขียนรูปแบบเท่านั้น ไม่ได้ทำให้เส้นทางภายนอกเป็นส่วนหนึ่งของพื้นที่ทำงานปัจจุบัน ดังนั้นเส้นทางภายนอกไดเรกทอรีการทำงานยังต้องได้รับอนุญาตผ่าน `external_directory`
+Home expansion (like `~/...`) only affects how a pattern is written. It does not make an external path part of the current workspace, so paths outside the working directory must still be allowed via `external_directory`.
 
-ตัวอย่างเช่น อนุญาตให้เข้าถึงทุกสิ่งภายใต้ `~/projects/personal/`:
+For example, this allows access to everything under `~/projects/personal/`:
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "permission": {
     "external_directory": {
       "~/projects/personal/**": "allow"
@@ -105,11 +105,11 @@ OpenCode ใช้การกำหนดค่า `permission` เพื่อ
 }
 ```
 
-ไดเร็กทอรีใดๆ ที่ได้รับอนุญาตที่นี่จะสืบทอดค่าเริ่มต้นเดียวกันกับพื้นที่ทำงานปัจจุบัน เนื่องจาก [`read` มีค่าเริ่มต้นเป็น `allow`](#defaults) การอ่านจึงได้รับอนุญาตสำหรับรายการภายใต้ `external_directory` เว้นแต่จะถูกแทนที่ เพิ่มกฎที่ชัดเจนเมื่อควรจำกัดเครื่องมือในเส้นทางเหล่านี้ เช่น การบล็อกการแก้ไขในขณะที่ยังคงอ่านอยู่:
+Any directory allowed here inherits the same defaults as the current workspace. Since [`read` defaults to `allow`](#defaults), reads are also allowed for entries under `external_directory` unless overridden. Add explicit rules when a tool should be restricted in these paths, such as blocking edits while keeping reads:
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "permission": {
     "external_directory": {
       "~/projects/personal/**": "allow"
@@ -121,38 +121,39 @@ OpenCode ใช้การกำหนดค่า `permission` เพื่อ
 }
 ```
 
-ให้รายการมุ่งเน้นไปที่เส้นทางที่เชื่อถือได้ และเลเยอร์อนุญาตหรือปฏิเสธกฎเพิ่มเติมตามที่จำเป็นสำหรับเครื่องมืออื่นๆ (เช่น `bash`)
+Keep the list focused on trusted paths, and layer extra allow or deny rules as needed for other tools (for example `bash`).
 
 ---
 
-## สิทธิ์ที่มีอยู่
+## Available Permissions
 
-สิทธิ์ของ OpenCode จะกำหนดไว้ตามชื่อเครื่องมือ พร้อมด้วย guardrails อีก 2-3 คน:
+cyxcode permissions are keyed by tool name, plus a couple of safety guards:
 
-- `read` — อ่านไฟล์ (ตรงกับเส้นทางของไฟล์)
-- `edit` — การแก้ไขไฟล์ทั้งหมด (ครอบคลุมถึง `edit`, `write`, `patch`, `multiedit`)
-- `glob` — ไฟล์ globbing (ตรงกับรูปแบบ glob)
-- `grep` — การค้นหาเนื้อหา (ตรงกับรูปแบบ regex)
-- `list` — แสดงรายการไฟล์ในไดเร็กทอรี (ตรงกับเส้นทางไดเร็กทอรี)
-- `bash` — การรันคำสั่ง shell (ตรงกับคำสั่งที่แยกวิเคราะห์เช่น `git status --porcelain`)
-- `task` — การเปิดตัวตัวแทนย่อย (ตรงกับประเภทตัวแทนย่อย)
-- `skill` — กำลังโหลดทักษะ (ตรงกับชื่อทักษะ)
-- `lsp` — กำลังเรียกใช้คำสั่ง LSP (ปัจจุบันยังไม่ละเอียด)
-- `todoread`, `todowrite` — กำลังอ่าน/updating รายการสิ่งที่ต้องทำ
-- `webfetch` — กำลังดึง URL (ตรงกับ URL)
-- `websearch`, `codesearch` — การค้นหาเว็บ/code (ตรงกับข้อความค้นหา)
-- `external_directory` — ทริกเกอร์เมื่อเครื่องมือแตะเส้นทางนอกไดเร็กทอรีการทำงานของโปรเจ็กต์
-- `doom_loop` — ทริกเกอร์เมื่อมีการเรียกใช้เครื่องมือเดียวกันซ้ำ 3 ครั้งโดยมีอินพุตเหมือนกัน
+- `read` — reading a file (matches the file path)
+- `edit` — all file modifications (covers `edit`, `write`, `patch`, `multiedit`)
+- `glob` — file globbing (matches the glob pattern)
+- `grep` — content search (matches the regex pattern)
+- `list` — listing files in a directory (matches the directory path)
+- `bash` — running shell commands (matches parsed commands like `git status --porcelain`)
+- `task` — launching subagents (matches the subagent type)
+- `skill` — loading a skill (matches the skill name)
+- `lsp` — running LSP queries (currently non-granular)
+- `todoread`, `todowrite` — reading/updating the todo list
+- `wikiread`, `wikiwrite` — reading/updating project wiki notes
+- `webfetch` — fetching a URL (matches the URL)
+- `websearch`, `codesearch` — web/code search (matches the query)
+- `external_directory` — triggered when a tool touches paths outside the project working directory
+- `doom_loop` — triggered when the same tool call repeats 3 times with identical input
 
 ---
 
-## ค่าเริ่มต้น
+## Defaults
 
-หากคุณไม่ได้ระบุสิ่งใด OpenCode จะเริ่มต้นจากค่าเริ่มต้นที่อนุญาต:
+If you don’t specify anything, CyxCode starts from permissive defaults:
 
-- การอนุญาตส่วนใหญ่มีค่าเริ่มต้นเป็น `"allow"`
-- `doom_loop` และ `external_directory` มีค่าเริ่มต้นเป็น `"ask"`
-- `read` คือ `"allow"` แต่ไฟล์ `.env` ถูกปฏิเสธโดยค่าเริ่มต้น:
+- Most permissions default to `"allow"`.
+- `doom_loop` and `external_directory` default to `"ask"`.
+- `read` is `"allow"`, but `.env` files are denied by default:
 
 ```json title="opencode.json"
 {
@@ -169,29 +170,29 @@ OpenCode ใช้การกำหนดค่า `permission` เพื่อ
 
 ---
 
-## สิ่งที่ "ถาม" ทำ
+## What “Ask” Does
 
-เมื่อ OpenCode แจ้งให้อนุมัติ UI จะเสนอผลลัพธ์สามประการ:
+When CyxCode prompts for approval, the UI offers three outcomes:
 
-- `once` — อนุมัติเพียงคำขอนี้
-- `always` — อนุมัติคำขอในอนาคตที่ตรงกับรูปแบบที่แนะนำ (สำหรับส่วนที่เหลือของเซสชัน OpenCode ปัจจุบัน)
-- `reject` — ปฏิเสธคำขอ
+- `once` — approve just this request
+- `always` — approve future requests matching the suggested patterns (for the rest of the current CyxCode session)
+- `reject` — deny the request
 
-ชุดรูปแบบที่ `always` จะอนุมัตินั้นมาจากเครื่องมือ (เช่น โดยทั่วไปการอนุมัติ bash จะกำหนดไวท์ลิสต์คำนำหน้าคำสั่งที่ปลอดภัย เช่น `git status*`)
+The set of patterns that `always` would approve is provided by the tool (for example, bash approvals typically whitelist a safe command prefix like `git status*`).
 
 ---
 
-## ตัวแทน
+## Agents
 
-คุณสามารถแทนที่สิทธิ์ต่อตัวแทนได้ สิทธิ์ของตัวแทนจะผสานเข้ากับการกำหนดค่าส่วนกลาง และกฎของตัวแทนจะมีความสำคัญกว่า [เรียนรู้เพิ่มเติม](/docs/agents#permissions) เกี่ยวกับการอนุญาตของตัวแทน
+You can override permissions per agent. Agent permissions are merged with the global config, and agent rules take precedence. [Learn more](/docs/agents#permissions) about agent permissions.
 
 :::note
-โปรดดูส่วน [กฎแบบละเอียด (ไวยากรณ์ของวัตถุ)](#granular-rules-object-syntax) ด้านบนเพื่อดูตัวอย่างการจับคู่รูปแบบโดยละเอียดเพิ่มเติม
+Refer to the [Granular Rules (Object Syntax)](#granular-rules-object-syntax) section above for more detailed pattern matching examples.
 :::
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "permission": {
     "bash": {
       "*": "ask",
@@ -217,7 +218,7 @@ OpenCode ใช้การกำหนดค่า `permission` เพื่อ
 }
 ```
 
-คุณยังสามารถกำหนดค่าการอนุญาตตัวแทนใน Markdown ได้:
+You can also configure agent permissions in Markdown:
 
 ```markdown title="~/.config/opencode/agents/review.md"
 ---
@@ -233,5 +234,5 @@ Only analyze code and suggest changes.
 ```
 
 :::tip
-ใช้การจับคู่รูปแบบสำหรับคำสั่งที่มีอาร์กิวเมนต์ `"grep *"` อนุญาต `grep pattern file.txt` ในขณะที่ `"grep"` คนเดียวจะบล็อกได้ คำสั่งเช่น `git status` ใช้งานได้กับพฤติกรรมเริ่มต้น แต่ต้องได้รับอนุญาตอย่างชัดเจน (เช่น `"git status *"`) เมื่ออาร์กิวเมนต์ถูกส่งผ่าน
+Use pattern matching for commands with arguments. `"grep *"` allows `grep pattern file.txt`, while `"grep"` alone would block it. Commands like `git status` work for default behavior but require explicit permission (like `"git status *"`) when arguments are passed.
 :::

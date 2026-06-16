@@ -2,10 +2,10 @@
   "name": "@cyxcode/console-mail",
   "version": "1.3.2",
   "dependencies": {
-    "@jsx-email/all": "2.2.3",
-    "@jsx-email/cli": "1.4.3",
+    "@jsx-email/all": "3.0.1",
     "@tsconfig/bun": "1.0.9",
     "@types/react": "18.0.25",
+    "jsx-email": "3.2.1",
     "react": "18.2.0",
     "solid-js": "catalog:"
   },

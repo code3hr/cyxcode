@@ -1,133 +1,132 @@
 ---
-title: ウェブ
-description: ブラウザで OpenCode を使用する。
+title: Web
+description: Using CyxCode in your browser.
 ---
 
-OpenCode はブラウザで Web アプリケーションとして実行でき、ターミナルを必要とせずに同じ強力な AI コーディングエクスペリエンスを提供します。
+CyxCode can run as a web application in your browser, providing the same powerful AI coding experience without needing a terminal.
 
-![OpenCode Web - 新しいセッション](../../../assets/web/web-homepage-new-session.png)
+![CyxCode Web - New Session](../../../assets/web/web-homepage-new-session.png)
 
----
+## Getting Started
 
-## はじめる
-
-以下を実行して Web インターフェースを開始します。
+Start the web interface by running:
 
 ```bash
-opencode web
+cyxcode web
 ```
 
-これにより、利用可能なランダムなポートを使用して `127.0.0.1` でローカルサーバーが起動され、デフォルトのブラウザで OpenCode が自動的に開きます。
+This starts a local server on `127.0.0.1` with a random available port and automatically opens CyxCode in your default browser.
 
 :::caution
-`OPENCODE_SERVER_PASSWORD` が設定されていない場合、サーバーは保護されません。これはローカルで使用する場合には問題ありませんが、ネットワークアクセス用に設定する必要があります。
+If `OPENCODE_SERVER_PASSWORD` is not set, the server will be unsecured. This is fine for local use but should be set for network access.
 :::
-:::tip[Windows ユーザー]
-最高のエクスペリエンスを得るには、PowerShell ではなく [WSL](/docs/windows-wsl) から `opencode web` を実行します。これにより、ファイルシステムへの適切なアクセスとターミナルの統合が保証されます。
+
+:::tip[Windows Users]
+For the best experience, run `cyxcode web` from [WSL](/docs/windows-wsl) rather than PowerShell. This ensures proper file system access and terminal integration.
 :::
 
 ---
 
-## 設定
+## Configuration
 
-コマンドラインフラグを使用するか、[設定ファイル](/docs/config)で Web サーバーを設定できます。
+You can configure the web server using command line flags or in your [config file](/docs/config).
 
-### ポート
+### Port
 
-デフォルトでは、OpenCode は使用可能なポートを選択します。ポートを指定できます。
-
-```bash
-opencode web --port 4096
-```
-
-### ホスト名
-
-デフォルトでは、サーバーは `127.0.0.1` (localhost のみ) にバインドされます。ネットワーク上で OpenCode にアクセスできるようにするには:
+By default, CyxCode picks an available port. You can specify a port:
 
 ```bash
-opencode web --hostname 0.0.0.0
+cyxcode web --port 4096
 ```
 
-`0.0.0.0` を使用すると、OpenCode はローカルアドレスとネットワークアドレスの両方を表示します。
+### Hostname
+
+By default, the server binds to `127.0.0.1` (localhost only). To make CyxCode accessible on your network:
+
+```bash
+cyxcode web --hostname 0.0.0.0
+```
+
+When using `0.0.0.0`, CyxCode will display both local and network addresses:
 
 ```
   Local access:       http://localhost:4096
   Network access:     http://192.168.1.100:4096
 ```
 
-### mDNS 検出
+### mDNS Discovery
 
-mDNS を有効にして、ローカルネットワーク上でサーバーを検出できるようにします。
+Enable mDNS to make your server discoverable on the local network:
 
 ```bash
-opencode web --mdns
+cyxcode web --mdns
 ```
 
-これにより、ホスト名が自動的に `0.0.0.0` に設定され、サーバーが `opencode.local` としてアドバタイズされます。
+This automatically sets the hostname to `0.0.0.0` and advertises the server as `opencode.local`.
 
-mDNS ドメイン名をカスタマイズして、同じネットワーク上で複数のインスタンスを実行できます。
+You can customize the mDNS domain name to run multiple instances on the same network:
 
 ```bash
-opencode web --mdns --mdns-domain myproject.local
+cyxcode web --mdns --mdns-domain myproject.local
 ```
 
 ### CORS
 
-CORS の追加ドメインを許可するには (カスタムフロントエンドに便利):
+To allow additional domains for CORS (useful for custom frontends):
 
 ```bash
-opencode web --cors https://example.com
+cyxcode web --cors https://example.com
 ```
 
-### 認証
+### Authentication
 
-アクセスを保護するには、`OPENCODE_SERVER_PASSWORD` 環境変数を使用してパスワードを設定します。
+To protect access, set a password using the `OPENCODE_SERVER_PASSWORD` environment variable:
 
 ```bash
-OPENCODE_SERVER_PASSWORD=secret opencode web
+OPENCODE_SERVER_PASSWORD=secret cyxcode web
 ```
 
-ユーザー名のデフォルトは `opencode` ですが、`OPENCODE_SERVER_USERNAME` で変更できます。
+The username defaults to `opencode` but can be changed with `OPENCODE_SERVER_USERNAME`.
 
 ---
 
-## Web インターフェースの使用
+## Using the Web Interface
 
-開始すると、Web インターフェイスから OpenCode セッションにアクセスできるようになります。
+Once started, the web interface provides access to your CyxCode sessions.
 
-### セッション
+### Sessions
 
-ホームページからセッションを表示および管理します。アクティブなセッションを確認したり、新しいセッションを開始したりできます。
+View and manage your sessions from the homepage. You can see active sessions and start new ones.
 
-![OpenCode Web - アクティブなセッション](../../../assets/web/web-homepage-active-session.png)
+![CyxCode Web - Active Session](../../../assets/web/web-homepage-active-session.png)
 
-### サーバーステータス
+### Server Status
 
-「サーバーを表示」をクリックすると、接続されているサーバーとそのステータスが表示されます。
+Click "See Servers" to view connected servers and their status.
 
-![OpenCode Web - サーバー](../../../assets/web/web-homepage-see-servers.png)
+![CyxCode Web - See Servers](../../../assets/web/web-homepage-see-servers.png)
 
 ---
 
-## ターミナルの接続
+## Attaching a Terminal
 
-実行中の Web サーバーにターミナル TUI を接続できます。
+You can attach a terminal TUI to a running web server:
 
 ```bash
 # Start the web server
-opencode web --port 4096
+cyxcode web --port 4096
 
 # In another terminal, attach the TUI
-opencode attach http://localhost:4096
+cyxcode attach http://localhost:4096
 ```
 
-これにより、Web インターフェイスとターミナルの両方を同時に使用し、同じセッションと状態を共有できるようになります。
+This allows you to use both the web interface and terminal simultaneously, sharing the same sessions and state.
 
 ---
 
-## 設定ファイル
+## Config File
 
-`opencode.json` 設定ファイルでサーバー設定を構成することもできます。
+You can also configure server settings in your `opencode.json` config file:
 
 ```json
 {
@@ -140,4 +139,4 @@ opencode attach http://localhost:4096
 }
 ```
 
-コマンドラインフラグは、設定ファイルの設定よりも優先されます。
+Command line flags take precedence over config file settings.

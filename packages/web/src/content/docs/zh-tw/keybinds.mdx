@@ -1,13 +1,13 @@
 ---
-title: 快捷鍵
-description: 自訂您的快捷鍵。
+title: Keybinds
+description: Customize your keybinds.
 ---
 
-OpenCode 提供了一系列快捷鍵，您可以透過 `tui.json` 進行自訂。
+cyxcode has a list of keybinds that you can customize through `tui.json`.
 
 ```json title="tui.json"
 {
-  "$schema": "https://opencode.ai/tui.json",
+  "$schema": "https://cyxcode.ai/tui.json",
   "keybinds": {
     "leader": "ctrl+x",
     "app_exit": "ctrl+c,ctrl+d,<leader>q",
@@ -29,9 +29,9 @@ OpenCode 提供了一系列快捷鍵，您可以透過 `tui.json` 進行自訂�
     "session_interrupt": "escape",
     "session_compact": "<leader>c",
     "session_child_first": "<leader>down",
-    "session_child_cycle": "<leader>right",
-    "session_child_cycle_reverse": "<leader>left",
-    "session_parent": "<leader>up",
+    "session_child_cycle": "right",
+    "session_child_cycle_reverse": "left",
+    "session_parent": "up",
     "messages_page_up": "pageup,ctrl+alt+b",
     "messages_page_down": "pagedown,ctrl+alt+f",
     "messages_line_up": "ctrl+alt+y",
@@ -106,23 +106,25 @@ OpenCode 提供了一系列快捷鍵，您可以透過 `tui.json` 進行自訂�
 
 ---
 
-## 前導鍵
+## Leader key
 
-OpenCode 的大多數快捷鍵使用 `leader`（前導鍵）。這可以避免與終端機中的其他快捷鍵衝突。
+CyxCode uses a `leader` key for most keybinds. This avoids conflicts in your terminal.
 
-預設情況下，`ctrl+x` 是前導鍵，大多數操作需要您先按下前導鍵，然後再按對應的快捷鍵。例如，要新建一個工作階段，請先按 `ctrl+x`，然後按 `n`。
+By default, `ctrl+x` is the leader key and most actions require you to first press the leader key and then the shortcut. For example, to start a new session you first press `ctrl+x` and then press `n`.
 
-您不一定需要使用前導鍵來設定快捷鍵，但我們建議您這樣做。
+You don't need to use a leader key for your keybinds but we recommend doing so.
+
+Some navigation keybinds intentionally do not use the leader key by default. For subagent sessions, the defaults are `session_child_first` = `\<leader>down`, `session_child_cycle` = `right`, `session_child_cycle_reverse` = `left`, and `session_parent` = `up`.
 
 ---
 
-## 停用快捷鍵
+## Disable keybind
 
-您可以透過在 `tui.json` 中將對應的鍵值設定為 "none" 來停用某個快捷鍵。
+You can disable a keybind by adding the key to `tui.json` with a value of "none".
 
 ```json title="tui.json"
 {
-  "$schema": "https://opencode.ai/tui.json",
+  "$schema": "https://cyxcode.ai/tui.json",
   "keybinds": {
     "session_compact": "none"
   }
@@ -131,41 +133,41 @@ OpenCode 的大多數快捷鍵使用 `leader`（前導鍵）。這可以避免�
 
 ---
 
-## 桌面版提示詞輸入快捷鍵
+## Desktop prompt shortcuts
 
-OpenCode 桌面應用程式的提示詞輸入框支援常見的 Readline/Emacs 風格文字編輯快捷鍵。這些快捷鍵為內建功能，目前無法透過 `opencode.json` 進行設定。
+The CyxCode desktop app prompt input supports common Readline/Emacs-style shortcuts for editing text. These are built-in and currently not configurable via `opencode.json`.
 
-| 快捷鍵   | 操作                              |
-| -------- | --------------------------------- |
-| `ctrl+a` | 移動到當前行的開頭                |
-| `ctrl+e` | 移動到當前行的末尾                |
-| `ctrl+b` | 游標向後移動一個字元              |
-| `ctrl+f` | 游標向前移動一個字元              |
-| `alt+b`  | 游標向後移動一個單詞              |
-| `alt+f`  | 游標向前移動一個單詞              |
-| `ctrl+d` | 刪除游標所在位置的字元            |
-| `ctrl+k` | 刪除從游標到行尾的內容            |
-| `ctrl+u` | 刪除從游標到行首的內容            |
-| `ctrl+w` | 刪除前一個單詞                    |
-| `alt+d`  | 刪除後一個單詞                    |
-| `ctrl+t` | 交換游標前後的字元                |
-| `ctrl+g` | 取消彈出視窗 / 中止正在執行的回應 |
+| Shortcut | Action                                   |
+| -------- | ---------------------------------------- |
+| `ctrl+a` | Move to start of current line            |
+| `ctrl+e` | Move to end of current line              |
+| `ctrl+b` | Move cursor back one character           |
+| `ctrl+f` | Move cursor forward one character        |
+| `alt+b`  | Move cursor back one word                |
+| `alt+f`  | Move cursor forward one word             |
+| `ctrl+d` | Delete character under cursor            |
+| `ctrl+k` | Kill to end of line                      |
+| `ctrl+u` | Kill to start of line                    |
+| `ctrl+w` | Kill previous word                       |
+| `alt+d`  | Kill next word                           |
+| `ctrl+t` | Transpose characters                     |
+| `ctrl+g` | Cancel popovers / abort running response |
 
 ---
 
 ## Shift+Enter
 
-某些終端機預設不會發送帶修飾鍵的 Enter 鍵。您可能需要設定終端機將 `Shift+Enter` 作為跳脫序列發送。
+Some terminals don't send modifier keys with Enter by default. You may need to configure your terminal to send `Shift+Enter` as an escape sequence.
 
 ### Windows Terminal
 
-開啟您的 `settings.json` 檔案，路徑為：
+Open your `settings.json` at:
 
 ```
 %LOCALAPPDATA%\Packages\Microsoft.WindowsTerminal_8wekyb3d8bbwe\LocalState\settings.json
 ```
 
-將以下內容新增到根級 `actions` 陣列中：
+Add this to the root-level `actions` array:
 
 ```json
 "actions": [
@@ -179,7 +181,7 @@ OpenCode 桌面應用程式的提示詞輸入框支援常見的 Readline/Emacs �
 ]
 ```
 
-將以下內容新增到根級 `keybindings` 陣列中：
+Add this to the root-level `keybindings` array:
 
 ```json
 "keybindings": [
@@ -190,4 +192,4 @@ OpenCode 桌面應用程式的提示詞輸入框支援常見的 Readline/Emacs �
 ]
 ```
 
-儲存檔案並重新啟動 Windows Terminal，或開啟一個新分頁。
+Save the file and restart Windows Terminal or open a new tab.

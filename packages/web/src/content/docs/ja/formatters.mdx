@@ -1,15 +1,15 @@
 ---
-title: フォーマッタ
-description: OpenCode は言語固有のフォーマッタを使用します。
+title: Formatters
+description: CyxCode uses language specific formatters.
 ---
 
-OpenCode は、言語固有のフォーマッタを使用してファイルを作成または編集した後、ファイルを自動的にフォーマットします。これにより、生成されるコードがプロジェクトのコードスタイルに従っていることが保証されます。
+CyxCode automatically formats files after they are written or edited using language-specific formatters. This ensures that the code that is generated follows the code styles of your project.
 
 ---
 
-## 組み込み
+## Built-in
 
-OpenCode には、一般的な言語およびフレームワーク用のいくつかの組み込みフォーマッタが付属しています。以下は、フォーマッタ、サポートされているファイル拡張子、および必要なコマンドまたは構成オプションのリストです。
+CyxCode comes with several built-in formatters for popular languages and frameworks. Below is a list of the formatters, supported file extensions, and commands or config options it needs.
 
 | Formatter            | Extensions                                                                                               | Requirements                                                                                          |
 | -------------------- | -------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
@@ -40,62 +40,62 @@ OpenCode には、一般的な言語およびフレームワーク用のいく�
 | uv                   | .py, .pyi                                                                                                | `uv` command available                                                                                |
 | zig                  | .zig, .zon                                                                                               | `zig` command available                                                                               |
 
-したがって、プロジェクトの `prettier` に `package.json` が含まれている場合、OpenCode は自動的にそれを使用します。
+So if your project has `prettier` in your `package.json`, CyxCode will automatically use it.
 
 ---
 
-## 仕組み
+## How it works
 
-OpenCode がファイルを書き込んだり編集したりすると、次のことが行われます。
+When CyxCode writes or edits a file, it:
 
-1. 有効なすべてのフォーマッタに対してファイル拡張子をチェックします。
-2. ファイルに対して適切なフォーマッタコマンドを実行します。
-3. 書式の変更を自動的に適用します。
+1. Checks the file extension against all enabled formatters.
+2. Runs the appropriate formatter command on the file.
+3. Applies the formatting changes automatically.
 
-このプロセスはバックグラウンドで実行されるため、手動の手順を行わなくてもコードスタイルが維持されます。
+This process happens in the background, ensuring your code styles are maintained without any manual steps.
 
 ---
 
-## 設定
+## Configure
 
-OpenCode 設定の `formatter` セクションを通じてフォーマッタをカスタマイズできます。
+You can customize formatters through the `formatter` section in your CyxCode config.
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "formatter": {}
 }
 ```
 
-各フォーマッタ設定は以下をサポートします。
+Each formatter configuration supports the following:
 
-| プロパティ    | タイプ       | 説明                                                       |
-| ------------- | ------------ | ---------------------------------------------------------- |
-| `disabled`    | ブール値     | フォーマッタを無効にするには、これを `true` に設定します。 |
-| `command`     | 文字列[]     | フォーマットのために実行するコマンド                       |
-| `environment` | オブジェクト | フォーマッタの実行時に設定する環境変数                     |
-| `extensions`  | 文字列[]     | このフォーマッタが処理するファイル拡張子                   |
+| Property      | Type     | Description                                             |
+| ------------- | -------- | ------------------------------------------------------- |
+| `disabled`    | boolean  | Set this to `true` to disable the formatter             |
+| `command`     | string[] | The command to run for formatting                       |
+| `environment` | object   | Environment variables to set when running the formatter |
+| `extensions`  | string[] | File extensions this formatter should handle            |
 
-いくつかの例を見てみましょう。
+Let's look at some examples.
 
 ---
 
-### フォーマッタの無効化
+### Disabling formatters
 
-**すべて**のフォーマッタをグローバルに無効にするには、`formatter` を `false` に設定します。
+To disable **all** formatters globally, set `formatter` to `false`:
 
 ```json title="opencode.json" {3}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "formatter": false
 }
 ```
 
-**特定**のフォーマッタを無効にするには、`disabled` を `true` に設定します。
+To disable a **specific** formatter, set `disabled` to `true`:
 
 ```json title="opencode.json" {5}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "formatter": {
     "prettier": {
       "disabled": true
@@ -106,13 +106,13 @@ OpenCode 設定の `formatter` セクションを通じてフォーマッタを�
 
 ---
 
-### カスタムフォーマッタ
+### Custom formatters
 
-コマンド、環境変数、ファイル拡張子を指定することで、組み込みフォーマッタをオーバーライドしたり、新しいフォーマッタを追加したりできます。
+You can override the built-in formatters or add new ones by specifying the command, environment variables, and file extensions:
 
 ```json title="opencode.json" {4-14}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "formatter": {
     "prettier": {
       "command": ["npx", "prettier", "--write", "$FILE"],
@@ -129,4 +129,4 @@ OpenCode 設定の `formatter` セクションを通じてフォーマッタを�
 }
 ```
 
-コマンド内の **`$FILE` プレースホルダー** は、フォーマットされるファイルへのパスに置き換えられます。
+The **`$FILE` placeholder** in the command will be replaced with the path to the file being formatted.

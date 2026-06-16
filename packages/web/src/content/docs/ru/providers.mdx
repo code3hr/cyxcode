@@ -1,41 +1,41 @@
 ---
-title: Провайдеры
-description: Использование любого провайдера LLM в opencode.
+title: Providers
+description: Using any LLM provider in CyxCode.
 ---
 
 import config from "../../../../config.mjs"
 export const console = config.console
 
-opencode использует [AI SDK](https://ai-sdk.dev/) и [Models.dev](https://models.dev) для поддержки **более 75 поставщиков LLM** и поддерживает запуск локальных моделей.
+CyxCode uses the [AI SDK](https://ai-sdk.dev/) and [Models.dev](https://models.dev) to support **75+ LLM providers** and it supports running local models.
 
-Чтобы добавить провайдера, вам необходимо:
+To add a provider you need to:
 
-1. Добавьте ключи API для провайдера с помощью команды `/connect`.
-2. Настройте провайдера в вашей конфигурации opencode.
-
----
-
-### Учетные данные
-
-Когда вы добавляете ключи API провайдера с помощью команды `/connect`, они сохраняются
-в `~/.local/share/opencode/auth.json`.
+1. Add the API keys for the provider using the `/connect` command.
+2. Configure the provider in your CyxCode config.
 
 ---
 
-### Настройка
+### Credentials
 
-Вы можете настроить поставщиков через раздел `provider` в вашем opencode.
-конфиг.
+When you add a provider's API keys with the `/connect` command, they are stored
+in `~/.local/share/opencode/auth.json`.
 
 ---
 
-#### Базовый URL
+### Config
 
-Вы можете настроить базовый URL-адрес для любого провайдера, установив параметр `baseURL`. Это полезно при использовании прокси-сервисов или пользовательских конечных точек.
+You can customize the providers through the `provider` section in your CyxCode
+config.
+
+---
+
+#### Base URL
+
+You can customize the base URL for any provider by setting the `baseURL` option. This is useful when using proxy services or custom endpoints.
 
 ```json title="opencode.json" {6}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "provider": {
     "anthropic": {
       "options": {
@@ -48,95 +48,90 @@ opencode использует [AI SDK](https://ai-sdk.dev/) и [Models.dev](http
 
 ---
 
-## OpenCode Zen
+## CyxCode Zen
 
-OpenCode Zen — это список моделей, предоставленный командой opencode, которые были
-протестировано и проверено на хорошую работу с opencode. [Подробнее](/docs/zen).
+CyxCode Zen is a list of models provided by the CyxCode team that have been
+tested and verified to work well with CyxCode. [Learn more](/docs/zen).
 
 :::tip
-Если вы новичок, мы рекомендуем начать с OpenCode Zen.
+If you are new, we recommend starting with CyxCode Zen.
 :::
 
-1. Запустите команду `/connect` в TUI, выберите `OpenCode Zen` и перейдите по адресу [opencode.ai/auth](https://opencode.ai/zen).
+1. Run the `/connect` command in the TUI, select `CyxCode Zen`, and head to [cyxcode.ai/auth](https://cyxcode.ai/zen).
 
    ```txt
    /connect
    ```
 
-2. Войдите в систему, добавьте свои платежные данные и скопируйте ключ API.
+2. Sign in, add your billing details, and copy your API key.
 
-3. Вставьте свой ключ API.
+3. Paste your API key.
 
    ```txt
-   ┌ API key
-   │
-   │
-   └ enter
+   API key
    ```
 
-4. Запустите `/models` в TUI, чтобы просмотреть список рекомендуемых нами моделей.
+4. Run `/models` in the TUI to see the list of models we recommend.
 
    ```txt
    /models
    ```
 
-Он работает как любой другой поставщик в opencode и его использование совершенно необязательно.
+It works like any other provider in CyxCode and is completely optional to use.
 
 ---
 
-## OpenCode Go
+## CyxCode Go
 
-OpenCode Go — это недорогой план подписки, обеспечивающий надежный доступ к популярным открытым моделям кодирования, предоставляемым командой opencode, которые были
-протестированы и проверены на хорошую работу с opencode.
+CyxCode Go is a low cost subscription plan that provides reliable access to popular open coding models provided by the CyxCode team that have been
+tested and verified to work well with CyxCode.
 
-1. Запустите команду `/connect` в TUI, выберите `OpenCode Go` и перейдите по адресу [opencode.ai/auth](https://opencode.ai/zen).
+1. Run the `/connect` command in the TUI, select `CyxCode Go`, and head to [cyxcode.ai/auth](https://cyxcode.ai/zen).
 
    ```txt
    /connect
    ```
 
-2. Войдите в систему, добавьте свои платежные данные и скопируйте ключ API.
+2. Sign in, add your billing details, and copy your API key.
 
-3. Вставьте свой ключ API.
+3. Paste your API key.
 
    ```txt
-   ┌ API key
-   │
-   │
-   └ enter
+   API key
    ```
 
-4. Запустите `/models` в TUI, чтобы просмотреть список рекомендуемых нами моделей.
+4. Run `/models` in the TUI to see the list of models we recommend.
 
    ```txt
    /models
    ```
 
-Он работает как любой другой поставщик в opencode и его использование совершенно необязательно.
+It works like any other provider in CyxCode and is completely optional to use.
 
 ---
 
-## Каталог
+## Directory
 
-Рассмотрим некоторых провайдеров подробнее. Если вы хотите добавить провайдера в список, смело открывайте PR.
+Let's look at some of the providers in detail. If you'd like to add a provider to the
+list, feel free to open a PR.
 
 :::note
-Не видите здесь провайдера? Откройте PR.
+Don't see a provider here? Submit a PR.
 :::
 
 ---
 
 ### 302.AI
 
-1. Перейдите в консоль 302.AI](https://302.ai/), создайте учетную запись и сгенерируйте ключ API.
+1. Head over to the [302.AI console](https://302.ai/), create an account, and generate an API key.
 
-2. Запустите команду `/connect` и найдите **302.AI**.
+2. Run the `/connect` command and search for **302.AI**.
 
    ```txt
    /connect
    ```
 
-3. Введите свой ключ API 302.AI.
+3. Enter your 302.AI API key.
 
    ```txt
    ┌ API key
@@ -145,7 +140,7 @@ OpenCode Go — это недорогой план подписки, обесп�
    └ enter
    ```
 
-4. Запустите команду `/models`, чтобы выбрать модель.
+4. Run the `/models` command to select a model.
 
    ```txt
    /models
@@ -155,46 +150,50 @@ OpenCode Go — это недорогой план подписки, обесп�
 
 ### Amazon Bedrock
 
-Чтобы использовать Amazon Bedrock с opencode:
+To use Amazon Bedrock with CyxCode:
 
-1. Перейдите в **Каталог моделей** в консоли Amazon Bedrock и запросите
-   доступ к нужным моделям.
+1. Head over to the **Model catalog** in the Amazon Bedrock console and request
+   access to the models you want.
 
    :::tip
-   Вам необходимо иметь доступ к нужной модели в Amazon Bedrock.
+   You need to have access to the model you want in Amazon Bedrock.
    :::
 
-2. **Настройте аутентификацию** одним из следующих способов:
+2. **Configure authentication** using one of the following methods:
 
-   #### Переменные среды (быстрый старт)
+   ***
 
-   Установите одну из этих переменных среды при запуске opencode:
+   #### Environment Variables (Quick Start)
+
+   Set one of these environment variables while running CyxCode:
 
    ```bash
    # Option 1: Using AWS access keys
-   AWS_ACCESS_KEY_ID=XXX AWS_SECRET_ACCESS_KEY=YYY opencode
+   AWS_ACCESS_KEY_ID=XXX AWS_SECRET_ACCESS_KEY=YYY CyxCode
 
    # Option 2: Using named AWS profile
-   AWS_PROFILE=my-profile opencode
+   AWS_PROFILE=my-profile CyxCode
 
    # Option 3: Using Bedrock bearer token
-   AWS_BEARER_TOKEN_BEDROCK=XXX opencode
+   AWS_BEARER_TOKEN_BEDROCK=XXX CyxCode
    ```
 
-   Или добавьте их в свой профиль bash:
+   Or add them to your bash profile:
 
    ```bash title="~/.bash_profile"
    export AWS_PROFILE=my-dev-profile
    export AWS_REGION=us-east-1
    ```
 
-   #### Файл конфигурации (рекомендуется)
+   ***
 
-   Для конкретной или постоянной конфигурации проекта используйте `opencode.json`:
+   #### Configuration File (Recommended)
+
+   For project-specific or persistent configuration, use `opencode.json`:
 
    ```json title="opencode.json"
    {
-     "$schema": "https://opencode.ai/config.json",
+     "$schema": "https://cyxcode.ai/config.json",
      "provider": {
        "amazon-bedrock": {
          "options": {
@@ -206,22 +205,24 @@ OpenCode Go — это недорогой план подписки, обесп�
    }
    ```
 
-   **Доступные варианты:**
-   - `region` – регион AWS (например, `us-east-1`, `eu-west-1`).
-   - `profile` – именованный профиль AWS из `~/.aws/credentials`.
-   - `endpoint` — URL-адрес пользовательской конечной точки для конечных точек VPC (псевдоним для общей опции `baseURL`).
+   **Available options:**
+   - `region` - AWS region (e.g., `us-east-1`, `eu-west-1`)
+   - `profile` - AWS named profile from `~/.aws/credentials`
+   - `endpoint` - Custom endpoint URL for VPC endpoints (alias for generic `baseURL` option)
 
    :::tip
-   Параметры файла конфигурации имеют приоритет над переменными среды.
+   Configuration file options take precedence over environment variables.
    :::
 
-   #### Дополнительно: конечные точки VPC
+   ***
 
-   Если вы используете конечные точки VPC для Bedrock:
+   #### Advanced: VPC Endpoints
+
+   If you're using VPC endpoints for Bedrock:
 
    ```json title="opencode.json"
    {
-     "$schema": "https://opencode.ai/config.json",
+     "$schema": "https://cyxcode.ai/config.json",
      "provider": {
        "amazon-bedrock": {
          "options": {
@@ -235,37 +236,42 @@ OpenCode Go — это недорогой план подписки, обесп�
    ```
 
    :::note
-   Параметр `endpoint` — это псевдоним общего параметра `baseURL`, использующий терминологию, специфичную для AWS. Если указаны и `endpoint`, и `baseURL`, `endpoint` имеет приоритет.
+   The `endpoint` option is an alias for the generic `baseURL` option, using AWS-specific terminology. If both `endpoint` and `baseURL` are specified, `endpoint` takes precedence.
    :::
 
-   #### Методы аутентификации
-   - **`AWS_ACCESS_KEY_ID` / `AWS_SECRET_ACCESS_KEY`**: создайте пользователя IAM и сгенерируйте ключи доступа в консоли AWS.
-   - **`AWS_PROFILE`**: использовать именованные профили из `~/.aws/credentials`. Сначала настройте `aws configure --profile my-profile` или `aws sso login`.
-   - **`AWS_BEARER_TOKEN_BEDROCK`**: создание долгосрочных ключей API из консоли Amazon Bedrock.
-   - **`AWS_WEB_IDENTITY_TOKEN_FILE`/`AWS_ROLE_ARN`**: для EKS IRSA (роли IAM для учетных записей служб) или других сред Kubernetes с федерацией OIDC. Эти переменные среды автоматически вводятся Kubernetes при использовании аннотаций учетной записи службы.
+   ***
 
-   #### Приоритет аутентификации
+   #### Authentication Methods
+   - **`AWS_ACCESS_KEY_ID` / `AWS_SECRET_ACCESS_KEY`**: Create an IAM user and generate access keys in the AWS Console
+   - **`AWS_PROFILE`**: Use named profiles from `~/.aws/credentials`. First configure with `aws configure --profile my-profile` or `aws sso login`
+   - **`AWS_BEARER_TOKEN_BEDROCK`**: Generate long-term API keys from the Amazon Bedrock console
+   - **`AWS_WEB_IDENTITY_TOKEN_FILE` / `AWS_ROLE_ARN`**: For EKS IRSA (IAM Roles for Service Accounts) or other Kubernetes environments with OIDC federation. These environment variables are automatically injected by Kubernetes when using service account annotations.
 
-   Amazon Bedrock использует следующий приоритет аутентификации:
-   1. **Токен носителя** — переменная среды `AWS_BEARER_TOKEN_BEDROCK` или токен из команды `/connect`.
-   2. **Цепочка учетных данных AWS** — профиль, ключи доступа, общие учетные данные, роли IAM, токены веб-идентификации (EKS IRSA), метаданные экземпляра.
+   ***
+
+   #### Authentication Precedence
+
+   Amazon Bedrock uses the following authentication priority:
+   1. **Bearer Token** - `AWS_BEARER_TOKEN_BEDROCK` environment variable or token from `/connect` command
+   2. **AWS Credential Chain** - Profile, access keys, shared credentials, IAM roles, Web Identity Tokens (EKS IRSA), instance metadata
 
    :::note
-   Когда токен-носитель установлен (через `/connect` или `AWS_BEARER_TOKEN_BEDROCK`), он имеет приоритет над всеми методами учетных данных AWS, включая настроенные профили.
+   When a bearer token is set (via `/connect` or `AWS_BEARER_TOKEN_BEDROCK`), it takes precedence over all AWS credential methods including configured profiles.
    :::
 
-3. Запустите команду `/models`, чтобы выбрать нужную модель.
+3. Run the `/models` command to select the model you want.
 
    ```txt
    /models
    ```
 
 :::note
-Для пользовательских профилей вывода используйте имя модели и поставщика в ключе и задайте для свойства `id` значение arn. Это обеспечивает правильное кэширование:
+For custom inference profiles, use the model and provider name in the key and set the `id` property to the arn. This ensures correct caching.
+:::
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "provider": {
     "amazon-bedrock": {
       // ...
@@ -279,71 +285,72 @@ OpenCode Go — это недорогой план подписки, обесп�
 }
 ```
 
-:::
-
 ---
 
 ### Anthropic
 
-1. После регистрации введите команду `/connect` и выберите Anthropic.
+1. Once you've signed up, run the `/connect` command and select Anthropic.
 
    ```txt
    /connect
    ```
 
-2. Здесь вы можете выбрать опцию **Claude Pro/Max**, и ваш браузер откроется.
-   и попросите вас пройти аутентификацию.
+2. Here you can select the **Claude Pro/Max** option and it'll open your browser
+   and ask you to authenticate.
 
    ```txt
    ┌ Select auth method
    │
-   │ Claude Pro/Max
-   │ Create an API Key
    │ Manually enter API Key
    └
    ```
 
-3. Теперь все модели Anthropic должны быть доступны при использовании команды `/models`.
+3. Now all the Anthropic models should be available when you use the `/models` command.
 
    ```txt
    /models
    ```
 
 :::info
-Использование вашей подписки Claude Pro/Max в opencode официально не поддерживается [Anthropic](https://anthropic.com).
-:::
+There are plugins that allow you to use your Claude Pro/Max models with
+CyxCode. Anthropic explicitly prohibits this.
 
-##### Использование ключей API
+Previous versions of CyxCode came bundled with these plugins but that is no
+longer the case as of 1.3.0
 
-Вы также можете выбрать **Создать ключ API**, если у вас нет подписки Pro/Max. Он также откроет ваш браузер и попросит вас войти в Anthropic и предоставит вам код, который вы можете вставить в свой терминал.
+Other companies support freedom of choice with developer tooling - you can use
+the following subscriptions in CyxCode with zero setup:
 
-Или, если у вас уже есть ключ API, вы можете выбрать **Ввести ключ API вручную** и вставить его в свой терминал.
+- ChatGPT Plus
+- Github Copilot
+- Gitlab Duo
+  :::
 
 ---
 
 ### Azure OpenAI
 
 :::note
-Если вы столкнулись с ошибками «Извините, но я не могу помочь с этим запросом», попробуйте изменить фильтр содержимого с **DefaultV2** на **Default** в своем ресурсе Azure.
+If you encounter "I'm sorry, but I cannot assist with that request" errors, try changing the content filter from **DefaultV2** to **Default** in your Azure resource.
 :::
 
-1. Перейдите на [портал Azure](https://portal.azure.com/) и создайте ресурс **Azure OpenAI**. Вам понадобится:
-   - **Имя ресурса**: оно становится частью вашей конечной точки API (`https://RESOURCE_NAME.openai.azure.com/`).
-   - **Ключ API**: `KEY 1` или `KEY 2` из вашего ресурса.
+1. Head over to the [Azure portal](https://portal.azure.com/) and create an **Azure OpenAI** resource. You'll need:
+   - **Resource name**: This becomes part of your API endpoint (`https://RESOURCE_NAME.openai.azure.com/`)
+   - **API key**: Either `KEY 1` or `KEY 2` from your resource
 
-2. Перейдите в [Azure AI Foundry](https://ai.azure.com/) и разверните модель.
+2. Go to [Azure AI Foundry](https://ai.azure.com/) and deploy a model.
 
-   :::примечание
-   Для правильной работы opencode имя развертывания должно совпадать с именем модели.
+   :::note
+   The deployment name must match the model name for CyxCode to work properly.
    :::
 
-3. Запустите команду `/connect` и найдите **Azure**.
+3. Run the `/connect` command and search for **Azure**.
 
    ```txt
    /connect
    ```
 
-4. Введите свой ключ API.
+4. Enter your API key.
 
    ```txt
    ┌ API key
@@ -352,19 +359,19 @@ OpenCode Go — это недорогой план подписки, обесп�
    └ enter
    ```
 
-5. Задайте имя ресурса как переменную среды:
+5. Set your resource name as an environment variable:
 
    ```bash
-   AZURE_RESOURCE_NAME=XXX opencode
+   AZURE_RESOURCE_NAME=XXX CyxCode
    ```
 
-   Или добавьте его в свой профиль bash:
+   Or add it to your bash profile:
 
    ```bash title="~/.bash_profile"
    export AZURE_RESOURCE_NAME=XXX
    ```
 
-6. Запустите команду `/models`, чтобы выбрать развернутую модель.
+6. Run the `/models` command to select your deployed model.
 
    ```txt
    /models
@@ -374,23 +381,23 @@ OpenCode Go — это недорогой план подписки, обесп�
 
 ### Azure Cognitive Services
 
-1. Перейдите на [портал Azure](https://portal.azure.com/) и создайте ресурс **Azure OpenAI**. Вам понадобится:
-   - **Имя ресурса**: оно становится частью вашей конечной точки API (`https://AZURE_COGNITIVE_SERVICES_RESOURCE_NAME.cognitiveservices.azure.com/`).
-   - **Ключ API**: `KEY 1` или `KEY 2` из вашего ресурса.
+1. Head over to the [Azure portal](https://portal.azure.com/) and create an **Azure OpenAI** resource. You'll need:
+   - **Resource name**: This becomes part of your API endpoint (`https://AZURE_COGNITIVE_SERVICES_RESOURCE_NAME.cognitiveservices.azure.com/`)
+   - **API key**: Either `KEY 1` or `KEY 2` from your resource
 
-2. Перейдите в [Azure AI Foundry](https://ai.azure.com/) и разверните модель.
+2. Go to [Azure AI Foundry](https://ai.azure.com/) and deploy a model.
 
-   :::примечание
-   Для правильной работы opencode имя развертывания должно совпадать с именем модели.
+   :::note
+   The deployment name must match the model name for CyxCode to work properly.
    :::
 
-3. Запустите команду `/connect` и найдите **Azure Cognitive Services**.
+3. Run the `/connect` command and search for **Azure Cognitive Services**.
 
    ```txt
    /connect
    ```
 
-4. Введите свой ключ API.
+4. Enter your API key.
 
    ```txt
    ┌ API key
@@ -399,19 +406,19 @@ OpenCode Go — это недорогой план подписки, обесп�
    └ enter
    ```
 
-5. Задайте имя ресурса как переменную среды:
+5. Set your resource name as an environment variable:
 
    ```bash
-   AZURE_COGNITIVE_SERVICES_RESOURCE_NAME=XXX opencode
+   AZURE_COGNITIVE_SERVICES_RESOURCE_NAME=XXX CyxCode
    ```
 
-   Или добавьте его в свой профиль bash:
+   Or add it to your bash profile:
 
    ```bash title="~/.bash_profile"
    export AZURE_COGNITIVE_SERVICES_RESOURCE_NAME=XXX
    ```
 
-6. Запустите команду `/models`, чтобы выбрать развернутую модель.
+6. Run the `/models` command to select your deployed model.
 
    ```txt
    /models
@@ -421,15 +428,15 @@ OpenCode Go — это недорогой план подписки, обесп�
 
 ### Baseten
 
-1. Перейдите в [Baseten](https://app.baseten.co/), создайте учетную запись и сгенерируйте ключ API.
+1. Head over to the [Baseten](https://app.baseten.co/), create an account, and generate an API key.
 
-2. Запустите команду `/connect` и найдите **Baseten**.
+2. Run the `/connect` command and search for **Baseten**.
 
    ```txt
    /connect
    ```
 
-3. Введите свой ключ API Baseten.
+3. Enter your Baseten API key.
 
    ```txt
    ┌ API key
@@ -438,7 +445,7 @@ OpenCode Go — это недорогой план подписки, обесп�
    └ enter
    ```
 
-4. Запустите команду `/models`, чтобы выбрать модель.
+4. Run the `/models` command to select a model.
 
    ```txt
    /models
@@ -448,15 +455,15 @@ OpenCode Go — это недорогой план подписки, обесп�
 
 ### Cerebras
 
-1. Перейдите в [консоль Cerebras](https://inference.cerebras.ai/), создайте учетную запись и сгенерируйте ключ API.
+1. Head over to the [Cerebras console](https://inference.cerebras.ai/), create an account, and generate an API key.
 
-2. Запустите команду `/connect` и найдите **Cerebras**.
+2. Run the `/connect` command and search for **Cerebras**.
 
    ```txt
    /connect
    ```
 
-3. Введите свой ключ API Cerebras.
+3. Enter your Cerebras API key.
 
    ```txt
    ┌ API key
@@ -465,7 +472,7 @@ OpenCode Go — это недорогой план подписки, обесп�
    └ enter
    ```
 
-4. Запустите команду `/models`, чтобы выбрать такую ​​модель, как _Qwen 3 Coder 480B_.
+4. Run the `/models` command to select a model like _Qwen 3 Coder 480B_.
 
    ```txt
    /models
@@ -475,24 +482,24 @@ OpenCode Go — это недорогой план подписки, обесп�
 
 ### Cloudflare AI Gateway
 
-Cloudflare AI Gateway позволяет вам получать доступ к моделям OpenAI, Anthropic, Workers AI и т. д. через единую конечную точку. Благодаря [Unified Billing](https://developers.cloudflare.com/ai-gateway/features/unified-billing/) вам не нужны отдельные ключи API для каждого провайдера.
+Cloudflare AI Gateway lets you access models from OpenAI, Anthropic, Workers AI, and more through a unified endpoint. With [Unified Billing](https://developers.cloudflare.com/ai-gateway/features/unified-billing/) you don't need separate API keys for each provider.
 
-1. Перейдите на [панель управления Cloudflare](https://dash.cloudflare.com/), выберите **AI** > **AI Gateway** и создайте новый шлюз.
+1. Head over to the [Cloudflare dashboard](https://dash.cloudflare.com/), navigate to **AI** > **AI Gateway**, and create a new gateway.
 
-2. Установите идентификатор своей учетной записи и идентификатор шлюза в качестве переменных среды.
+2. Set your Account ID and Gateway ID as environment variables.
 
    ```bash title="~/.bash_profile"
    export CLOUDFLARE_ACCOUNT_ID=your-32-character-account-id
    export CLOUDFLARE_GATEWAY_ID=your-gateway-id
    ```
 
-3. Запустите команду `/connect` и найдите **Cloudflare AI Gateway**.
+3. Run the `/connect` command and search for **Cloudflare AI Gateway**.
 
    ```txt
    /connect
    ```
 
-4. Введите свой токен API Cloudflare.
+4. Enter your Cloudflare API token.
 
    ```txt
    ┌ API key
@@ -501,23 +508,23 @@ Cloudflare AI Gateway позволяет вам получать доступ к
    └ enter
    ```
 
-   Или установите его как переменную среды.
+   Or set it as an environment variable.
 
    ```bash title="~/.bash_profile"
    export CLOUDFLARE_API_TOKEN=your-api-token
    ```
 
-5. Запустите команду `/models`, чтобы выбрать модель.
+5. Run the `/models` command to select a model.
 
    ```txt
    /models
    ```
 
-   Вы также можете добавлять модели через конфигурацию opencode.
+   You can also add models through your CyxCode config.
 
    ```json title="opencode.json"
    {
-     "$schema": "https://opencode.ai/config.json",
+     "$schema": "https://cyxcode.ai/config.json",
      "provider": {
        "cloudflare-ai-gateway": {
          "models": {
@@ -531,17 +538,25 @@ Cloudflare AI Gateway позволяет вам получать доступ к
 
 ---
 
-### Cortecs
+### Cloudflare Workers AI
 
-1. Перейдите в [консоль Cortecs](https://cortecs.ai/), создайте учетную запись и сгенерируйте ключ API.
+Cloudflare Workers AI lets you run AI models on Cloudflare's global network directly via REST API, with no separate provider accounts needed for supported models.
 
-2. Запустите команду `/connect` и найдите **Cortecs**.
+1. Head over to the [Cloudflare dashboard](https://dash.cloudflare.com/), navigate to **Workers AI**, and select **Use REST API** to get your Account ID and create an API token.
+
+2. Set your Account ID as an environment variable.
+
+   ```bash title="~/.bash_profile"
+   export CLOUDFLARE_ACCOUNT_ID=your-32-character-account-id
+   ```
+
+3. Run the `/connect` command and search for **Cloudflare Workers AI**.
 
    ```txt
    /connect
    ```
 
-3. Введите свой ключ API Cortecs.
+4. Enter your Cloudflare API token.
 
    ```txt
    ┌ API key
@@ -550,7 +565,40 @@ Cloudflare AI Gateway позволяет вам получать доступ к
    └ enter
    ```
 
-4. Запустите команду `/models`, чтобы выбрать такую ​​модель, как _Kimi K2 Instruct_.
+   Or set it as an environment variable.
+
+   ```bash title="~/.bash_profile"
+   export CLOUDFLARE_API_KEY=your-api-token
+   ```
+
+5. Run the `/models` command to select a model.
+
+   ```txt
+   /models
+   ```
+
+---
+
+### Cortecs
+
+1. Head over to the [Cortecs console](https://cortecs.ai/), create an account, and generate an API key.
+
+2. Run the `/connect` command and search for **Cortecs**.
+
+   ```txt
+   /connect
+   ```
+
+3. Enter your Cortecs API key.
+
+   ```txt
+   ┌ API key
+   │
+   │
+   └ enter
+   ```
+
+4. Run the `/models` command to select a model like _Kimi K2 Instruct_.
 
    ```txt
    /models
@@ -560,15 +608,15 @@ Cloudflare AI Gateway позволяет вам получать доступ к
 
 ### DeepSeek
 
-1. Перейдите в [консоль DeepSeek](https://platform.deepseek.com/), создайте учетную запись и нажмите **Создать новый ключ API**.
+1. Head over to the [DeepSeek console](https://platform.deepseek.com/), create an account, and click **Create new API key**.
 
-2. Запустите команду `/connect` и найдите **DeepSeek**.
+2. Run the `/connect` command and search for **DeepSeek**.
 
    ```txt
    /connect
    ```
 
-3. Введите свой ключ API DeepSeek.
+3. Enter your DeepSeek API key.
 
    ```txt
    ┌ API key
@@ -577,7 +625,7 @@ Cloudflare AI Gateway позволяет вам получать доступ к
    └ enter
    ```
 
-4. Запустите команду `/models`, чтобы выбрать модель DeepSeek, например _DeepSeek Reasoner_.
+4. Run the `/models` command to select a DeepSeek model like _DeepSeek Reasoner_.
 
    ```txt
    /models
@@ -587,15 +635,15 @@ Cloudflare AI Gateway позволяет вам получать доступ к
 
 ### Deep Infra
 
-1. Перейдите на панель мониторинга Deep Infra](https://deepinfra.com/dash), создайте учетную запись и сгенерируйте ключ API.
+1. Head over to the [Deep Infra dashboard](https://deepinfra.com/dash), create an account, and generate an API key.
 
-2. Запустите команду `/connect` и найдите **Deep Infra**.
+2. Run the `/connect` command and search for **Deep Infra**.
 
    ```txt
    /connect
    ```
 
-3. Введите свой ключ API Deep Infra.
+3. Enter your Deep Infra API key.
 
    ```txt
    ┌ API key
@@ -604,7 +652,7 @@ Cloudflare AI Gateway позволяет вам получать доступ к
    └ enter
    ```
 
-4. Запустите команду `/models`, чтобы выбрать модель.
+4. Run the `/models` command to select a model.
 
    ```txt
    /models
@@ -614,15 +662,15 @@ Cloudflare AI Gateway позволяет вам получать доступ к
 
 ### Firmware
 
-1. Перейдите на [панель Firmware](https://app.firmware.ai/signup), создайте учетную запись и сгенерируйте ключ API.
+1. Head over to the [Firmware dashboard](https://app.firmware.ai/signup), create an account, and generate an API key.
 
-2. Запустите команду `/connect` и найдите **Firmware**.
+2. Run the `/connect` command and search for **Firmware**.
 
    ```txt
    /connect
    ```
 
-3. Введите ключ API Firmware.
+3. Enter your Firmware API key.
 
    ```txt
    ┌ API key
@@ -631,7 +679,7 @@ Cloudflare AI Gateway позволяет вам получать доступ к
    └ enter
    ```
 
-4. Запустите команду `/models`, чтобы выбрать модель.
+4. Run the `/models` command to select a model.
 
    ```txt
    /models
@@ -641,15 +689,15 @@ Cloudflare AI Gateway позволяет вам получать доступ к
 
 ### Fireworks AI
 
-1. Перейдите в [консоль Fireworks AI](https://app.fireworks.ai/), создайте учетную запись и нажмите **Создать ключ API**.
+1. Head over to the [Fireworks AI console](https://app.fireworks.ai/), create an account, and click **Create API Key**.
 
-2. Запустите команду `/connect` и найдите **Fireworks AI**.
+2. Run the `/connect` command and search for **Fireworks AI**.
 
    ```txt
    /connect
    ```
 
-3. Введите ключ API Fireworks AI.
+3. Enter your Fireworks AI API key.
 
    ```txt
    ┌ API key
@@ -658,7 +706,7 @@ Cloudflare AI Gateway позволяет вам получать доступ к
    └ enter
    ```
 
-4. Запустите команду `/models`, чтобы выбрать такую ​​модель, как _Kimi K2 Instruct_.
+4. Run the `/models` command to select a model like _Kimi K2 Instruct_.
 
    ```txt
    /models
@@ -668,15 +716,28 @@ Cloudflare AI Gateway позволяет вам получать доступ к
 
 ### GitLab Duo
 
-GitLab Duo предоставляет агентский чат на базе искусственного интеллекта со встроенными возможностями вызова инструментов через прокси-сервер GitLab Anthropic.
+:::caution[Experimental]
+GitLab Duo support in CyxCode is experimental. Features, configuration, and
+behavior may change in future releases.
+:::
 
-1. Запустите команду `/connect` и выберите GitLab.
+CyxCode integrates with the [GitLab Duo Agent Platform](https://docs.gitlab.com/user/duo_agent_platform/),
+providing AI-powered agentic chat with native tool calling capabilities.
+
+:::note[License requirements]
+GitLab Duo Agent Platform requires a **Premium** or **Ultimate** GitLab
+subscription. It is available on GitLab.com and GitLab Self-Managed.
+See [GitLab Duo Agent Platform prerequisites](https://docs.gitlab.com/user/duo_agent_platform/#prerequisites)
+for full requirements.
+:::
+
+1. Run the `/connect` command and select GitLab.
 
    ```txt
    /connect
    ```
 
-2. Выберите метод аутентификации:
+2. Choose your authentication method:
 
    ```txt
    ┌ Select auth method
@@ -686,44 +747,44 @@ GitLab Duo предоставляет агентский чат на базе и
    └
    ```
 
-   #### Использование OAuth (рекомендуется)
+   #### Using OAuth (Recommended)
 
-   Выберите **OAuth**, и ваш браузер откроется для авторизации.
+   Select **OAuth** and your browser will open for authorization.
 
-   #### Использование токена личного доступа
-   1. Перейдите в [Настройки пользователя GitLab > Токены доступа](https://gitlab.com/-/user_settings/personal_access_tokens).
-   2. Нажмите **Добавить новый токен**.
-   3. Имя: `OpenCode`, Области применения: `api`
-   4. Скопируйте токен (начинается с `glpat-`)
-   5. Введите его в терминал
+   #### Using Personal Access Token
+   1. Go to [GitLab User Settings > Access Tokens](https://gitlab.com/-/user_settings/personal_access_tokens)
+   2. Click **Add new token**
+   3. Name: `cyxcode`, Scopes: `api`
+   4. Copy the token (starts with `glpat-`)
+   5. Enter it in the terminal
 
-3. Запустите команду `/models`, чтобы просмотреть доступные модели.
+3. Run the `/models` command to see available models.
 
    ```txt
    /models
    ```
 
-   Доступны три модели на основе Claude:
-   - **duo-chat-haiku-4-5** (по умолчанию) — быстрые ответы на быстрые задачи.
-   - **duo-chat-sonnet-4-5** — сбалансированная производительность для большинства рабочих процессов.
-   - **duo-chat-opus-4-5** — Наиболее способен к комплексному анализу.
+   Three Claude-based models are available:
+   - **duo-chat-haiku-4-5** (Default) - Fast responses for quick tasks
+   - **duo-chat-sonnet-4-5** - Balanced performance for most workflows
+   - **duo-chat-opus-4-5** - Most capable for complex analysis
 
 :::note
-Вы также можете указать переменную среды «GITLAB_TOKEN», если не хотите.
-для хранения токена в хранилище аутентификации opencode.
+You can also specify 'GITLAB_TOKEN' environment variable if you don't want
+to store token in CyxCode auth storage.
 :::
 
-##### Самостоятельная GitLab
+##### Self-Hosted GitLab
 
-:::note[примечание о соответствии]
-opencode использует небольшую модель для некоторых задач ИИ, таких как создание заголовка сеанса.
-По умолчанию он настроен на использование gpt-5-nano, размещенного на Zen. Чтобы заблокировать opencode
-чтобы использовать только свой собственный экземпляр, размещенный на GitLab, добавьте следующее в свой
-`opencode.json` файл. Также рекомендуется отключить совместное использование сеансов.
+:::note[compliance note]
+CyxCode uses a small model for some AI tasks like generating the session title.
+It is configured to use gpt-5-nano by default, hosted by Zen. To lock CyxCode
+to only use your own GitLab-hosted instance, add the following to your
+`opencode.json` file. It is also recommended to disable session sharing.
 
 ```json
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "small_model": "gitlab/duo-chat-haiku-4-5",
   "share": "disabled"
 }
@@ -731,20 +792,20 @@ opencode использует небольшую модель для некот�
 
 :::
 
-Для самостоятельных экземпляров GitLab:
+For self-hosted GitLab instances:
 
 ```bash
 export GITLAB_INSTANCE_URL=https://gitlab.company.com
 export GITLAB_TOKEN=glpat-...
 ```
 
-Если в вашем экземпляре используется собственный AI-шлюз:
+If your instance runs a custom AI Gateway:
 
 ```bash
 GITLAB_AI_GATEWAY_URL=https://ai-gateway.company.com
 ```
 
-Или добавьте в свой профиль bash:
+Or add to your bash profile:
 
 ```bash title="~/.bash_profile"
 export GITLAB_INSTANCE_URL=https://gitlab.company.com
@@ -753,39 +814,41 @@ export GITLAB_TOKEN=glpat-...
 ```
 
 :::note
-Ваш администратор GitLab должен включить следующее:
+Your GitLab administrator must:
 
-1. [Платформа Duo Agent](https://docs.gitlab.com/user/duo_agent_platform/turn_on_off/) для пользователя, группы или экземпляра
-2. Флаги функций (через консоль Rails):
-   - `agent_platform_claude_code`
-   - `third_party_agents_enabled`
-     :::
+1. [Turn on GitLab Duo](https://docs.gitlab.com/user/duo_agent_platform/turn_on_off/#turn-gitlab-duo-on-or-off)
+   for the user, group, or instance
+2. [Turn on the Agent Platform](https://docs.gitlab.com/user/duo_agent_platform/turn_on_off/#turn-gitlab-duo-agent-platform-on-or-off)
+   (GitLab 18.8+) or [enable beta and experimental features](https://docs.gitlab.com/user/duo_agent_platform/turn_on_off/#turn-on-beta-and-experimental-features)
+   (GitLab 18.7 and earlier)
+3. For Self-Managed, [configure your instance](https://docs.gitlab.com/administration/gitlab_duo/configure/gitlab_self_managed/)
+   :::
 
-##### OAuth для локальных экземпляров
+##### OAuth for Self-Hosted instances
 
-Чтобы Oauth работал на вашем локальном экземпляре, вам необходимо создать
-новое приложение (Настройки → Приложения) с
-URL обратного вызова `http://127.0.0.1:8080/callback` и следующие области:
+In order to make Oauth working for your self-hosted instance, you need to create
+a new application (Settings → Applications) with the
+callback URL `http://127.0.0.1:8080/callback` and following scopes:
 
-- API (Доступ к API от вашего имени)
-- read_user (прочитать вашу личную информацию)
-- read_repository (разрешает доступ к репозиторию только для чтения)
+- api (Access the API on your behalf)
+- read_user (Read your personal information)
+- read_repository (Allows read-only access to the repository)
 
-Затем укажите идентификатор приложения как переменную среды:
+Then expose application ID as environment variable:
 
 ```bash
 export GITLAB_OAUTH_CLIENT_ID=your_application_id_here
 ```
 
-Дополнительная документация на домашней странице [opencode-gitlab-auth](https://www.npmjs.com/package/opencode-gitlab-auth).
+More documentation on [CyxCode-gitlab-auth](https://www.npmjs.com/package/CyxCode-gitlab-auth) homepage.
 
-##### Конфигурация
+##### Configuration
 
-Настройте через `opencode.json`:
+Customize through `opencode.json`:
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "provider": {
     "gitlab": {
       "options": {
@@ -796,39 +859,51 @@ export GITLAB_OAUTH_CLIENT_ID=your_application_id_here
 }
 ```
 
-##### Инструменты API GitLab (необязательно, но настоятельно рекомендуется)
+##### GitLab Duo Agent Platform (DAP) Workflow Models
 
-Чтобы получить доступ к инструментам GitLab (мерж-реквесты, задачи, конвейеры, CI/CD и т. д.):
+DAP workflow models provide an alternative execution path that routes tool calls
+through GitLab's Duo Workflow Service (DWS) instead of the standard agentic chat.
+When a `duo-workflow-*` model is selected, CyxCode will:
+
+1. Discover available models from your GitLab namespace
+2. Present a selection picker if multiple models are available
+3. Cache the selected model to disk for fast subsequent startups
+4. Route tool execution requests through CyxCode's permission-gated tool system
+
+Available DAP workflow models follow the `duo-workflow-*` naming convention and
+are dynamically discovered from your GitLab instance.
+
+##### GitLab API Tools (Optional, but highly recommended)
+
+To access GitLab tools (merge requests, issues, pipelines, CI/CD, etc.):
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
-  "plugin": ["opencode-gitlab-plugin"]
+  "$schema": "https://cyxcode.ai/config.json",
+  "plugin": ["CyxCode-gitlab-plugin"]
 }
 ```
 
-Этот плагин предоставляет комплексные возможности управления репозиторием GitLab, включая проверки MR, отслеживание проблем, мониторинг конвейера и многое другое.
+This plugin provides comprehensive GitLab repository management capabilities including MR reviews, issue tracking, pipeline monitoring, and more.
 
 ---
 
 ### GitHub Copilot
 
-Чтобы использовать подписку GitHub Copilot с открытым кодом:
+To use your GitHub Copilot subscription with CyxCode:
 
 :::note
-Некоторым моделям может потребоваться [Pro+
-подписка](https://github.com/features/copilot/plans) для использования.
-
-Некоторые модели необходимо включить вручную в настройках [GitHub Copilot](https://docs.github.com/en/copilot/how-tos/use-ai-models/configure-access-to-ai-models#setup-for-individual-use).
+Some models might need a [Pro+
+subscription](https://github.com/features/copilot/plans) to use.
 :::
 
-1. Запустите команду `/connect` и найдите GitHub Copilot.
+1. Run the `/connect` command and search for GitHub Copilot.
 
    ```txt
    /connect
    ```
 
-2. Перейдите на [github.com/login/device](https://github.com/login/device) и введите код.
+2. Navigate to [github.com/login/device](https://github.com/login/device) and enter the code.
 
    ```txt
    ┌ Login with GitHub Copilot
@@ -840,7 +915,7 @@ export GITLAB_OAUTH_CLIENT_ID=your_application_id_here
    └ Waiting for authorization...
    ```
 
-3. Теперь запустите команду `/models`, чтобы выбрать нужную модель.
+3. Now run the `/models` command to select the model you want.
 
    ```txt
    /models
@@ -850,29 +925,29 @@ export GITLAB_OAUTH_CLIENT_ID=your_application_id_here
 
 ### Google Vertex AI
 
-Чтобы использовать Google Vertex AI с opencode:
+To use Google Vertex AI with CyxCode:
 
-1. Перейдите в **Model Garden** в Google Cloud Console и проверьте
-   модели, доступные в вашем регионе.
+1. Head over to the **Model Garden** in the Google Cloud Console and check the
+   models available in your region.
 
    :::note
-   Вам необходим проект Google Cloud с включенным Vertex AI API.
+   You need to have a Google Cloud project with Vertex AI API enabled.
    :::
 
-2. Установите необходимые переменные среды:
-   - `GOOGLE_CLOUD_PROJECT`: идентификатор вашего проекта Google Cloud.
-   - `VERTEX_LOCATION` (необязательно): регион для Vertex AI (по умолчанию `global`).
-   - Аутентификация (выберите одну):
-     - `GOOGLE_APPLICATION_CREDENTIALS`: путь к ключевому файлу JSON вашего сервисного аккаунта.
-     - Аутентификация через CLI gcloud: `gcloud auth application-default login`.
+2. Set the required environment variables:
+   - `GOOGLE_CLOUD_PROJECT`: Your Google Cloud project ID
+   - `VERTEX_LOCATION` (optional): The region for Vertex AI (defaults to `global`)
+   - Authentication (choose one):
+     - `GOOGLE_APPLICATION_CREDENTIALS`: Path to your service account JSON key file
+     - Authenticate using gcloud CLI: `gcloud auth application-default login`
 
-   Установите их во время запуска opencode.
+   Set them while running CyxCode.
 
    ```bash
-   GOOGLE_APPLICATION_CREDENTIALS=/path/to/service-account.json GOOGLE_CLOUD_PROJECT=your-project-id opencode
+   GOOGLE_APPLICATION_CREDENTIALS=/path/to/service-account.json GOOGLE_CLOUD_PROJECT=your-project-id CyxCode
    ```
 
-   Или добавьте их в свой профиль bash.
+   Or add them to your bash profile.
 
    ```bash title="~/.bash_profile"
    export GOOGLE_APPLICATION_CREDENTIALS=/path/to/service-account.json
@@ -881,10 +956,10 @@ export GITLAB_OAUTH_CLIENT_ID=your_application_id_here
    ```
 
 :::tip
-Регион `global` повышает доступность и уменьшает количество ошибок без дополнительных затрат. Используйте региональные конечные точки (например, `us-central1`) для требований к местонахождению данных. [Подробнее](https://cloud.google.com/vertex-ai/generative-ai/docs/partner-models/use-partner-models#regional_and_global_endpoints)
+The `global` region improves availability and reduces errors at no extra cost. Use regional endpoints (e.g., `us-central1`) for data residency requirements. [Learn more](https://cloud.google.com/vertex-ai/generative-ai/docs/partner-models/use-partner-models#regional_and_global_endpoints)
 :::
 
-3. Запустите команду `/models`, чтобы выбрать нужную модель.
+3. Run the `/models` command to select the model you want.
 
    ```txt
    /models
@@ -894,15 +969,15 @@ export GITLAB_OAUTH_CLIENT_ID=your_application_id_here
 
 ### Groq
 
-1. Перейдите в консоль Groq](https://console.groq.com/), нажмите **Создать ключ API** и скопируйте ключ.
+1. Head over to the [Groq console](https://console.groq.com/), click **Create API Key**, and copy the key.
 
-2. Запустите команду `/connect` и найдите Groq.
+2. Run the `/connect` command and search for Groq.
 
    ```txt
    /connect
    ```
 
-3. Введите ключ API для провайдера.
+3. Enter the API key for the provider.
 
    ```txt
    ┌ API key
@@ -911,7 +986,7 @@ export GITLAB_OAUTH_CLIENT_ID=your_application_id_here
    └ enter
    ```
 
-4. Запустите команду `/models`, чтобы выбрать тот, который вам нужен.
+4. Run the `/models` command to select the one you want.
 
    ```txt
    /models
@@ -921,17 +996,17 @@ export GITLAB_OAUTH_CLIENT_ID=your_application_id_here
 
 ### Hugging Face
 
-[Hugging Face Inference Providers](https://huggingface.co/docs/inference-providers) предоставляют доступ к открытым моделям, поддерживаемым более чем 17 поставщиками.
+[Hugging Face Inference Providers](https://huggingface.co/docs/inference-providers) provides access to open models supported by 17+ providers.
 
-1. Перейдите в [Настройки Hugging Face](https://huggingface.co/settings/tokens/new?ownUserPermissions=inference.serverless.write&tokenType=fineGrained), чтобы создать токен с разрешением совершать вызовы к поставщикам выводов.
+1. Head over to [Hugging Face settings](https://huggingface.co/settings/tokens/new?ownUserPermissions=inference.serverless.write&tokenType=fineGrained) to create a token with permission to make calls to Inference Providers.
 
-2. Запустите команду `/connect` и найдите **Hugging Face**.
+2. Run the `/connect` command and search for **Hugging Face**.
 
    ```txt
    /connect
    ```
 
-3. Введите свой токен Hugging Face.
+3. Enter your Hugging Face token.
 
    ```txt
    ┌ API key
@@ -940,7 +1015,7 @@ export GITLAB_OAUTH_CLIENT_ID=your_application_id_here
    └ enter
    ```
 
-4. Запустите команду `/models`, чтобы выбрать такую ​​модель, как _Kimi-K2-Instruct_ или _GLM-4.6_.
+4. Run the `/models` command to select a model like _Kimi-K2-Instruct_ or _GLM-4.6_.
 
    ```txt
    /models
@@ -950,17 +1025,17 @@ export GITLAB_OAUTH_CLIENT_ID=your_application_id_here
 
 ### Helicone
 
-[Helicone](https://helicone.ai) — это платформа наблюдения LLM, которая обеспечивает ведение журнала, мониторинг и аналитику для ваших приложений искусственного интеллекта. Helicone AI Gateway автоматически направляет ваши запросы соответствующему поставщику на основе модели.
+[Helicone](https://helicone.ai) is an LLM observability platform that provides logging, monitoring, and analytics for your AI applications. The Helicone AI Gateway routes your requests to the appropriate provider automatically based on the model.
 
-1. Перейдите в [Helicone](https://helicone.ai), создайте учетную запись и сгенерируйте ключ API на своей панели управления.
+1. Head over to [Helicone](https://helicone.ai), create an account, and generate an API key from your dashboard.
 
-2. Запустите команду `/connect` и найдите **Helicone**.
+2. Run the `/connect` command and search for **Helicone**.
 
    ```txt
    /connect
    ```
 
-3. Введите свой ключ API Helicone.
+3. Enter your Helicone API key.
 
    ```txt
    ┌ API key
@@ -969,23 +1044,23 @@ export GITLAB_OAUTH_CLIENT_ID=your_application_id_here
    └ enter
    ```
 
-4. Запустите команду `/models`, чтобы выбрать модель.
+4. Run the `/models` command to select a model.
 
    ```txt
    /models
    ```
 
-Дополнительные сведения о дополнительных провайдерах и расширенных функциях, таких как кэширование и ограничение скорости, см. в [Документация Helicone](https://docs.helicone.ai).
+For more providers and advanced features like caching and rate limiting, check the [Helicone documentation](https://docs.helicone.ai).
 
-#### Дополнительные конфигурации
+#### Optional Configs
 
-Если вы видите функцию или модель от Helicone, которая не настраивается автоматически через opencode, вы всегда можете настроить ее самостоятельно.
+In the event you see a feature or model from Helicone that isn't configured automatically through CyxCode, you can always configure it yourself.
 
-Вот [Справочник моделей Helicone](https://helicone.ai/models), он понадобится вам, чтобы получить идентификаторы моделей, которые вы хотите добавить.
+Here's [Helicone's Model Directory](https://helicone.ai/models), you'll need this to grab the IDs of the models you want to add.
 
 ```jsonc title="~/.config/opencode/opencode.jsonc"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "provider": {
     "helicone": {
       "npm": "@ai-sdk/openai-compatible",
@@ -1007,13 +1082,13 @@ export GITLAB_OAUTH_CLIENT_ID=your_application_id_here
 }
 ```
 
-#### Пользовательские заголовки
+#### Custom Headers
 
-Helicone поддерживает пользовательские заголовки для таких функций, как кэширование, отслеживание пользователей и управление сеансами. Добавьте их в конфигурацию вашего провайдера, используя `options.headers`:
+Helicone supports custom headers for features like caching, user tracking, and session management. Add them to your provider config using `options.headers`:
 
 ```jsonc title="~/.config/opencode/opencode.jsonc"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "provider": {
     "helicone": {
       "npm": "@ai-sdk/openai-compatible",
@@ -1022,7 +1097,7 @@ Helicone поддерживает пользовательские заголо�
         "baseURL": "https://ai-gateway.helicone.ai",
         "headers": {
           "Helicone-Cache-Enabled": "true",
-          "Helicone-User-Id": "opencode",
+          "Helicone-User-Id": "CyxCode",
         },
       },
     },
@@ -1030,15 +1105,15 @@ Helicone поддерживает пользовательские заголо�
 }
 ```
 
-##### Отслеживание сеансов
+##### Session tracking
 
-Функция Helicone [Sessions](https://docs.helicone.ai/features/sessions) позволяет группировать связанные запросы LLM вместе. Используйте плагин [opencode-helicone-session](https://github.com/H2Shami/opencode-helicone-session), чтобы автоматически регистрировать каждый диалог opencode как сеанс в Helicone.
+Helicone's [Sessions](https://docs.helicone.ai/features/sessions) feature lets you group related LLM requests together. Use the [opencode-helicone-session](https://github.com/H2Shami/opencode-helicone-session) plugin to automatically log each CyxCode conversation as a session in Helicone.
 
 ```bash
 npm install -g opencode-helicone-session
 ```
 
-Добавьте его в свою конфигурацию.
+Add it to your config.
 
 ```json title="opencode.json"
 {
@@ -1046,28 +1121,28 @@ npm install -g opencode-helicone-session
 }
 ```
 
-Плагин вставляет в ваши запросы заголовки `Helicone-Session-Id` и `Helicone-Session-Name`. На странице «Сеансы» Helicone вы увидите каждый диалог opencode, указанный как отдельный сеанс.
+The plugin injects `Helicone-Session-Id` and `Helicone-Session-Name` headers into your requests. In Helicone's Sessions page, you'll see each CyxCode conversation listed as a separate session.
 
-##### Общие разъемы Helicone
+##### Common Helicone headers
 
-| Заголовок                  | Описание                                                                       |
-| -------------------------- | ------------------------------------------------------------------------------ |
-| `Helicone-Cache-Enabled`   | Включить кэширование ответов (`true`/`false`)                                  |
-| `Helicone-User-Id`         | Отслеживание показателей по пользователю                                       |
-| `Helicone-Property-[Name]` | Добавьте пользовательские свойства (например, `Helicone-Property-Environment`) |
-| `Helicone-Prompt-Id`       | Связывание запросов с версиями промптов                                        |
+| Header                     | Description                                                   |
+| -------------------------- | ------------------------------------------------------------- |
+| `Helicone-Cache-Enabled`   | Enable response caching (`true`/`false`)                      |
+| `Helicone-User-Id`         | Track metrics by user                                         |
+| `Helicone-Property-[Name]` | Add custom properties (e.g., `Helicone-Property-Environment`) |
+| `Helicone-Prompt-Id`       | Associate requests with prompt versions                       |
 
-См. [Справочник заголовков Helicone](https://docs.helicone.ai/helicone-headers/header-directory) для всех доступных заголовков.
+See the [Helicone Header Directory](https://docs.helicone.ai/helicone-headers/header-directory) for all available headers.
 
 ---
 
 ### llama.cpp
 
-Вы можете настроить opencode для использования локальных моделей с помощью [утилиты llama-server llama.cpp's](https://github.com/ggml-org/llama.cpp)
+You can configure CyxCode to use local models through [llama.cpp's](https://github.com/ggml-org/llama.cpp) llama-server utility
 
 ```json title="opencode.json" "llama.cpp" {5, 6, 8, 10-15}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "provider": {
     "llama.cpp": {
       "npm": "@ai-sdk/openai-compatible",
@@ -1089,29 +1164,29 @@ npm install -g opencode-helicone-session
 }
 ```
 
-В этом примере:
+In this example:
 
-- `llama.cpp` — это идентификатор пользовательского поставщика. Это может быть любая строка, которую вы хотите.
-- `npm` указывает пакет, который будет использоваться для этого поставщика. Здесь `@ai-sdk/openai-compatible` используется для любого API-интерфейса, совместимого с OpenAI.
-- `name` — это отображаемое имя поставщика в пользовательском интерфейсе.
-- `options.baseURL` — конечная точка локального сервера.
-- `models` — это карта идентификаторов моделей с их конфигурациями. Название модели будет отображаться в списке выбора модели.
+- `llama.cpp` is the custom provider ID. This can be any string you want.
+- `npm` specifies the package to use for this provider. Here, `@ai-sdk/openai-compatible` is used for any OpenAI-compatible API.
+- `name` is the display name for the provider in the UI.
+- `options.baseURL` is the endpoint for the local server.
+- `models` is a map of model IDs to their configurations. The model name will be displayed in the model selection list.
 
 ---
 
 ### IO.NET
 
-IO.NET предлагает 17 моделей, оптимизированных для различных случаев использования:
+IO.NET offers 17 models optimized for various use cases:
 
-1. Перейдите в консоль IO.NET](https://ai.io.net/), создайте учетную запись и сгенерируйте ключ API.
+1. Head over to the [IO.NET console](https://ai.io.net/), create an account, and generate an API key.
 
-2. Запустите команду `/connect` и найдите **IO.NET**.
+2. Run the `/connect` command and search for **IO.NET**.
 
    ```txt
    /connect
    ```
 
-3. Введите свой ключ API IO.NET.
+3. Enter your IO.NET API key.
 
    ```txt
    ┌ API key
@@ -1120,7 +1195,7 @@ IO.NET предлагает 17 моделей, оптимизированных 
    └ enter
    ```
 
-4. Запустите команду `/models`, чтобы выбрать модель.
+4. Run the `/models` command to select a model.
 
    ```txt
    /models
@@ -1130,11 +1205,11 @@ IO.NET предлагает 17 моделей, оптимизированных 
 
 ### LM Studio
 
-Вы можете настроить opencode для использования локальных моделей через LM Studio.
+You can configure CyxCode to use local models through LM Studio.
 
 ```json title="opencode.json" "lmstudio" {5, 6, 8, 10-14}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "provider": {
     "lmstudio": {
       "npm": "@ai-sdk/openai-compatible",
@@ -1152,29 +1227,29 @@ IO.NET предлагает 17 моделей, оптимизированных 
 }
 ```
 
-В этом примере:
+In this example:
 
-- `lmstudio` — это идентификатор пользовательского поставщика. Это может быть любая строка, которую вы хотите.
-- `npm` указывает пакет, который будет использоваться для этого поставщика. Здесь `@ai-sdk/openai-compatible` используется для любого API-интерфейса, совместимого с OpenAI.
-- `name` — это отображаемое имя поставщика в пользовательском интерфейсе.
-- `options.baseURL` — конечная точка локального сервера.
-- `models` — это карта идентификаторов моделей с их конфигурациями. Название модели будет отображаться в списке выбора модели.
+- `lmstudio` is the custom provider ID. This can be any string you want.
+- `npm` specifies the package to use for this provider. Here, `@ai-sdk/openai-compatible` is used for any OpenAI-compatible API.
+- `name` is the display name for the provider in the UI.
+- `options.baseURL` is the endpoint for the local server.
+- `models` is a map of model IDs to their configurations. The model name will be displayed in the model selection list.
 
 ---
 
 ### Moonshot AI
 
-Чтобы использовать Кими К2 из Moonshot AI:
+To use Kimi K2 from Moonshot AI:
 
-1. Перейдите в [консоль Moonshot AI](https://platform.moonshot.ai/console), создайте учетную запись и нажмите **Создать ключ API**.
+1. Head over to the [Moonshot AI console](https://platform.moonshot.ai/console), create an account, and click **Create API key**.
 
-2. Запустите команду `/connect` и найдите **Moonshot AI**.
+2. Run the `/connect` command and search for **Moonshot AI**.
 
    ```txt
    /connect
    ```
 
-3. Введите свой API-ключ Moonshot.
+3. Enter your Moonshot API key.
 
    ```txt
    ┌ API key
@@ -1183,7 +1258,7 @@ IO.NET предлагает 17 моделей, оптимизированных 
    └ enter
    ```
 
-4. Запустите команду `/models`, чтобы выбрать _Kimi K2_.
+4. Run the `/models` command to select _Kimi K2_.
 
    ```txt
    /models
@@ -1193,15 +1268,15 @@ IO.NET предлагает 17 моделей, оптимизированных 
 
 ### MiniMax
 
-1. Перейдите в [консоль API MiniMax](https://platform.minimax.io/login), создайте учетную запись и сгенерируйте ключ API.
+1. Head over to the [MiniMax API Console](https://platform.minimax.io/login), create an account, and generate an API key.
 
-2. Запустите команду `/connect` и найдите **MiniMax**.
+2. Run the `/connect` command and search for **MiniMax**.
 
    ```txt
    /connect
    ```
 
-3. Введите свой ключ API MiniMax.
+3. Enter your MiniMax API key.
 
    ```txt
    ┌ API key
@@ -1210,7 +1285,7 @@ IO.NET предлагает 17 моделей, оптимизированных 
    └ enter
    ```
 
-4. Запустите команду `/models`, чтобы выбрать модель типа _M2.1_.
+4. Run the `/models` command to select a model like _M2.1_.
 
    ```txt
    /models
@@ -1220,15 +1295,15 @@ IO.NET предлагает 17 моделей, оптимизированных 
 
 ### Nebius Token Factory
 
-1. Перейдите в консоль Nebius Token Factory](https://tokenfactory.nebius.com/), создайте учетную запись и нажмите **Добавить ключ**.
+1. Head over to the [Nebius Token Factory console](https://tokenfactory.nebius.com/), create an account, and click **Add Key**.
 
-2. Запустите команду `/connect` и найдите **Nebius Token Factory**.
+2. Run the `/connect` command and search for **Nebius Token Factory**.
 
    ```txt
    /connect
    ```
 
-3. Введите ключ API фабрики токенов Nebius.
+3. Enter your Nebius Token Factory API key.
 
    ```txt
    ┌ API key
@@ -1237,7 +1312,7 @@ IO.NET предлагает 17 моделей, оптимизированных 
    └ enter
    ```
 
-4. Запустите команду `/models`, чтобы выбрать такую ​​модель, как _Kimi K2 Instruct_.
+4. Run the `/models` command to select a model like _Kimi K2 Instruct_.
 
    ```txt
    /models
@@ -1247,15 +1322,15 @@ IO.NET предлагает 17 моделей, оптимизированных 
 
 ### Ollama
 
-Вы можете настроить opencode для использования локальных моделей через Ollama.
+You can configure CyxCode to use local models through Ollama.
 
 :::tip
-Ollama может автоматически настроиться для opencode. Подробности см. в документации по интеграции Ollama](https://docs.ollama.com/integrations/opencode).
+Ollama can automatically configure itself for CyxCode. See the [Ollama integration docs](https://docs.ollama.com/integrations/CyxCode) for details.
 :::
 
 ```json title="opencode.json" "ollama" {5, 6, 8, 10-14}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "provider": {
     "ollama": {
       "npm": "@ai-sdk/openai-compatible",
@@ -1273,37 +1348,37 @@ Ollama может автоматически настроиться для openc
 }
 ```
 
-В этом примере:
+In this example:
 
-- `ollama` — это идентификатор пользовательского поставщика. Это может быть любая строка, которую вы хотите.
-- `npm` указывает пакет, который будет использоваться для этого поставщика. Здесь `@ai-sdk/openai-compatible` используется для любого API-интерфейса, совместимого с OpenAI.
-- `name` — это отображаемое имя поставщика в пользовательском интерфейсе.
-- `options.baseURL` — конечная точка локального сервера.
-- `models` — это карта идентификаторов моделей с их конфигурациями. Название модели будет отображаться в списке выбора модели.
+- `ollama` is the custom provider ID. This can be any string you want.
+- `npm` specifies the package to use for this provider. Here, `@ai-sdk/openai-compatible` is used for any OpenAI-compatible API.
+- `name` is the display name for the provider in the UI.
+- `options.baseURL` is the endpoint for the local server.
+- `models` is a map of model IDs to their configurations. The model name will be displayed in the model selection list.
 
 :::tip
-Если вызовы инструментов не работают, попробуйте увеличить `num_ctx` в Олламе. Начните с 16–32 тысяч.
+If tool calls aren't working, try increasing `num_ctx` in Ollama. Start around 16k - 32k.
 :::
 
 ---
 
 ### Ollama Cloud
 
-Чтобы использовать Ollama Cloud с opencode:
+To use Ollama Cloud with CyxCode:
 
-1. Перейдите на [https://ollama.com/](https://ollama.com/) и войдите в систему или создайте учетную запись.
+1. Head over to [https://ollama.com/](https://ollama.com/) and sign in or create an account.
 
-2. Перейдите в **Настройки** > **Ключи** и нажмите **Добавить ключ API**, чтобы создать новый ключ API.
+2. Navigate to **Settings** > **Keys** and click **Add API Key** to generate a new API key.
 
-3. Скопируйте ключ API для использования в opencode.
+3. Copy the API key for use in CyxCode.
 
-4. Запустите команду `/connect` и найдите **Ollama Cloud**.
+4. Run the `/connect` command and search for **Ollama Cloud**.
 
    ```txt
    /connect
    ```
 
-5. Введите свой ключ API Ollama Cloud.
+5. Enter your Ollama Cloud API key.
 
    ```txt
    ┌ API key
@@ -1312,13 +1387,13 @@ Ollama может автоматически настроиться для openc
    └ enter
    ```
 
-6. **Важно**. Перед использованием облачных моделей в opencode необходимо получить информацию о модели локально:
+6. **Important**: Before using cloud models in CyxCode, you must pull the model information locally:
 
    ```bash
    ollama pull gpt-oss:20b-cloud
    ```
 
-7. Запустите команду `/models`, чтобы выбрать модель облака Ollama.
+7. Run the `/models` command to select your Ollama Cloud model.
 
    ```txt
    /models
@@ -1328,16 +1403,16 @@ Ollama может автоматически настроиться для openc
 
 ### OpenAI
 
-Мы рекомендуем подписаться на [ChatGPT Plus или Pro](https://chatgpt.com/pricing).
+We recommend signing up for [ChatGPT Plus or Pro](https://chatgpt.com/pricing).
 
-1. После регистрации выполните команду `/connect` и выберите OpenAI.
+1. Once you've signed up, run the `/connect` command and select OpenAI.
 
    ```txt
    /connect
    ```
 
-2. Здесь вы можете выбрать опцию **ChatGPT Plus/Pro**, и ваш браузер откроется.
-   и попросите вас пройти аутентификацию.
+2. Here you can select the **ChatGPT Plus/Pro** option and it'll open your browser
+   and ask you to authenticate.
 
    ```txt
    ┌ Select auth method
@@ -1347,31 +1422,31 @@ Ollama может автоматически настроиться для openc
    └
    ```
 
-3. Теперь все модели OpenAI должны быть доступны при использовании команды `/models`.
+3. Now all the OpenAI models should be available when you use the `/models` command.
 
    ```txt
    /models
    ```
 
-##### Использование ключей API
+##### Using API keys
 
-Если у вас уже есть ключ API, вы можете выбрать **Ввести ключ API вручную** и вставить его в свой терминал.
+If you already have an API key, you can select **Manually enter API Key** and paste it in your terminal.
 
 ---
 
-### OpenCode Zen
+### CyxCode Zen
 
-OpenCode Zen — это список протестированных и проверенных моделей, предоставленный командой opencode. [Подробнее](/docs/zen).
+CyxCode Zen is a list of tested and verified models provided by the CyxCode team. [Learn more](/docs/zen).
 
-1. Войдите в систему **<a href={console}>OpenCode Zen</a>** и нажмите **Создать ключ API**.
+1. Sign in to **<a href={console}>CyxCode Zen</a>** and click **Create API Key**.
 
-2. Запустите команду `/connect` и найдите **OpenCode Zen**.
+2. Run the `/connect` command and search for **CyxCode Zen**.
 
    ```txt
    /connect
    ```
 
-3. Введите свой ключ API opencode.
+3. Enter your CyxCode API key.
 
    ```txt
    ┌ API key
@@ -1380,7 +1455,7 @@ OpenCode Zen — это список протестированных и про�
    └ enter
    ```
 
-4. Запустите команду `/models`, чтобы выбрать такую ​​модель, как _Qwen 3 Coder 480B_.
+4. Run the `/models` command to select a model like _Qwen 3 Coder 480B_.
 
    ```txt
    /models
@@ -1390,15 +1465,15 @@ OpenCode Zen — это список протестированных и про�
 
 ### OpenRouter
 
-1. Перейдите на панель управления OpenRouter](https://openrouter.ai/settings/keys), нажмите **Создать ключ API** и скопируйте ключ.
+1. Head over to the [OpenRouter dashboard](https://openrouter.ai/settings/keys), click **Create API Key**, and copy the key.
 
-2. Запустите команду `/connect` и найдите OpenRouter.
+2. Run the `/connect` command and search for OpenRouter.
 
    ```txt
    /connect
    ```
 
-3. Введите ключ API для провайдера.
+3. Enter the API key for the provider.
 
    ```txt
    ┌ API key
@@ -1407,17 +1482,17 @@ OpenCode Zen — это список протестированных и про�
    └ enter
    ```
 
-4. Многие модели OpenRouter предварительно загружены по умолчанию. Запустите команду `/models`, чтобы выбрать нужную.
+4. Many OpenRouter models are preloaded by default, run the `/models` command to select the one you want.
 
    ```txt
    /models
    ```
 
-   Вы также можете добавить дополнительные модели через конфигурацию opencode.
+   You can also add additional models through your CyxCode config.
 
    ```json title="opencode.json" {6}
    {
-     "$schema": "https://opencode.ai/config.json",
+     "$schema": "https://cyxcode.ai/config.json",
      "provider": {
        "openrouter": {
          "models": {
@@ -1428,11 +1503,11 @@ OpenCode Zen — это список протестированных и про�
    }
    ```
 
-5. Вы также можете настроить их через конфигурацию opencode. Вот пример указания провайдера
+5. You can also customize them through your CyxCode config. Here's an example of specifying a provider
 
    ```json title="opencode.json"
    {
-     "$schema": "https://opencode.ai/config.json",
+     "$schema": "https://cyxcode.ai/config.json",
      "provider": {
        "openrouter": {
          "models": {
@@ -1454,21 +1529,21 @@ OpenCode Zen — это список протестированных и про�
 
 ### SAP AI Core
 
-SAP AI Core предоставляет доступ к более чем 40 моделям от OpenAI, Anthropic, Google, Amazon, Meta, Mistral и AI21 через единую платформу.
+SAP AI Core provides access to 40+ models from OpenAI, Anthropic, Google, Amazon, Meta, Mistral, and AI21 through a unified platform.
 
-1. Перейдите в [SAP BTP Cockpit](https://account.hana.ondemand.com/), перейдите к экземпляру службы SAP AI Core и создайте ключ службы.
+1. Go to your [SAP BTP Cockpit](https://account.hana.ondemand.com/), navigate to your SAP AI Core service instance, and create a service key.
 
    :::tip
-   Ключ службы — это объект JSON, содержащий `clientid`, `clientsecret`, `url` и `serviceurls.AI_API_URL`. Экземпляр AI Core можно найти в разделе **Сервисы** > **Экземпляры и подписки** в панели управления BTP.
+   The service key is a JSON object containing `clientid`, `clientsecret`, `url`, and `serviceurls.AI_API_URL`. You can find your AI Core instance under **Services** > **Instances and Subscriptions** in the BTP Cockpit.
    :::
 
-2. Запустите команду `/connect` и найдите **SAP AI Core**.
+2. Run the `/connect` command and search for **SAP AI Core**.
 
    ```txt
    /connect
    ```
 
-3. Введите свой сервисный ключ в формате JSON.
+3. Enter your service key JSON.
 
    ```txt
    ┌ Service key
@@ -1477,29 +1552,29 @@ SAP AI Core предоставляет доступ к более чем 40 мо
    └ enter
    ```
 
-   Или установите переменную среды `AICORE_SERVICE_KEY`:
+   Or set the `AICORE_SERVICE_KEY` environment variable:
 
    ```bash
-   AICORE_SERVICE_KEY='{"clientid":"...","clientsecret":"...","url":"...","serviceurls":{"AI_API_URL":"..."}}' opencode
+   AICORE_SERVICE_KEY='{"clientid":"...","clientsecret":"...","url":"...","serviceurls":{"AI_API_URL":"..."}}' CyxCode
    ```
 
-   Или добавьте его в свой профиль bash:
+   Or add it to your bash profile:
 
    ```bash title="~/.bash_profile"
    export AICORE_SERVICE_KEY='{"clientid":"...","clientsecret":"...","url":"...","serviceurls":{"AI_API_URL":"..."}}'
    ```
 
-4. При необходимости укажите идентификатор развертывания и группу ресурсов:
+4. Optionally set deployment ID and resource group:
 
    ```bash
-   AICORE_DEPLOYMENT_ID=your-deployment-id AICORE_RESOURCE_GROUP=your-resource-group opencode
+   AICORE_DEPLOYMENT_ID=your-deployment-id AICORE_RESOURCE_GROUP=your-resource-group CyxCode
    ```
 
    :::note
-   Эти параметры являются необязательными и должны быть настроены в соответствии с настройками SAP AI Core.
+   These settings are optional and should be configured according to your SAP AI Core setup.
    :::
 
-5. Запустите команду `/models`, чтобы выбрать одну из более чем 40 доступных моделей.
+5. Run the `/models` command to select from 40+ available models.
 
    ```txt
    /models
@@ -1509,21 +1584,21 @@ SAP AI Core предоставляет доступ к более чем 40 мо
 
 ### STACKIT
 
-STACKIT AI Model Serving предоставляет полностью управляемую суверенную среду хостинга для моделей ИИ, ориентированную на LLM, таких как Llama, Mistral и Qwen, с максимальным суверенитетом данных в европейской инфраструктуре.
+STACKIT AI Model Serving provides fully managed soverign hosting environment for AI models, focusing on LLMs like Llama, Mistral, and Qwen, with maximum data sovereignty on European infrastructure.
 
-1. Перейдите на [портал STACKIT](https://portal.stackit.cloud), перейдите в **AI Model Serving** и создайте токен аутентификации для своего проекта.
+1. Head over to [STACKIT Portal](https://portal.stackit.cloud), navigate to **AI Model Serving**, and create an auth token for your project.
 
    :::tip
-   Вам необходима учетная запись клиента STACKIT, учетная запись пользователя и проект перед созданием токенов аутентификации.
+   You need a STACKIT customer account, user account, and project before creating auth tokens.
    :::
 
-2. Запустите команду `/connect` и найдите **STACKIT**.
+2. Run the `/connect` command and search for **STACKIT**.
 
    ```txt
    /connect
    ```
 
-3. Введите свой токен аутентификации STACKIT AI Model Serving.
+3. Enter your STACKIT AI Model Serving auth token.
 
    ```txt
    ┌ API key
@@ -1532,7 +1607,7 @@ STACKIT AI Model Serving предоставляет полностью упра�
    └ enter
    ```
 
-4. Запустите команду `/models`, чтобы выбрать одну из доступных моделей, например _Qwen3-VL 235B_ или _Llama 3.3 70B_.
+4. Run the `/models` command to select from available models like _Qwen3-VL 235B_ or _Llama 3.3 70B_.
 
    ```txt
    /models
@@ -1542,15 +1617,15 @@ STACKIT AI Model Serving предоставляет полностью упра�
 
 ### OVHcloud AI Endpoints
 
-1. Перейдите к [OVHcloud Panel](https://ovh.com/manager). Перейдите в раздел `Public Cloud`, `AI & Machine Learning` > `AI Endpoints` и на вкладке `API Keys` нажмите **Создать новый ключ API**.
+1. Head over to the [OVHcloud panel](https://ovh.com/manager). Navigate to the `Public Cloud` section, `AI & Machine Learning` > `AI Endpoints` and in `API Keys` tab, click **Create a new API key**.
 
-2. Запустите команду `/connect` и найдите **Конечные точки OVHcloud AI**.
+2. Run the `/connect` command and search for **OVHcloud AI Endpoints**.
 
    ```txt
    /connect
    ```
 
-3. Введите ключ API конечных точек OVHcloud AI.
+3. Enter your OVHcloud AI Endpoints API key.
 
    ```txt
    ┌ API key
@@ -1559,7 +1634,7 @@ STACKIT AI Model Serving предоставляет полностью упра�
    └ enter
    ```
 
-4. Запустите команду `/models`, чтобы выбрать модель типа _gpt-oss-120b_.
+4. Run the `/models` command to select a model like _gpt-oss-120b_.
 
    ```txt
    /models
@@ -1569,17 +1644,17 @@ STACKIT AI Model Serving предоставляет полностью упра�
 
 ### Scaleway
 
-Чтобы использовать [Scaleway Generative APIs](https://www.scaleway.com/en/docs/generative-apis/) с opencode:
+To use [Scaleway Generative APIs](https://www.scaleway.com/en/docs/generative-apis/) with CyxCode:
 
-1. Перейдите к [Настройки IAM консоли Scaleway](https://console.scaleway.com/iam/api-keys), чтобы сгенерировать новый ключ API.
+1. Head over to the [Scaleway Console IAM settings](https://console.scaleway.com/iam/api-keys) to generate a new API key.
 
-2. Запустите команду `/connect` и найдите **Scaleway**.
+2. Run the `/connect` command and search for **Scaleway**.
 
    ```txt
    /connect
    ```
 
-3. Введите ключ API Scaleway.
+3. Enter your Scaleway API key.
 
    ```txt
    ┌ API key
@@ -1588,7 +1663,7 @@ STACKIT AI Model Serving предоставляет полностью упра�
    └ enter
    ```
 
-4. Запустите команду `/models`, чтобы выбрать модель, например _devstral-2-123b-instruct-2512_ или _gpt-oss-120b_.
+4. Run the `/models` command to select a model like _devstral-2-123b-instruct-2512_ or _gpt-oss-120b_.
 
    ```txt
    /models
@@ -1598,15 +1673,15 @@ STACKIT AI Model Serving предоставляет полностью упра�
 
 ### Together AI
 
-1. Перейдите в [консоль Together AI](https://api.together.ai), создайте учетную запись и нажмите **Добавить ключ**.
+1. Head over to the [Together AI console](https://api.together.ai), create an account, and click **Add Key**.
 
-2. Запустите команду `/connect` и найдите **Together AI**.
+2. Run the `/connect` command and search for **Together AI**.
 
    ```txt
    /connect
    ```
 
-3. Введите ключ API Together AI.
+3. Enter your Together AI API key.
 
    ```txt
    ┌ API key
@@ -1615,7 +1690,7 @@ STACKIT AI Model Serving предоставляет полностью упра�
    └ enter
    ```
 
-4. Запустите команду `/models`, чтобы выбрать такую ​​модель, как _Kimi K2 Instruct_.
+4. Run the `/models` command to select a model like _Kimi K2 Instruct_.
 
    ```txt
    /models
@@ -1625,15 +1700,15 @@ STACKIT AI Model Serving предоставляет полностью упра�
 
 ### Venice AI
 
-1. Перейдите к [консоли Venice AI](https://venice.ai), создайте учетную запись и сгенерируйте ключ API.
+1. Head over to the [Venice AI console](https://venice.ai), create an account, and generate an API key.
 
-2. Запустите команду `/connect` и найдите **Venice AI**.
+2. Run the `/connect` command and search for **Venice AI**.
 
    ```txt
    /connect
    ```
 
-3. Введите свой ключ API Venice AI.
+3. Enter your Venice AI API key.
 
    ```txt
    ┌ API key
@@ -1642,7 +1717,7 @@ STACKIT AI Model Serving предоставляет полностью упра�
    └ enter
    ```
 
-4. Запустите команду `/models`, чтобы выбрать модель типа _Llama 3.3 70B_.
+4. Run the `/models` command to select a model like _Llama 3.3 70B_.
 
    ```txt
    /models
@@ -1652,17 +1727,17 @@ STACKIT AI Model Serving предоставляет полностью упра�
 
 ### Vercel AI Gateway
 
-Vercel AI Gateway позволяет получать доступ к моделям OpenAI, Anthropic, Google, xAI и других источников через единую конечную точку. Модели предлагаются по прейскурантной цене без наценок.
+Vercel AI Gateway lets you access models from OpenAI, Anthropic, Google, xAI, and more through a unified endpoint. Models are offered at list price with no markup.
 
-1. Перейдите на [панель мониторинга Vercel](https://vercel.com/), перейдите на вкладку **AI Gateway** и нажмите **Ключи API**, чтобы создать новый ключ API.
+1. Head over to the [Vercel dashboard](https://vercel.com/), navigate to the **AI Gateway** tab, and click **API keys** to create a new API key.
 
-2. Запустите команду `/connect` и найдите **Vercel AI Gateway**.
+2. Run the `/connect` command and search for **Vercel AI Gateway**.
 
    ```txt
    /connect
    ```
 
-3. Введите ключ API Vercel AI Gateway.
+3. Enter your Vercel AI Gateway API key.
 
    ```txt
    ┌ API key
@@ -1671,17 +1746,17 @@ Vercel AI Gateway позволяет получать доступ к модел
    └ enter
    ```
 
-4. Запустите команду `/models`, чтобы выбрать модель.
+4. Run the `/models` command to select a model.
 
    ```txt
    /models
    ```
 
-Вы также можете настраивать модели через конфигурацию opencode. Ниже приведен пример указания порядка маршрутизации поставщика.
+You can also customize models through your CyxCode config. Here's an example of specifying provider routing order.
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "provider": {
     "vercel": {
       "models": {
@@ -1696,27 +1771,27 @@ Vercel AI Gateway позволяет получать доступ к модел
 }
 ```
 
-Некоторые полезные параметры маршрутизации:
+Some useful routing options:
 
-| Вариант             | Описание                                                             |
-| ------------------- | -------------------------------------------------------------------- |
-| `order`             | Последовательность провайдеров для попытки                           |
-| `only`              | Ограничить конкретными провайдерами                                  |
-| `zeroDataRetention` | Использовать только провайдеров с политикой нулевого хранения данных |
+| Option              | Description                                          |
+| ------------------- | ---------------------------------------------------- |
+| `order`             | Provider sequence to try                             |
+| `only`              | Restrict to specific providers                       |
+| `zeroDataRetention` | Only use providers with zero data retention policies |
 
 ---
 
 ### xAI
 
-1. Перейдите на [консоль xAI](https://console.x.ai/), создайте учетную запись и сгенерируйте ключ API.
+1. Head over to the [xAI console](https://console.x.ai/), create an account, and generate an API key.
 
-2. Запустите команду `/connect` и найдите **xAI**.
+2. Run the `/connect` command and search for **xAI**.
 
    ```txt
    /connect
    ```
 
-3. Введите свой ключ API xAI.
+3. Enter your xAI API key.
 
    ```txt
    ┌ API key
@@ -1725,7 +1800,7 @@ Vercel AI Gateway позволяет получать доступ к модел
    └ enter
    ```
 
-4. Запустите команду `/models`, чтобы выбрать такую ​​модель, как _Grok Beta_.
+4. Run the `/models` command to select a model like _Grok Beta_.
 
    ```txt
    /models
@@ -1735,17 +1810,17 @@ Vercel AI Gateway позволяет получать доступ к модел
 
 ### Z.AI
 
-1. Перейдите в [консоль Z.AI API](https://z.ai/manage-apikey/apikey-list), создайте учетную запись и нажмите **Создать новый ключ API**.
+1. Head over to the [Z.AI API console](https://z.ai/manage-apikey/apikey-list), create an account, and click **Create a new API key**.
 
-2. Запустите команду `/connect` и найдите **Z.AI**.
+2. Run the `/connect` command and search for **Z.AI**.
 
    ```txt
    /connect
    ```
 
-   Если вы подписаны на **План кодирования GLM**, выберите **План кодирования Z.AI**.
+   If you are subscribed to the **GLM Coding Plan**, select **Z.AI Coding Plan**.
 
-3. Введите свой ключ API Z.AI.
+3. Enter your Z.AI API key.
 
    ```txt
    ┌ API key
@@ -1754,7 +1829,7 @@ Vercel AI Gateway позволяет получать доступ к модел
    └ enter
    ```
 
-4. Запустите команду `/models`, чтобы выбрать модель типа _GLM-4.7_.
+4. Run the `/models` command to select a model like _GLM-4.7_.
 
    ```txt
    /models
@@ -1764,15 +1839,15 @@ Vercel AI Gateway позволяет получать доступ к модел
 
 ### ZenMux
 
-1. Перейдите на [панель управления ZenMux](https://zenmux.ai/settings/keys), нажмите **Создать ключ API** и скопируйте ключ.
+1. Head over to the [ZenMux dashboard](https://zenmux.ai/settings/keys), click **Create API Key**, and copy the key.
 
-2. Запустите команду `/connect` и найдите ZenMux.
+2. Run the `/connect` command and search for ZenMux.
 
    ```txt
    /connect
    ```
 
-3. Введите ключ API для провайдера.
+3. Enter the API key for the provider.
 
    ```txt
    ┌ API key
@@ -1781,17 +1856,17 @@ Vercel AI Gateway позволяет получать доступ к модел
    └ enter
    ```
 
-4. Многие модели ZenMux предварительно загружены по умолчанию. Запустите команду `/models`, чтобы выбрать нужную.
+4. Many ZenMux models are preloaded by default, run the `/models` command to select the one you want.
 
    ```txt
    /models
    ```
 
-   Вы также можете добавить дополнительные модели через конфигурацию opencode.
+   You can also add additional models through your CyxCode config.
 
    ```json title="opencode.json" {6}
    {
-     "$schema": "https://opencode.ai/config.json",
+     "$schema": "https://cyxcode.ai/config.json",
      "provider": {
        "zenmux": {
          "models": {
@@ -1804,15 +1879,15 @@ Vercel AI Gateway позволяет получать доступ к модел
 
 ---
 
-## Пользовательский поставщик
+## Custom provider
 
-Чтобы добавить любого **совместимого с OpenAI** поставщика, не указанного в команде `/connect`:
+To add any **OpenAI-compatible** provider that's not listed in the `/connect` command:
 
 :::tip
-Вы можете использовать любого OpenAI-совместимого провайдера с открытым кодом. Большинство современных поставщиков ИИ предлагают API-интерфейсы, совместимые с OpenAI.
+You can use any OpenAI-compatible provider with CyxCode. Most modern AI providers offer OpenAI-compatible APIs.
 :::
 
-1. Запустите команду `/connect` и прокрутите вниз до пункта **Другое**.
+1. Run the `/connect` command and scroll down to **Other**.
 
    ```bash
    $ /connect
@@ -1825,7 +1900,7 @@ Vercel AI Gateway позволяет получать доступ к модел
    └
    ```
 
-2. Введите уникальный идентификатор провайдера.
+2. Enter a unique ID for the provider.
 
    ```bash
    $ /connect
@@ -1837,11 +1912,11 @@ Vercel AI Gateway позволяет получать доступ к модел
    └
    ```
 
-   :::примечание
-   Выберите запоминающийся идентификатор, вы будете использовать его в своем файле конфигурации.
+   :::note
+   Choose a memorable ID, you'll use this in your config file.
    :::
 
-3. Введите свой ключ API для провайдера.
+3. Enter your API key for the provider.
 
    ```bash
    $ /connect
@@ -1855,11 +1930,11 @@ Vercel AI Gateway позволяет получать доступ к модел
    └
    ```
 
-4. Создайте или обновите файл `opencode.json` в каталоге вашего проекта:
+4. Create or update your `opencode.json` file in your project directory:
 
    ```json title="opencode.json" ""myprovider"" {5-15}
    {
-     "$schema": "https://opencode.ai/config.json",
+     "$schema": "https://cyxcode.ai/config.json",
      "provider": {
        "myprovider": {
          "npm": "@ai-sdk/openai-compatible",
@@ -1877,27 +1952,27 @@ Vercel AI Gateway позволяет получать доступ к модел
    }
    ```
 
-   Вот варианты конфигурации:
-   - **npm**: используемый пакет AI SDK, `@ai-sdk/openai-compatible` для поставщиков, совместимых с OpenAI.
-   - **имя**: отображаемое имя в пользовательском интерфейсе.
-   - **модели**: Доступные модели.
-   - **options.baseURL**: URL-адрес конечной точки API.
-   - **options.apiKey**: при необходимости установите ключ API, если не используется аутентификация.
-   - **options.headers**: при необходимости можно установить собственные заголовки.
+   Here are the configuration options:
+   - **npm**: AI SDK package to use, `@ai-sdk/openai-compatible` for OpenAI-compatible providers (for `/v1/chat/completions`). If your provider/model uses `/v1/responses`, use `@ai-sdk/openai`.
+   - **name**: Display name in UI.
+   - **models**: Available models.
+   - **options.baseURL**: API endpoint URL.
+   - **options.apiKey**: Optionally set the API key, if not using auth.
+   - **options.headers**: Optionally set custom headers.
 
-   Подробнее о дополнительных параметрах в примере ниже.
+   More on the advanced options in the example below.
 
-5. Запустите команду `/models`, и ваш пользовательский поставщик и модели появятся в списке выбора.
+5. Run the `/models` command and your custom provider and models will appear in the selection list.
 
 ---
 
-##### Пример
+##### Example
 
-Ниже приведен пример настройки параметров `apiKey`, `headers` и модели `limit`.
+Here's an example setting the `apiKey`, `headers`, and model `limit` options.
 
 ```json title="opencode.json" {9,11,17-20}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "provider": {
     "myprovider": {
       "npm": "@ai-sdk/openai-compatible",
@@ -1923,27 +1998,27 @@ Vercel AI Gateway позволяет получать доступ к модел
 }
 ```
 
-Детали конфигурации:
+Configuration details:
 
-- **apiKey**: устанавливается с использованием синтаксиса переменной `env`, [подробнее ](/docs/config#env-vars).
-- **заголовки**: пользовательские заголовки, отправляемые с каждым запросом.
-- **limit.context**: Максимальное количество входных токенов, которые принимает модель.
-- **limit.output**: Максимальное количество токенов, которые может сгенерировать модель.
+- **apiKey**: Set using `env` variable syntax, [learn more](/docs/config#env-vars).
+- **headers**: Custom headers sent with each request.
+- **limit.context**: Maximum input tokens the model accepts.
+- **limit.output**: Maximum tokens the model can generate.
 
-Поля `limit` позволяют opencode понять, сколько контекста у вас осталось. Стандартные поставщики автоматически извлекают их из models.dev.
+The `limit` fields allow CyxCode to understand how much context you have left. Standard providers pull these from models.dev automatically.
 
 ---
 
-## Поиск неисправностей
+## Troubleshooting
 
-Если у вас возникли проблемы с настройкой провайдера, проверьте следующее:
+If you are having trouble with configuring a provider, check the following:
 
-1. **Проверьте настройку аутентификации**: запустите `opencode auth list`, чтобы проверить, верны ли учетные данные.
-   для провайдера добавлены в ваш конфиг.
+1. **Check the auth setup**: Run `cyxcode auth list` to see if the credentials
+   for the provider are added to your config.
 
-   Это не относится к таким поставщикам, как Amazon Bedrock, которые для аутентификации полагаются на переменные среды.
+   This doesn't apply to providers like Amazon Bedrock, that rely on environment variables for their auth.
 
-2. Для пользовательских поставщиков проверьте конфигурацию opencode и:
-   - Убедитесь, что идентификатор провайдера, используемый в команде `/connect`, соответствует идентификатору в вашей конфигурации opencode.
-   - Для провайдера используется правильный пакет npm. Например, используйте `@ai-sdk/cerebras` для Cerebras. А для всех других поставщиков, совместимых с OpenAI, используйте `@ai-sdk/openai-compatible`.
-   - Убедитесь, что в поле `options.baseURL` используется правильная конечная точка API.
+2. For custom providers, check the CyxCode config and:
+   - Make sure the provider ID used in the `/connect` command matches the ID in your CyxCode config.
+   - The right npm package is used for the provider. For example, use `@ai-sdk/cerebras` for Cerebras. And for all other OpenAI-compatible providers, use `@ai-sdk/openai-compatible` (for `/v1/chat/completions`); if a model uses `/v1/responses`, use `@ai-sdk/openai`. For mixed setups under one provider, you can override per model via `provider.npm`.
+   - Check correct API endpoint is used in the `options.baseURL` field.

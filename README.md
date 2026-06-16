@@ -471,10 +471,10 @@ If you see `opencode` in a directory path or source file, that's normal. If you 
 | Document | Description |
 |----------|-------------|
 | **[User Guide](docs/USAGE.md)** | **Complete guide: all modes, commands, features** |
+| **[Docs Index](docs/README.md)** | **Contributor and feature documentation map** |
 | **[FAQ](docs/FAQ.md)** | **Community questions answered: fork vs plugin, testing, maintenance** |
 | [Adding Patterns](docs/ADDING-PATTERNS.md) | Step-by-step guide to adding custom patterns |
 | [Contributing Patterns](docs/CONTRIBUTING-PATTERNS.md) | Community contribution guide, wanted categories |
-| [Before/After Comparison](docs/BEFORE-AFTER.md) | Side-by-side: CyxCode vs standard AI |
 | [State Versioning Design](docs/STATE-VERSIONING.md) | Git for AI state — full design document |
 | [Audit System](docs/AUDIT-SYSTEM.md) | Event journal, reports, token accountability |
 | [Semantic Recall](docs/RECALL.md) | Local vector search over memory + learned patterns, zero API cost |

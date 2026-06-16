@@ -1,62 +1,62 @@
 ---
-title: Навыки агента
-description: Определите повторно используемое поведение с помощью определений SKILL.md
+title: "Agent Skills"
+description: "Define reusable behavior via SKILL.md definitions"
 ---
 
-Навыки агента позволяют opencode обнаруживать многократно используемые инструкции из вашего репозитория или домашнего каталога.
-Навыки загружаются по требованию с помощью встроенного инструмента `skill`: агенты видят доступные навыки и при необходимости могут загрузить весь контент.
-
----
-
-## Разместить файлы
-
-Создайте одну папку для каждого имени навыка и поместите в нее `SKILL.md`.
-opencode выполняет поиск в следующих местах:
-
-- Конфигурация проекта: `.opencode/skills/<name>/SKILL.md`
-- Глобальная конфигурация: `~/.config/opencode/skills/<name>/SKILL.md`.
-- Совместимость с Project Claude: `.claude/skills/<name>/SKILL.md`
-- Глобальная совместимость с Claude: `~/.claude/skills/<name>/SKILL.md`
-- Совместимость с агентом проекта: `.agents/skills/<name>/SKILL.md`
-- Совместимость с глобальным агентом: `~/.agents/skills/<name>/SKILL.md`
+Agent skills let CyxCode discover reusable instructions from your repo or home directory.
+Skills are loaded on-demand via the native `skill` tool—agents see available skills and can load the full content when needed.
 
 ---
 
-## Понимание обнаружения
+## Place files
 
-Для локальных путей проекта opencode переходит из вашего текущего рабочего каталога, пока не достигнет рабочего дерева git.
-Он загружает все соответствующие `skills/*/SKILL.md` в `.opencode/` и все соответствующие `.claude/skills/*/SKILL.md` или `.agents/skills/*/SKILL.md` по пути.
+Create one folder per skill name and put a `SKILL.md` inside it.
+cyxcode searches these locations:
 
-Глобальные определения также загружаются из `~/.config/opencode/skills/*/SKILL.md`, `~/.claude/skills/*/SKILL.md` и `~/.agents/skills/*/SKILL.md`.
+- Project config: `.opencode/skills/<name>/SKILL.md`
+- Global config: `~/.config/opencode/skills/<name>/SKILL.md`
+- Project Claude-compatible: `.claude/skills/<name>/SKILL.md`
+- Global Claude-compatible: `~/.claude/skills/<name>/SKILL.md`
+- Project agent-compatible: `.agents/skills/<name>/SKILL.md`
+- Global agent-compatible: `~/.agents/skills/<name>/SKILL.md`
 
 ---
 
-## Напишите заголовок
+## Understand discovery
 
-Каждый `SKILL.md` должен начинаться с заголовка YAML.
-Распознаются только эти поля:
+For project-local paths, CyxCode walks up from your current working directory until it reaches the git worktree.
+It loads any matching `skills/*/SKILL.md` in `.opencode/` and any matching `.claude/skills/*/SKILL.md` or `.agents/skills/*/SKILL.md` along the way.
+
+Global definitions are also loaded from `~/.config/opencode/skills/*/SKILL.md`, `~/.claude/skills/*/SKILL.md`, and `~/.agents/skills/*/SKILL.md`.
+
+---
+
+## Write frontmatter
+
+Each `SKILL.md` must start with YAML frontmatter.
+Only these fields are recognized:
 
 - `name` (required)
 - `description` (required)
-- `license` (необязательно)
-- `compatibility` (необязательно)
-- `metadata` (необязательно, преобразование строк в строки)
+- `license` (optional)
+- `compatibility` (optional)
+- `metadata` (optional, string-to-string map)
 
-Неизвестные поля заголовка игнорируются.
+Unknown frontmatter fields are ignored.
 
 ---
 
-## Проверка имен
+## Validate names
 
-`name` должен:
+`name` must:
 
-- Длина от 1 до 64 символов.
-- Используйте строчные буквы и цифры с одинарным дефисом.
-- Не начинаться и не заканчиваться на `-`.
-- Не содержать последовательных `--`
-- Сопоставьте имя каталога, содержащее `SKILL.md`.
+- Be 1–64 characters
+- Be lowercase alphanumeric with single hyphen separators
+- Not start or end with `-`
+- Not contain consecutive `--`
+- Match the directory name that contains `SKILL.md`
 
-Эквивалентное регулярное выражение:
+Equivalent regex:
 
 ```text
 ^[a-z0-9]+(-[a-z0-9]+)*$
@@ -64,23 +64,23 @@ opencode выполняет поиск в следующих местах:
 
 ---
 
-## Соблюдайте правила длины
+## Follow length rules
 
-`description` должно содержать от 1 до 1024 символов.
-Держите его достаточно конкретным, чтобы агент мог сделать правильный выбор.
+`description` must be 1-1024 characters.
+Keep it specific enough for the agent to choose correctly.
 
 ---
 
-## Используйте пример
+## Use an example
 
-Создайте `.opencode/skills/git-release/SKILL.md` следующим образом:
+Create `.opencode/skills/git-release/SKILL.md` like this:
 
 ```markdown
 ---
 name: git-release
 description: Create consistent releases and changelogs
 license: MIT
-compatibility: opencode
+compatibility: CyxCode
 metadata:
   audience: maintainers
   workflow: github
@@ -100,10 +100,10 @@ Ask clarifying questions if the target versioning scheme is unclear.
 
 ---
 
-## Распознавание описания инструмента
+## Recognize tool description
 
-opencode перечисляет доступные навыки в описании инструмента `skill`.
-Каждая запись включает название и описание навыка:
+cyxcode lists available skills in the `skill` tool description.
+Each entry includes the skill name and description:
 
 ```xml
 <available_skills>
@@ -114,7 +114,7 @@ opencode перечисляет доступные навыки в описан�
 </available_skills>
 ```
 
-Агент загружает навык, вызывая инструмент:
+The agent loads a skill by calling the tool:
 
 ```
 skill({ name: "git-release" })
@@ -122,9 +122,9 @@ skill({ name: "git-release" })
 
 ---
 
-## Настройка разрешений
+## Configure permissions
 
-Контролируйте, к каким навыкам агенты могут получить доступ, используя разрешения на основе шаблонов в `opencode.json`:
+Control which skills agents can access using pattern-based permissions in `opencode.json`:
 
 ```json
 {
@@ -139,21 +139,21 @@ skill({ name: "git-release" })
 }
 ```
 
-| Разрешение | Поведение                                 |
+| Permission | Behavior                                  |
 | ---------- | ----------------------------------------- |
 | `allow`    | Skill loads immediately                   |
 | `deny`     | Skill hidden from agent, access rejected  |
 | `ask`      | User prompted for approval before loading |
 
-Шаблоны поддерживают подстановочные знаки: `internal-*` соответствует `internal-docs`, `internal-tools` и т. д.
+Patterns support wildcards: `internal-*` matches `internal-docs`, `internal-tools`, etc.
 
 ---
 
-## Переопределить для каждого агента
+## Override per agent
 
-Предоставьте конкретным агентам разрешения, отличные от глобальных настроек по умолчанию.
+Give specific agents different permissions than the global defaults.
 
-**Для пользовательских агентов** (в заголовке агента):
+**For custom agents** (in agent frontmatter):
 
 ```yaml
 ---
@@ -163,7 +163,7 @@ permission:
 ---
 ```
 
-**Для встроенных агентов** (в формате `opencode.json`):
+**For built-in agents** (in `opencode.json`):
 
 ```json
 {
@@ -181,11 +181,11 @@ permission:
 
 ---
 
-## Отключить инструмент навыков
+## Disable the skill tool
 
-Полностью отключить навыки для агентов, которым не следует их использовать:
+Completely disable skills for agents that shouldn't use them:
 
-**Для индивидуальных агентов**:
+**For custom agents**:
 
 ```yaml
 ---
@@ -194,7 +194,7 @@ tools:
 ---
 ```
 
-**Для встроенных агентов**:
+**For built-in agents**:
 
 ```json
 {
@@ -208,15 +208,15 @@ tools:
 }
 ```
 
-Если этот параметр отключен, раздел `<available_skills>` полностью опускается.
+When disabled, the `<available_skills>` section is omitted entirely.
 
 ---
 
-## Устранение неполадок с загрузкой
+## Troubleshoot loading
 
-Если навык не отображается:
+If a skill does not show up:
 
-1. Убедитесь, что `SKILL.md` написано заглавными буквами.
-2. Убедитесь, что заголовок включает `name` и `description`.
-3. Убедитесь, что названия навыков уникальны во всех локациях.
-4. Проверьте разрешения — навыки с `deny` скрыты от агентов.
+1. Verify `SKILL.md` is spelled in all caps
+2. Check that frontmatter includes `name` and `description`
+3. Ensure skill names are unique across all locations
+4. Check permissions—skills with `deny` are hidden from agents

@@ -1,41 +1,41 @@
 ---
-title: プロバイダー
-description: OpenCode で LLM プロバイダーを使用する。
+title: Providers
+description: Using any LLM provider in CyxCode.
 ---
 
 import config from "../../../../config.mjs"
 export const console = config.console
 
-OpenCode は [AI SDK](https://ai-sdk.dev/) および [Models.dev](https://models.dev) を使用して **75 以上の LLM プロバイダー** をサポートし、ローカルモデルの実行をサポートします。
+CyxCode uses the [AI SDK](https://ai-sdk.dev/) and [Models.dev](https://models.dev) to support **75+ LLM providers** and it supports running local models.
 
-プロバイダーを追加するには、次のことを行う必要があります。
+To add a provider you need to:
 
-1. `/connect` コマンドを使用して、プロバイダーの API キーを追加します。
-2. OpenCode 設定でプロバイダーを構成します。
-
----
-
-### 認証情報
-
-`/connect` コマンドを使用してプロバイダーの API キーを追加すると、それらは保存されます
-`~/.local/share/opencode/auth.json`で。
+1. Add the API keys for the provider using the `/connect` command.
+2. Configure the provider in your CyxCode config.
 
 ---
 
-### 設定
+### Credentials
 
-OpenCode の `provider` セクションを通じてプロバイダーをカスタマイズできます。
+When you add a provider's API keys with the `/connect` command, they are stored
+in `~/.local/share/opencode/auth.json`.
+
+---
+
+### Config
+
+You can customize the providers through the `provider` section in your CyxCode
 config.
 
 ---
 
 #### Base URL
 
-`baseURL` オプションを設定することで、任意のプロバイダーのベース URL をカスタマイズできます。これは、プロキシサービスまたはカスタムエンドポイントを使用する場合に便利です。
+You can customize the base URL for any provider by setting the `baseURL` option. This is useful when using proxy services or custom endpoints.
 
 ```json title="opencode.json" {6}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "provider": {
     "anthropic": {
       "options": {
@@ -48,95 +48,90 @@ config.
 
 ---
 
-## OpenCode Zen
+## CyxCode Zen
 
-OpenCode Zen は、OpenCode チームが提供するモデルのリストです。
-OpenCode で適切に動作することがテストおよび検証されています。 [詳細はこちら](/docs/zen)。
+CyxCode Zen is a list of models provided by the CyxCode team that have been
+tested and verified to work well with CyxCode. [Learn more](/docs/zen).
 
 :::tip
-初めての方は、OpenCode Zen から始めることをお勧めします。
+If you are new, we recommend starting with CyxCode Zen.
 :::
 
-1. TUI で `/connect` コマンドを実行し、`OpenCode Zen` を選択して、[opencode.ai/zen](https://opencode.ai/zen) にアクセスします。
+1. Run the `/connect` command in the TUI, select `CyxCode Zen`, and head to [cyxcode.ai/auth](https://cyxcode.ai/zen).
 
    ```txt
    /connect
    ```
 
-2. サインインし、お支払いの詳細を追加し、API キーをコピーします。
+2. Sign in, add your billing details, and copy your API key.
 
-3. API キーを貼り付けます。
+3. Paste your API key.
 
    ```txt
-   ┌ API key
-   │
-   │
-   └ enter
+   API key
    ```
 
-4. TUI で `/models` を実行すると、推奨されるモデルのリストが表示されます。
+4. Run `/models` in the TUI to see the list of models we recommend.
 
    ```txt
    /models
    ```
 
-これは OpenCode の他のプロバイダーと同様に機能し、使用は完全にオプションです。
+It works like any other provider in CyxCode and is completely optional to use.
 
 ---
 
-## OpenCode Go
+## CyxCode Go
 
-OpenCode Go は、OpenCode チームによって提供される、人気のあるオープンコーディングモデルへの信頼性の高いアクセスを提供する低コストのサブスクリプションプランです。これらは OpenCode でうまく機能することがテストおよび検証されています。
+CyxCode Go is a low cost subscription plan that provides reliable access to popular open coding models provided by the CyxCode team that have been
+tested and verified to work well with CyxCode.
 
-1. TUI で `/connect` コマンドを実行し、`OpenCode Go` を選択して、[opencode.ai/zen](https://opencode.ai/zen) にアクセスします。
+1. Run the `/connect` command in the TUI, select `CyxCode Go`, and head to [cyxcode.ai/auth](https://cyxcode.ai/zen).
 
    ```txt
    /connect
    ```
 
-2. サインインし、お支払いの詳細を追加し、API キーをコピーします。
+2. Sign in, add your billing details, and copy your API key.
 
-3. API キーを貼り付けます。
+3. Paste your API key.
 
    ```txt
-   ┌ API key
-   │
-   │
-   └ enter
+   API key
    ```
 
-4. TUI で `/models` を実行すると、推奨されるモデルのリストが表示されます。
+4. Run `/models` in the TUI to see the list of models we recommend.
 
    ```txt
    /models
    ```
 
-これは OpenCode の他のプロバイダーと同様に機能し、使用は完全にオプションです。
+It works like any other provider in CyxCode and is completely optional to use.
 
 ---
 
-## ディレクトリ
+## Directory
 
-いくつかのプロバイダーを詳しく見てみましょう。プロバイダーを追加したい場合は、
-リストにある場合は、お気軽に PR を開いてください。
+Let's look at some of the providers in detail. If you'd like to add a provider to the
+list, feel free to open a PR.
 
 :::note
-ここにプロバイダーが表示されない場合は、 PRを送信してください。
+Don't see a provider here? Submit a PR.
 :::
 
 ---
 
 ### 302.AI
 
-1. [302.AI console](https://302.ai/) に移動し、アカウントを作成し、API キーを生成します。
+1. Head over to the [302.AI console](https://302.ai/), create an account, and generate an API key.
 
-2. `/connect` コマンドを実行し、**302.AI** を検索します。
+2. Run the `/connect` command and search for **302.AI**.
 
    ```txt
    /connect
    ```
 
-3. 302.AI API キーを入力します。
+3. Enter your 302.AI API key.
 
    ```txt
    ┌ API key
@@ -145,7 +140,7 @@ OpenCode Go は、OpenCode チームによって提供される、人気のあ�
    └ enter
    ```
 
-4. `/models` コマンドを実行してモデルを選択します。
+4. Run the `/models` command to select a model.
 
    ```txt
    /models
@@ -155,34 +150,35 @@ OpenCode Go は、OpenCode チームによって提供される、人気のあ�
 
 ### Amazon Bedrock
 
-OpenCode で Amazon Bedrock を使用するには:
+To use Amazon Bedrock with CyxCode:
 
-1. Amazon Bedrock コンソールの **モデルカタログ** に移動し、必要なモデルへのアクセスをリクエストします。
+1. Head over to the **Model catalog** in the Amazon Bedrock console and request
+   access to the models you want.
 
    :::tip
-   Amazon Bedrock で必要なモデルにアクセスできる必要があります。
+   You need to have access to the model you want in Amazon Bedrock.
    :::
 
-2. **次のいずれかの方法を使用して認証を構成します**:
+2. **Configure authentication** using one of the following methods:
 
    ***
 
-   #### 環境変数 (クイックスタート)
+   #### Environment Variables (Quick Start)
 
-   opencode の実行中に次の環境変数のいずれかを設定します。
+   Set one of these environment variables while running CyxCode:
 
    ```bash
-   # オプション 1: AWS アクセスキーの使用
-   AWS_ACCESS_KEY_ID=XXX AWS_SECRET_ACCESS_KEY=YYY opencode
+   # Option 1: Using AWS access keys
+   AWS_ACCESS_KEY_ID=XXX AWS_SECRET_ACCESS_KEY=YYY CyxCode
 
-   # オプション 2: 名前付き AWS プロファイルの使用
-   AWS_PROFILE=my-profile opencode
+   # Option 2: Using named AWS profile
+   AWS_PROFILE=my-profile CyxCode
 
-   # オプション 3: Bedrock ベアラートークンの使用
-   AWS_BEARER_TOKEN_BEDROCK=XXX opencode
+   # Option 3: Using Bedrock bearer token
+   AWS_BEARER_TOKEN_BEDROCK=XXX CyxCode
    ```
 
-   または、それらを bash プロファイルに追加します。
+   Or add them to your bash profile:
 
    ```bash title="~/.bash_profile"
    export AWS_PROFILE=my-dev-profile
@@ -191,13 +187,13 @@ OpenCode で Amazon Bedrock を使用するには:
 
    ***
 
-   #### 設定ファイル (推奨)
+   #### Configuration File (Recommended)
 
-   プロジェクト固有の設定または永続的な設定の場合は、`opencode.json` を使用します。
+   For project-specific or persistent configuration, use `opencode.json`:
 
    ```json title="opencode.json"
    {
-     "$schema": "https://opencode.ai/config.json",
+     "$schema": "https://cyxcode.ai/config.json",
      "provider": {
        "amazon-bedrock": {
          "options": {
@@ -209,24 +205,24 @@ OpenCode で Amazon Bedrock を使用するには:
    }
    ```
 
-   **利用可能なオプション:**
-   - `region` - AWS リージョン (例: `us-east-1`、`eu-west-1`)
-   - `profile` - `~/.aws/credentials` からの AWS 名前付きプロファイル
-   - `endpoint` - VPC エンドポイントのカスタムエンドポイント URL (汎用 `baseURL` オプションのエイリアス)
+   **Available options:**
+   - `region` - AWS region (e.g., `us-east-1`, `eu-west-1`)
+   - `profile` - AWS named profile from `~/.aws/credentials`
+   - `endpoint` - Custom endpoint URL for VPC endpoints (alias for generic `baseURL` option)
 
    :::tip
-   設定ファイルのオプションは環境変数より優先されます。
+   Configuration file options take precedence over environment variables.
    :::
 
    ***
 
-   #### 上級: VPC エンドポイント
+   #### Advanced: VPC Endpoints
 
-   Bedrock の VPC エンドポイントを使用している場合:
+   If you're using VPC endpoints for Bedrock:
 
    ```json title="opencode.json"
    {
-     "$schema": "https://opencode.ai/config.json",
+     "$schema": "https://cyxcode.ai/config.json",
      "provider": {
        "amazon-bedrock": {
          "options": {
@@ -240,42 +236,42 @@ OpenCode で Amazon Bedrock を使用するには:
    ```
 
    :::note
-   `endpoint` オプションは、AWS 固有の用語を使用した汎用の `baseURL` オプションのエイリアスです。 `endpoint` と `baseURL` の両方が指定された場合は、`endpoint` が優先されます。
+   The `endpoint` option is an alias for the generic `baseURL` option, using AWS-specific terminology. If both `endpoint` and `baseURL` are specified, `endpoint` takes precedence.
    :::
 
    ***
 
-   #### 認証方法
-   - **`AWS_ACCESS_KEY_ID` / `AWS_SECRET_ACCESS_KEY`**: IAM ユーザーを作成し、AWS コンソールでアクセスキーを生成します
-   - **`AWS_PROFILE`**: `~/.aws/credentials` の名前付きプロファイルを使用します。最初に `aws configure --profile my-profile` または `aws sso login` を設定します
-   - **`AWS_BEARER_TOKEN_BEDROCK`**: Amazon Bedrock コンソールから長期 API キーを生成します
-   - **`AWS_WEB_IDENTITY_TOKEN_FILE` / `AWS_ROLE_ARN`**: EKS IRSA (サービスアカウントの IAM ロール) または OIDC フェデレーションを備えた他の Kubernetes 環境の場合。これらの環境変数は、サービスアカウントアノテーションを使用するときに Kubernetes によって自動的に挿入されます。
+   #### Authentication Methods
+   - **`AWS_ACCESS_KEY_ID` / `AWS_SECRET_ACCESS_KEY`**: Create an IAM user and generate access keys in the AWS Console
+   - **`AWS_PROFILE`**: Use named profiles from `~/.aws/credentials`. First configure with `aws configure --profile my-profile` or `aws sso login`
+   - **`AWS_BEARER_TOKEN_BEDROCK`**: Generate long-term API keys from the Amazon Bedrock console
+   - **`AWS_WEB_IDENTITY_TOKEN_FILE` / `AWS_ROLE_ARN`**: For EKS IRSA (IAM Roles for Service Accounts) or other Kubernetes environments with OIDC federation. These environment variables are automatically injected by Kubernetes when using service account annotations.
 
    ***
 
-   #### 認証の優先順位
+   #### Authentication Precedence
 
-   Amazon Bedrock は次の認証優先度を使用します。
-   1. **ベアラー トークン** - `AWS_BEARER_TOKEN_BEDROCK` 環境変数または `/connect` コマンドからのトークン
-   2. **AWS 認証情報チェーン** - プロファイル、アクセスキー、共有認証情報、IAM ロール、Web ID トークン (EKS IRSA)、インスタンスメタデータ
+   Amazon Bedrock uses the following authentication priority:
+   1. **Bearer Token** - `AWS_BEARER_TOKEN_BEDROCK` environment variable or token from `/connect` command
+   2. **AWS Credential Chain** - Profile, access keys, shared credentials, IAM roles, Web Identity Tokens (EKS IRSA), instance metadata
 
    :::note
-   ベアラー トークンが (`/connect` または `AWS_BEARER_TOKEN_BEDROCK` 経由で) 設定されると、設定されたプロファイルを含むすべての AWS 認証情報方法よりも優先されます。
+   When a bearer token is set (via `/connect` or `AWS_BEARER_TOKEN_BEDROCK`), it takes precedence over all AWS credential methods including configured profiles.
    :::
 
-3. `/models` コマンドを実行して、必要なモデルを選択します。
+3. Run the `/models` command to select the model you want.
 
    ```txt
    /models
    ```
 
 :::note
-カスタム推論プロファイルの場合、キーでモデルとプロバイダー名を使用し、`id` プロパティを arn に設定します。これにより、正しいキャッシュが保証されます。
+For custom inference profiles, use the model and provider name in the key and set the `id` property to the arn. This ensures correct caching.
 :::
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "provider": {
     "amazon-bedrock": {
       // ...
@@ -293,65 +289,68 @@ OpenCode で Amazon Bedrock を使用するには:
 
 ### Anthropic
 
-1. サインアップしたら、`/connect` コマンドを実行し、[Anthropic] を選択します。
+1. Once you've signed up, run the `/connect` command and select Anthropic.
 
    ```txt
    /connect
    ```
 
-2. ここで **Claude Pro/Max** オプションを選択すると、ブラウザが開きます
-   そして認証を求められます。
+2. Here you can select the **Claude Pro/Max** option and it'll open your browser
+   and ask you to authenticate.
 
    ```txt
    ┌ Select auth method
    │
-   │ Claude Pro/Max
-   │ Create an API Key
    │ Manually enter API Key
    └
    ```
 
-3. これで、`/models` コマンドを使用すると、すべての Anthropic モデルが利用できるようになります。
+3. Now all the Anthropic models should be available when you use the `/models` command.
 
    ```txt
    /models
    ```
 
 :::info
-OpenCode での Claude Pro/Max サブスクリプションの使用は、[Anthropic](https://anthropic.com) によって正式に許可されていませんが、一般的に機能します。
-:::
+There are plugins that allow you to use your Claude Pro/Max models with
+CyxCode. Anthropic explicitly prohibits this.
 
-##### APIキーの使用
+Previous versions of CyxCode came bundled with these plugins but that is no
+longer the case as of 1.3.0
 
-Pro/Max サブスクリプションをお持ちでない場合は、[**API キーの作成**] を選択することもできます。また、ブラウザが開き、Anthropic にログインするよう求められ、ターミナルに貼り付けるコードが表示されます。
+Other companies support freedom of choice with developer tooling - you can use
+the following subscriptions in CyxCode with zero setup:
 
-または、すでに API キーをお持ちの場合は、[**API キーを手動で入力**] を選択してターミナルに貼り付けることができます。
+- ChatGPT Plus
+- Github Copilot
+- Gitlab Duo
+  :::
 
 ---
 
 ### Azure OpenAI
 
 :::note
-「申し訳ありませんが、そのリクエストには対応できません」エラーが発生した場合は、Azure リソースのコンテンツフィルターを **DefaultV2** から **Default** に変更してみてください。
+If you encounter "I'm sorry, but I cannot assist with that request" errors, try changing the content filter from **DefaultV2** to **Default** in your Azure resource.
 :::
 
-1. [Azure portal](https://portal.azure.com/) に移動し、**Azure OpenAI** リソースを作成します。必要なものは次のとおりです。
-   - **リソース名**: これは API エンドポイント (`https://RESOURCE_NAME.openai.azure.com/`) の一部になります。
-   - **API キー**: リソースの `KEY 1` または `KEY 2` のいずれか
+1. Head over to the [Azure portal](https://portal.azure.com/) and create an **Azure OpenAI** resource. You'll need:
+   - **Resource name**: This becomes part of your API endpoint (`https://RESOURCE_NAME.openai.azure.com/`)
+   - **API key**: Either `KEY 1` or `KEY 2` from your resource
 
-2. [Azure AI Foundry](https://ai.azure.com/) に移動し、モデルをデプロイします。
+2. Go to [Azure AI Foundry](https://ai.azure.com/) and deploy a model.
 
-:::note
-OpenCode が正しく動作するには、デプロイメント名がモデル名と一致する必要があります。
-:::
+   :::note
+   The deployment name must match the model name for CyxCode to work properly.
+   :::
 
-3. `/connect` コマンドを実行し、**Azure** を検索します。
+3. Run the `/connect` command and search for **Azure**.
 
    ```txt
    /connect
    ```
 
-4. API キーを入力します。
+4. Enter your API key.
 
    ```txt
    ┌ API key
@@ -360,19 +359,19 @@ OpenCode が正しく動作するには、デプロイメント名がモデル�
    └ enter
    ```
 
-5. リソース名を環境変数として設定します。
+5. Set your resource name as an environment variable:
 
    ```bash
-   AZURE_RESOURCE_NAME=XXX opencode
+   AZURE_RESOURCE_NAME=XXX CyxCode
    ```
 
-または、bash プロファイルに追加します。
+   Or add it to your bash profile:
 
-```bash title="~/.bash_profile"
+   ```bash title="~/.bash_profile"
    export AZURE_RESOURCE_NAME=XXX
-```
+   ```
 
-6. `/models` コマンドを実行して、デプロイされたモデルを選択します。
+6. Run the `/models` command to select your deployed model.
 
    ```txt
    /models
@@ -382,23 +381,23 @@ OpenCode が正しく動作するには、デプロイメント名がモデル�
 
 ### Azure Cognitive Services
 
-1. [Azure portal](https://portal.azure.com/) に移動し、**Azure OpenAI** リソースを作成します。必要なものは次のとおりです。
-   - **リソース名**: これは API エンドポイント (`https://AZURE_COGNITIVE_SERVICES_RESOURCE_NAME.cognitiveservices.azure.com/`) の一部になります。
-   - **API キー**: リソースの `KEY 1` または `KEY 2` のいずれか
+1. Head over to the [Azure portal](https://portal.azure.com/) and create an **Azure OpenAI** resource. You'll need:
+   - **Resource name**: This becomes part of your API endpoint (`https://AZURE_COGNITIVE_SERVICES_RESOURCE_NAME.cognitiveservices.azure.com/`)
+   - **API key**: Either `KEY 1` or `KEY 2` from your resource
 
-2. [Azure AI Foundry](https://ai.azure.com/) に移動し、モデルをデプロイします。
+2. Go to [Azure AI Foundry](https://ai.azure.com/) and deploy a model.
 
-:::note
-OpenCode が正しく動作するには、デプロイメント名がモデル名と一致する必要があります。
-:::
+   :::note
+   The deployment name must match the model name for CyxCode to work properly.
+   :::
 
-3. `/connect` コマンドを実行し、**Azure Cognitive Services** を検索します。
+3. Run the `/connect` command and search for **Azure Cognitive Services**.
 
    ```txt
    /connect
    ```
 
-4. API キーを入力します。
+4. Enter your API key.
 
    ```txt
    ┌ API key
@@ -407,19 +406,19 @@ OpenCode が正しく動作するには、デプロイメント名がモデル�
    └ enter
    ```
 
-5. リソース名を環境変数として設定します。
+5. Set your resource name as an environment variable:
 
    ```bash
-   AZURE_COGNITIVE_SERVICES_RESOURCE_NAME=XXX opencode
+   AZURE_COGNITIVE_SERVICES_RESOURCE_NAME=XXX CyxCode
    ```
 
-または、bash プロファイルに追加します。
+   Or add it to your bash profile:
 
-```bash title="~/.bash_profile"
+   ```bash title="~/.bash_profile"
    export AZURE_COGNITIVE_SERVICES_RESOURCE_NAME=XXX
-```
+   ```
 
-6. `/models` コマンドを実行して、デプロイされたモデルを選択します。
+6. Run the `/models` command to select your deployed model.
 
    ```txt
    /models
@@ -429,15 +428,15 @@ OpenCode が正しく動作するには、デプロイメント名がモデル�
 
 ### Baseten
 
-1. [Baseten](https://app.baseten.co/) に移動し、アカウントを作成し、API キーを生成します。
+1. Head over to the [Baseten](https://app.baseten.co/), create an account, and generate an API key.
 
-2. `/connect` コマンドを実行し、**Baseten** を検索します。
+2. Run the `/connect` command and search for **Baseten**.
 
    ```txt
    /connect
    ```
 
-3. Baseten API キーを入力します。
+3. Enter your Baseten API key.
 
    ```txt
    ┌ API key
@@ -446,7 +445,7 @@ OpenCode が正しく動作するには、デプロイメント名がモデル�
    └ enter
    ```
 
-4. `/models` コマンドを実行してモデルを選択します。
+4. Run the `/models` command to select a model.
 
    ```txt
    /models
@@ -456,15 +455,15 @@ OpenCode が正しく動作するには、デプロイメント名がモデル�
 
 ### Cerebras
 
-1. [Cerebras console](https://inference.cerebras.ai/) に移動し、アカウントを作成し、API キーを生成します。
+1. Head over to the [Cerebras console](https://inference.cerebras.ai/), create an account, and generate an API key.
 
-2. `/connect` コマンドを実行し、**Cerebras** を検索します。
+2. Run the `/connect` command and search for **Cerebras**.
 
    ```txt
    /connect
    ```
 
-3. Cerebras API キーを入力します。
+3. Enter your Cerebras API key.
 
    ```txt
    ┌ API key
@@ -473,7 +472,7 @@ OpenCode が正しく動作するには、デプロイメント名がモデル�
    └ enter
    ```
 
-4. `/models` コマンドを実行して、_Qwen 3 Coder 480B_ のようなモデルを選択します。
+4. Run the `/models` command to select a model like _Qwen 3 Coder 480B_.
 
    ```txt
    /models
@@ -483,24 +482,24 @@ OpenCode が正しく動作するには、デプロイメント名がモデル�
 
 ### Cloudflare AI Gateway
 
-Cloudflare AI Gatewayを使用すると、統合エンドポイントを通じてOpenAI、Anthropic、Workers AIなどのモデルにアクセスできます。 [Unified Billing](https://developers.cloudflare.com/ai-gateway/features/unified-billing/) を使用すると、プロバイダーごとに個別の API キーは必要ありません。
+Cloudflare AI Gateway lets you access models from OpenAI, Anthropic, Workers AI, and more through a unified endpoint. With [Unified Billing](https://developers.cloudflare.com/ai-gateway/features/unified-billing/) you don't need separate API keys for each provider.
 
-1. [Cloudflare ダッシュボード ](https://dash.cloudflare.com/) に移動し、**AI** > **AI ゲートウェイ** に移動し、新しいゲートウェイを作成します。
+1. Head over to the [Cloudflare dashboard](https://dash.cloudflare.com/), navigate to **AI** > **AI Gateway**, and create a new gateway.
 
-2. アカウント ID とゲートウェイ ID を環境変数として設定します。
+2. Set your Account ID and Gateway ID as environment variables.
 
    ```bash title="~/.bash_profile"
    export CLOUDFLARE_ACCOUNT_ID=your-32-character-account-id
    export CLOUDFLARE_GATEWAY_ID=your-gateway-id
    ```
 
-3. `/connect` コマンドを実行し、**Cloudflare AI Gateway** を検索します。
+3. Run the `/connect` command and search for **Cloudflare AI Gateway**.
 
    ```txt
    /connect
    ```
 
-4. Cloudflare API トークンを入力します。
+4. Enter your Cloudflare API token.
 
    ```txt
    ┌ API key
@@ -509,47 +508,55 @@ Cloudflare AI Gatewayを使用すると、統合エンドポイントを通じ�
    └ enter
    ```
 
-または環境変数として設定します。
+   Or set it as an environment variable.
 
-```bash title="~/.bash_profile"
+   ```bash title="~/.bash_profile"
    export CLOUDFLARE_API_TOKEN=your-api-token
-```
+   ```
 
-5. `/models` コマンドを実行してモデルを選択します。
+5. Run the `/models` command to select a model.
 
    ```txt
    /models
    ```
 
-OpenCode 設定を通じてモデルを追加することもできます。
+   You can also add models through your CyxCode config.
 
-```json title="opencode.json"
-{
-  "$schema": "https://opencode.ai/config.json",
-  "provider": {
-    "cloudflare-ai-gateway": {
-      "models": {
-        "openai/gpt-4o": {},
-        "anthropic/claude-sonnet-4": {}
-      }
-    }
-  }
-}
-```
+   ```json title="opencode.json"
+   {
+     "$schema": "https://cyxcode.ai/config.json",
+     "provider": {
+       "cloudflare-ai-gateway": {
+         "models": {
+           "openai/gpt-4o": {},
+           "anthropic/claude-sonnet-4": {}
+         }
+       }
+     }
+   }
+   ```
 
 ---
 
-### Cortecs
+### Cloudflare Workers AI
 
-1. [Cortecs console](https://cortecs.ai/) に移動し、アカウントを作成し、API キーを生成します。
+Cloudflare Workers AI lets you run AI models on Cloudflare's global network directly via REST API, with no separate provider accounts needed for supported models.
 
-2. `/connect` コマンドを実行し、**Cortecs** を検索します。
+1. Head over to the [Cloudflare dashboard](https://dash.cloudflare.com/), navigate to **Workers AI**, and select **Use REST API** to get your Account ID and create an API token.
+
+2. Set your Account ID as an environment variable.
+
+   ```bash title="~/.bash_profile"
+   export CLOUDFLARE_ACCOUNT_ID=your-32-character-account-id
+   ```
+
+3. Run the `/connect` command and search for **Cloudflare Workers AI**.
 
    ```txt
    /connect
    ```
 
-3. Cortecs API キーを入力します。
+4. Enter your Cloudflare API token.
 
    ```txt
    ┌ API key
@@ -558,7 +565,40 @@ OpenCode 設定を通じてモデルを追加することもできます。
    └ enter
    ```
 
-4. `/models` コマンドを実行して、_Kimi K2 Instruct_ のようなモデルを選択します。
+   Or set it as an environment variable.
+
+   ```bash title="~/.bash_profile"
+   export CLOUDFLARE_API_KEY=your-api-token
+   ```
+
+5. Run the `/models` command to select a model.
+
+   ```txt
+   /models
+   ```
+
+---
+
+### Cortecs
+
+1. Head over to the [Cortecs console](https://cortecs.ai/), create an account, and generate an API key.
+
+2. Run the `/connect` command and search for **Cortecs**.
+
+   ```txt
+   /connect
+   ```
+
+3. Enter your Cortecs API key.
+
+   ```txt
+   ┌ API key
+   │
+   │
+   └ enter
+   ```
+
+4. Run the `/models` command to select a model like _Kimi K2 Instruct_.
 
    ```txt
    /models
@@ -568,15 +608,15 @@ OpenCode 設定を通じてモデルを追加することもできます。
 
 ### DeepSeek
 
-1. [DeepSeek コンソール ](https://platform.deepseek.com/) に移動し、アカウントを作成し、**新しい API キーの作成** をクリックします。
+1. Head over to the [DeepSeek console](https://platform.deepseek.com/), create an account, and click **Create new API key**.
 
-2. `/connect` コマンドを実行し、**DeepSeek** を検索します。
+2. Run the `/connect` command and search for **DeepSeek**.
 
    ```txt
    /connect
    ```
 
-3. DeepSeek API キーを入力します。
+3. Enter your DeepSeek API key.
 
    ```txt
    ┌ API key
@@ -585,7 +625,7 @@ OpenCode 設定を通じてモデルを追加することもできます。
    └ enter
    ```
 
-4. `/models` コマンドを実行して、_DeepSeek Reasoner_ のような DeepSeek モデルを選択します。
+4. Run the `/models` command to select a DeepSeek model like _DeepSeek Reasoner_.
 
    ```txt
    /models
@@ -595,15 +635,15 @@ OpenCode 設定を通じてモデルを追加することもできます。
 
 ### Deep Infra
 
-1. [Deep Infra ダッシュボード](https://deepinfra.com/dash) に移動し、アカウントを作成し、API キーを生成します。
+1. Head over to the [Deep Infra dashboard](https://deepinfra.com/dash), create an account, and generate an API key.
 
-2. `/connect` コマンドを実行し、**Deep Infra** を検索します。
+2. Run the `/connect` command and search for **Deep Infra**.
 
    ```txt
    /connect
    ```
 
-3. Deep Infra API キーを入力します。
+3. Enter your Deep Infra API key.
 
    ```txt
    ┌ API key
@@ -612,7 +652,7 @@ OpenCode 設定を通じてモデルを追加することもできます。
    └ enter
    ```
 
-4. `/models` コマンドを実行してモデルを選択します。
+4. Run the `/models` command to select a model.
 
    ```txt
    /models
@@ -622,15 +662,15 @@ OpenCode 設定を通じてモデルを追加することもできます。
 
 ### Firmware
 
-1. [ファームウェアダッシュボード](https://app.firmware.ai/signup) に移動し、アカウントを作成し、API キーを生成します。
+1. Head over to the [Firmware dashboard](https://app.firmware.ai/signup), create an account, and generate an API key.
 
-2. `/connect` コマンドを実行し、**ファームウェア**を検索します。
+2. Run the `/connect` command and search for **Firmware**.
 
    ```txt
    /connect
    ```
 
-3. ファームウェア API キーを入力します。
+3. Enter your Firmware API key.
 
    ```txt
    ┌ API key
@@ -639,7 +679,7 @@ OpenCode 設定を通じてモデルを追加することもできます。
    └ enter
    ```
 
-4. `/models` コマンドを実行してモデルを選択します。
+4. Run the `/models` command to select a model.
 
    ```txt
    /models
@@ -649,15 +689,15 @@ OpenCode 設定を通じてモデルを追加することもできます。
 
 ### Fireworks AI
 
-1. [Fireworks AI コンソール ](https://app.fireworks.ai/) に移動し、アカウントを作成し、**API キーの作成** をクリックします。
+1. Head over to the [Fireworks AI console](https://app.fireworks.ai/), create an account, and click **Create API Key**.
 
-2. `/connect` コマンドを実行し、**Fireworks AI** を検索します。
+2. Run the `/connect` command and search for **Fireworks AI**.
 
    ```txt
    /connect
    ```
 
-3. Fireworks AI API キーを入力します。
+3. Enter your Fireworks AI API key.
 
    ```txt
    ┌ API key
@@ -666,7 +706,7 @@ OpenCode 設定を通じてモデルを追加することもできます。
    └ enter
    ```
 
-4. `/models` コマンドを実行して、_Kimi K2 Instruct_ のようなモデルを選択します。
+4. Run the `/models` command to select a model like _Kimi K2 Instruct_.
 
    ```txt
    /models
@@ -676,15 +716,28 @@ OpenCode 設定を通じてモデルを追加することもできます。
 
 ### GitLab Duo
 
-GitLab Duo は、GitLab の Anthropic プロキシを介したネイティブツール呼び出し機能を備えた AI を活用したエージェントチャットを提供します。
+:::caution[Experimental]
+GitLab Duo support in CyxCode is experimental. Features, configuration, and
+behavior may change in future releases.
+:::
 
-1. `/connect` コマンドを実行し、GitLab を選択します。
+CyxCode integrates with the [GitLab Duo Agent Platform](https://docs.gitlab.com/user/duo_agent_platform/),
+providing AI-powered agentic chat with native tool calling capabilities.
+
+:::note[License requirements]
+GitLab Duo Agent Platform requires a **Premium** or **Ultimate** GitLab
+subscription. It is available on GitLab.com and GitLab Self-Managed.
+See [GitLab Duo Agent Platform prerequisites](https://docs.gitlab.com/user/duo_agent_platform/#prerequisites)
+for full requirements.
+:::
+
+1. Run the `/connect` command and select GitLab.
 
    ```txt
    /connect
    ```
 
-2. 認証方法を選択してください:
+2. Choose your authentication method:
 
    ```txt
    ┌ Select auth method
@@ -694,78 +747,44 @@ GitLab Duo は、GitLab の Anthropic プロキシを介したネイティブツ
    └
    ```
 
-   #### OAuthの使用(推奨)
+   #### Using OAuth (Recommended)
 
-**OAuth** を選択すると、認証のためにブラウザが開きます。
+   Select **OAuth** and your browser will open for authorization.
 
-#### パーソナルアクセストークンの使用
+   #### Using Personal Access Token
+   1. Go to [GitLab User Settings > Access Tokens](https://gitlab.com/-/user_settings/personal_access_tokens)
+   2. Click **Add new token**
+   3. Name: `cyxcode`, Scopes: `api`
+   4. Copy the token (starts with `glpat-`)
+   5. Enter it in the terminal
 
-1.  [GitLab ユーザー設定 > アクセス Tokens](https://gitlab.com/-/user_settings/personal_access_tokens) に移動します。
-2.  **新しいトークンを追加** をクリックします
-3.  名前: `OpenCode`、スコープ: `api`
-4.  トークンをコピーします（`glpat-`で始まる）
-5.  ターミナルに入力してください
-
-6.  `/models` コマンドを実行して、利用可能なモデルを確認します。
-
-```txt
-/models
-```
-
----
-
-### STACKIT
-
-STACKIT AI Model Serving は、Llama、Mistral、Qwen などの LLM に焦点を当て、ヨーロッパのインフラストラクチャでの最大限のデータ主権を備えた、AI モデル用の完全に管理された主権ホスティング環境を提供します。
-
-1. [STACKIT Portal](https://portal.stackit.cloud) に移動し、**AI Model Serving** に移動して、プロジェクトの認証トークンを作成します。
-
-   :::tip
-   認証トークンを作成する前に、STACKIT 顧客アカウント、ユーザーアカウント、およびプロジェクトが必要です。
-   :::
-
-2. `/connect` コマンドを実行し、**STACKIT** を検索します。
-
-   ```txt
-   /connect
-   ```
-
-3. STACKIT AI Model Serving 認証トークンを入力します。
-
-   ```txt
-   ┌ API key
-   │
-   │
-   └ enter
-   ```
-
-4. `/models` コマンドを実行して、_Qwen3-VL 235B_ や _Llama 3.3 70B_ などの利用可能なモデルから選択します。
+3. Run the `/models` command to see available models.
 
    ```txt
    /models
    ```
 
-3 つの Claude ベースのモデルが利用可能です。
-
-- **duo-chat-haiku-4-5** (デフォルト) - 素早いタスクに対する素早い応答
-- **duo-chat-sonnet-4-5** - ほとんどのワークフローでバランスの取れたパフォーマンス
-- **duo-chat-opus-4-5** - 複雑な分析に最も適した能力
+   Three Claude-based models are available:
+   - **duo-chat-haiku-4-5** (Default) - Fast responses for quick tasks
+   - **duo-chat-sonnet-4-5** - Balanced performance for most workflows
+   - **duo-chat-opus-4-5** - Most capable for complex analysis
 
 :::note
-必要がない場合は、「GITLAB_TOKEN」環境変数を指定することもできます。
-トークンを OpenCode 認証ストレージに保存します。
+You can also specify 'GITLAB_TOKEN' environment variable if you don't want
+to store token in CyxCode auth storage.
 :::
 
-##### 自己ホスト型 GitLab
+##### Self-Hosted GitLab
 
-:::note[コンプライアンスメモ]
-OpenCode は、セッションタイトルの生成などの一部の AI タスクに小規模なモデルを使用します。
-デフォルトでは、Zen によってホストされる gpt-5-nano を使用するように構成されています。 OpenCode をロックするには
-自分の GitLab でホストされているインスタンスのみを使用するには、次の行を
-`opencode.json` ファイル。セッション共有を無効にすることもお勧めします。
+:::note[compliance note]
+CyxCode uses a small model for some AI tasks like generating the session title.
+It is configured to use gpt-5-nano by default, hosted by Zen. To lock CyxCode
+to only use your own GitLab-hosted instance, add the following to your
+`opencode.json` file. It is also recommended to disable session sharing.
 
 ```json
 {
+  "$schema": "https://cyxcode.ai/config.json",
   "small_model": "gitlab/duo-chat-haiku-4-5",
   "share": "disabled"
 }
@@ -773,20 +792,20 @@ OpenCode は、セッションタイトルの生成などの一部の AI タス�
 
 :::
 
-セルフホスト型 GitLab インスタンスの場合:
+For self-hosted GitLab instances:
 
 ```bash
 export GITLAB_INSTANCE_URL=https://gitlab.company.com
 export GITLAB_TOKEN=glpat-...
 ```
 
-インスタンスがカスタム AI ゲートウェイを実行している場合:
+If your instance runs a custom AI Gateway:
 
 ```bash
 GITLAB_AI_GATEWAY_URL=https://ai-gateway.company.com
 ```
 
-または、bash プロファイルに追加します。
+Or add to your bash profile:
 
 ```bash title="~/.bash_profile"
 export GITLAB_INSTANCE_URL=https://gitlab.company.com
@@ -795,39 +814,41 @@ export GITLAB_TOKEN=glpat-...
 ```
 
 :::note
-GitLab 管理者は以下を有効にする必要があります。
+Your GitLab administrator must:
 
-1. [Duo Agent Platform](https://docs.gitlab.com/user/duo_agent_platform/turn_on_off/) (ユーザー、グループ、またはインスタンス用)
-2. 機能フラグ (Rails コンソール経由):
-   - `agent_platform_claude_code`
-   - `third_party_agents_enabled`
-     :::
+1. [Turn on GitLab Duo](https://docs.gitlab.com/user/duo_agent_platform/turn_on_off/#turn-gitlab-duo-on-or-off)
+   for the user, group, or instance
+2. [Turn on the Agent Platform](https://docs.gitlab.com/user/duo_agent_platform/turn_on_off/#turn-gitlab-duo-agent-platform-on-or-off)
+   (GitLab 18.8+) or [enable beta and experimental features](https://docs.gitlab.com/user/duo_agent_platform/turn_on_off/#turn-on-beta-and-experimental-features)
+   (GitLab 18.7 and earlier)
+3. For Self-Managed, [configure your instance](https://docs.gitlab.com/administration/gitlab_duo/configure/gitlab_self_managed/)
+   :::
 
-##### セルフホスト型インスタンスの OAuth
+##### OAuth for Self-Hosted instances
 
-自己ホスト型インスタンスで Oauth を機能させるには、以下を作成する必要があります。
-新しいアプリケーション ([設定] → [アプリケーション]) で、
-コールバック URL `http://127.0.0.1:8080/callback` と次のスコープ:
+In order to make Oauth working for your self-hosted instance, you need to create
+a new application (Settings → Applications) with the
+callback URL `http://127.0.0.1:8080/callback` and following scopes:
 
-- api (あなたの代わりに API にアクセスします)
-- read_user (個人情報の読み取り)
-- read_repository (リポジトリへの読み取り専用アクセスを許可します)
+- api (Access the API on your behalf)
+- read_user (Read your personal information)
+- read_repository (Allows read-only access to the repository)
 
-次に、アプリケーション ID を環境変数として公開します。
+Then expose application ID as environment variable:
 
 ```bash
 export GITLAB_OAUTH_CLIENT_ID=your_application_id_here
 ```
 
-詳細については、[opencode-gitlab-auth](https://www.npmjs.com/package/opencode-gitlab-auth) ホームページ。
+More documentation on [CyxCode-gitlab-auth](https://www.npmjs.com/package/CyxCode-gitlab-auth) homepage.
 
-##### 設定
+##### Configuration
 
-`opencode.json` を通じてカスタマイズします。
+Customize through `opencode.json`:
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "provider": {
     "gitlab": {
       "options": {
@@ -838,39 +859,51 @@ export GITLAB_OAUTH_CLIENT_ID=your_application_id_here
 }
 ```
 
-##### GitLab API ツール (オプションですが強く推奨)
+##### GitLab Duo Agent Platform (DAP) Workflow Models
 
-GitLab ツール (マージリクエスト、問題、パイプライン、CI/CD など) にアクセスするには:
+DAP workflow models provide an alternative execution path that routes tool calls
+through GitLab's Duo Workflow Service (DWS) instead of the standard agentic chat.
+When a `duo-workflow-*` model is selected, CyxCode will:
+
+1. Discover available models from your GitLab namespace
+2. Present a selection picker if multiple models are available
+3. Cache the selected model to disk for fast subsequent startups
+4. Route tool execution requests through CyxCode's permission-gated tool system
+
+Available DAP workflow models follow the `duo-workflow-*` naming convention and
+are dynamically discovered from your GitLab instance.
+
+##### GitLab API Tools (Optional, but highly recommended)
+
+To access GitLab tools (merge requests, issues, pipelines, CI/CD, etc.):
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
-  "plugin": ["opencode-gitlab-plugin"]
+  "$schema": "https://cyxcode.ai/config.json",
+  "plugin": ["CyxCode-gitlab-plugin"]
 }
 ```
 
-このプラグインは、MR レビュー、問題追跡、パイプライン監視などを含む、包括的な GitLab リポジトリ管理機能を提供します。
+This plugin provides comprehensive GitLab repository management capabilities including MR reviews, issue tracking, pipeline monitoring, and more.
 
 ---
 
 ### GitHub Copilot
 
-GitHub Copilot サブスクリプションを OpenCode で使用するには:
+To use your GitHub Copilot subscription with CyxCode:
 
 :::note
-一部のモデルでは [Pro+] が必要になる場合があります。
-subscription](https://github.com/features/copilot/plans) を使用します。
-
-一部のモデルは、[GitHub Copilot settings](https://docs.github.com/en/copilot/how-tos/use-ai-models/configure-access-to-ai-models#setup-for-individual-use) で構成する必要があります。
+Some models might need a [Pro+
+subscription](https://github.com/features/copilot/plans) to use.
 :::
 
-1. `/connect` コマンドを実行し、GitHub Copilot を検索します。
+1. Run the `/connect` command and search for GitHub Copilot.
 
    ```txt
    /connect
    ```
 
-2. [github.com/login/device](https://github.com/login/device) に移動し、コードを入力します。
+2. Navigate to [github.com/login/device](https://github.com/login/device) and enter the code.
 
    ```txt
    ┌ Login with GitHub Copilot
@@ -879,11 +912,10 @@ subscription](https://github.com/features/copilot/plans) を使用します。
    │
    │ Enter code: 8F43-6FCF
    │
-   │
    └ Waiting for authorization...
    ```
 
-3. 次に、`/models` コマンドを実行して、必要なモデルを選択します。
+3. Now run the `/models` command to select the model you want.
 
    ```txt
    /models
@@ -893,41 +925,41 @@ subscription](https://github.com/features/copilot/plans) を使用します。
 
 ### Google Vertex AI
 
-OpenCode で Google Vertex AI を使用するには:
+To use Google Vertex AI with CyxCode:
 
-1. Google Cloud Console の **Model Garden** に移動し、
-   お住まいの地域で利用可能なモデル。
+1. Head over to the **Model Garden** in the Google Cloud Console and check the
+   models available in your region.
 
-:::note
-Vertex AI API が有効になっている Google Cloud プロジェクトが必要です。
-:::
+   :::note
+   You need to have a Google Cloud project with Vertex AI API enabled.
+   :::
 
-2. 必要な環境変数を設定します。
-   - `GOOGLE_CLOUD_PROJECT`: Google Cloud プロジェクト ID
-   - `VERTEX_LOCATION` (オプション): Vertex AI の領域 (デフォルトは `global`)
-   - 認証 (1 つ選択):
-     - `GOOGLE_APPLICATION_CREDENTIALS`: サービスアカウントの JSON キーファイルへのパス
-     - gcloud CLI を使用して認証する: `gcloud auth application-default login`
+2. Set the required environment variables:
+   - `GOOGLE_CLOUD_PROJECT`: Your Google Cloud project ID
+   - `VERTEX_LOCATION` (optional): The region for Vertex AI (defaults to `global`)
+   - Authentication (choose one):
+     - `GOOGLE_APPLICATION_CREDENTIALS`: Path to your service account JSON key file
+     - Authenticate using gcloud CLI: `gcloud auth application-default login`
 
-opencode の実行中に設定します。
+   Set them while running CyxCode.
 
-```bash
-   GOOGLE_APPLICATION_CREDENTIALS=/path/to/service-account.json GOOGLE_CLOUD_PROJECT=your-project-id opencode
-```
+   ```bash
+   GOOGLE_APPLICATION_CREDENTIALS=/path/to/service-account.json GOOGLE_CLOUD_PROJECT=your-project-id CyxCode
+   ```
 
-または、それらを bash プロファイルに追加します。
+   Or add them to your bash profile.
 
-```bash title="~/.bash_profile"
+   ```bash title="~/.bash_profile"
    export GOOGLE_APPLICATION_CREDENTIALS=/path/to/service-account.json
    export GOOGLE_CLOUD_PROJECT=your-project-id
    export VERTEX_LOCATION=global
-```
+   ```
 
 :::tip
-`global` 領域は、追加コストなしで可用性を向上させ、エラーを削減します。データ常駐要件には、リージョンエンドポイント (`us-central1` など) を使用します。 [詳細はこちら](https://cloud.google.com/vertex-ai/generative-ai/docs/partner-models/use-partner-models#regional_and_global_endpoints)
+The `global` region improves availability and reduces errors at no extra cost. Use regional endpoints (e.g., `us-central1`) for data residency requirements. [Learn more](https://cloud.google.com/vertex-ai/generative-ai/docs/partner-models/use-partner-models#regional_and_global_endpoints)
 :::
 
-3. `/models` コマンドを実行して、必要なモデルを選択します。
+3. Run the `/models` command to select the model you want.
 
    ```txt
    /models
@@ -937,15 +969,15 @@ opencode の実行中に設定します。
 
 ### Groq
 
-1. [Groq console](https://console.groq.com/) に移動し、[**API キーの作成**] をクリックして、キーをコピーします。
+1. Head over to the [Groq console](https://console.groq.com/), click **Create API Key**, and copy the key.
 
-2. `/connect` コマンドを実行し、Groq を検索します。
+2. Run the `/connect` command and search for Groq.
 
    ```txt
    /connect
    ```
 
-3. プロバイダーの API キーを入力します。
+3. Enter the API key for the provider.
 
    ```txt
    ┌ API key
@@ -954,7 +986,7 @@ opencode の実行中に設定します。
    └ enter
    ```
 
-4. `/models` コマンドを実行して、必要なものを選択します。
+4. Run the `/models` command to select the one you want.
 
    ```txt
    /models
@@ -964,17 +996,17 @@ opencode の実行中に設定します。
 
 ### Hugging Face
 
-[Hugging Face Inference Provider](https://huggingface.co/docs/inference-providers) は、17 を超えるプロバイダーがサポートするオープンモデルへのアクセスを提供します。
+[Hugging Face Inference Providers](https://huggingface.co/docs/inference-providers) provides access to open models supported by 17+ providers.
 
-1. [Hugging Face settings](https://huggingface.co/settings/tokens/new?ownUserPermissions=inference.serverless.write&tokenType=fineGrained) に移動して、推論プロバイダーを呼び出す権限を持つトークンを作成します。
+1. Head over to [Hugging Face settings](https://huggingface.co/settings/tokens/new?ownUserPermissions=inference.serverless.write&tokenType=fineGrained) to create a token with permission to make calls to Inference Providers.
 
-2. `/connect` コマンドを実行し、**Hugging Face** を検索します。
+2. Run the `/connect` command and search for **Hugging Face**.
 
    ```txt
    /connect
    ```
 
-3. Hugging Face トークンを入力してください。
+3. Enter your Hugging Face token.
 
    ```txt
    ┌ API key
@@ -983,7 +1015,7 @@ opencode の実行中に設定します。
    └ enter
    ```
 
-4. `/models` コマンドを実行して、_Kimi-K2-Instruct_ や _GLM-4.6_ などのモデルを選択します。
+4. Run the `/models` command to select a model like _Kimi-K2-Instruct_ or _GLM-4.6_.
 
    ```txt
    /models
@@ -993,17 +1025,17 @@ opencode の実行中に設定します。
 
 ### Helicone
 
-[Helicone](https://helicone.ai) は、AI アプリケーションのロギング、監視、分析を提供する LLM 可観測性プラットフォームです。 Helicone AI ゲートウェイは、モデルに基づいてリクエストを適切なプロバイダーに自動的にルーティングします。
+[Helicone](https://helicone.ai) is an LLM observability platform that provides logging, monitoring, and analytics for your AI applications. The Helicone AI Gateway routes your requests to the appropriate provider automatically based on the model.
 
-1. [Helicone](https://helicone.ai) に移動し、アカウントを作成し、ダッシュボードから API キーを生成します。
+1. Head over to [Helicone](https://helicone.ai), create an account, and generate an API key from your dashboard.
 
-2. `/connect` コマンドを実行し、**Helicone** を検索します。
+2. Run the `/connect` command and search for **Helicone**.
 
    ```txt
    /connect
    ```
 
-3. Helicone API キーを入力します。
+3. Enter your Helicone API key.
 
    ```txt
    ┌ API key
@@ -1012,23 +1044,23 @@ opencode の実行中に設定します。
    └ enter
    ```
 
-4. `/models` コマンドを実行してモデルを選択します。
+4. Run the `/models` command to select a model.
 
    ```txt
    /models
    ```
 
-その他のプロバイダーや、キャッシュやレート制限などの高度な機能については、[Helicone ドキュメント](https://docs.helicone.ai).
+For more providers and advanced features like caching and rate limiting, check the [Helicone documentation](https://docs.helicone.ai).
 
-#### オプションの設定
+#### Optional Configs
 
-OpenCode を通じて自動的に構成されていない Helicone の機能またはモデルを見つけた場合は、いつでも自分で構成できます。
+In the event you see a feature or model from Helicone that isn't configured automatically through CyxCode, you can always configure it yourself.
 
-これは [Helicone のモデルディレクトリ](https://helicone.ai/models) です。追加するモデルの ID を取得するためにこれが必要になります。
+Here's [Helicone's Model Directory](https://helicone.ai/models), you'll need this to grab the IDs of the models you want to add.
 
 ```jsonc title="~/.config/opencode/opencode.jsonc"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "provider": {
     "helicone": {
       "npm": "@ai-sdk/openai-compatible",
@@ -1041,7 +1073,7 @@ OpenCode を通じて自動的に構成されていない Helicone の機能ま�
           // Model ID (from Helicone's model directory page)
           "name": "GPT-4o", // Your own custom name for the model
         },
-        "claude-sonnet-4-20250929": {
+        "claude-sonnet-4-20250514": {
           "name": "Claude Sonnet 4",
         },
       },
@@ -1050,13 +1082,13 @@ OpenCode を通じて自動的に構成されていない Helicone の機能ま�
 }
 ```
 
-#### カスタムヘッダー
+#### Custom Headers
 
-Helicone は、キャッシュ、ユーザー追跡、セッション管理などの機能のカスタムヘッダーをサポートしています。 `options.headers` を使用してプロバイダー設定に追加します。
+Helicone supports custom headers for features like caching, user tracking, and session management. Add them to your provider config using `options.headers`:
 
 ```jsonc title="~/.config/opencode/opencode.jsonc"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "provider": {
     "helicone": {
       "npm": "@ai-sdk/openai-compatible",
@@ -1065,7 +1097,7 @@ Helicone は、キャッシュ、ユーザー追跡、セッション管理な�
         "baseURL": "https://ai-gateway.helicone.ai",
         "headers": {
           "Helicone-Cache-Enabled": "true",
-          "Helicone-User-Id": "opencode",
+          "Helicone-User-Id": "CyxCode",
         },
       },
     },
@@ -1073,15 +1105,15 @@ Helicone は、キャッシュ、ユーザー追跡、セッション管理な�
 }
 ```
 
-##### セッション追跡
+##### Session tracking
 
-Helicone の [Sessions](https://docs.helicone.ai/features/sessions) 機能を使用すると、関連する LLM リクエストをグループ化できます。 [opencode-helicone-session](https://github.com/H2Shami/opencode-helicone-session) プラグインを使用して、各 OpenCode 会話を Helicone のセッションとして自動的に記録します。
+Helicone's [Sessions](https://docs.helicone.ai/features/sessions) feature lets you group related LLM requests together. Use the [opencode-helicone-session](https://github.com/H2Shami/opencode-helicone-session) plugin to automatically log each CyxCode conversation as a session in Helicone.
 
 ```bash
 npm install -g opencode-helicone-session
 ```
 
-それを設定に追加します。
+Add it to your config.
 
 ```json title="opencode.json"
 {
@@ -1089,28 +1121,28 @@ npm install -g opencode-helicone-session
 }
 ```
 
-プラグインは、リクエストに `Helicone-Session-Id` ヘッダーと `Helicone-Session-Name` ヘッダーを挿入します。 Helicone のセッションページでは、OpenCode の各会話が個別のセッションとしてリストされています。
+The plugin injects `Helicone-Session-Id` and `Helicone-Session-Name` headers into your requests. In Helicone's Sessions page, you'll see each CyxCode conversation listed as a separate session.
 
-##### 一般的なヘリコーンヘッダー
+##### Common Helicone headers
 
-| ヘッダー                   | 説明                                                                   |
-| -------------------------- | ---------------------------------------------------------------------- |
-| `Helicone-Cache-Enabled`   | 応答キャッシュを有効にする (`true`/`false`)                            |
-| `Helicone-User-Id`         | ユーザーごとにメトリクスを追跡する                                     |
-| `Helicone-Property-[Name]` | カスタムプロパティを追加します (例: `Helicone-Property-Environment`)。 |
-| `Helicone-Prompt-Id`       | リクエストをプロンプトバージョンに関連付ける                           |
+| Header                     | Description                                                   |
+| -------------------------- | ------------------------------------------------------------- |
+| `Helicone-Cache-Enabled`   | Enable response caching (`true`/`false`)                      |
+| `Helicone-User-Id`         | Track metrics by user                                         |
+| `Helicone-Property-[Name]` | Add custom properties (e.g., `Helicone-Property-Environment`) |
+| `Helicone-Prompt-Id`       | Associate requests with prompt versions                       |
 
-利用可能なすべてのヘッダーについては、[Helicone Header Directory](https://docs.helicone.ai/helicone-headers/header-directory) を参照してください。
+See the [Helicone Header Directory](https://docs.helicone.ai/helicone-headers/header-directory) for all available headers.
 
 ---
 
 ### llama.cpp
 
-[llama.cpp の s](https://github.com/ggml-org/llama.cpp) llama-server ユーティリティ] を通じて、ローカルモデルを使用するように opencode を構成できます。
+You can configure CyxCode to use local models through [llama.cpp's](https://github.com/ggml-org/llama.cpp) llama-server utility
 
 ```json title="opencode.json" "llama.cpp" {5, 6, 8, 10-15}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "provider": {
     "llama.cpp": {
       "npm": "@ai-sdk/openai-compatible",
@@ -1132,29 +1164,29 @@ npm install -g opencode-helicone-session
 }
 ```
 
-この例では:
+In this example:
 
-- `llama.cpp` はカスタムプロバイダー ID です。これには任意の文字列を指定できます。
-- `npm` は、このプロバイダーに使用するパッケージを指定します。ここで、`@ai-sdk/openai-compatible` は OpenAI 互換 API に使用されます。
-- `name` は、UI でのプロバイダーの表示名です。
-- `options.baseURL` はローカルサーバーのエンドポイントです。
-- `models` は、モデル ID とその設定のマップです。機種選択リストに機種名が表示されます。
+- `llama.cpp` is the custom provider ID. This can be any string you want.
+- `npm` specifies the package to use for this provider. Here, `@ai-sdk/openai-compatible` is used for any OpenAI-compatible API.
+- `name` is the display name for the provider in the UI.
+- `options.baseURL` is the endpoint for the local server.
+- `models` is a map of model IDs to their configurations. The model name will be displayed in the model selection list.
 
 ---
 
 ### IO.NET
 
-IO.NET は、さまざまなユースケースに最適化された 17 のモデルを提供します。
+IO.NET offers 17 models optimized for various use cases:
 
-1. [IO.NET console](https://ai.io.net/) に移動し、アカウントを作成し、API キーを生成します。
+1. Head over to the [IO.NET console](https://ai.io.net/), create an account, and generate an API key.
 
-2. `/connect` コマンドを実行し、**IO.NET** を検索します。
+2. Run the `/connect` command and search for **IO.NET**.
 
    ```txt
    /connect
    ```
 
-3. IO.NET API キーを入力します。
+3. Enter your IO.NET API key.
 
    ```txt
    ┌ API key
@@ -1163,7 +1195,7 @@ IO.NET は、さまざまなユースケースに最適化された 17 のモデ
    └ enter
    ```
 
-4. `/models` コマンドを実行してモデルを選択します。
+4. Run the `/models` command to select a model.
 
    ```txt
    /models
@@ -1173,11 +1205,11 @@ IO.NET は、さまざまなユースケースに最適化された 17 のモデ
 
 ### LM Studio
 
-LM Studio を通じてローカルモデルを使用するように opencode を構成できます。
+You can configure CyxCode to use local models through LM Studio.
 
 ```json title="opencode.json" "lmstudio" {5, 6, 8, 10-14}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "provider": {
     "lmstudio": {
       "npm": "@ai-sdk/openai-compatible",
@@ -1195,29 +1227,29 @@ LM Studio を通じてローカルモデルを使用するように opencode を
 }
 ```
 
-この例では:
+In this example:
 
-- `lmstudio` はカスタムプロバイダー ID です。これには任意の文字列を指定できます。
-- `npm` は、このプロバイダーに使用するパッケージを指定します。ここで、`@ai-sdk/openai-compatible` は OpenAI 互換 API に使用されます。
-- `name` は、UI でのプロバイダーの表示名です。
-- `options.baseURL` はローカルサーバーのエンドポイントです。
-- `models` は、モデル ID とその設定のマップです。機種選択リストに機種名が表示されます。
+- `lmstudio` is the custom provider ID. This can be any string you want.
+- `npm` specifies the package to use for this provider. Here, `@ai-sdk/openai-compatible` is used for any OpenAI-compatible API.
+- `name` is the display name for the provider in the UI.
+- `options.baseURL` is the endpoint for the local server.
+- `models` is a map of model IDs to their configurations. The model name will be displayed in the model selection list.
 
 ---
 
 ### Moonshot AI
 
-Moonshot AI の Kim K2 を使用するには:
+To use Kimi K2 from Moonshot AI:
 
-1. [Moonshot AI console](https://platform.moonshot.ai/console) に移動し、アカウントを作成し、[**API キーの作成**] をクリックします。
+1. Head over to the [Moonshot AI console](https://platform.moonshot.ai/console), create an account, and click **Create API key**.
 
-2. `/connect` コマンドを実行し、**Moonshot AI** を検索します。
+2. Run the `/connect` command and search for **Moonshot AI**.
 
    ```txt
    /connect
    ```
 
-3. Moonshot API キーを入力します。
+3. Enter your Moonshot API key.
 
    ```txt
    ┌ API key
@@ -1226,7 +1258,7 @@ Moonshot AI の Kim K2 を使用するには:
    └ enter
    ```
 
-4. `/models` コマンドを実行して、_Kimi K2_ を選択します。
+4. Run the `/models` command to select _Kimi K2_.
 
    ```txt
    /models
@@ -1236,15 +1268,15 @@ Moonshot AI の Kim K2 を使用するには:
 
 ### MiniMax
 
-1. [MiniMax API Console](https://platform.minimax.io/login) に移動し、アカウントを作成し、API キーを生成します。
+1. Head over to the [MiniMax API Console](https://platform.minimax.io/login), create an account, and generate an API key.
 
-2. `/connect` コマンドを実行し、**MiniMax** を検索します。
+2. Run the `/connect` command and search for **MiniMax**.
 
    ```txt
    /connect
    ```
 
-3. MiniMax API キーを入力します。
+3. Enter your MiniMax API key.
 
    ```txt
    ┌ API key
@@ -1253,7 +1285,7 @@ Moonshot AI の Kim K2 を使用するには:
    └ enter
    ```
 
-4. `/models` コマンドを実行して、_M2.1_ のようなモデルを選択します。
+4. Run the `/models` command to select a model like _M2.1_.
 
    ```txt
    /models
@@ -1263,15 +1295,15 @@ Moonshot AI の Kim K2 を使用するには:
 
 ### Nebius Token Factory
 
-1. [Nebius Token Factory console](https://tokenfactory.nebius.com/) に移動し、アカウントを作成し、[**キーの追加**] をクリックします。
+1. Head over to the [Nebius Token Factory console](https://tokenfactory.nebius.com/), create an account, and click **Add Key**.
 
-2. `/connect` コマンドを実行し、**Nebius Token Factory** を検索します。
+2. Run the `/connect` command and search for **Nebius Token Factory**.
 
    ```txt
    /connect
    ```
 
-3. Nebius Token Factory API キーを入力します。
+3. Enter your Nebius Token Factory API key.
 
    ```txt
    ┌ API key
@@ -1280,7 +1312,7 @@ Moonshot AI の Kim K2 を使用するには:
    └ enter
    ```
 
-4. `/models` コマンドを実行して、_Kimi K2 Instruct_ のようなモデルを選択します。
+4. Run the `/models` command to select a model like _Kimi K2 Instruct_.
 
    ```txt
    /models
@@ -1290,15 +1322,15 @@ Moonshot AI の Kim K2 を使用するには:
 
 ### Ollama
 
-Ollama を通じてローカルモデルを使用するように opencode を構成できます。
+You can configure CyxCode to use local models through Ollama.
 
 :::tip
-Ollama は OpenCode 用に自動的に構成できます。詳細については、[Ollama 統合 docs](https://docs.ollama.com/integrations/opencode)」を参照してください。
+Ollama can automatically configure itself for CyxCode. See the [Ollama integration docs](https://docs.ollama.com/integrations/CyxCode) for details.
 :::
 
 ```json title="opencode.json" "ollama" {5, 6, 8, 10-14}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "provider": {
     "ollama": {
       "npm": "@ai-sdk/openai-compatible",
@@ -1316,37 +1348,37 @@ Ollama は OpenCode 用に自動的に構成できます。詳細については
 }
 ```
 
-この例では:
+In this example:
 
-- `ollama` はカスタムプロバイダー ID です。これには任意の文字列を指定できます。
-- `npm` は、このプロバイダーに使用するパッケージを指定します。ここで、`@ai-sdk/openai-compatible` は OpenAI 互換 API に使用されます。
-- `name` は、UI でのプロバイダーの表示名です。
-- `options.baseURL` はローカルサーバーのエンドポイントです。
-- `models` は、モデル ID とその設定のマップです。機種選択リストに機種名が表示されます。
+- `ollama` is the custom provider ID. This can be any string you want.
+- `npm` specifies the package to use for this provider. Here, `@ai-sdk/openai-compatible` is used for any OpenAI-compatible API.
+- `name` is the display name for the provider in the UI.
+- `options.baseURL` is the endpoint for the local server.
+- `models` is a map of model IDs to their configurations. The model name will be displayed in the model selection list.
 
 :::tip
-ツール呼び出しが機能しない場合は、Ollama の `num_ctx` を増やしてみてください。 16k〜32kあたりから始めてください。
+If tool calls aren't working, try increasing `num_ctx` in Ollama. Start around 16k - 32k.
 :::
 
 ---
 
 ### Ollama Cloud
 
-OpenCode で Ollama Cloud を使用するには:
+To use Ollama Cloud with CyxCode:
 
-1. [https://ollama.com/](https://ollama.com/) にアクセスしてサインインするか、アカウントを作成します。
+1. Head over to [https://ollama.com/](https://ollama.com/) and sign in or create an account.
 
-2. [**設定**] > [キー**] に移動し、[**API キーの追加**] をクリックして新しい API キーを生成します。
+2. Navigate to **Settings** > **Keys** and click **Add API Key** to generate a new API key.
 
-3. OpenCode で使用するために API キーをコピーします。
+3. Copy the API key for use in CyxCode.
 
-4. `/connect` コマンドを実行し、**Ollama Cloud** を検索します。
+4. Run the `/connect` command and search for **Ollama Cloud**.
 
    ```txt
    /connect
    ```
 
-5. Ollama Cloud API キーを入力します。
+5. Enter your Ollama Cloud API key.
 
    ```txt
    ┌ API key
@@ -1355,13 +1387,13 @@ OpenCode で Ollama Cloud を使用するには:
    └ enter
    ```
 
-6. **重要**: OpenCode でクラウドモデルを使用する前に、モデル情報をローカルに取得する必要があります。
+6. **Important**: Before using cloud models in CyxCode, you must pull the model information locally:
 
    ```bash
    ollama pull gpt-oss:20b-cloud
    ```
 
-7. `/models` コマンドを実行して、Ollama Cloud モデルを選択します。
+7. Run the `/models` command to select your Ollama Cloud model.
 
    ```txt
    /models
@@ -1371,16 +1403,16 @@ OpenCode で Ollama Cloud を使用するには:
 
 ### OpenAI
 
-[ChatGPT Plus または Pro](https://chatgpt.com/pricing) にサインアップすることをお勧めします。
+We recommend signing up for [ChatGPT Plus or Pro](https://chatgpt.com/pricing).
 
-1. サインアップしたら、`/connect` コマンドを実行し、OpenAI を選択します。
+1. Once you've signed up, run the `/connect` command and select OpenAI.
 
    ```txt
    /connect
    ```
 
-2. ここで **ChatGPT Plus/Pro** オプションを選択すると、ブラウザが開きます。
-   そして認証を求められます。
+2. Here you can select the **ChatGPT Plus/Pro** option and it'll open your browser
+   and ask you to authenticate.
 
    ```txt
    ┌ Select auth method
@@ -1390,31 +1422,31 @@ OpenCode で Ollama Cloud を使用するには:
    └
    ```
 
-3. これで、`/models` コマンドを使用すると、すべての OpenAI モデルが利用できるようになります。
+3. Now all the OpenAI models should be available when you use the `/models` command.
 
    ```txt
    /models
    ```
 
-##### APIキーの使用
+##### Using API keys
 
-すでに API キーをお持ちの場合は、**API キーを手動で入力** を選択し、ターミナルに貼り付けることができます。
+If you already have an API key, you can select **Manually enter API Key** and paste it in your terminal.
 
 ---
 
-### OpenCode Zen
+### CyxCode Zen
 
-OpenCode Zen は、OpenCode チームによって提供される、テストおよび検証されたモデルのリストです。 [詳細はこちら](/docs/zen)。
+CyxCode Zen is a list of tested and verified models provided by the CyxCode team. [Learn more](/docs/zen).
 
-1. **<a href={console}>OpenCode Zen</a>** にサインインし、**API キーの作成** をクリックします。
+1. Sign in to **<a href={console}>CyxCode Zen</a>** and click **Create API Key**.
 
-2. `/connect` コマンドを実行し、**OpenCode Zen** を検索します。
+2. Run the `/connect` command and search for **CyxCode Zen**.
 
    ```txt
    /connect
    ```
 
-3. OpenCode API キーを入力します。
+3. Enter your CyxCode API key.
 
    ```txt
    ┌ API key
@@ -1423,7 +1455,7 @@ OpenCode Zen は、OpenCode チームによって提供される、テストお�
    └ enter
    ```
 
-4. `/models` コマンドを実行して、_Qwen 3 Coder 480B_ のようなモデルを選択します。
+4. Run the `/models` command to select a model like _Qwen 3 Coder 480B_.
 
    ```txt
    /models
@@ -1433,15 +1465,15 @@ OpenCode Zen は、OpenCode チームによって提供される、テストお�
 
 ### OpenRouter
 
-1. [OpenRouter ダッシュボード](https://openrouter.ai/settings/keys) に移動し、[**API キーの作成**] をクリックして、キーをコピーします。
+1. Head over to the [OpenRouter dashboard](https://openrouter.ai/settings/keys), click **Create API Key**, and copy the key.
 
-2. `/connect` コマンドを実行し、OpenRouter を検索します。
+2. Run the `/connect` command and search for OpenRouter.
 
    ```txt
    /connect
    ```
 
-3. プロバイダーの API キーを入力します。
+3. Enter the API key for the provider.
 
    ```txt
    ┌ API key
@@ -1450,32 +1482,32 @@ OpenCode Zen は、OpenCode チームによって提供される、テストお�
    └ enter
    ```
 
-4. 多くの OpenRouter モデルはデフォルトでプリロードされており、`/models` コマンドを実行して必要なモデルを選択します。
+4. Many OpenRouter models are preloaded by default, run the `/models` command to select the one you want.
 
    ```txt
    /models
    ```
 
-OpenCode 設定を通じて追加のモデルを追加することもできます。
+   You can also add additional models through your CyxCode config.
 
-```json title="opencode.json" {6}
-{
-  "$schema": "https://opencode.ai/config.json",
-  "provider": {
-    "openrouter": {
-      "models": {
-        "somecoolnewmodel": {}
-      }
-    }
-  }
-}
-```
+   ```json title="opencode.json" {6}
+   {
+     "$schema": "https://cyxcode.ai/config.json",
+     "provider": {
+       "openrouter": {
+         "models": {
+           "somecoolnewmodel": {}
+         }
+       }
+     }
+   }
+   ```
 
-5. OpenCode 設定を通じてカスタマイズすることもできます。プロバイダーを指定する例を次に示します。
+5. You can also customize them through your CyxCode config. Here's an example of specifying a provider
 
    ```json title="opencode.json"
    {
-     "$schema": "https://opencode.ai/config.json",
+     "$schema": "https://cyxcode.ai/config.json",
      "provider": {
        "openrouter": {
          "models": {
@@ -1497,21 +1529,21 @@ OpenCode 設定を通じて追加のモデルを追加することもできま�
 
 ### SAP AI Core
 
-SAP AI コアは、統合プラットフォームを通じて、OpenAI、Anthropic、Google、Amazon、Meta、Mistral、AI21 の 40 以上のモデルへのアクセスを提供します。
+SAP AI Core provides access to 40+ models from OpenAI, Anthropic, Google, Amazon, Meta, Mistral, and AI21 through a unified platform.
 
-1. [SAP BTP Cockpit](https://account.hana.ondemand.com/) に移動し、SAP AI コアサービスインスタンスに移動して、サービスキーを作成します。
+1. Go to your [SAP BTP Cockpit](https://account.hana.ondemand.com/), navigate to your SAP AI Core service instance, and create a service key.
 
-:::tip
-サービスキーは、`clientid`、`clientsecret`、`url`、および `serviceurls.AI_API_URL` を含む JSON オブジェクトです。 AI コアインスタンスは、BTP コックピットの **サービス** > **インスタンスとサブスクリプション** で見つかります。
-:::
+   :::tip
+   The service key is a JSON object containing `clientid`, `clientsecret`, `url`, and `serviceurls.AI_API_URL`. You can find your AI Core instance under **Services** > **Instances and Subscriptions** in the BTP Cockpit.
+   :::
 
-2. `/connect` コマンドを実行し、**SAP AI Core** を検索します。
+2. Run the `/connect` command and search for **SAP AI Core**.
 
    ```txt
    /connect
    ```
 
-3. サービスキーの JSON を入力します。
+3. Enter your service key JSON.
 
    ```txt
    ┌ Service key
@@ -1520,29 +1552,62 @@ SAP AI コアは、統合プラットフォームを通じて、OpenAI、Anthrop
    └ enter
    ```
 
-または、`AICORE_SERVICE_KEY` 環境変数を設定します。
-
-```bash
-   AICORE_SERVICE_KEY='{"clientid":"...","clientsecret":"...","url":"...","serviceurls":{"AI_API_URL":"..."}}' opencode
-```
-
-または、bash プロファイルに追加します。
-
-```bash title="~/.bash_profile"
-   export AICORE_SERVICE_KEY='{"clientid":"...","clientsecret":"...","url":"...","serviceurls":{"AI_API_URL":"..."}}'
-```
-
-4. 必要に応じて、デプロイメント ID とリソースグループを設定します。
+   Or set the `AICORE_SERVICE_KEY` environment variable:
 
    ```bash
-   AICORE_DEPLOYMENT_ID=your-deployment-id AICORE_RESOURCE_GROUP=your-resource-group opencode
+   AICORE_SERVICE_KEY='{"clientid":"...","clientsecret":"...","url":"...","serviceurls":{"AI_API_URL":"..."}}' CyxCode
    ```
 
-:::note
-これらの設定はオプションであり、SAP AI コアのセットアップに従って構成する必要があります。
-:::
+   Or add it to your bash profile:
 
-5. `/models` コマンドを実行して、40 以上の利用可能なモデルから選択します。
+   ```bash title="~/.bash_profile"
+   export AICORE_SERVICE_KEY='{"clientid":"...","clientsecret":"...","url":"...","serviceurls":{"AI_API_URL":"..."}}'
+   ```
+
+4. Optionally set deployment ID and resource group:
+
+   ```bash
+   AICORE_DEPLOYMENT_ID=your-deployment-id AICORE_RESOURCE_GROUP=your-resource-group CyxCode
+   ```
+
+   :::note
+   These settings are optional and should be configured according to your SAP AI Core setup.
+   :::
+
+5. Run the `/models` command to select from 40+ available models.
+
+   ```txt
+   /models
+   ```
+
+---
+
+### STACKIT
+
+STACKIT AI Model Serving provides fully managed soverign hosting environment for AI models, focusing on LLMs like Llama, Mistral, and Qwen, with maximum data sovereignty on European infrastructure.
+
+1. Head over to [STACKIT Portal](https://portal.stackit.cloud), navigate to **AI Model Serving**, and create an auth token for your project.
+
+   :::tip
+   You need a STACKIT customer account, user account, and project before creating auth tokens.
+   :::
+
+2. Run the `/connect` command and search for **STACKIT**.
+
+   ```txt
+   /connect
+   ```
+
+3. Enter your STACKIT AI Model Serving auth token.
+
+   ```txt
+   ┌ API key
+   │
+   │
+   └ enter
+   ```
+
+4. Run the `/models` command to select from available models like _Qwen3-VL 235B_ or _Llama 3.3 70B_.
 
    ```txt
    /models
@@ -1552,15 +1617,15 @@ SAP AI コアは、統合プラットフォームを通じて、OpenAI、Anthrop
 
 ### OVHcloud AI Endpoints
 
-1. [OVHcloud パネル](https://ovh.com/manager) に移動します。 `Public Cloud` セクション、`AI & Machine Learning` > `AI Endpoints` に移動し、`API Keys` タブで **新しい API キーの作成** をクリックします。
+1. Head over to the [OVHcloud panel](https://ovh.com/manager). Navigate to the `Public Cloud` section, `AI & Machine Learning` > `AI Endpoints` and in `API Keys` tab, click **Create a new API key**.
 
-2. `/connect` コマンドを実行し、**OVHcloud AI エンドポイント**を検索します。
+2. Run the `/connect` command and search for **OVHcloud AI Endpoints**.
 
    ```txt
    /connect
    ```
 
-3. OVHcloud AI エンドポイント API キーを入力します。
+3. Enter your OVHcloud AI Endpoints API key.
 
    ```txt
    ┌ API key
@@ -1569,7 +1634,7 @@ SAP AI コアは、統合プラットフォームを通じて、OpenAI、Anthrop
    └ enter
    ```
 
-4. `/models` コマンドを実行して、_gpt-oss-120b_ のようなモデルを選択します。
+4. Run the `/models` command to select a model like _gpt-oss-120b_.
 
    ```txt
    /models
@@ -1579,17 +1644,17 @@ SAP AI コアは、統合プラットフォームを通じて、OpenAI、Anthrop
 
 ### Scaleway
 
-[Scaleway Generative APIs](https://www.scaleway.com/en/docs/generative-apis/) を Opencode で使用するには:
+To use [Scaleway Generative APIs](https://www.scaleway.com/en/docs/generative-apis/) with CyxCode:
 
-1. [Scaleway Console IAM settings](https://console.scaleway.com/iam/api-keys) に移動して、新しい API キーを生成します。
+1. Head over to the [Scaleway Console IAM settings](https://console.scaleway.com/iam/api-keys) to generate a new API key.
 
-2. `/connect` コマンドを実行し、**Scaleway** を検索します。
+2. Run the `/connect` command and search for **Scaleway**.
 
    ```txt
    /connect
    ```
 
-3. Scaleway API キーを入力します。
+3. Enter your Scaleway API key.
 
    ```txt
    ┌ API key
@@ -1598,7 +1663,7 @@ SAP AI コアは、統合プラットフォームを通じて、OpenAI、Anthrop
    └ enter
    ```
 
-4. `/models` コマンドを実行して、_devstral-2-123b-instruct-2512_ や _gpt-oss-120b_ などのモデルを選択します。
+4. Run the `/models` command to select a model like _devstral-2-123b-instruct-2512_ or _gpt-oss-120b_.
 
    ```txt
    /models
@@ -1608,15 +1673,15 @@ SAP AI コアは、統合プラットフォームを通じて、OpenAI、Anthrop
 
 ### Together AI
 
-1. [Together AI console](https://api.together.ai) に移動し、アカウントを作成し、[**キーの追加**] をクリックします。
+1. Head over to the [Together AI console](https://api.together.ai), create an account, and click **Add Key**.
 
-2. `/connect` コマンドを実行し、**Together AI** を検索します。
+2. Run the `/connect` command and search for **Together AI**.
 
    ```txt
    /connect
    ```
 
-3. Together AI API キーを入力します。
+3. Enter your Together AI API key.
 
    ```txt
    ┌ API key
@@ -1625,7 +1690,7 @@ SAP AI コアは、統合プラットフォームを通じて、OpenAI、Anthrop
    └ enter
    ```
 
-4. `/models` コマンドを実行して、_Kimi K2 Instruct_ のようなモデルを選択します。
+4. Run the `/models` command to select a model like _Kimi K2 Instruct_.
 
    ```txt
    /models
@@ -1635,15 +1700,15 @@ SAP AI コアは、統合プラットフォームを通じて、OpenAI、Anthrop
 
 ### Venice AI
 
-1. [Venice AI console](https://venice.ai) に移動し、アカウントを作成し、API キーを生成します。
+1. Head over to the [Venice AI console](https://venice.ai), create an account, and generate an API key.
 
-2. `/connect` コマンドを実行し、**Venice AI** を検索します。
+2. Run the `/connect` command and search for **Venice AI**.
 
    ```txt
    /connect
    ```
 
-3. Venice AI API キーを入力します。
+3. Enter your Venice AI API key.
 
    ```txt
    ┌ API key
@@ -1652,7 +1717,7 @@ SAP AI コアは、統合プラットフォームを通じて、OpenAI、Anthrop
    └ enter
    ```
 
-4. `/models` コマンドを実行して、_Llama 3.3 70B_ のようなモデルを選択します。
+4. Run the `/models` command to select a model like _Llama 3.3 70B_.
 
    ```txt
    /models
@@ -1662,17 +1727,17 @@ SAP AI コアは、統合プラットフォームを通じて、OpenAI、Anthrop
 
 ### Vercel AI Gateway
 
-Vercel AI Gateway を使用すると、統合エンドポイントを通じて OpenAI、Anthropic、Google、xAI などのモデルにアクセスできます。モデルは値上げなしの定価で提供されます。
+Vercel AI Gateway lets you access models from OpenAI, Anthropic, Google, xAI, and more through a unified endpoint. Models are offered at list price with no markup.
 
-1. [Vercel ダッシュボード ](https://vercel.com/) に移動し、**AI ゲートウェイ** タブに移動し、**API キー** をクリックして新しい API キーを作成します。
+1. Head over to the [Vercel dashboard](https://vercel.com/), navigate to the **AI Gateway** tab, and click **API keys** to create a new API key.
 
-2. `/connect` コマンドを実行し、**Vercel AI Gateway** を検索します。
+2. Run the `/connect` command and search for **Vercel AI Gateway**.
 
    ```txt
    /connect
    ```
 
-3. Vercel AI Gateway API キーを入力します。
+3. Enter your Vercel AI Gateway API key.
 
    ```txt
    ┌ API key
@@ -1681,17 +1746,17 @@ Vercel AI Gateway を使用すると、統合エンドポイントを通じて O
    └ enter
    ```
 
-4. `/models` コマンドを実行してモデルを選択します。
+4. Run the `/models` command to select a model.
 
    ```txt
    /models
    ```
 
-OpenCode 設定を通じてモデルをカスタマイズすることもできます。プロバイダーのルーティング順序を指定する例を次に示します。
+You can also customize models through your CyxCode config. Here's an example of specifying provider routing order.
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "provider": {
     "vercel": {
       "models": {
@@ -1706,27 +1771,27 @@ OpenCode 設定を通じてモデルをカスタマイズすることもでき�
 }
 ```
 
-いくつかの便利なルーティングオプション:
+Some useful routing options:
 
-| オプション          | 説明                                                 |
+| Option              | Description                                          |
 | ------------------- | ---------------------------------------------------- |
-| `order`             | 試行するプロバイダーシーケンス                       |
-| `only`              | 特定のプロバイダーに制限する                         |
-| `zeroDataRetention` | データ保持ポリシーがゼロのプロバイダーのみを使用する |
+| `order`             | Provider sequence to try                             |
+| `only`              | Restrict to specific providers                       |
+| `zeroDataRetention` | Only use providers with zero data retention policies |
 
 ---
 
 ### xAI
 
-1. [xAI console](https://console.x.ai/) に移動し、アカウントを作成し、API キーを生成します。
+1. Head over to the [xAI console](https://console.x.ai/), create an account, and generate an API key.
 
-2. `/connect` コマンドを実行し、**xAI** を検索します。
+2. Run the `/connect` command and search for **xAI**.
 
    ```txt
    /connect
    ```
 
-3. xAI API キーを入力します。
+3. Enter your xAI API key.
 
    ```txt
    ┌ API key
@@ -1735,7 +1800,7 @@ OpenCode 設定を通じてモデルをカスタマイズすることもでき�
    └ enter
    ```
 
-4. `/models` コマンドを実行して、_Grok Beta_ のようなモデルを選択します。
+4. Run the `/models` command to select a model like _Grok Beta_.
 
    ```txt
    /models
@@ -1745,17 +1810,17 @@ OpenCode 設定を通じてモデルをカスタマイズすることもでき�
 
 ### Z.AI
 
-1. [Z.AI API コンソール ](https://z.ai/manage-apikey/apikey-list) に移動し、アカウントを作成し、**新しい API キーの作成** をクリックします。
+1. Head over to the [Z.AI API console](https://z.ai/manage-apikey/apikey-list), create an account, and click **Create a new API key**.
 
-2. `/connect` コマンドを実行し、**Z.AI** を検索します。
+2. Run the `/connect` command and search for **Z.AI**.
 
    ```txt
    /connect
    ```
 
-**GLM コーディングプラン**に加入している場合は、**Z.AI コーディングプラン**を選択します。
+   If you are subscribed to the **GLM Coding Plan**, select **Z.AI Coding Plan**.
 
-3. Z.AI API キーを入力します。
+3. Enter your Z.AI API key.
 
    ```txt
    ┌ API key
@@ -1764,7 +1829,7 @@ OpenCode 設定を通じてモデルをカスタマイズすることもでき�
    └ enter
    ```
 
-4. `/models` コマンドを実行して、_GLM-4.7_ のようなモデルを選択します。
+4. Run the `/models` command to select a model like _GLM-4.7_.
 
    ```txt
    /models
@@ -1774,15 +1839,15 @@ OpenCode 設定を通じてモデルをカスタマイズすることもでき�
 
 ### ZenMux
 
-1. [ZenMux ダッシュボード](https://zenmux.ai/settings/keys) に移動し、[**API キーの作成**] をクリックして、キーをコピーします。
+1. Head over to the [ZenMux dashboard](https://zenmux.ai/settings/keys), click **Create API Key**, and copy the key.
 
-2. `/connect` コマンドを実行し、ZenMux を検索します。
+2. Run the `/connect` command and search for ZenMux.
 
    ```txt
    /connect
    ```
 
-3. プロバイダーの API キーを入力します。
+3. Enter the API key for the provider.
 
    ```txt
    ┌ API key
@@ -1791,38 +1856,38 @@ OpenCode 設定を通じてモデルをカスタマイズすることもでき�
    └ enter
    ```
 
-4. 多くの ZenMux モデルはデフォルトでプリロードされており、`/models` コマンドを実行して必要なモデルを選択します。
+4. Many ZenMux models are preloaded by default, run the `/models` command to select the one you want.
 
    ```txt
    /models
    ```
 
-OpenCode 設定を通じて追加のモデルを追加することもできます。
+   You can also add additional models through your CyxCode config.
 
-```json title="opencode.json" {6}
-{
-  "$schema": "https://opencode.ai/config.json",
-  "provider": {
-    "zenmux": {
-      "models": {
-        "somecoolnewmodel": {}
-      }
-    }
-  }
-}
-```
+   ```json title="opencode.json" {6}
+   {
+     "$schema": "https://cyxcode.ai/config.json",
+     "provider": {
+       "zenmux": {
+         "models": {
+           "somecoolnewmodel": {}
+         }
+       }
+     }
+   }
+   ```
 
 ---
 
-## カスタムプロバイダー
+## Custom provider
 
-`/connect` コマンドにリストされていない **OpenAI 互換**プロバイダーを追加するには:
+To add any **OpenAI-compatible** provider that's not listed in the `/connect` command:
 
 :::tip
-OpenAI と互換性のある任意のプロバイダーを OpenCode で使用できます。最新の AI プロバイダーのほとんどは、OpenAI 互換の API を提供しています。
+You can use any OpenAI-compatible provider with CyxCode. Most modern AI providers offer OpenAI-compatible APIs.
 :::
 
-1. `/connect` コマンドを実行し、**その他**まで下にスクロールします。
+1. Run the `/connect` command and scroll down to **Other**.
 
    ```bash
    $ /connect
@@ -1835,7 +1900,7 @@ OpenAI と互換性のある任意のプロバイダーを OpenCode で使用で
    └
    ```
 
-2. プロバイダーの一意の ID を入力します。
+2. Enter a unique ID for the provider.
 
    ```bash
    $ /connect
@@ -1847,11 +1912,11 @@ OpenAI と互換性のある任意のプロバイダーを OpenCode で使用で
    └
    ```
 
-:::note
-覚えやすい ID を選択してください。これを設定ファイルで使用します。
-:::
+   :::note
+   Choose a memorable ID, you'll use this in your config file.
+   :::
 
-3. プロバイダーの API キーを入力します。
+3. Enter your API key for the provider.
 
    ```bash
    $ /connect
@@ -1865,11 +1930,11 @@ OpenAI と互換性のある任意のプロバイダーを OpenCode で使用で
    └
    ```
 
-4. プロジェクトディレクトリで `opencode.json` ファイルを作成または更新します。
+4. Create or update your `opencode.json` file in your project directory:
 
    ```json title="opencode.json" ""myprovider"" {5-15}
    {
-     "$schema": "https://opencode.ai/config.json",
+     "$schema": "https://cyxcode.ai/config.json",
      "provider": {
        "myprovider": {
          "npm": "@ai-sdk/openai-compatible",
@@ -1887,28 +1952,27 @@ OpenAI と互換性のある任意のプロバイダーを OpenCode で使用で
    }
    ```
 
-構成オプションは次のとおりです。
+   Here are the configuration options:
+   - **npm**: AI SDK package to use, `@ai-sdk/openai-compatible` for OpenAI-compatible providers (for `/v1/chat/completions`). If your provider/model uses `/v1/responses`, use `@ai-sdk/openai`.
+   - **name**: Display name in UI.
+   - **models**: Available models.
+   - **options.baseURL**: API endpoint URL.
+   - **options.apiKey**: Optionally set the API key, if not using auth.
+   - **options.headers**: Optionally set custom headers.
 
-- **npm**: 使用する AI SDK パッケージ、OpenAI 互換プロバイダーの場合は `@ai-sdk/openai-compatible`
-- **name**: UI での表示名。
-- **models**: 利用可能なモデル。
-- **options.baseURL**: API エンドポイント URL。
-- **options.apiKey**: 認証を使用しない場合は、オプションで API キーを設定します。
-- **options.headers**: 必要に応じてカスタムヘッダーを設定します。
+   More on the advanced options in the example below.
 
-詳細オプションの詳細については、以下の例を参照してください。
-
-5. `/models` コマンドを実行すると、カスタムプロバイダーとモデルが選択リストに表示されます。
+5. Run the `/models` command and your custom provider and models will appear in the selection list.
 
 ---
 
-##### 例
+##### Example
 
-次に、`apiKey`、`headers`、およびモデル `limit` オプションを設定する例を示します。
+Here's an example setting the `apiKey`, `headers`, and model `limit` options.
 
 ```json title="opencode.json" {9,11,17-20}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "provider": {
     "myprovider": {
       "npm": "@ai-sdk/openai-compatible",
@@ -1934,27 +1998,27 @@ OpenAI と互換性のある任意のプロバイダーを OpenCode で使用で
 }
 ```
 
-設定の詳細:
+Configuration details:
 
-- **apiKey**: `env` 変数構文を使用して設定します。[詳細については ](/docs/config#env-vars).
-- **headers**: 各リクエストとともに送信されるカスタムヘッダー。
-- **limit.context**: モデルが受け入れる最大入力トークン。
-- **limit.output**: モデルが生成できる最大出力トークン。
+- **apiKey**: Set using `env` variable syntax, [learn more](/docs/config#env-vars).
+- **headers**: Custom headers sent with each request.
+- **limit.context**: Maximum input tokens the model accepts.
+- **limit.output**: Maximum tokens the model can generate.
 
-`limit` フィールドを使用すると、OpenCode はコンテキストがどのくらい残っているかを理解できます。標準プロバイダーは、これらを models.dev から自動的に取得します。
+The `limit` fields allow CyxCode to understand how much context you have left. Standard providers pull these from models.dev automatically.
 
 ---
 
-## トラブルシューティング
+## Troubleshooting
 
-プロバイダーの設定で問題が発生した場合は、次の点を確認してください。
+If you are having trouble with configuring a provider, check the following:
 
-1. **認証設定を確認します**: `opencode auth list` を実行して、資格情報が正しいかどうかを確認します。
-   プロバイダー用のものが設定に追加されます。
+1. **Check the auth setup**: Run `cyxcode auth list` to see if the credentials
+   for the provider are added to your config.
 
-これは、認証に環境変数に依存する Amazon Bedrock のようなプロバイダーには当てはまりません。
+   This doesn't apply to providers like Amazon Bedrock, that rely on environment variables for their auth.
 
-2. カスタムプロバイダーの場合は、OpenCode 設定を確認し、次のことを行います。
-   - `/connect` コマンドで使用されるプロバイダー ID が、OpenCode 設定内の ID と一致することを確認してください。
-   - プロバイダーには適切な npm パッケージが使用されます。たとえば、Cerebras には `@ai-sdk/cerebras` を使用します。他のすべての OpenAI 互換プロバイダーの場合は、`@ai-sdk/openai-compatible` を使用します。
-   - `options.baseURL` フィールドで正しい API エンドポイントが使用されていることを確認してください。
+2. For custom providers, check the CyxCode config and:
+   - Make sure the provider ID used in the `/connect` command matches the ID in your CyxCode config.
+   - The right npm package is used for the provider. For example, use `@ai-sdk/cerebras` for Cerebras. And for all other OpenAI-compatible providers, use `@ai-sdk/openai-compatible` (for `/v1/chat/completions`); if a model uses `/v1/responses`, use `@ai-sdk/openai`. For mixed setups under one provider, you can override per model via `provider.npm`.
+   - Check correct API endpoint is used in the `options.baseURL` field.

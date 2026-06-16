@@ -1,135 +1,149 @@
 ---
 title: Go
-description: การสมัครสมาชิกราคาประหยัดสำหรับโมเดลโอเพนซอร์สเพื่อการเขียนโค้ด
+description: Low cost subscription for open coding models.
 ---
 
 import config from "../../../../config.mjs"
 export const console = config.console
 export const email = `mailto:${config.email}`
 
-OpenCode Go คือการสมัครสมาชิกในราคาประหยัด — **$5 สำหรับเดือนแรก** จากนั้น **$10/เดือน** — ซึ่งให้คุณเข้าถึงโมเดลโอเพนซอร์สยอดนิยมสำหรับการเขียนโค้ดได้อย่างเสถียร
+cyxcode Go is a low cost subscription — **$5 for your first month**, then **$10/month** — that gives you reliable access to popular open coding models.
 
 :::note
-OpenCode Go ขณะนี้อยู่ในช่วงเบต้า
+cyxcode Go is currently in beta.
 :::
 
-Go ทำงานเหมือนกับผู้ให้บริการ (provider) รายอื่นๆ ใน OpenCode คุณสามารถสมัครสมาชิก OpenCode Go และรับ API key ของคุณ บริการนี้เป็น**ทางเลือกเพิ่มเติม** และคุณไม่จำเป็นต้องใช้มันเพื่อใช้งาน OpenCode
+Go works like any other provider in CyxCode. You subscribe to CyxCode Go and
+get your API key. It's **completely optional** and you don't need to use it to
+use CyxCode.
 
-บริการนี้ออกแบบมาเพื่อผู้ใช้ในระดับสากลเป็นหลัก โดยมีโมเดลโฮสต์อยู่ในสหรัฐอเมริกา สหภาพยุโรป และสิงคโปร์ เพื่อการเข้าถึงทั่วโลกที่เสถียร
+It is designed primarily for international users, with models hosted in the US, EU, and Singapore for stable global access.
 
 ---
 
 ## Background
 
-โมเดลแบบเปิด (Open models) ได้รับการพัฒนาจนมีประสิทธิภาพดีมาก ตอนนี้ประสิทธิภาพในการเขียนโค้ดใกล้เคียงกับโมเดลแบบปิด (proprietary models) แล้ว และเนื่องจากมีผู้ให้บริการหลายรายสามารถให้บริการแข่งขันกันได้ จึงทำให้มีราคาถูกกว่ามาก
+Open models have gotten really good. They now reach performance close to
+proprietary models for coding tasks. And because many providers can serve them
+competitively, they are usually far cheaper.
 
-อย่างไรก็ตาม การเข้าถึงโมเดลเหล่านี้อย่างเสถียรและมีค่า Latency ต่ำนั้นอาจเป็นเรื่องยาก ผู้ให้บริการแต่ละรายมีคุณภาพและความพร้อมในการให้บริการแตกต่างกันไป
+However, getting reliable, low latency access to them can be difficult. Providers
+vary in quality and availability.
 
 :::tip
-เราได้ทดสอบกลุ่มโมเดลและผู้ให้บริการที่คัดเลือกมาเพื่อให้ทำงานร่วมกับ OpenCode ได้เป็นอย่างดี
+We tested a select group of models and providers that work well with CyxCode.
 :::
 
-เพื่อแก้ปัญหานี้ เราได้ดำเนินการดังต่อไปนี้:
+To fix this, we did a couple of things:
 
-1. เราทดสอบกลุ่มโมเดลแบบเปิดที่คัดเลือกมาและพูดคุยกับทีมผู้พัฒนาเกี่ยวกับวิธีการรันโมเดลเหล่านี้ให้ดีที่สุด
-2. จากนั้นเราได้ทำงานร่วมกับผู้ให้บริการบางรายเพื่อให้แน่ใจว่าการให้บริการเป็นไปอย่างถูกต้อง
-3. สุดท้าย เราได้ทำการวัดประสิทธิภาพ (benchmark) ของการทำงานร่วมกันระหว่างโมเดลและผู้ให้บริการ จนได้รายชื่อที่เรามั่นใจในการแนะนำ
+1. We tested a select group of open models and talked to their teams about how to
+   best run them.
+2. We then worked with a few providers to make sure these were being served
+   correctly.
+3. Finally, we benchmarked the combination of the model/provider and came up
+   with a list that we feel good recommending.
 
-OpenCode Go ให้คุณเข้าถึงโมเดลเหล่านี้ได้ในราคา **$5 สำหรับเดือนแรก** จากนั้น **$10/เดือน**
+cyxcode Go gives you access to these models for **$5 for your first month**, then **$10/month**.
 
 ---
 
 ## How it works
 
-OpenCode Go ทำงานเหมือนกับผู้ให้บริการรายอื่นๆ ใน OpenCode
+cyxcode Go works like any other provider in CyxCode.
 
-1. ลงชื่อเข้าใช้ที่ **<a href={console}>OpenCode Zen</a>**, สมัครสมาชิก Go และคัดลอก API key ของคุณ
-2. รันคำสั่ง `/connect` ใน TUI, เลือก `OpenCode Go`, และวาง API key ของคุณ
-3. รัน `/models` ใน TUI เพื่อดูรายชื่อโมเดลที่ใช้งานได้ผ่าน Go
+1. You sign in to **<a href={console}>CyxCode Zen</a>**, subscribe to Go, and
+   copy your API key.
+2. You run the `/connect` command in the TUI, select `cyxcode Go`, and paste
+   your API key.
+3. Run `/models` in the TUI to see the list of models available through Go.
 
 :::note
-มีเพียงสมาชิกหนึ่งคนต่อ workspace เท่านั้นที่สามารถสมัครสมาชิก OpenCode Go ได้
+Only one member per workspace can subscribe to CyxCode Go.
 :::
 
-รายชื่อโมเดลในปัจจุบันประกอบด้วย:
+The current list of models includes:
 
 - **GLM-5**
 - **Kimi K2.5**
 - **MiniMax M2.5**
 - **MiniMax M2.7**
 
-รายชื่อโมเดลอาจมีการเปลี่ยนแปลงเมื่อเราทำการทดสอบและเพิ่มโมเดลใหม่ๆ
+The list of models may change as we test and add new ones.
 
 ---
 
 ## Usage limits
 
-OpenCode Go มีขีดจำกัดดังต่อไปนี้:
+cyxcode Go includes the following limits:
 
-- **ขีดจำกัดต่อ 5 ชั่วโมง** — การใช้งานมูลค่า $12
-- **ขีดจำกัดรายสัปดาห์** — การใช้งานมูลค่า $30
-- **ขีดจำกัดรายเดือน** — การใช้งานมูลค่า $60
+- **5 hour limit** — $12 of usage
+- **Weekly limit** — $30 of usage
+- **Monthly limit** — $60 of usage
 
-ขีดจำกัดถูกกำหนดเป็นมูลค่าดอลลาร์ ซึ่งหมายความว่าจำนวน request จริงของคุณจะขึ้นอยู่กับโมเดลที่คุณใช้งาน โมเดลที่ราคาถูกกว่าอย่าง MiniMax M2.5 จะสามารถส่ง request ได้มากกว่า ในขณะที่โมเดลที่มีราคาสูงกว่าอย่าง GLM-5 จะส่งได้น้อยกว่า
+Limits are defined in dollar value. This means your actual request count depends on the model you use. Cheaper models like MiniMax M2.5 allow for more requests, while higher-cost models like GLM-5 allow for fewer.
 
-ตารางด้านล่างแสดงจำนวน request โดยประมาณตามรูปแบบการใช้งานปกติของ Go:
+The table below provides an estimated request count based on typical Go usage patterns:
 
-|                             | GLM-5 | Kimi K2.5 | MiniMax M2.7 | MiniMax M2.5 |
-| --------------------------- | ----- | --------- | ------------ | ------------ |
-| จำนวน request ต่อ 5 ชั่วโมง | 1,150 | 1,850     | 14,000       | 20,000       |
-| จำนวน request ต่อสัปดาห์    | 2,880 | 4,630     | 35,000       | 50,000       |
-| จำนวน request ต่อเดือน      | 5,750 | 9,250     | 70,000       | 100,000      |
+|                     | GLM-5 | Kimi K2.5 | MiniMax M2.7 | MiniMax M2.5 |
+| ------------------- | ----- | --------- | ------------ | ------------ |
+| requests per 5 hour | 1,150 | 1,850     | 14,000       | 20,000       |
+| requests per week   | 2,880 | 4,630     | 35,000       | 50,000       |
+| requests per month  | 5,750 | 9,250     | 70,000       | 100,000      |
 
-การประมาณการอ้างอิงจากรูปแบบการใช้งาน request โดยเฉลี่ยที่สังเกตพบ:
+Estimates are based on observed average request patterns:
 
-- GLM-5 — 700 input, 52,000 cached, 150 output tokens ต่อ request
-- Kimi K2.5 — 870 input, 55,000 cached, 200 output tokens ต่อ request
-- MiniMax M2.7/M2.5 — 300 input, 55,000 cached, 125 output tokens ต่อ request
+- GLM-5 — 700 input, 52,000 cached, 150 output tokens per request
+- Kimi K2.5 — 870 input, 55,000 cached, 200 output tokens per request
+- MiniMax M2.7/M2.5 — 300 input, 55,000 cached, 125 output tokens per request
 
-คุณสามารถติดตามการใช้งานปัจจุบันของคุณได้ใน **<a href={console}>console</a>**
+You can track your current usage in the **<a href={console}>console</a>**.
 
 :::tip
-หากคุณใช้งานถึงขีดจำกัดแล้ว คุณยังสามารถใช้งานโมเดลฟรีต่อไปได้
+If you reach the usage limit, you can continue using the free models.
 :::
 
-ขีดจำกัดการใช้งานอาจมีการเปลี่ยนแปลงเมื่อเราได้เรียนรู้จากการใช้งานในช่วงแรกและรับฟังข้อเสนอแนะ
+Usage limits may change as we learn from early usage and feedback.
 
 ---
 
 ### Usage beyond limits
 
-หากคุณมีเครดิตในยอดเงินคงเหลือของ Zen ด้วย คุณสามารถเปิดใช้งานตัวเลือก **Use balance** ใน console เมื่อเปิดใช้งาน Go จะหันไปใช้ยอดเงินคงเหลือใน Zen ของคุณหลังจากที่คุณใช้งานถึงขีดจำกัดแล้วแทนที่จะบล็อก request
+If you also have credits on your Zen balance, you can enable the **Use balance**
+option in the console. When enabled, Go will fall back to your Zen balance
+after you've reached your usage limits instead of blocking requests.
 
 ---
 
 ## Endpoints
 
-คุณสามารถเข้าถึงโมเดลของ Go ผ่าน API endpoints ต่อไปนี้ได้เช่นกัน
+You can also access Go models through the following API endpoints.
 
 | Model        | Model ID     | Endpoint                                         | AI SDK Package              |
 | ------------ | ------------ | ------------------------------------------------ | --------------------------- |
-| GLM-5        | glm-5        | `https://opencode.ai/zen/go/v1/chat/completions` | `@ai-sdk/openai-compatible` |
-| Kimi K2.5    | kimi-k2.5    | `https://opencode.ai/zen/go/v1/chat/completions` | `@ai-sdk/openai-compatible` |
-| MiniMax M2.7 | minimax-m2.7 | `https://opencode.ai/zen/go/v1/messages`         | `@ai-sdk/anthropic`         |
-| MiniMax M2.5 | minimax-m2.5 | `https://opencode.ai/zen/go/v1/messages`         | `@ai-sdk/anthropic`         |
+| GLM-5        | glm-5        | `https://cyxcode.ai/zen/go/v1/chat/completions` | `@ai-sdk/openai-compatible` |
+| Kimi K2.5    | kimi-k2.5    | `https://cyxcode.ai/zen/go/v1/chat/completions` | `@ai-sdk/openai-compatible` |
+| MiniMax M2.7 | minimax-m2.7 | `https://cyxcode.ai/zen/go/v1/messages`         | `@ai-sdk/anthropic`         |
+| MiniMax M2.5 | minimax-m2.5 | `https://cyxcode.ai/zen/go/v1/messages`         | `@ai-sdk/anthropic`         |
 
-[model id](/docs/config/#models) ใน OpenCode config ของคุณจะใช้รูปแบบ `opencode-go/<model-id>` ตัวอย่างเช่น สำหรับ Kimi K2.5 คุณจะใช้ `opencode-go/kimi-k2.5` ใน config ของคุณ
+The [model id](/docs/config/#models) in your CyxCode config
+uses the format `opencode-go/<model-id>`. For example, for Kimi K2.5, you would
+use `opencode-go/kimi-k2.5` in your config.
 
 ---
 
 ## Privacy
 
-แพ็กเกจนี้ออกแบบมาเพื่อผู้ใช้ในระดับสากลเป็นหลัก โดยมีโมเดลโฮสต์อยู่ในสหรัฐอเมริกา สหภาพยุโรป และสิงคโปร์ เพื่อการเข้าถึงทั่วโลกที่เสถียร
+The plan is designed primarily for international users, with models hosted in the US, EU, and Singapore for stable global access.
 
-<a href={email}>ติดต่อเรา</a> หากคุณมีคำถามใดๆ
+<a href={email}>Contact us</a> if you have any questions.
 
 ---
 
 ## Goals
 
-เราสร้าง OpenCode Go เพื่อ:
+We created CyxCode Go to:
 
-1. ทำให้การเขียนโค้ดด้วย AI **เข้าถึงได้** สำหรับผู้คนจำนวนมากขึ้นด้วยการสมัครสมาชิกในราคาประหยัด
-2. มอบการเข้าถึงโมเดลโอเพนซอร์สสำหรับการเขียนโค้ดที่ดีที่สุดได้อย่าง**เสถียร**
-3. คัดสรรโมเดลที่ผ่าน**การทดสอบและวัดประสิทธิภาพ**สำหรับการใช้งาน coding agent แล้ว
-4. **ไม่ผูกขาดการใช้งาน (no lock-in)** โดยอนุญาตให้คุณใช้งานผู้ให้บริการรายอื่นๆ ร่วมกับ OpenCode ได้เช่นกัน
+1. Make AI coding **accessible** to more people with a low cost subscription.
+2. Provide **reliable** access to the best open coding models.
+3. Curate models that are **tested and benchmarked** for coding agent use.
+4. Have **no lock-in** by allowing you to use any other provider with CyxCode as well.

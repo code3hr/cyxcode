@@ -1,97 +1,97 @@
 ---
 title: GitLab
-description: Brug OpenCode i GitLab-problemer og Merge Requests.
+description: Use CyxCode in GitLab issues and merge requests.
 ---
 
-OpenCode integreres med din GitLab-arbejdsgang gennem din GitLab CI/CD-pipeline eller med GitLab Duo.
+CyxCode integrates with your GitLab workflow through your GitLab CI/CD pipeline or with GitLab Duo.
 
-I begge tilfælde vil OpenCode køre på dine GitLab-løbere.
+In both cases, CyxCode will run on your GitLab runners.
 
 ---
 
 ## GitLab CI
 
-OpenCode fungerer i en almindelig GitLab-pipeline. Du kan bygge det ind i en pipeline som en [CI component](https://docs.gitlab.com/ee/ci/components/)
+CyxCode works in a regular GitLab pipeline. You can build it into a pipeline as a [CI component](https://docs.gitlab.com/ee/ci/components/)
 
-Her bruger vi en community-skabt CI/CD-komponent til OpenCode — [nagyv/gitlab-opencode](https://gitlab.com/nagyv/gitlab-opencode).
-
----
-
-### Funktioner
-
-- **Brug brugerdefineret konfiguration pr. job**: Konfigurer OpenCode med en brugerdefineret konfigurationsmappe, for eksempel `./config/#custom-directory` for at aktivere eller deaktivere funktionalitet pr. OpenCode påkald.
-- **Minimal opsætning**: CI-komponenten sætter OpenCode op i baggrunden, du behøver kun at oprette OpenCode-konfigurationen og den indledende prompt.
-- **Fleksibel**: CI-komponenten understøtter flere input til at tilpasse dens adfærd
+Here we are using a community-created CI/CD component for CyxCode compatibility: [nagyv/gitlab-opencode](https://gitlab.com/nagyv/gitlab-opencode).
 
 ---
 
-### Opsætning
+### Features
 
-1. Gem din OpenCode-autentificering JSON som en filtype CI-miljøvariabel under **Indstillinger** > **CI/CD** > **Variabler**. Sørg for at markere dem som "Maskede og skjulte".
-2. Tilføj følgende til din `.gitlab-ci.yml` fil.
+- **Use custom configuration per job**: Configure CyxCode with a custom configuration directory, for example `./config/#custom-directory` to enable or disable functionality per CyxCode invocation.
+- **Minimal setup**: The CI component sets up CyxCode in the background, you only need to create the CyxCode configuration and the initial prompt.
+- **Flexible**: The CI component supports several inputs for customizing its behavior
+
+---
+
+### Setup
+
+1. Store your CyxCode authentication JSON as a File type CI environment variables under **Settings** > **CI/CD** > **Variables**. Make sure to mark them as "Masked and hidden".
+2. Add the following to your `.gitlab-ci.yml` file.
 
    ```yaml title=".gitlab-ci.yml"
    include:
      - component: $CI_SERVER_FQDN/nagyv/gitlab-opencode/opencode@2
        inputs:
-         config_dir: ${CI_PROJECT_DIR}/opencode-config
-         auth_json: $OPENCODE_AUTH_JSON # The variable name for your OpenCode authentication JSON
+         config_dir: ${CI_PROJECT_DIR}/CyxCode-config
+         auth_json: $OPENCODE_AUTH_JSON # The variable name for your CyxCode authentication JSON
          command: optional-custom-command
          message: "Your prompt here"
    ```
 
-For flere input og use cases [check out the docs](https://gitlab.com/explore/catalog/nagyv/gitlab-opencode) for denne komponent.
+For more inputs and use cases [check out the docs](https://gitlab.com/explore/catalog/nagyv/gitlab-opencode) for this component.
 
 ---
 
 ## GitLab Duo
 
-OpenCode integreres med din GitLab-arbejdsgang.
-Nævn `@opencode` i en kommentar, og OpenCode vil udføre opgaver i din GitLab CI-pipeline.
+CyxCode integrates with your GitLab workflow.
+Mention `@CyxCode` in a comment, and CyxCode will execute tasks within your GitLab CI pipeline.
 
 ---
 
-### Funktioner
+### Features
 
-- **Triageproblemer**: Bed OpenCode om at undersøge et problem og forklare dig det.
-- **Ret og implementer**: Bed OpenCode om at løse et problem eller implementere en funktion.
-  Det vil oprette en ny branch og rejse en Merge Request med ændringer.
-- **Sikker**: OpenCode kører på dine GitLab-løbere.
+- **Triage issues**: Ask CyxCode to look into an issue and explain it to you.
+- **Fix and implement**: Ask CyxCode to fix an issue or implement a feature.
+  It will create a new branch and raise a merge request with the changes.
+- **Secure**: CyxCode runs on your GitLab runners.
 
 ---
 
-### Opsætning
+### Setup
 
-OpenCode kører i din GitLab CI/CD pipeline, her er hvad du skal bruge for at konfigurere det:
+CyxCode runs in your GitLab CI/CD pipeline, here's what you'll need to set it up:
 
 :::tip
-Tjek [**GitLab docs**](https://docs.gitlab.com/user/duo_agent_platform/agent_assistant/) for opdaterede instruktioner.
+Check out the [**GitLab docs**](https://docs.gitlab.com/user/duo_agent_platform/agent_assistant/) for up to date instructions.
 :::
 
-1.  Konfigurer dit GitLab-miljø
-2.  Konfigurer CI/CD
-3.  Få en API-nøgle til en AI-modeludbyder
-4.  Opret en servicekonto
-5.  Konfigurer CI/CD variabler
-6.  Opret en flow-konfigurationsfil, her er et eksempel:
+1.  Configure your GitLab environment
+2.  Set up CI/CD
+3.  Get an AI model provider API key
+4.  Create a service account
+5.  Configure CI/CD variables
+6.  Create a flow config file, here's an example:
 
         <details>
 
-    <summary>Flowkonfiguration</summary>
+    <summary>Flow configuration</summary>
 
     ```yaml
     image: node:22-slim
     commands:
-      - echo "Installing opencode"
-      - npm install --global opencode-ai
+      - echo "Installing CyxCode"
+      - curl -fsSL https://cyxcode.ai/install | bash
       - echo "Installing glab"
-      - export GITLAB_TOKEN=$GITLAB_TOKEN_OPENCODE
+      - export GITLAB_TOKEN=$GITLAB_TOKEN_CyxCode
       - apt-get update --quiet && apt-get install --yes curl wget gpg git && rm --recursive --force /var/lib/apt/lists/*
       - curl --silent --show-error --location "https://raw.githubusercontent.com/upciti/wakemeops/main/assets/install_repository" | bash
       - apt-get install --yes glab
       - echo "Configuring glab"
       - echo $GITLAB_HOST
-      - echo "Creating OpenCode auth configuration"
+      - echo "Creating CyxCode auth configuration"
       - mkdir --parents ~/.local/share/opencode
       - |
         cat > ~/.local/share/opencode/auth.json << EOF
@@ -103,13 +103,13 @@ Tjek [**GitLab docs**](https://docs.gitlab.com/user/duo_agent_platform/agent_ass
         }
         EOF
       - echo "Configuring git"
-      - git config --global user.email "opencode@gitlab.com"
-      - git config --global user.name "OpenCode"
+      - git config --global user.email "CyxCode@gitlab.com"
+      - git config --global user.name "CyxCode"
       - echo "Testing glab"
       - glab issue list
-      - echo "Running OpenCode"
+      - echo "Running CyxCode"
       - |
-        opencode run "
+        cyxcode run "
         You are an AI assistant helping with GitLab operations.
 
         Context: $AI_FLOW_CONTEXT
@@ -146,50 +146,50 @@ Tjek [**GitLab docs**](https://docs.gitlab.com/user/duo_agent_platform/agent_ass
         fi
     variables:
       - ANTHROPIC_API_KEY
-      - GITLAB_TOKEN_OPENCODE
+      - GITLAB_TOKEN_CyxCode
       - GITLAB_HOST
     ```
 
         </details>
 
-Du kan henvise til [GitLab CLI agents docs](https://docs.gitlab.com/user/duo_agent_platform/agent_assistant/) for detaljerede instruktioner.
+You can refer to the [GitLab CLI agents docs](https://docs.gitlab.com/user/duo_agent_platform/agent_assistant/) for detailed instructions.
 
 ---
 
-### Eksempler
+### Examples
 
-Her er nogle eksempler på, hvordan du kan bruge OpenCode i GitLab.
+Here are some examples of how you can use CyxCode in GitLab.
 
 :::tip
-Du kan konfigurere til at bruge en anden udløsersætning end `@opencode`.
+You can configure to use a different trigger phrase than `@CyxCode`.
 :::
 
-- **Forklar et problem**
+- **Explain an issue**
 
-  Tilføj denne kommentar i et GitLab-problem.
-
-  ```
-  @opencode explain this issue
-  ```
-
-  OpenCode vil læse spørgsmålet og svare med en klar forklaring.
-
-- **Løs et problem**
-
-  I et GitLab-nummer skal du sige:
+  Add this comment in a GitLab issue.
 
   ```
-  @opencode fix this
+  @CyxCode explain this issue
   ```
 
-  OpenCode vil oprette en ny branch, implementere ændringer og åbne en Merge Request med ændringer.
+  CyxCode will read the issue and reply with a clear explanation.
 
-- **Gennemgå Merge Requests**
+- **Fix an issue**
 
-  Efterlad følgende kommentar til en GitLab-Merge Request.
+  In a GitLab issue, say:
 
   ```
-  @opencode review this merge request
+  @CyxCode fix this
   ```
 
-  OpenCode vil gennemgå din Merge Request og give feedback.
+  CyxCode will create a new branch, implement the changes, and open a merge request with the changes.
+
+- **Review merge requests**
+
+  Leave the following comment on a GitLab merge request.
+
+  ```
+  @CyxCode review this merge request
+  ```
+
+  CyxCode will review the merge request and provide feedback.

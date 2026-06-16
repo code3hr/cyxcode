@@ -1,12 +1,12 @@
 {
-  "name": "opencode",
-  "displayName": "opencode",
-  "description": "opencode for VS Code",
+  "name": "cyxcode",
+  "displayName": "CyxCode",
+  "description": "CyxCode for VS Code",
   "version": "1.3.2",
   "publisher": "sst-dev",
   "repository": {
     "type": "git",
-    "url": "https://github.com/anomalyco/opencode"
+    "url": "https://github.com/code3hr/cyxcode"
   },
   "license": "MIT",
   "icon": "images/icon.png",
@@ -26,7 +26,7 @@
     "commands": [
       {
         "command": "opencode.openTerminal",
-        "title": "Open opencode",
+        "title": "Open CyxCode",
         "icon": {
           "light": "images/button-dark.svg",
           "dark": "images/button-light.svg"
@@ -34,7 +34,7 @@
       },
       {
         "command": "opencode.openNewTerminal",
-        "title": "Open opencode in new tab",
+        "title": "Open CyxCode in new tab",
         "icon": {
           "light": "images/button-dark.svg",
           "dark": "images/button-light.svg"
@@ -56,7 +56,7 @@
     "keybindings": [
       {
         "command": "opencode.openTerminal",
-        "title": "Run opencode",
+        "title": "Run CyxCode",
         "key": "cmd+escape",
         "mac": "cmd+escape",
         "win": "ctrl+escape",
@@ -64,7 +64,7 @@
       },
       {
         "command": "opencode.openNewTerminal",
-        "title": "Run opencode",
+        "title": "Run CyxCode",
         "key": "cmd+shift+escape",
         "mac": "cmd+shift+escape",
         "win": "ctrl+shift+escape",
@@ -72,7 +72,7 @@
       },
       {
         "command": "opencode.addFilepathToTerminal",
-        "title": "opencode: Insert At-Mentioned",
+        "title": "CyxCode: Insert At-Mentioned",
         "key": "cmd+alt+k",
         "mac": "cmd+alt+k",
         "win": "ctrl+alt+K",

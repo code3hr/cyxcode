@@ -16,13 +16,13 @@ Pliki logów są zapisywane w:
 
 Nazwy plików dziennika zawierają znaczniki czasu (np. `2025-01-09T123456.log`) i przechowywanych jest 10 ostatnich plików dziennika.
 
-Możesz ustawić poziom dziennika za pomocą opcji wiersza poleceń `--log-level`, aby uzyskać bardziej szczegółowe informacje debugowania. Na przykład `opencode --log-level DEBUG`.
+Możesz ustawić poziom dziennika za pomocą opcji wiersza poleceń `--log-level`, aby uzyskać bardziej szczegółowe informacje debugowania. Na przykład `cyxcode --log-level DEBUG`.
 
 ---
 
 ## Przechowywanie danych
 
-opencode przechowuje dane sesji i inne dane aplikacji na dysku pod adresem:
+cyxcode przechowuje dane sesji i inne dane aplikacji na dysku pod adresem:
 
 - **macOS/Linux**: `~/.local/share/opencode/`
 - **Windows**: Naciśnij `WIN+R` i wklej `%USERPROFILE%\.local\share\opencode`
@@ -39,13 +39,13 @@ Ten katalog zawiera:
 
 ## Aplikacja desktopowa
 
-opencode Desktop uruchamia w tle lokalny serwer opencode (sidecar `opencode-cli`). Większość problemów jest spowodowana nieprawidłowo działającą wtyczką, uszkodzoną pamięcią podręczną lub złymi ustawieniami serwera.
+cyxcode Desktop uruchamia w tle lokalny serwer opencode (sidecar `opencode-cli`). Większość problemów jest spowodowana nieprawidłowo działającą wtyczką, uszkodzoną pamięcią podręczną lub złymi ustawieniami serwera.
 
 ### Szybkie sprawdzenie
 
 - Całkowicie zakończ i uruchom ponownie aplikację.
 - Jeśli aplikacja wyświetli ekran błędu, kliknij **Uruchom ponownie** i skopiuj szczegóły błędu.
-- Tylko macOS: menu `OpenCode` -> **Załaduj ponownie przeglądarkę internetową** (pomaga, jeśli interfejs użytkownika jest pusty/zawieszony).
+- Tylko macOS: menu `CyxCode` -> **Załaduj ponownie przeglądarkę internetową** (pomaga, jeśli interfejs użytkownika jest pusty/zawieszony).
 
 ---
 
@@ -65,14 +65,14 @@ Jeśli masz skonfigurowane wtyczki, tymczasowo je wyłącz, usuwając klucz lub 
 
 ```jsonc
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "plugin": [],
 }
 ```
 
 #### Sprawdź katalogi wtyczek
 
-opencode może także ładować lokalne wtyczki z dysku. Tymczasowo usuń je (lub zmień nazwę folderu) i uruchom ponownie aplikację komputerową:
+cyxcode może także ładować lokalne wtyczki z dysku. Tymczasowo usuń je (lub zmień nazwę folderu) i uruchom ponownie aplikację komputerową:
 
 - **Wtyczki globalne**
   - **macOS/Linux**: `~/.config/opencode/plugins/`
@@ -101,7 +101,7 @@ Jeśli wyłączenie wtyczek nie pomoże (lub instalacja wtyczki utknęła), wycz
 
 ### Napraw problemy z połączeniem z serwerem
 
-opencode Desktop może uruchomić własny serwer lokalny (domyślnie) lub połączyć się ze skonfigurowanym adresem URL serwera.
+cyxcode Desktop może uruchomić własny serwer lokalny (domyślnie) lub połączyć się ze skonfigurowanym adresem URL serwera.
 
 Jeśli zobaczysz okno dialogowe **„Połączenie nie powiodło się”** (lub aplikacja nigdy nie wychodzi poza ekran powitalny), sprawdź, czy jest niestandardowy adres URL serwera.
 
@@ -144,7 +144,7 @@ Jeśli doświadczasz niskiej wydajności, problemów z dostępem do plików lub 
 
 ### Brak powiadomień
 
-opencode Desktop pokazuje powiadomienia systemowe tylko wtedy, gdy:
+cyxcode Desktop pokazuje powiadomienia systemowe tylko wtedy, gdy:
 
 - powiadomienia są włączone dla opencode w ustawieniach systemu operacyjnego, oraz
 - okno aplikacji nie jest aktywne.
@@ -177,7 +177,7 @@ Jeśli masz problemy z opencode:
 
    Najlepszym sposobem zgłaszania błędów lub zgłaszania żądań funkcji jest skorzystanie z naszego repozytorium GitHub:
 
-   [**github.com/anomalyco/opencode/issues**](https://github.com/anomalyco/opencode/issues)
+   [**github.com/code3hr/cyxcode/issues**](https://github.com/code3hr/cyxcode/issues)
 
    Przed utworzeniem nowego problemu przeszukaj istniejące i sprawdź, czy Twój problem nie został już zgłoszony.
 
@@ -185,7 +185,7 @@ Jeśli masz problemy z opencode:
 
    Aby uzyskać pomoc w czasie rzeczywistym i dyskusję społeczności, dołącz do naszego serwera Discord:
 
-   [**opencode.ai/discord**](https://opencode.ai/discord)
+   [**cyxcode.ai/discord**](https://cyxcode.ai/discord)
 
 ---
 
@@ -199,7 +199,7 @@ Oto kilka typowych problemów i sposobów ich rozwiązania.
 
 1. Sprawdź dzienniki pod kątem komunikatów o błędach
 2. Spróbuj uruchomić z `--print-logs`, aby zobaczyć dane wyjściowe w terminalu
-3. Upewnij się, że masz najnowszą wersję z `opencode upgrade`
+3. Upewnij się, że masz najnowszą wersję z `cyxcode upgrade`
 
 ---
 
@@ -227,7 +227,7 @@ Przykłady:
 - `openrouter/google/gemini-2.5-flash`
 - `opencode/kimi-k2`
 
-Aby dowiedzieć się, do jakich modeli masz dostęp, uruchom `opencode models`
+Aby dowiedzieć się, do jakich modeli masz dostęp, uruchom `cyxcode models`
 
 ---
 
@@ -297,4 +297,4 @@ Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &
 export DISPLAY=:99.0
 ```
 
-opencode wykryje, czy używasz Waylanda i wolisz `wl-clipboard`, w przeciwnym razie spróbuje znaleźć narzędzia schowka w kolejności: `xclip` i `xsel`.
+cyxcode wykryje, czy używasz Waylanda i wolisz `wl-clipboard`, w przeciwnym razie spróbuje znaleźć narzędzia schowka w kolejności: `xclip` i `xsel`.

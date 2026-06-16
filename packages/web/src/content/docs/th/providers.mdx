@@ -1,41 +1,41 @@
 ---
-title: ผู้ให้บริการ
-description: ใช้ผู้ให้บริการ LLM ใน OpenCode
+title: Providers
+description: Using any LLM provider in CyxCode.
 ---
 
 import config from "../../../../config.mjs"
 export const console = config.console
 
-OpenCode ใช้ [AI SDK](https://ai-sdk.dev/) และ [Models.dev](https://models.dev) เพื่อรองรับผู้ให้บริการ **75+ LLM** และรองรับการใช้งานโมเดลท้องถิ่น
+CyxCode uses the [AI SDK](https://ai-sdk.dev/) and [Models.dev](https://models.dev) to support **75+ LLM providers** and it supports running local models.
 
-หากต้องการเพิ่มผู้ให้บริการ คุณต้อง:
+To add a provider you need to:
 
-1. เพิ่มคีย์ API สำหรับผู้ให้บริการโดยใช้คำสั่ง `/connect`
-2. กำหนดค่าผู้ให้บริการในการกำหนดค่า OpenCode ของคุณ
-
----
-
-### ข้อมูลรับรอง
-
-เมื่อคุณเพิ่มคีย์ API ของผู้ให้บริการด้วยคำสั่ง `/connect` คีย์เหล่านั้นจะถูกเก็บไว้
-ใน `~/.local/share/opencode/auth.json`.
+1. Add the API keys for the provider using the `/connect` command.
+2. Configure the provider in your CyxCode config.
 
 ---
 
-### การกำหนดค่า
+### Credentials
 
-คุณสามารถปรับแต่งผู้ให้บริการได้ผ่านทางส่วน `provider` ใน OpenCode ของคุณ
-กำหนดค่า
+When you add a provider's API keys with the `/connect` command, they are stored
+in `~/.local/share/opencode/auth.json`.
 
 ---
 
-#### Base URL (URL พื้นฐาน)
+### Config
 
-คุณสามารถปรับแต่งฐาน URL สำหรับผู้ให้บริการรายใดก็ได้โดยตั้งค่าตัวเลือก `baseURL` สิ่งนี้มีประโยชน์เมื่อใช้บริการพร็อกซีหรือจุดสิ้นสุดแบบกำหนดเอง
+You can customize the providers through the `provider` section in your CyxCode
+config.
+
+---
+
+#### Base URL
+
+You can customize the base URL for any provider by setting the `baseURL` option. This is useful when using proxy services or custom endpoints.
 
 ```json title="opencode.json" {6}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "provider": {
     "anthropic": {
       "options": {
@@ -48,95 +48,90 @@ OpenCode ใช้ [AI SDK](https://ai-sdk.dev/) และ [Models.dev](https://
 
 ---
 
-## OpenCode Zen
+## CyxCode Zen
 
-OpenCode Zen คือรายชื่อโมเดลที่จัดทำโดยทีมงาน OpenCode ที่ได้รับ
-ทดสอบและตรวจสอบแล้วว่าทำงานได้ดีกับ OpenCode [เรียนรู้เพิ่มเติม](/docs/zen)
+CyxCode Zen is a list of models provided by the CyxCode team that have been
+tested and verified to work well with CyxCode. [Learn more](/docs/zen).
 
 :::tip
-หากคุณยังใหม่ เราขอแนะนำให้เริ่มต้นด้วย OpenCode Zen
+If you are new, we recommend starting with CyxCode Zen.
 :::
 
-1. เรียกใช้คำสั่ง `/connect` ใน TUI เลือก opencode และไปที่ [opencode.ai/auth](https://opencode.ai/auth)
+1. Run the `/connect` command in the TUI, select `CyxCode Zen`, and head to [cyxcode.ai/auth](https://cyxcode.ai/zen).
 
    ```txt
    /connect
    ```
 
-2. ลงชื่อเข้าใช้ เพิ่มรายละเอียดการเรียกเก็บเงินของคุณ และคัดลอกรหัส API ของคุณ
+2. Sign in, add your billing details, and copy your API key.
 
-3. วางคีย์ API ของคุณ
+3. Paste your API key.
 
    ```txt
-   ┌ API key
-   │
-   │
-   └ enter
+   API key
    ```
 
-4. เรียกใช้ `/models` ใน TUI เพื่อดูรายการรุ่นที่เราแนะนำ
+4. Run `/models` in the TUI to see the list of models we recommend.
 
    ```txt
    /models
    ```
 
-มันทำงานเหมือนกับผู้ให้บริการรายอื่นใน OpenCode และเป็นทางเลือกในการใช้งานโดยสมบูรณ์
+It works like any other provider in CyxCode and is completely optional to use.
 
 ---
 
-## OpenCode Go
+## CyxCode Go
 
-OpenCode Go คือแผนการสมัครสมาชิกราคาประหยัดที่ให้การเข้าถึงโมเดลการเขียนโค้ดแบบเปิดยอดนิยมที่เชื่อถือได้ ซึ่งจัดเตรียมโดยทีมงาน OpenCode ที่ได้รับการทดสอบและตรวจสอบแล้วว่าทำงานได้ดีกับ OpenCode
+CyxCode Go is a low cost subscription plan that provides reliable access to popular open coding models provided by the CyxCode team that have been
+tested and verified to work well with CyxCode.
 
-1. เรียกใช้คำสั่ง `/connect` ใน TUI เลือก `OpenCode Go` และไปที่ [opencode.ai/auth](https://opencode.ai/zen)
+1. Run the `/connect` command in the TUI, select `CyxCode Go`, and head to [cyxcode.ai/auth](https://cyxcode.ai/zen).
 
    ```txt
    /connect
    ```
 
-2. ลงชื่อเข้าใช้ เพิ่มรายละเอียดการเรียกเก็บเงินของคุณ และคัดลอกรหัส API ของคุณ
+2. Sign in, add your billing details, and copy your API key.
 
-3. วางคีย์ API ของคุณ
+3. Paste your API key.
 
    ```txt
-   ┌ API key
-   │
-   │
-   └ enter
+   API key
    ```
 
-4. เรียกใช้ `/models` ใน TUI เพื่อดูรายการรุ่นที่เราแนะนำ
+4. Run `/models` in the TUI to see the list of models we recommend.
 
    ```txt
    /models
    ```
 
-มันทำงานเหมือนกับผู้ให้บริการรายอื่นใน OpenCode และเป็นทางเลือกในการใช้งานโดยสมบูรณ์
+It works like any other provider in CyxCode and is completely optional to use.
 
 ---
 
-## ไดเรกทอรี
+## Directory
 
-มาดูรายละเอียดผู้ให้บริการบางรายกัน หากคุณต้องการเพิ่มผู้ให้บริการให้กับ
-รายการอย่าลังเลที่จะเปิดประชาสัมพันธ์
+Let's look at some of the providers in detail. If you'd like to add a provider to the
+list, feel free to open a PR.
 
 :::note
-ไม่เห็นผู้ให้บริการที่นี่ใช่ไหม ส่งพีอาร์.
+Don't see a provider here? Submit a PR.
 :::
 
 ---
 
 ### 302.AI
 
-1. ไปที่ [302.AI console](https://302.ai/) สร้างบัญชี และสร้างคีย์ API
+1. Head over to the [302.AI console](https://302.ai/), create an account, and generate an API key.
 
-2. เรียกใช้คำสั่ง `/connect` และค้นหา **302.AI**
+2. Run the `/connect` command and search for **302.AI**.
 
    ```txt
    /connect
    ```
 
-3. ป้อนคีย์ 302.AI API ของคุณ
+3. Enter your 302.AI API key.
 
    ```txt
    ┌ API key
@@ -145,7 +140,7 @@ OpenCode Go คือแผนการสมัครสมาชิกรา�
    └ enter
    ```
 
-4. รันคำสั่ง `/models` เพื่อเลือกรุ่น
+4. Run the `/models` command to select a model.
 
    ```txt
    /models
@@ -155,46 +150,50 @@ OpenCode Go คือแผนการสมัครสมาชิกรา�
 
 ### Amazon Bedrock
 
-วิธีใช้ Amazon Bedrock กับ OpenCode:
+To use Amazon Bedrock with CyxCode:
 
-1. ไปที่ **แค็ตตาล็อกโมเดล** ในคอนโซล Amazon Bedrock และขอ
-   เข้าถึงโมเดลที่คุณต้องการ
+1. Head over to the **Model catalog** in the Amazon Bedrock console and request
+   access to the models you want.
 
    :::tip
-   คุณต้องมีสิทธิ์เข้าถึงโมเดลที่คุณต้องการใน Amazon Bedrock
+   You need to have access to the model you want in Amazon Bedrock.
    :::
 
-2. **กำหนดค่าการตรวจสอบสิทธิ์** โดยใช้วิธีใดวิธีหนึ่งต่อไปนี้:
+2. **Configure authentication** using one of the following methods:
 
-   #### ตัวแปรสภาพแวดล้อม (เริ่มต้นอย่างรวดเร็ว)
+   ***
 
-   ตั้งค่าหนึ่งในตัวแปรสภาพแวดล้อมเหล่านี้ขณะเรียกใช้ opencode:
+   #### Environment Variables (Quick Start)
+
+   Set one of these environment variables while running CyxCode:
 
    ```bash
    # Option 1: Using AWS access keys
-   AWS_ACCESS_KEY_ID=XXX AWS_SECRET_ACCESS_KEY=YYY opencode
+   AWS_ACCESS_KEY_ID=XXX AWS_SECRET_ACCESS_KEY=YYY CyxCode
 
    # Option 2: Using named AWS profile
-   AWS_PROFILE=my-profile opencode
+   AWS_PROFILE=my-profile CyxCode
 
    # Option 3: Using Bedrock bearer token
-   AWS_BEARER_TOKEN_BEDROCK=XXX opencode
+   AWS_BEARER_TOKEN_BEDROCK=XXX CyxCode
    ```
 
-   หรือเพิ่มลงในโปรไฟล์ทุบตีของคุณ:
+   Or add them to your bash profile:
 
    ```bash title="~/.bash_profile"
    export AWS_PROFILE=my-dev-profile
    export AWS_REGION=us-east-1
    ```
 
-   #### ไฟล์การกำหนดค่า (แนะนำ)
+   ***
 
-   สำหรับการกำหนดค่าเฉพาะโครงการหรือแบบถาวร ให้ใช้ `opencode.json`:
+   #### Configuration File (Recommended)
+
+   For project-specific or persistent configuration, use `opencode.json`:
 
    ```json title="opencode.json"
    {
-     "$schema": "https://opencode.ai/config.json",
+     "$schema": "https://cyxcode.ai/config.json",
      "provider": {
        "amazon-bedrock": {
          "options": {
@@ -206,22 +205,24 @@ OpenCode Go คือแผนการสมัครสมาชิกรา�
    }
    ```
 
-   **ตัวเลือกที่มี:**
-   - `region` - ​​AWS ภูมิภาค (เช่น `us-east-1`, `eu-west-1`)
-   - `profile` - ​​AWS ตั้งชื่อโปรไฟล์จาก `~/.aws/credentials`
-   - `endpoint` - ​​จุดสิ้นสุดที่กำหนดเอง URL สำหรับ VPC จุดสิ้นสุด (นามแฝงสำหรับตัวเลือก `baseURL` ทั่วไป)
+   **Available options:**
+   - `region` - AWS region (e.g., `us-east-1`, `eu-west-1`)
+   - `profile` - AWS named profile from `~/.aws/credentials`
+   - `endpoint` - Custom endpoint URL for VPC endpoints (alias for generic `baseURL` option)
 
    :::tip
-   ตัวเลือกไฟล์การกำหนดค่ามีความสำคัญเหนือกว่าตัวแปรสภาพแวดล้อม
+   Configuration file options take precedence over environment variables.
    :::
 
-   #### ขั้นสูง: VPC จุดสิ้นสุด
+   ***
 
-   หากคุณใช้จุดสิ้นสุด VPC สำหรับ Bedrock:
+   #### Advanced: VPC Endpoints
+
+   If you're using VPC endpoints for Bedrock:
 
    ```json title="opencode.json"
    {
-     "$schema": "https://opencode.ai/config.json",
+     "$schema": "https://cyxcode.ai/config.json",
      "provider": {
        "amazon-bedrock": {
          "options": {
@@ -235,37 +236,42 @@ OpenCode Go คือแผนการสมัครสมาชิกรา�
    ```
 
    :::note
-   ตัวเลือก `endpoint` เป็นนามแฝงสำหรับตัวเลือก `baseURL` ทั่วไป โดยใช้คำศัพท์เฉพาะ AWS หากมีการระบุทั้ง `endpoint` และ `baseURL` `endpoint` จะมีความสำคัญเหนือกว่า
+   The `endpoint` option is an alias for the generic `baseURL` option, using AWS-specific terminology. If both `endpoint` and `baseURL` are specified, `endpoint` takes precedence.
    :::
 
-   #### วิธีการรับรองความถูกต้อง
-   - **`AWS_ACCESS_KEY_ID` / `AWS_SECRET_ACCESS_KEY`**: สร้างผู้ใช้ IAM และสร้างคีย์การเข้าถึงในคอนโซล AWS
-   - **`AWS_PROFILE`**: ใช้โปรไฟล์ที่มีชื่อจาก `~/.aws/credentials` ขั้นแรกให้กำหนดค่าด้วย `aws configure --profile my-profile` หรือ `aws sso login`
-   - **`AWS_BEARER_TOKEN_BEDROCK`**: สร้างคีย์ API ระยะยาวจากคอนโซล Amazon Bedrock
-   - **`AWS_WEB_IDENTITY_TOKEN_FILE` / `AWS_ROLE_ARN`**: สำหรับ EKS IRSA (IAM บทบาทสำหรับบัญชีบริการ) หรือสภาพแวดล้อม Kubernetes อื่นๆ ที่มีการเชื่อมโยง OIDC Kubernetes แทรกตัวแปรสภาพแวดล้อมเหล่านี้โดยอัตโนมัติเมื่อใช้คำอธิบายประกอบของบัญชีบริการ
+   ***
 
-   #### ลำดับความสำคัญของการรับรองความถูกต้อง
+   #### Authentication Methods
+   - **`AWS_ACCESS_KEY_ID` / `AWS_SECRET_ACCESS_KEY`**: Create an IAM user and generate access keys in the AWS Console
+   - **`AWS_PROFILE`**: Use named profiles from `~/.aws/credentials`. First configure with `aws configure --profile my-profile` or `aws sso login`
+   - **`AWS_BEARER_TOKEN_BEDROCK`**: Generate long-term API keys from the Amazon Bedrock console
+   - **`AWS_WEB_IDENTITY_TOKEN_FILE` / `AWS_ROLE_ARN`**: For EKS IRSA (IAM Roles for Service Accounts) or other Kubernetes environments with OIDC federation. These environment variables are automatically injected by Kubernetes when using service account annotations.
 
-   Amazon Bedrock ใช้ลำดับความสำคัญในการรับรองความถูกต้องต่อไปนี้:
-   1. **Bearer Token** - `AWS_BEARER_TOKEN_BEDROCK` ตัวแปรสภาพแวดล้อมหรือโทเค็นจากคำสั่ง `/connect`
-   2. **AWS Credential Chain** - โปรไฟล์, คีย์การเข้าถึง, ข้อมูลประจำตัวที่แชร์, บทบาท IAM, โทเค็นข้อมูลประจำตัวของเว็บ (EKS IRSA), ข้อมูลเมตาของอินสแตนซ์
+   ***
+
+   #### Authentication Precedence
+
+   Amazon Bedrock uses the following authentication priority:
+   1. **Bearer Token** - `AWS_BEARER_TOKEN_BEDROCK` environment variable or token from `/connect` command
+   2. **AWS Credential Chain** - Profile, access keys, shared credentials, IAM roles, Web Identity Tokens (EKS IRSA), instance metadata
 
    :::note
-   เมื่อตั้งค่าBearer Token (ผ่าน `/connect` หรือ `AWS_BEARER_TOKEN_BEDROCK`) โทเค็นนั้นจะมีความสำคัญเหนือกว่าวิธีการข้อมูลประจำตัว AWS ทั้งหมด รวมถึงโปรไฟล์ที่กำหนดค่าไว้
+   When a bearer token is set (via `/connect` or `AWS_BEARER_TOKEN_BEDROCK`), it takes precedence over all AWS credential methods including configured profiles.
    :::
 
-3. รันคำสั่ง `/models` เพื่อเลือกรุ่นที่ต้องการ
+3. Run the `/models` command to select the model you want.
 
    ```txt
    /models
    ```
 
 :::note
-สำหรับโปรไฟล์การอนุมานแบบกำหนดเอง ให้ใช้ชื่อรุ่นและผู้ให้บริการในคีย์และตั้งค่าคุณสมบัติ `id` เป็น arn สิ่งนี้ทำให้มั่นใจได้ว่าแคชถูกต้อง:
+For custom inference profiles, use the model and provider name in the key and set the `id` property to the arn. This ensures correct caching.
+:::
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "provider": {
     "amazon-bedrock": {
       // ...
@@ -279,71 +285,72 @@ OpenCode Go คือแผนการสมัครสมาชิกรา�
 }
 ```
 
-:::
-
 ---
 
 ### Anthropic
 
-1. เมื่อคุณสมัครแล้ว ให้รันคำสั่ง `/connect` และเลือก Anthropic
+1. Once you've signed up, run the `/connect` command and select Anthropic.
 
    ```txt
    /connect
    ```
 
-2. ที่นี่คุณสามารถเลือกตัวเลือก **Claude Pro/Max** และมันจะเปิดเบราว์เซอร์ของคุณ
-   และขอให้คุณตรวจสอบสิทธิ์
+2. Here you can select the **Claude Pro/Max** option and it'll open your browser
+   and ask you to authenticate.
 
    ```txt
    ┌ Select auth method
    │
-   │ Claude Pro/Max
-   │ Create an API Key
    │ Manually enter API Key
    └
    ```
 
-3. ตอนนี้โมเดล Anthropic ทั้งหมดควรจะพร้อมใช้งานเมื่อคุณใช้คำสั่ง `/models`
+3. Now all the Anthropic models should be available when you use the `/models` command.
 
    ```txt
    /models
    ```
 
 :::info
-การใช้การสมัครสมาชิก Claude Pro/Max ใน OpenCode ไม่ได้รับการสนับสนุนอย่างเป็นทางการจาก [Anthropic](https://anthropic.com)
-:::
+There are plugins that allow you to use your Claude Pro/Max models with
+CyxCode. Anthropic explicitly prohibits this.
 
-##### การใช้ API Key
+Previous versions of CyxCode came bundled with these plugins but that is no
+longer the case as of 1.3.0
 
-คุณยังสามารถเลือก **สร้าง API คีย์** หากคุณไม่มีการสมัครสมาชิก Pro/Max นอกจากนี้ยังจะเปิดเบราว์เซอร์ของคุณและขอให้คุณเข้าสู่ระบบ Anthropic และให้รหัสที่คุณสามารถวางใน terminal ของคุณ
+Other companies support freedom of choice with developer tooling - you can use
+the following subscriptions in CyxCode with zero setup:
 
-หรือหากคุณมีคีย์ API อยู่แล้ว คุณสามารถเลือก **ป้อนคีย์ API ด้วยตนเอง** และวางลงใน terminal ของคุณ
+- ChatGPT Plus
+- Github Copilot
+- Gitlab Duo
+  :::
 
 ---
 
 ### Azure OpenAI
 
 :::note
-หากคุณพบข้อผิดพลาด "ฉันขอโทษ แต่ฉันไม่สามารถช่วยเหลือคำขอนั้นได้" ให้ลองเปลี่ยนตัวกรองเนื้อหาจาก **DefaultV2** เป็น **Default** ในทรัพยากร Azure ของคุณ
+If you encounter "I'm sorry, but I cannot assist with that request" errors, try changing the content filter from **DefaultV2** to **Default** in your Azure resource.
 :::
 
-1. ไปที่ [พอร์ทัล Azure](https://portal.azure.com/) และสร้างทรัพยากร **Azure OpenAI** คุณจะต้องการ:
-   - **ชื่อทรัพยากร**: นี่จะกลายเป็นส่วนหนึ่งของจุดสิ้นสุด API ของคุณ (`https://RESOURCE_NAME.openai.azure.com/`)
-   - **API key**: `KEY 1` หรือ `KEY 2` จากทรัพยากรของคุณ
+1. Head over to the [Azure portal](https://portal.azure.com/) and create an **Azure OpenAI** resource. You'll need:
+   - **Resource name**: This becomes part of your API endpoint (`https://RESOURCE_NAME.openai.azure.com/`)
+   - **API key**: Either `KEY 1` or `KEY 2` from your resource
 
-2. ไปที่ [Azure AI Foundry](https://ai.azure.com/) และปรับใช้โมเดล
+2. Go to [Azure AI Foundry](https://ai.azure.com/) and deploy a model.
 
    :::note
-   ชื่อการปรับใช้จะต้องตรงกับชื่อรุ่นเพื่อให้ opencode ทำงานได้อย่างถูกต้อง
+   The deployment name must match the model name for CyxCode to work properly.
    :::
 
-3. เรียกใช้คำสั่ง `/connect` และค้นหา **Azure**
+3. Run the `/connect` command and search for **Azure**.
 
    ```txt
    /connect
    ```
 
-4. ป้อน API ของคุณ
+4. Enter your API key.
 
    ```txt
    ┌ API key
@@ -352,19 +359,19 @@ OpenCode Go คือแผนการสมัครสมาชิกรา�
    └ enter
    ```
 
-5. ตั้งชื่อทรัพยากรของคุณเป็นตัวแปรสภาพแวดล้อม:
+5. Set your resource name as an environment variable:
 
    ```bash
-   AZURE_RESOURCE_NAME=XXX opencode
+   AZURE_RESOURCE_NAME=XXX CyxCode
    ```
 
-   หรือเพิ่มลงในโปรไฟล์ทุบตีของคุณ:
+   Or add it to your bash profile:
 
    ```bash title="~/.bash_profile"
    export AZURE_RESOURCE_NAME=XXX
    ```
 
-6. รันคำสั่ง `/models` เพื่อเลือกโมเดลที่ปรับใช้ของคุณ
+6. Run the `/models` command to select your deployed model.
 
    ```txt
    /models
@@ -374,23 +381,23 @@ OpenCode Go คือแผนการสมัครสมาชิกรา�
 
 ### Azure Cognitive Services
 
-1. ไปที่ [พอร์ทัล Azure](https://portal.azure.com/) และสร้างทรัพยากร **Azure OpenAI** คุณจะต้องการ:
-   - **ชื่อทรัพยากร**: นี่จะกลายเป็นส่วนหนึ่งของจุดสิ้นสุด API ของคุณ (`https://AZURE_COGNITIVE_SERVICES_RESOURCE_NAME.cognitiveservices.azure.com/`)
-   - **API key**: `KEY 1` หรือ `KEY 2` จากทรัพยากรของคุณ
+1. Head over to the [Azure portal](https://portal.azure.com/) and create an **Azure OpenAI** resource. You'll need:
+   - **Resource name**: This becomes part of your API endpoint (`https://AZURE_COGNITIVE_SERVICES_RESOURCE_NAME.cognitiveservices.azure.com/`)
+   - **API key**: Either `KEY 1` or `KEY 2` from your resource
 
-2. ไปที่ [Azure AI Foundry](https://ai.azure.com/) และปรับใช้โมเดล
+2. Go to [Azure AI Foundry](https://ai.azure.com/) and deploy a model.
 
    :::note
-   ชื่อการปรับใช้จะต้องตรงกับชื่อรุ่นเพื่อให้ opencode ทำงานได้อย่างถูกต้อง
+   The deployment name must match the model name for CyxCode to work properly.
    :::
 
-3. เรียกใช้คำสั่ง `/connect` และค้นหา **Azure Cognitive Services**
+3. Run the `/connect` command and search for **Azure Cognitive Services**.
 
    ```txt
    /connect
    ```
 
-4. ป้อน API ของคุณ
+4. Enter your API key.
 
    ```txt
    ┌ API key
@@ -399,19 +406,19 @@ OpenCode Go คือแผนการสมัครสมาชิกรา�
    └ enter
    ```
 
-5. ตั้งชื่อทรัพยากรของคุณเป็นตัวแปรสภาพแวดล้อม:
+5. Set your resource name as an environment variable:
 
    ```bash
-   AZURE_COGNITIVE_SERVICES_RESOURCE_NAME=XXX opencode
+   AZURE_COGNITIVE_SERVICES_RESOURCE_NAME=XXX CyxCode
    ```
 
-   หรือเพิ่มลงในโปรไฟล์ทุบตีของคุณ:
+   Or add it to your bash profile:
 
    ```bash title="~/.bash_profile"
    export AZURE_COGNITIVE_SERVICES_RESOURCE_NAME=XXX
    ```
 
-6. รันคำสั่ง `/models` เพื่อเลือกโมเดลที่ปรับใช้ของคุณ
+6. Run the `/models` command to select your deployed model.
 
    ```txt
    /models
@@ -421,15 +428,15 @@ OpenCode Go คือแผนการสมัครสมาชิกรา�
 
 ### Baseten
 
-1. ไปที่ [Baseten](https://app.baseten.co/) สร้างบัญชี และสร้างคีย์ API
+1. Head over to the [Baseten](https://app.baseten.co/), create an account, and generate an API key.
 
-2. รันคำสั่ง `/connect` และค้นหา **Baseten**
+2. Run the `/connect` command and search for **Baseten**.
 
    ```txt
    /connect
    ```
 
-3. ป้อนคีย์ Baseten API ของคุณ
+3. Enter your Baseten API key.
 
    ```txt
    ┌ API key
@@ -438,7 +445,7 @@ OpenCode Go คือแผนการสมัครสมาชิกรา�
    └ enter
    ```
 
-4. รันคำสั่ง `/models` เพื่อเลือกรุ่น
+4. Run the `/models` command to select a model.
 
    ```txt
    /models
@@ -448,15 +455,15 @@ OpenCode Go คือแผนการสมัครสมาชิกรา�
 
 ### Cerebras
 
-1. ไปที่ [คอนโซล Cerebras](https://inference.cerebras.ai/) สร้างบัญชี และสร้างคีย์ API
+1. Head over to the [Cerebras console](https://inference.cerebras.ai/), create an account, and generate an API key.
 
-2. เรียกใช้คำสั่ง `/connect` และค้นหา **Cerebras**
+2. Run the `/connect` command and search for **Cerebras**.
 
    ```txt
    /connect
    ```
 
-3. ป้อนคีย์ Cerebras API ของคุณ
+3. Enter your Cerebras API key.
 
    ```txt
    ┌ API key
@@ -465,7 +472,7 @@ OpenCode Go คือแผนการสมัครสมาชิกรา�
    └ enter
    ```
 
-4. รันคำสั่ง `/models` เพื่อเลือกรุ่นเช่น _Qwen 3 Coder 480B_
+4. Run the `/models` command to select a model like _Qwen 3 Coder 480B_.
 
    ```txt
    /models
@@ -475,24 +482,24 @@ OpenCode Go คือแผนการสมัครสมาชิกรา�
 
 ### Cloudflare AI Gateway
 
-Cloudflare AI Gateway ช่วยให้คุณเข้าถึงโมเดลจาก OpenAI, Anthropic, Workers AI และอื่นๆ อีกมากมายผ่านตำแหน่งข้อมูลแบบรวม ด้วย [การเรียกเก็บเงินแบบรวม](https://developers.cloudflare.com/ai-gateway/features/unified-billing/) คุณไม่จำเป็นต้องใช้คีย์ API แยกต่างหากสำหรับผู้ให้บริการแต่ละราย
+Cloudflare AI Gateway lets you access models from OpenAI, Anthropic, Workers AI, and more through a unified endpoint. With [Unified Billing](https://developers.cloudflare.com/ai-gateway/features/unified-billing/) you don't need separate API keys for each provider.
 
-1. ไปที่ [แดชบอร์ด Cloudflare](https://dash.cloudflare.com/) ไปที่ **AI** > **AI Gateway** และสร้างเกตเวย์ใหม่
+1. Head over to the [Cloudflare dashboard](https://dash.cloudflare.com/), navigate to **AI** > **AI Gateway**, and create a new gateway.
 
-2. ตั้งค่ารหัสบัญชีและรหัสเกตเวย์ของคุณเป็นตัวแปรสภาพแวดล้อม
+2. Set your Account ID and Gateway ID as environment variables.
 
    ```bash title="~/.bash_profile"
    export CLOUDFLARE_ACCOUNT_ID=your-32-character-account-id
    export CLOUDFLARE_GATEWAY_ID=your-gateway-id
    ```
 
-3. รันคำสั่ง `/connect` และค้นหา **Cloudflare AI Gateway**
+3. Run the `/connect` command and search for **Cloudflare AI Gateway**.
 
    ```txt
    /connect
    ```
 
-4. ป้อน Cloudflare API Token ของคุณ
+4. Enter your Cloudflare API token.
 
    ```txt
    ┌ API key
@@ -501,23 +508,23 @@ Cloudflare AI Gateway ช่วยให้คุณเข้าถึงโม�
    └ enter
    ```
 
-   หรือตั้งเป็นตัวแปรสภาพแวดล้อม
+   Or set it as an environment variable.
 
    ```bash title="~/.bash_profile"
    export CLOUDFLARE_API_TOKEN=your-api-token
    ```
 
-5. รันคำสั่ง `/models` เพื่อเลือกรุ่น
+5. Run the `/models` command to select a model.
 
    ```txt
    /models
    ```
 
-   คุณยังสามารถเพิ่มโมเดลผ่านการกำหนดค่า opencode ของคุณได้
+   You can also add models through your CyxCode config.
 
    ```json title="opencode.json"
    {
-     "$schema": "https://opencode.ai/config.json",
+     "$schema": "https://cyxcode.ai/config.json",
      "provider": {
        "cloudflare-ai-gateway": {
          "models": {
@@ -531,17 +538,25 @@ Cloudflare AI Gateway ช่วยให้คุณเข้าถึงโม�
 
 ---
 
-### Cortecs
+### Cloudflare Workers AI
 
-1. ไปที่ [คอนโซล Cortecs](https://cortecs.ai/) สร้างบัญชี และสร้างคีย์ API
+Cloudflare Workers AI lets you run AI models on Cloudflare's global network directly via REST API, with no separate provider accounts needed for supported models.
 
-2. เรียกใช้คำสั่ง `/connect` และค้นหา **Cortecs**
+1. Head over to the [Cloudflare dashboard](https://dash.cloudflare.com/), navigate to **Workers AI**, and select **Use REST API** to get your Account ID and create an API token.
+
+2. Set your Account ID as an environment variable.
+
+   ```bash title="~/.bash_profile"
+   export CLOUDFLARE_ACCOUNT_ID=your-32-character-account-id
+   ```
+
+3. Run the `/connect` command and search for **Cloudflare Workers AI**.
 
    ```txt
    /connect
    ```
 
-3. ป้อนคีย์ Cortecs API ของคุณ
+4. Enter your Cloudflare API token.
 
    ```txt
    ┌ API key
@@ -550,7 +565,40 @@ Cloudflare AI Gateway ช่วยให้คุณเข้าถึงโม�
    └ enter
    ```
 
-4. รันคำสั่ง `/models` เพื่อเลือกโมเดลเช่น _Kimi K2 Instruct_
+   Or set it as an environment variable.
+
+   ```bash title="~/.bash_profile"
+   export CLOUDFLARE_API_KEY=your-api-token
+   ```
+
+5. Run the `/models` command to select a model.
+
+   ```txt
+   /models
+   ```
+
+---
+
+### Cortecs
+
+1. Head over to the [Cortecs console](https://cortecs.ai/), create an account, and generate an API key.
+
+2. Run the `/connect` command and search for **Cortecs**.
+
+   ```txt
+   /connect
+   ```
+
+3. Enter your Cortecs API key.
+
+   ```txt
+   ┌ API key
+   │
+   │
+   └ enter
+   ```
+
+4. Run the `/models` command to select a model like _Kimi K2 Instruct_.
 
    ```txt
    /models
@@ -560,15 +608,15 @@ Cloudflare AI Gateway ช่วยให้คุณเข้าถึงโม�
 
 ### DeepSeek
 
-1. ไปที่ [คอนโซล DeepSeek](https://platform.deepseek.com/) สร้างบัญชี แล้วคลิก **สร้างคีย์ API ใหม่**
+1. Head over to the [DeepSeek console](https://platform.deepseek.com/), create an account, and click **Create new API key**.
 
-2. รันคำสั่ง `/connect` และค้นหา **DeepSeek**
+2. Run the `/connect` command and search for **DeepSeek**.
 
    ```txt
    /connect
    ```
 
-3. ป้อนคีย์ DeepSeek API ของคุณ
+3. Enter your DeepSeek API key.
 
    ```txt
    ┌ API key
@@ -577,7 +625,7 @@ Cloudflare AI Gateway ช่วยให้คุณเข้าถึงโม�
    └ enter
    ```
 
-4. รันคำสั่ง `/models` เพื่อเลือกโมเดล DeepSeek เช่น _DeepSeek Reasoner_
+4. Run the `/models` command to select a DeepSeek model like _DeepSeek Reasoner_.
 
    ```txt
    /models
@@ -587,15 +635,15 @@ Cloudflare AI Gateway ช่วยให้คุณเข้าถึงโม�
 
 ### Deep Infra
 
-1. ไปที่ [แดชบอร์ด Deep Infra](https://deepinfra.com/dash) สร้างบัญชี และสร้างคีย์ API
+1. Head over to the [Deep Infra dashboard](https://deepinfra.com/dash), create an account, and generate an API key.
 
-2. เรียกใช้คำสั่ง `/connect` และค้นหา **Deep Infra**
+2. Run the `/connect` command and search for **Deep Infra**.
 
    ```txt
    /connect
    ```
 
-3. ป้อนคีย์ Deep Infra API ของคุณ
+3. Enter your Deep Infra API key.
 
    ```txt
    ┌ API key
@@ -604,7 +652,7 @@ Cloudflare AI Gateway ช่วยให้คุณเข้าถึงโม�
    └ enter
    ```
 
-4. รันคำสั่ง `/models` เพื่อเลือกรุ่น
+4. Run the `/models` command to select a model.
 
    ```txt
    /models
@@ -614,15 +662,15 @@ Cloudflare AI Gateway ช่วยให้คุณเข้าถึงโม�
 
 ### Firmware
 
-1. ไปที่ [แดชบอร์ด Firmware](https://app.firmware.ai/signup) สร้างบัญชี และสร้างคีย์ API
+1. Head over to the [Firmware dashboard](https://app.firmware.ai/signup), create an account, and generate an API key.
 
-2. เรียกใช้คำสั่ง `/connect` และค้นหา **Firmware**
+2. Run the `/connect` command and search for **Firmware**.
 
    ```txt
    /connect
    ```
 
-3. ป้อนคีย์ Firmware API ของคุณ
+3. Enter your Firmware API key.
 
    ```txt
    ┌ API key
@@ -631,7 +679,7 @@ Cloudflare AI Gateway ช่วยให้คุณเข้าถึงโม�
    └ enter
    ```
 
-4. รันคำสั่ง `/models` เพื่อเลือกรุ่น
+4. Run the `/models` command to select a model.
 
    ```txt
    /models
@@ -641,15 +689,15 @@ Cloudflare AI Gateway ช่วยให้คุณเข้าถึงโม�
 
 ### Fireworks AI
 
-1. ไปที่ [คอนโซล Fireworks AI](https://app.fireworks.ai/) สร้างบัญชี แล้วคลิก **Create API Key**
+1. Head over to the [Fireworks AI console](https://app.fireworks.ai/), create an account, and click **Create API Key**.
 
-2. รันคำสั่ง `/connect` และค้นหา **Fireworks AI**
+2. Run the `/connect` command and search for **Fireworks AI**.
 
    ```txt
    /connect
    ```
 
-3. ป้อนคีย์ Fireworks AI API ของคุณ
+3. Enter your Fireworks AI API key.
 
    ```txt
    ┌ API key
@@ -658,7 +706,7 @@ Cloudflare AI Gateway ช่วยให้คุณเข้าถึงโม�
    └ enter
    ```
 
-4. รันคำสั่ง `/models` เพื่อเลือกโมเดลเช่น _Kimi K2 Instruct_
+4. Run the `/models` command to select a model like _Kimi K2 Instruct_.
 
    ```txt
    /models
@@ -668,15 +716,28 @@ Cloudflare AI Gateway ช่วยให้คุณเข้าถึงโม�
 
 ### GitLab Duo
 
-GitLab Duo ให้การแชทแบบเอเจนต์ที่ขับเคลื่อนด้วย AI พร้อมความสามารถในการเรียกใช้เครื่องมือแบบเนทีฟผ่านพร็อกซี Anthropic ของ GitLab
+:::caution[Experimental]
+GitLab Duo support in CyxCode is experimental. Features, configuration, and
+behavior may change in future releases.
+:::
 
-1. รันคำสั่ง `/connect` และเลือก GitLab
+CyxCode integrates with the [GitLab Duo Agent Platform](https://docs.gitlab.com/user/duo_agent_platform/),
+providing AI-powered agentic chat with native tool calling capabilities.
+
+:::note[License requirements]
+GitLab Duo Agent Platform requires a **Premium** or **Ultimate** GitLab
+subscription. It is available on GitLab.com and GitLab Self-Managed.
+See [GitLab Duo Agent Platform prerequisites](https://docs.gitlab.com/user/duo_agent_platform/#prerequisites)
+for full requirements.
+:::
+
+1. Run the `/connect` command and select GitLab.
 
    ```txt
    /connect
    ```
 
-2. เลือกวิธีการรับรองความถูกต้องของคุณ:
+2. Choose your authentication method:
 
    ```txt
    ┌ Select auth method
@@ -686,45 +747,44 @@ GitLab Duo ให้การแชทแบบเอเจนต์ที่ข
    └
    ```
 
-   #### การใช้ OAuth (แนะนำ)
+   #### Using OAuth (Recommended)
 
-   เลือก **OAuth** และเบราว์เซอร์ของคุณจะเปิดขึ้นเพื่อรับสิทธิ์
+   Select **OAuth** and your browser will open for authorization.
 
-#### การใช้ Personal Access Token
+   #### Using Personal Access Token
+   1. Go to [GitLab User Settings > Access Tokens](https://gitlab.com/-/user_settings/personal_access_tokens)
+   2. Click **Add new token**
+   3. Name: `cyxcode`, Scopes: `api`
+   4. Copy the token (starts with `glpat-`)
+   5. Enter it in the terminal
 
-1.  ไปที่ [GitLab User Settings > Access Tokens](https://gitlab.com/-/user_settings/personal_access_tokens)
-2.  คลิก **เพิ่มโทเค็นใหม่**
-3.  ชื่อ: `OpenCode`, ขอบเขต: `api`
-4.  คัดลอกโทเค็น (เริ่มต้นด้วย `glpat-`)
-5.  ป้อนลงใน terminal
+3. Run the `/models` command to see available models.
 
-6.  รันคำสั่ง `/models` เพื่อดูรุ่นที่มีจำหน่าย
+   ```txt
+   /models
+   ```
 
-    ```txt
-    /models
-    ```
-
-    มีโมเดลที่ใช้ Claude สามรุ่นให้เลือก:
-    - **duo-chat-haiku-4-5** (ค่าเริ่มต้น) - ตอบสนองรวดเร็วสำหรับงานด่วน
-    - **duo-chat-sonnet-4-5** - ประสิทธิภาพที่สมดุลสำหรับขั้นตอนการทำงานส่วนใหญ่
-    - **duo-chat-opus-4-5** - มีความสามารถมากที่สุดสำหรับการวิเคราะห์ที่ซับซ้อน
+   Three Claude-based models are available:
+   - **duo-chat-haiku-4-5** (Default) - Fast responses for quick tasks
+   - **duo-chat-sonnet-4-5** - Balanced performance for most workflows
+   - **duo-chat-opus-4-5** - Most capable for complex analysis
 
 :::note
-คุณยังสามารถระบุตัวแปรสภาพแวดล้อม 'GITLAB_TOKEN' ได้หากคุณไม่ต้องการ
-เพื่อจัดเก็บโทเค็นในที่เก็บข้อมูลการรับรองความถูกต้องของ opencode
+You can also specify 'GITLAB_TOKEN' environment variable if you don't want
+to store token in CyxCode auth storage.
 :::
 
-##### GitLab ที่โฮสต์เอง
+##### Self-Hosted GitLab
 
-:::note[บันทึกการปฏิบัติตาม]
-OpenCode ใช้โมเดลขนาดเล็กสำหรับงาน AI บางอย่าง เช่น การสร้างชื่อเซสชัน
-มีการกำหนดค่าให้ใช้ gpt-5-nano ตามค่าเริ่มต้น ซึ่งโฮสต์โดย Zen เพื่อล็อค OpenCode
-หากต้องการใช้เฉพาะอินสแตนซ์ที่โฮสต์บน GitLab ของคุณเอง ให้เพิ่มสิ่งต่อไปนี้ในของคุณ
-`opencode.json` ไฟล์. ขอแนะนำให้ปิดใช้งานการแชร์เซสชันด้วย
+:::note[compliance note]
+CyxCode uses a small model for some AI tasks like generating the session title.
+It is configured to use gpt-5-nano by default, hosted by Zen. To lock CyxCode
+to only use your own GitLab-hosted instance, add the following to your
+`opencode.json` file. It is also recommended to disable session sharing.
 
 ```json
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "small_model": "gitlab/duo-chat-haiku-4-5",
   "share": "disabled"
 }
@@ -732,20 +792,20 @@ OpenCode ใช้โมเดลขนาดเล็กสำหรับง�
 
 :::
 
-สำหรับอินสแตนซ์ GitLab ที่โฮสต์เอง:
+For self-hosted GitLab instances:
 
 ```bash
 export GITLAB_INSTANCE_URL=https://gitlab.company.com
 export GITLAB_TOKEN=glpat-...
 ```
 
-หากอินสแตนซ์ของคุณใช้งาน AI Gateway แบบกำหนดเอง:
+If your instance runs a custom AI Gateway:
 
 ```bash
 GITLAB_AI_GATEWAY_URL=https://ai-gateway.company.com
 ```
 
-หรือเพิ่มในโปรไฟล์ทุบตีของคุณ:
+Or add to your bash profile:
 
 ```bash title="~/.bash_profile"
 export GITLAB_INSTANCE_URL=https://gitlab.company.com
@@ -754,39 +814,41 @@ export GITLAB_TOKEN=glpat-...
 ```
 
 :::note
-ผู้ดูแลระบบ GitLab ของคุณต้องเปิดใช้งานสิ่งต่อไปนี้:
+Your GitLab administrator must:
 
-1. [Duo Agent Platform](https://docs.gitlab.com/user/duo_agent_platform/turn_on_off/) สำหรับผู้ใช้ กลุ่ม หรืออินสแตนซ์
-2. แฟล็กคุณลักษณะ (ผ่านคอนโซล Rails):
-   - `agent_platform_claude_code`
-   - `third_party_agents_enabled`
-     :::
+1. [Turn on GitLab Duo](https://docs.gitlab.com/user/duo_agent_platform/turn_on_off/#turn-gitlab-duo-on-or-off)
+   for the user, group, or instance
+2. [Turn on the Agent Platform](https://docs.gitlab.com/user/duo_agent_platform/turn_on_off/#turn-gitlab-duo-agent-platform-on-or-off)
+   (GitLab 18.8+) or [enable beta and experimental features](https://docs.gitlab.com/user/duo_agent_platform/turn_on_off/#turn-on-beta-and-experimental-features)
+   (GitLab 18.7 and earlier)
+3. For Self-Managed, [configure your instance](https://docs.gitlab.com/administration/gitlab_duo/configure/gitlab_self_managed/)
+   :::
 
-##### OAuth สำหรับอินสแตนซ์ที่โฮสต์เอง
+##### OAuth for Self-Hosted instances
 
-คุณต้องสร้างเพื่อให้ Oauth ทำงานกับอินสแตนซ์ที่โฮสต์เองได้
-แอพพลิเคชั่นใหม่ (Settings → Applications) ด้วย
-โทรกลับ URL `http://127.0.0.1:8080/callback` และขอบเขตต่อไปนี้:
+In order to make Oauth working for your self-hosted instance, you need to create
+a new application (Settings → Applications) with the
+callback URL `http://127.0.0.1:8080/callback` and following scopes:
 
-- api (เข้าถึง API ในนามของคุณ)
-- read_user (อ่านข้อมูลส่วนตัวของคุณ)
-- read_repository (อนุญาตให้เข้าถึงที่เก็บแบบอ่านอย่างเดียว)
+- api (Access the API on your behalf)
+- read_user (Read your personal information)
+- read_repository (Allows read-only access to the repository)
 
-จากนั้นเปิดเผย ID แอปพลิเคชันเป็นตัวแปรสภาพแวดล้อม:
+Then expose application ID as environment variable:
 
 ```bash
 export GITLAB_OAUTH_CLIENT_ID=your_application_id_here
 ```
 
-เอกสารประกอบเพิ่มเติมเกี่ยวกับหน้าแรกของ [opencode-gitlab-auth](https://www.npmjs.com/package/opencode-gitlab-auth)
+More documentation on [CyxCode-gitlab-auth](https://www.npmjs.com/package/CyxCode-gitlab-auth) homepage.
 
-##### การกำหนดค่า
+##### Configuration
 
-ปรับแต่งผ่าน `opencode.json`:
+Customize through `opencode.json`:
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "provider": {
     "gitlab": {
       "options": {
@@ -797,39 +859,51 @@ export GITLAB_OAUTH_CLIENT_ID=your_application_id_here
 }
 ```
 
-##### GitLab API Tools (เป็นทางเลือก แต่แนะนำเป็นอย่างยิ่ง)
+##### GitLab Duo Agent Platform (DAP) Workflow Models
 
-วิธีเข้าถึงเครื่องมือ GitLab (รวมคำขอ ปัญหา ไปป์ไลน์ CI/CD ฯลฯ):
+DAP workflow models provide an alternative execution path that routes tool calls
+through GitLab's Duo Workflow Service (DWS) instead of the standard agentic chat.
+When a `duo-workflow-*` model is selected, CyxCode will:
+
+1. Discover available models from your GitLab namespace
+2. Present a selection picker if multiple models are available
+3. Cache the selected model to disk for fast subsequent startups
+4. Route tool execution requests through CyxCode's permission-gated tool system
+
+Available DAP workflow models follow the `duo-workflow-*` naming convention and
+are dynamically discovered from your GitLab instance.
+
+##### GitLab API Tools (Optional, but highly recommended)
+
+To access GitLab tools (merge requests, issues, pipelines, CI/CD, etc.):
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
-  "plugin": ["opencode-gitlab-plugin"]
+  "$schema": "https://cyxcode.ai/config.json",
+  "plugin": ["CyxCode-gitlab-plugin"]
 }
 ```
 
-ปลั๊กอินนี้มอบความสามารถในการจัดการพื้นที่เก็บข้อมูล GitLab ที่ครอบคลุม รวมถึงการตรวจสอบ MR การติดตามปัญหา การตรวจสอบไปป์ไลน์ และอื่นๆ
+This plugin provides comprehensive GitLab repository management capabilities including MR reviews, issue tracking, pipeline monitoring, and more.
 
 ---
 
 ### GitHub Copilot
 
-วิธีใช้การสมัครสมาชิก GitHub Copilot ด้วย opencode:
+To use your GitHub Copilot subscription with CyxCode:
 
 :::note
-บางรุ่นอาจต้องมี [Pro+
-subscription](https://github.com/features/copilot/plans) เพื่อใช้งาน
-
-บางรุ่นจำเป็นต้องเปิดใช้งานด้วยตนเองใน [การตั้งค่า GitHub Copilot](https://docs.github.com/en/copilot/how-tos/use-ai-models/configure-access-to-ai-models#setup-for-individual-use)
+Some models might need a [Pro+
+subscription](https://github.com/features/copilot/plans) to use.
 :::
 
-1. รันคำสั่ง `/connect` และค้นหา GitHub Copilot
+1. Run the `/connect` command and search for GitHub Copilot.
 
    ```txt
    /connect
    ```
 
-2. ไปที่ [github.com/login/device](https://github.com/login/device) และป้อนรหัส
+2. Navigate to [github.com/login/device](https://github.com/login/device) and enter the code.
 
    ```txt
    ┌ Login with GitHub Copilot
@@ -838,10 +912,10 @@ subscription](https://github.com/features/copilot/plans) เพื่อใช�
    │
    │ Enter code: 8F43-6FCF
    │
-   │ Waiting for authorization...
+   └ Waiting for authorization...
    ```
 
-3. ตอนนี้รันคำสั่ง `/models` เพื่อเลือกรุ่นที่คุณต้องการ
+3. Now run the `/models` command to select the model you want.
 
    ```txt
    /models
@@ -851,29 +925,29 @@ subscription](https://github.com/features/copilot/plans) เพื่อใช�
 
 ### Google Vertex AI
 
-วิธีใช้ Google Vertex AI กับ OpenCode:
+To use Google Vertex AI with CyxCode:
 
-1. ไปที่ **Model Garden** ใน Google Cloud Console แล้วตรวจสอบ
-   รุ่นที่มีในภูมิภาคของคุณ
+1. Head over to the **Model Garden** in the Google Cloud Console and check the
+   models available in your region.
 
    :::note
-   คุณต้องมีโปรเจ็กต์ Google Cloud ที่เปิดใช้งาน Vertex AI API
+   You need to have a Google Cloud project with Vertex AI API enabled.
    :::
 
-2. ตั้งค่าตัวแปรสภาพแวดล้อมที่ต้องการ:
-   - `GOOGLE_CLOUD_PROJECT`: รหัสโครงการ Google Cloud ของคุณ
-   - `VERTEX_LOCATION` (เป็นทางเลือก): ภูมิภาคสำหรับ Vertex AI (ค่าเริ่มต้นคือ `global`)
-   - การรับรองความถูกต้อง (เลือกหนึ่งรายการ):
-     - `GOOGLE_APPLICATION_CREDENTIALS`: เส้นทางไปยังบัญชีบริการของคุณ JSON ไฟล์คีย์
-     - ตรวจสอบสิทธิ์โดยใช้ gcloud CLI: `gcloud auth application-default login`
+2. Set the required environment variables:
+   - `GOOGLE_CLOUD_PROJECT`: Your Google Cloud project ID
+   - `VERTEX_LOCATION` (optional): The region for Vertex AI (defaults to `global`)
+   - Authentication (choose one):
+     - `GOOGLE_APPLICATION_CREDENTIALS`: Path to your service account JSON key file
+     - Authenticate using gcloud CLI: `gcloud auth application-default login`
 
-   ตั้งค่าในขณะที่เรียกใช้ opencode
+   Set them while running CyxCode.
 
    ```bash
-   GOOGLE_APPLICATION_CREDENTIALS=/path/to/service-account.json GOOGLE_CLOUD_PROJECT=your-project-id opencode
+   GOOGLE_APPLICATION_CREDENTIALS=/path/to/service-account.json GOOGLE_CLOUD_PROJECT=your-project-id CyxCode
    ```
 
-   หรือเพิ่มลงในโปรไฟล์ทุบตีของคุณ
+   Or add them to your bash profile.
 
    ```bash title="~/.bash_profile"
    export GOOGLE_APPLICATION_CREDENTIALS=/path/to/service-account.json
@@ -882,10 +956,10 @@ subscription](https://github.com/features/copilot/plans) เพื่อใช�
    ```
 
 :::tip
-ภูมิภาค `global` ปรับปรุงความพร้อมใช้งานและลดข้อผิดพลาดโดยไม่มีค่าใช้จ่ายเพิ่มเติม ใช้ตำแหน่งข้อมูลระดับภูมิภาค (เช่น `us-central1`) สำหรับข้อกำหนดด้านถิ่นที่อยู่ของข้อมูล [เรียนรู้เพิ่มเติม](https://cloud.google.com/vertex-ai/generative-ai/docs/partner-models/use-partner-models#regional_and_global_endpoints)
+The `global` region improves availability and reduces errors at no extra cost. Use regional endpoints (e.g., `us-central1`) for data residency requirements. [Learn more](https://cloud.google.com/vertex-ai/generative-ai/docs/partner-models/use-partner-models#regional_and_global_endpoints)
 :::
 
-3. รันคำสั่ง `/models` เพื่อเลือกรุ่นที่ต้องการ
+3. Run the `/models` command to select the model you want.
 
    ```txt
    /models
@@ -895,15 +969,15 @@ subscription](https://github.com/features/copilot/plans) เพื่อใช�
 
 ### Groq
 
-1. ไปที่ [Groq console](https://console.groq.com/) คลิก **Create API Key** และคัดลอกคีย์
+1. Head over to the [Groq console](https://console.groq.com/), click **Create API Key**, and copy the key.
 
-2. เรียกใช้คำสั่ง `/connect` และค้นหา Groq
+2. Run the `/connect` command and search for Groq.
 
    ```txt
    /connect
    ```
 
-3. ป้อนคีย์ API สำหรับผู้ให้บริการ
+3. Enter the API key for the provider.
 
    ```txt
    ┌ API key
@@ -912,7 +986,7 @@ subscription](https://github.com/features/copilot/plans) เพื่อใช�
    └ enter
    ```
 
-4. รันคำสั่ง `/models` เพื่อเลือกคำสั่งที่คุณต้องการ
+4. Run the `/models` command to select the one you want.
 
    ```txt
    /models
@@ -922,17 +996,17 @@ subscription](https://github.com/features/copilot/plans) เพื่อใช�
 
 ### Hugging Face
 
-[ผู้ให้บริการการอนุมาน Hugging Face](https://huggingface.co/docs/inference-providers) ช่วยให้สามารถเข้าถึงโมเดลแบบเปิดที่รองรับโดยผู้ให้บริการมากกว่า 17 ราย
+[Hugging Face Inference Providers](https://huggingface.co/docs/inference-providers) provides access to open models supported by 17+ providers.
 
-1. ไปที่ [การตั้งค่า Hugging Face](https://huggingface.co/settings/tokens/new?ownUserPermissions=inference.serverless.write&tokenType=fineGrained) เพื่อสร้างโทเค็นที่มีสิทธิ์ในการโทรไปยังผู้ให้บริการการอนุมาน
+1. Head over to [Hugging Face settings](https://huggingface.co/settings/tokens/new?ownUserPermissions=inference.serverless.write&tokenType=fineGrained) to create a token with permission to make calls to Inference Providers.
 
-2. เรียกใช้คำสั่ง `/connect` และค้นหา **Hugging Face**
+2. Run the `/connect` command and search for **Hugging Face**.
 
    ```txt
    /connect
    ```
 
-3. ป้อน Hugging Face Token ของคุณ
+3. Enter your Hugging Face token.
 
    ```txt
    ┌ API key
@@ -941,7 +1015,7 @@ subscription](https://github.com/features/copilot/plans) เพื่อใช�
    └ enter
    ```
 
-4. รันคำสั่ง `/models` เพื่อเลือกโมเดล เช่น _Kimi-K2-Instruct_ หรือ _GLM-4.6_
+4. Run the `/models` command to select a model like _Kimi-K2-Instruct_ or _GLM-4.6_.
 
    ```txt
    /models
@@ -951,17 +1025,17 @@ subscription](https://github.com/features/copilot/plans) เพื่อใช�
 
 ### Helicone
 
-[Helicone](https://helicone.ai) เป็นแพลตฟอร์มการติดตาม LLM ที่ให้การบันทึก การตรวจสอบ และการวิเคราะห์สำหรับแอปพลิเคชัน AI ของคุณ Helicone AI Gateway กำหนดเส้นทางคำขอของคุณไปยังผู้ให้บริการที่เหมาะสมโดยอัตโนมัติตามรุ่น
+[Helicone](https://helicone.ai) is an LLM observability platform that provides logging, monitoring, and analytics for your AI applications. The Helicone AI Gateway routes your requests to the appropriate provider automatically based on the model.
 
-1. ไปที่ [Helicone](https://helicone.ai) สร้างบัญชี และสร้างคีย์ API จากแดชบอร์ดของคุณ
+1. Head over to [Helicone](https://helicone.ai), create an account, and generate an API key from your dashboard.
 
-2. รันคำสั่ง `/connect` และค้นหา **Helicone**
+2. Run the `/connect` command and search for **Helicone**.
 
    ```txt
    /connect
    ```
 
-3. ป้อนคีย์ Helicone API ของคุณ
+3. Enter your Helicone API key.
 
    ```txt
    ┌ API key
@@ -970,23 +1044,23 @@ subscription](https://github.com/features/copilot/plans) เพื่อใช�
    └ enter
    ```
 
-4. รันคำสั่ง `/models` เพื่อเลือกรุ่น
+4. Run the `/models` command to select a model.
 
    ```txt
    /models
    ```
 
-หากต้องการทราบผู้ให้บริการเพิ่มเติมและฟีเจอร์ขั้นสูง เช่น การแคชและการจำกัดอัตรา โปรดตรวจสอบ [เอกสารประกอบของ Helicone](https://docs.helicone.ai)
+For more providers and advanced features like caching and rate limiting, check the [Helicone documentation](https://docs.helicone.ai).
 
-#### การกำหนดค่าเพิ่มเติม
+#### Optional Configs
 
-ในกรณีที่คุณเห็นคุณสมบัติหรือรุ่นจาก Helicone ที่ไม่ได้กำหนดค่าโดยอัตโนมัติผ่าน opencode คุณสามารถกำหนดค่าด้วยตนเองได้ตลอดเวลา
+In the event you see a feature or model from Helicone that isn't configured automatically through CyxCode, you can always configure it yourself.
 
-นี่คือ [Helicone's Model Directory](https://helicone.ai/models) คุณจะต้องใช้สิ่งนี้เพื่อรับ ID ของโมเดลที่คุณต้องการเพิ่ม
+Here's [Helicone's Model Directory](https://helicone.ai/models), you'll need this to grab the IDs of the models you want to add.
 
 ```jsonc title="~/.config/opencode/opencode.jsonc"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "provider": {
     "helicone": {
       "npm": "@ai-sdk/openai-compatible",
@@ -1008,13 +1082,13 @@ subscription](https://github.com/features/copilot/plans) เพื่อใช�
 }
 ```
 
-#### ส่วนหัวที่กำหนดเอง
+#### Custom Headers
 
-Helicone รองรับส่วนหัวแบบกำหนดเองสำหรับฟีเจอร์ต่างๆ เช่น การแคช การติดตามผู้ใช้ และการจัดการเซสชัน เพิ่มลงในการกำหนดค่าผู้ให้บริการของคุณโดยใช้ `options.headers`:
+Helicone supports custom headers for features like caching, user tracking, and session management. Add them to your provider config using `options.headers`:
 
 ```jsonc title="~/.config/opencode/opencode.jsonc"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "provider": {
     "helicone": {
       "npm": "@ai-sdk/openai-compatible",
@@ -1023,7 +1097,7 @@ Helicone รองรับส่วนหัวแบบกำหนดเอ�
         "baseURL": "https://ai-gateway.helicone.ai",
         "headers": {
           "Helicone-Cache-Enabled": "true",
-          "Helicone-User-Id": "opencode",
+          "Helicone-User-Id": "CyxCode",
         },
       },
     },
@@ -1031,15 +1105,15 @@ Helicone รองรับส่วนหัวแบบกำหนดเอ�
 }
 ```
 
-##### การติดตามเซสชัน
+##### Session tracking
 
-คุณลักษณะ [เซสชัน](https://docs.helicone.ai/features/sessions) ของ Helicone ช่วยให้คุณสามารถจัดกลุ่มคำขอ LLM ที่เกี่ยวข้องเข้าด้วยกันได้ ใช้ปลั๊กอิน [opencode-helicone-session](https://github.com/H2Shami/opencode-helicone-session) เพื่อบันทึกการสนทนา OpenCode แต่ละรายการเป็นเซสชันใน Helicone โดยอัตโนมัติ
+Helicone's [Sessions](https://docs.helicone.ai/features/sessions) feature lets you group related LLM requests together. Use the [opencode-helicone-session](https://github.com/H2Shami/opencode-helicone-session) plugin to automatically log each CyxCode conversation as a session in Helicone.
 
 ```bash
 npm install -g opencode-helicone-session
 ```
 
-เพิ่มลงในการกำหนดค่าของคุณ
+Add it to your config.
 
 ```json title="opencode.json"
 {
@@ -1047,28 +1121,28 @@ npm install -g opencode-helicone-session
 }
 ```
 
-ปลั๊กอินจะแทรกส่วนหัว `Helicone-Session-Id` และ `Helicone-Session-Name` ลงในคำขอของคุณ ในหน้าเซสชันของ Helicone คุณจะเห็นการสนทนา OpenCode แต่ละรายการแยกเป็นเซสชันแยกกัน
+The plugin injects `Helicone-Session-Id` and `Helicone-Session-Name` headers into your requests. In Helicone's Sessions page, you'll see each CyxCode conversation listed as a separate session.
 
-##### ส่วนหัวของ Helicone ทั่วไป
+##### Common Helicone headers
 
-| ส่วนหัว                    | คำอธิบาย                                                         |
-| -------------------------- | ---------------------------------------------------------------- |
-| `Helicone-Cache-Enabled`   | เปิดใช้งานการแคชการตอบกลับ (`true`/`false`)                      |
-| `Helicone-User-Id`         | ติดตามตัวชี้วัดตามผู้ใช้                                         |
-| `Helicone-Property-[Name]` | เพิ่มคุณสมบัติที่กำหนดเอง (เช่น `Helicone-Property-Environment`) |
-| `Helicone-Prompt-Id`       | เชื่อมโยงคำขอกับเวอร์ชันพร้อมท์                                  |
+| Header                     | Description                                                   |
+| -------------------------- | ------------------------------------------------------------- |
+| `Helicone-Cache-Enabled`   | Enable response caching (`true`/`false`)                      |
+| `Helicone-User-Id`         | Track metrics by user                                         |
+| `Helicone-Property-[Name]` | Add custom properties (e.g., `Helicone-Property-Environment`) |
+| `Helicone-Prompt-Id`       | Associate requests with prompt versions                       |
 
-ดู [Helicone Header Directory](https://docs.helicone.ai/helicone-headers/header-directory) สำหรับส่วนหัวที่มีอยู่ทั้งหมด
+See the [Helicone Header Directory](https://docs.helicone.ai/helicone-headers/header-directory) for all available headers.
 
 ---
 
 ### llama.cpp
 
-คุณสามารถกำหนดค่า opencode เพื่อใช้โมเดลท้องถิ่นผ่านยูทิลิตี้ [llama.cpp's](https://github.com/ggml-org/llama.cpp) llama-server
+You can configure CyxCode to use local models through [llama.cpp's](https://github.com/ggml-org/llama.cpp) llama-server utility
 
 ```json title="opencode.json" "llama.cpp" {5, 6, 8, 10-15}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "provider": {
     "llama.cpp": {
       "npm": "@ai-sdk/openai-compatible",
@@ -1090,29 +1164,29 @@ npm install -g opencode-helicone-session
 }
 ```
 
-ในตัวอย่างนี้:
+In this example:
 
-- `llama.cpp` คือ ID ผู้ให้บริการที่กำหนดเอง นี่อาจเป็นสตริงใดก็ได้ที่คุณต้องการ
-- `npm` ระบุแพ็คเกจที่จะใช้สำหรับผู้ให้บริการรายนี้ ในที่นี้ `@ai-sdk/openai-compatible` ใช้สำหรับ API ที่เข้ากันได้กับ OpenAI
-- `name` คือชื่อที่แสดงของผู้ให้บริการใน UI
-- `options.baseURL` เป็นจุดสิ้นสุดสำหรับเซิร์ฟเวอร์ภายในเครื่อง
-- `models` คือแมปของ ID โมเดลกับการกำหนดค่า ชื่อรุ่นจะปรากฏในรายการเลือกรุ่น
+- `llama.cpp` is the custom provider ID. This can be any string you want.
+- `npm` specifies the package to use for this provider. Here, `@ai-sdk/openai-compatible` is used for any OpenAI-compatible API.
+- `name` is the display name for the provider in the UI.
+- `options.baseURL` is the endpoint for the local server.
+- `models` is a map of model IDs to their configurations. The model name will be displayed in the model selection list.
 
 ---
 
 ### IO.NET
 
-IO.NET มี 17 โมเดลที่ได้รับการปรับให้เหมาะกับการใช้งานที่หลากหลาย:
+IO.NET offers 17 models optimized for various use cases:
 
-1. ไปที่ [IO.NET console](https://ai.io.net/) สร้างบัญชี และสร้างคีย์ API
+1. Head over to the [IO.NET console](https://ai.io.net/), create an account, and generate an API key.
 
-2. รันคำสั่ง `/connect` และค้นหา **IO.NET**
+2. Run the `/connect` command and search for **IO.NET**.
 
    ```txt
    /connect
    ```
 
-3. ป้อนคีย์ IO.NET API ของคุณ
+3. Enter your IO.NET API key.
 
    ```txt
    ┌ API key
@@ -1121,7 +1195,7 @@ IO.NET มี 17 โมเดลที่ได้รับการปรับ
    └ enter
    ```
 
-4. รันคำสั่ง `/models` เพื่อเลือกรุ่น
+4. Run the `/models` command to select a model.
 
    ```txt
    /models
@@ -1131,11 +1205,11 @@ IO.NET มี 17 โมเดลที่ได้รับการปรับ
 
 ### LM Studio
 
-คุณสามารถกำหนดค่า opencode เพื่อใช้โมเดลท้องถิ่นผ่าน LM Studio
+You can configure CyxCode to use local models through LM Studio.
 
 ```json title="opencode.json" "lmstudio" {5, 6, 8, 10-14}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "provider": {
     "lmstudio": {
       "npm": "@ai-sdk/openai-compatible",
@@ -1153,29 +1227,29 @@ IO.NET มี 17 โมเดลที่ได้รับการปรับ
 }
 ```
 
-ในตัวอย่างนี้:
+In this example:
 
-- `lmstudio` คือ ID ผู้ให้บริการที่กำหนดเอง นี่อาจเป็นสตริงใดก็ได้ที่คุณต้องการ
-- `npm` ระบุแพ็คเกจที่จะใช้สำหรับผู้ให้บริการรายนี้ ในที่นี้ `@ai-sdk/openai-compatible` ใช้สำหรับ API ที่เข้ากันได้กับ OpenAI
-- `name` คือชื่อที่แสดงของผู้ให้บริการใน UI
-- `options.baseURL` เป็นจุดสิ้นสุดสำหรับเซิร์ฟเวอร์ภายในเครื่อง
-- `models` คือแมปของ ID โมเดลกับการกำหนดค่า ชื่อรุ่นจะปรากฏในรายการเลือกรุ่น
+- `lmstudio` is the custom provider ID. This can be any string you want.
+- `npm` specifies the package to use for this provider. Here, `@ai-sdk/openai-compatible` is used for any OpenAI-compatible API.
+- `name` is the display name for the provider in the UI.
+- `options.baseURL` is the endpoint for the local server.
+- `models` is a map of model IDs to their configurations. The model name will be displayed in the model selection list.
 
 ---
 
 ### Moonshot AI
 
-วิธีใช้ Kimi K2 จาก Moonshot AI:
+To use Kimi K2 from Moonshot AI:
 
-1. ไปที่ [Moonshot AI console](https://platform.moonshot.ai/console) สร้างบัญชี แล้วคลิก **Create API Key**
+1. Head over to the [Moonshot AI console](https://platform.moonshot.ai/console), create an account, and click **Create API key**.
 
-2. รันคำสั่ง `/connect` และค้นหา **Moonshot AI**
+2. Run the `/connect` command and search for **Moonshot AI**.
 
    ```txt
    /connect
    ```
 
-3. ป้อนคีย์ Moonshot API ของคุณ
+3. Enter your Moonshot API key.
 
    ```txt
    ┌ API key
@@ -1184,7 +1258,7 @@ IO.NET มี 17 โมเดลที่ได้รับการปรับ
    └ enter
    ```
 
-4. รันคำสั่ง `/models` เพื่อเลือก _Kimi K2_
+4. Run the `/models` command to select _Kimi K2_.
 
    ```txt
    /models
@@ -1194,15 +1268,15 @@ IO.NET มี 17 โมเดลที่ได้รับการปรับ
 
 ### MiniMax
 
-1. ไปที่ [MiniMax API Console](https://platform.minimax.io/login) สร้างบัญชี และสร้างคีย์ API
+1. Head over to the [MiniMax API Console](https://platform.minimax.io/login), create an account, and generate an API key.
 
-2. เรียกใช้คำสั่ง `/connect` และค้นหา **MiniMax**
+2. Run the `/connect` command and search for **MiniMax**.
 
    ```txt
    /connect
    ```
 
-3. ป้อนคีย์ MiniMax API ของคุณ
+3. Enter your MiniMax API key.
 
    ```txt
    ┌ API key
@@ -1211,7 +1285,7 @@ IO.NET มี 17 โมเดลที่ได้รับการปรับ
    └ enter
    ```
 
-4. รันคำสั่ง `/models` เพื่อเลือกรุ่นเช่น _M2.1_
+4. Run the `/models` command to select a model like _M2.1_.
 
    ```txt
    /models
@@ -1221,15 +1295,15 @@ IO.NET มี 17 โมเดลที่ได้รับการปรับ
 
 ### Nebius Token Factory
 
-1. ไปที่ [คอนโซล Nebius Token Factory](https://tokenfactory.nebius.com/) สร้างบัญชี แล้วคลิก **Add key**
+1. Head over to the [Nebius Token Factory console](https://tokenfactory.nebius.com/), create an account, and click **Add Key**.
 
-2. รันคำสั่ง `/connect` และค้นหา **Nebius Token Factory**
+2. Run the `/connect` command and search for **Nebius Token Factory**.
 
    ```txt
    /connect
    ```
 
-3. ป้อนคีย์ Nebius Token Factory API ของคุณ
+3. Enter your Nebius Token Factory API key.
 
    ```txt
    ┌ API key
@@ -1238,7 +1312,7 @@ IO.NET มี 17 โมเดลที่ได้รับการปรับ
    └ enter
    ```
 
-4. รันคำสั่ง `/models` เพื่อเลือกโมเดลเช่น _Kimi K2 Instruct_
+4. Run the `/models` command to select a model like _Kimi K2 Instruct_.
 
    ```txt
    /models
@@ -1248,15 +1322,15 @@ IO.NET มี 17 โมเดลที่ได้รับการปรับ
 
 ### Ollama
 
-คุณสามารถกำหนดค่า opencode เพื่อใช้โมเดลท้องถิ่นผ่าน Ollama
+You can configure CyxCode to use local models through Ollama.
 
 :::tip
-Ollama สามารถกำหนดค่าตัวเองสำหรับ OpenCode ได้โดยอัตโนมัติ ดู [เอกสารการบูรณาการ Ollama](https://docs.ollama.com/integrations/opencode) เพื่อดูรายละเอียด
+Ollama can automatically configure itself for CyxCode. See the [Ollama integration docs](https://docs.ollama.com/integrations/CyxCode) for details.
 :::
 
 ```json title="opencode.json" "ollama" {5, 6, 8, 10-14}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "provider": {
     "ollama": {
       "npm": "@ai-sdk/openai-compatible",
@@ -1274,37 +1348,37 @@ Ollama สามารถกำหนดค่าตัวเองสำหร�
 }
 ```
 
-ในตัวอย่างนี้:
+In this example:
 
-- `ollama` คือ ID ผู้ให้บริการที่กำหนดเอง นี่อาจเป็นสตริงใดก็ได้ที่คุณต้องการ
-- `npm` ระบุแพ็คเกจที่จะใช้สำหรับผู้ให้บริการรายนี้ ในที่นี้ `@ai-sdk/openai-compatible` ใช้สำหรับ API ที่เข้ากันได้กับ OpenAI
-- `name` คือชื่อที่แสดงของผู้ให้บริการใน UI
-- `options.baseURL` เป็นจุดสิ้นสุดสำหรับเซิร์ฟเวอร์ภายในเครื่อง
-- `models` คือแมปของ ID โมเดลกับการกำหนดค่า ชื่อรุ่นจะปรากฏในรายการเลือกรุ่น
+- `ollama` is the custom provider ID. This can be any string you want.
+- `npm` specifies the package to use for this provider. Here, `@ai-sdk/openai-compatible` is used for any OpenAI-compatible API.
+- `name` is the display name for the provider in the UI.
+- `options.baseURL` is the endpoint for the local server.
+- `models` is a map of model IDs to their configurations. The model name will be displayed in the model selection list.
 
 :::tip
-หากการเรียกใช้เครื่องมือไม่ทำงาน ให้ลองเพิ่ม `num_ctx` ใน Ollama เริ่มต้นประมาณ 16,000 - 32,000
+If tool calls aren't working, try increasing `num_ctx` in Ollama. Start around 16k - 32k.
 :::
 
 ---
 
 ### Ollama Cloud
 
-วิธีใช้ Ollama Cloud กับ OpenCode:
+To use Ollama Cloud with CyxCode:
 
-1. ไปที่ [https://ollama.com/](https://ollama.com/) แล้วลงชื่อเข้าใช้หรือสร้างบัญชี
+1. Head over to [https://ollama.com/](https://ollama.com/) and sign in or create an account.
 
-2. ไปที่ **Settings** > **Keys** แล้วคลิก **Add API Key** เพื่อสร้างคีย์ API ใหม่
+2. Navigate to **Settings** > **Keys** and click **Add API Key** to generate a new API key.
 
-3. คัดลอกคีย์ API เพื่อใช้ใน OpenCode
+3. Copy the API key for use in CyxCode.
 
-4. เรียกใช้คำสั่ง `/connect` และค้นหา **Ollama Cloud**
+4. Run the `/connect` command and search for **Ollama Cloud**.
 
    ```txt
    /connect
    ```
 
-5. ป้อนคีย์ Ollama Cloud API ของคุณ
+5. Enter your Ollama Cloud API key.
 
    ```txt
    ┌ API key
@@ -1313,13 +1387,13 @@ Ollama สามารถกำหนดค่าตัวเองสำหร�
    └ enter
    ```
 
-6. **สำคัญ**: ก่อนที่จะใช้โมเดลคลาวด์ใน OpenCode คุณต้องดึงข้อมูลโมเดลในเครื่อง:
+6. **Important**: Before using cloud models in CyxCode, you must pull the model information locally:
 
    ```bash
    ollama pull gpt-oss:20b-cloud
    ```
 
-7. รันคำสั่ง `/models` เพื่อเลือกโมเดล Ollama Cloud ของคุณ
+7. Run the `/models` command to select your Ollama Cloud model.
 
    ```txt
    /models
@@ -1329,16 +1403,16 @@ Ollama สามารถกำหนดค่าตัวเองสำหร�
 
 ### OpenAI
 
-เราขอแนะนำให้สมัคร [ChatGPT Plus หรือ Pro](https://chatgpt.com/pricing)
+We recommend signing up for [ChatGPT Plus or Pro](https://chatgpt.com/pricing).
 
-1. เมื่อคุณสมัครแล้ว ให้รันคำสั่ง `/connect` และเลือก OpenAI
+1. Once you've signed up, run the `/connect` command and select OpenAI.
 
    ```txt
    /connect
    ```
 
-2. ที่นี่คุณสามารถเลือกตัวเลือก **ChatGPT Plus/Pro** จากนั้นเบราว์เซอร์จะเปิดขึ้นมา
-   และขอให้คุณตรวจสอบสิทธิ์
+2. Here you can select the **ChatGPT Plus/Pro** option and it'll open your browser
+   and ask you to authenticate.
 
    ```txt
    ┌ Select auth method
@@ -1348,31 +1422,31 @@ Ollama สามารถกำหนดค่าตัวเองสำหร�
    └
    ```
 
-3. ตอนนี้โมเดล OpenAI ทั้งหมดควรจะพร้อมใช้งานเมื่อคุณใช้คำสั่ง `/models`
+3. Now all the OpenAI models should be available when you use the `/models` command.
 
    ```txt
    /models
    ```
 
-##### การใช้ API Key
+##### Using API keys
 
-หากคุณมีคีย์ API อยู่แล้ว คุณสามารถเลือก **Manually enter API Key** และวางลงใน terminal ของคุณ
+If you already have an API key, you can select **Manually enter API Key** and paste it in your terminal.
 
 ---
 
-### OpenCode Zen
+### CyxCode Zen
 
-OpenCode Zen คือรายการโมเดลที่ได้รับการทดสอบและตรวจสอบแล้วโดยทีมงาน OpenCode [เรียนรู้เพิ่มเติม](/docs/zen)
+CyxCode Zen is a list of tested and verified models provided by the CyxCode team. [Learn more](/docs/zen).
 
-1. ลงชื่อเข้าใช้ **<a href={console}>OpenCode Zen</a>** และคลิก **สร้าง API คีย์**
+1. Sign in to **<a href={console}>CyxCode Zen</a>** and click **Create API Key**.
 
-2. เรียกใช้คำสั่ง `/connect` และค้นหา **OpenCode Zen**
+2. Run the `/connect` command and search for **CyxCode Zen**.
 
    ```txt
    /connect
    ```
 
-3. ป้อนคีย์ OpenCode API ของคุณ
+3. Enter your CyxCode API key.
 
    ```txt
    ┌ API key
@@ -1381,7 +1455,7 @@ OpenCode Zen คือรายการโมเดลที่ได้รั�
    └ enter
    ```
 
-4. รันคำสั่ง `/models` เพื่อเลือกโมเดลเช่น _Qwen 3 Coder 480B_
+4. Run the `/models` command to select a model like _Qwen 3 Coder 480B_.
 
    ```txt
    /models
@@ -1391,15 +1465,15 @@ OpenCode Zen คือรายการโมเดลที่ได้รั�
 
 ### OpenRouter
 
-1. ไปที่ [OpenRouter dashboard](https://openrouter.ai/settings/keys) คลิก **Create API Key** และคัดลอกคีย์
+1. Head over to the [OpenRouter dashboard](https://openrouter.ai/settings/keys), click **Create API Key**, and copy the key.
 
-2. เรียกใช้คำสั่ง `/connect` และค้นหา OpenRouter
+2. Run the `/connect` command and search for OpenRouter.
 
    ```txt
    /connect
    ```
 
-3. ป้อนคีย์ API สำหรับผู้ให้บริการ
+3. Enter the API key for the provider.
 
    ```txt
    ┌ API key
@@ -1408,17 +1482,17 @@ OpenCode Zen คือรายการโมเดลที่ได้รั�
    └ enter
    ```
 
-4. โมเดล OpenRouter จำนวนมากถูกโหลดไว้ล่วงหน้าตามค่าเริ่มต้น รันคำสั่ง `/models` เพื่อเลือกโมเดลที่คุณต้องการ
+4. Many OpenRouter models are preloaded by default, run the `/models` command to select the one you want.
 
    ```txt
    /models
    ```
 
-   คุณยังสามารถเพิ่มโมเดลเพิ่มเติมผ่านการกำหนดค่า opencode ของคุณได้
+   You can also add additional models through your CyxCode config.
 
    ```json title="opencode.json" {6}
    {
-     "$schema": "https://opencode.ai/config.json",
+     "$schema": "https://cyxcode.ai/config.json",
      "provider": {
        "openrouter": {
          "models": {
@@ -1429,11 +1503,11 @@ OpenCode Zen คือรายการโมเดลที่ได้รั�
    }
    ```
 
-5. คุณยังสามารถปรับแต่งได้ผ่านการกำหนดค่า opencode ของคุณ นี่คือตัวอย่างการระบุผู้ให้บริการ
+5. You can also customize them through your CyxCode config. Here's an example of specifying a provider
 
    ```json title="opencode.json"
    {
-     "$schema": "https://opencode.ai/config.json",
+     "$schema": "https://cyxcode.ai/config.json",
      "provider": {
        "openrouter": {
          "models": {
@@ -1455,21 +1529,21 @@ OpenCode Zen คือรายการโมเดลที่ได้รั�
 
 ### SAP AI Core
 
-SAP AI Core ให้การเข้าถึงโมเดลมากกว่า 40 รุ่นจาก OpenAI, Anthropic, Google, Amazon, Meta, Mistral และ AI21 ผ่านแพลตฟอร์มเดียว
+SAP AI Core provides access to 40+ models from OpenAI, Anthropic, Google, Amazon, Meta, Mistral, and AI21 through a unified platform.
 
-1. ไปที่ [SAP BTP Cockpit](https://account.hana.ondemand.com/) ของคุณ ไปที่อินสแตนซ์บริการ SAP AI Core และสร้างคีย์บริการ
+1. Go to your [SAP BTP Cockpit](https://account.hana.ondemand.com/), navigate to your SAP AI Core service instance, and create a service key.
 
    :::tip
-   คีย์บริการคือวัตถุ JSON ที่มี `clientid`, `clientsecret`, `url` และ `serviceurls.AI_API_URL` คุณสามารถค้นหาอินสแตนซ์ AI Core ของคุณได้ภายใต้ **Services** > **Instances and Subscriptions** ใน BTP Cockpit
+   The service key is a JSON object containing `clientid`, `clientsecret`, `url`, and `serviceurls.AI_API_URL`. You can find your AI Core instance under **Services** > **Instances and Subscriptions** in the BTP Cockpit.
    :::
 
-2. เรียกใช้คำสั่ง `/connect` และค้นหา **SAP AI Core**
+2. Run the `/connect` command and search for **SAP AI Core**.
 
    ```txt
    /connect
    ```
 
-3. ป้อน JSON คีย์บริการของคุณ
+3. Enter your service key JSON.
 
    ```txt
    ┌ Service key
@@ -1478,29 +1552,29 @@ SAP AI Core ให้การเข้าถึงโมเดลมากก�
    └ enter
    ```
 
-   หรือตั้งค่าตัวแปรสภาพแวดล้อม `AICORE_SERVICE_KEY`:
+   Or set the `AICORE_SERVICE_KEY` environment variable:
 
    ```bash
-   AICORE_SERVICE_KEY='{"clientid":"...","clientsecret":"...","url":"...","serviceurls":{"AI_API_URL":"..."}}' opencode
+   AICORE_SERVICE_KEY='{"clientid":"...","clientsecret":"...","url":"...","serviceurls":{"AI_API_URL":"..."}}' CyxCode
    ```
 
-   หรือเพิ่มลงในโปรไฟล์ทุบตีของคุณ:
+   Or add it to your bash profile:
 
    ```bash title="~/.bash_profile"
    export AICORE_SERVICE_KEY='{"clientid":"...","clientsecret":"...","url":"...","serviceurls":{"AI_API_URL":"..."}}'
    ```
 
-4. เลือกตั้งค่ารหัสการปรับใช้และกลุ่มทรัพยากร:
+4. Optionally set deployment ID and resource group:
 
    ```bash
-   AICORE_DEPLOYMENT_ID=your-deployment-id AICORE_RESOURCE_GROUP=your-resource-group opencode
+   AICORE_DEPLOYMENT_ID=your-deployment-id AICORE_RESOURCE_GROUP=your-resource-group CyxCode
    ```
 
    :::note
-   การตั้งค่าเหล่านี้เป็นทางเลือกและควรกำหนดค่าตามการตั้งค่า SAP AI Core ของคุณ
+   These settings are optional and should be configured according to your SAP AI Core setup.
    :::
 
-5. รันคำสั่ง `/models` เพื่อเลือกจาก 40+ รุ่นที่มีอยู่
+5. Run the `/models` command to select from 40+ available models.
 
    ```txt
    /models
@@ -1510,21 +1584,21 @@ SAP AI Core ให้การเข้าถึงโมเดลมากก�
 
 ### STACKIT
 
-STACKIT AI Model Serving มอบสภาพแวดล้อมการโฮสต์ที่มีการจัดการเต็มรูปแบบสำหรับโมเดล AI โดยเน้นที่ LLM เช่น Llama, Mistral และ Qwen โดยมีอธิปไตยของข้อมูลสูงสุดบนโครงสร้างพื้นฐานยุโรป
+STACKIT AI Model Serving provides fully managed soverign hosting environment for AI models, focusing on LLMs like Llama, Mistral, and Qwen, with maximum data sovereignty on European infrastructure.
 
-1. ไปที่ [STACKIT Portal](https://portal.stackit.cloud) ไปที่ **AI Model Serving** และสร้างโทเค็นการตรวจสอบสิทธิ์สำหรับโครงการของคุณ
+1. Head over to [STACKIT Portal](https://portal.stackit.cloud), navigate to **AI Model Serving**, and create an auth token for your project.
 
    :::tip
-   คุณต้องมีบัญชีลูกค้า STACKIT บัญชีผู้ใช้ และโครงการก่อนสร้างโทเค็นการตรวจสอบสิทธิ์
+   You need a STACKIT customer account, user account, and project before creating auth tokens.
    :::
 
-2. เรียกใช้คำสั่ง `/connect` และค้นหา **STACKIT**
+2. Run the `/connect` command and search for **STACKIT**.
 
    ```txt
    /connect
    ```
 
-3. ป้อนโทเค็นการตรวจสอบสิทธิ์ STACKIT AI Model Serving ของคุณ
+3. Enter your STACKIT AI Model Serving auth token.
 
    ```txt
    ┌ API key
@@ -1533,7 +1607,7 @@ STACKIT AI Model Serving มอบสภาพแวดล้อมการโ�
    └ enter
    ```
 
-4. รันคำสั่ง `/models` เพื่อเลือกจากโมเดลที่มีอยู่ เช่น _Qwen3-VL 235B_ หรือ _Llama 3.3 70B_
+4. Run the `/models` command to select from available models like _Qwen3-VL 235B_ or _Llama 3.3 70B_.
 
    ```txt
    /models
@@ -1543,15 +1617,15 @@ STACKIT AI Model Serving มอบสภาพแวดล้อมการโ�
 
 ### OVHcloud AI Endpoints
 
-1. ไปที่ [OVHcloud panel](https://ovh.com/manager) ไปที่ส่วน `Public Cloud`, `AI & Machine Learning` > `AI Endpoints` และในแท็บ `API Keys` ให้คลิก **Create a new API key**
+1. Head over to the [OVHcloud panel](https://ovh.com/manager). Navigate to the `Public Cloud` section, `AI & Machine Learning` > `AI Endpoints` and in `API Keys` tab, click **Create a new API key**.
 
-2. เรียกใช้คำสั่ง `/connect` และค้นหา **OVHcloud AI Endpoints**
+2. Run the `/connect` command and search for **OVHcloud AI Endpoints**.
 
    ```txt
    /connect
    ```
 
-3. ป้อนคีย์ API OVHcloud AI Endpoints ของคุณ
+3. Enter your OVHcloud AI Endpoints API key.
 
    ```txt
    ┌ API key
@@ -1560,7 +1634,7 @@ STACKIT AI Model Serving มอบสภาพแวดล้อมการโ�
    └ enter
    ```
 
-4. รันคำสั่ง `/models` เพื่อเลือกโมเดลเช่น _gpt-oss-120b_
+4. Run the `/models` command to select a model like _gpt-oss-120b_.
 
    ```txt
    /models
@@ -1570,17 +1644,17 @@ STACKIT AI Model Serving มอบสภาพแวดล้อมการโ�
 
 ### Scaleway
 
-วิธีใช้ [Scaleway Generative APIs](https://www.scaleway.com/en/docs/generative-apis/) กับ Opencode:
+To use [Scaleway Generative APIs](https://www.scaleway.com/en/docs/generative-apis/) with CyxCode:
 
-1. ไปที่ [Scaleway Console IAM settings](https://console.scaleway.com/iam/api-keys) เพื่อสร้างคีย์ API ใหม่
+1. Head over to the [Scaleway Console IAM settings](https://console.scaleway.com/iam/api-keys) to generate a new API key.
 
-2. เรียกใช้คำสั่ง `/connect` และค้นหา **Scaleway**
+2. Run the `/connect` command and search for **Scaleway**.
 
    ```txt
    /connect
    ```
 
-3. ป้อนคีย์ Scaleway API ของคุณ
+3. Enter your Scaleway API key.
 
    ```txt
    ┌ API key
@@ -1589,7 +1663,7 @@ STACKIT AI Model Serving มอบสภาพแวดล้อมการโ�
    └ enter
    ```
 
-4. รันคำสั่ง `/models` เพื่อเลือกโมเดลเช่น _devstral-2-123b-instruct-2512_ หรือ _gpt-oss-120b_
+4. Run the `/models` command to select a model like _devstral-2-123b-instruct-2512_ or _gpt-oss-120b_.
 
    ```txt
    /models
@@ -1599,15 +1673,15 @@ STACKIT AI Model Serving มอบสภาพแวดล้อมการโ�
 
 ### Together AI
 
-1. ไปที่ [Together AI console](https://api.together.ai) สร้างบัญชี และคลิก **Add Key**
+1. Head over to the [Together AI console](https://api.together.ai), create an account, and click **Add Key**.
 
-2. เรียกใช้คำสั่ง `/connect` และค้นหา **Together AI**
+2. Run the `/connect` command and search for **Together AI**.
 
    ```txt
    /connect
    ```
 
-3. ป้อนคีย์ Together AI API ของคุณ
+3. Enter your Together AI API key.
 
    ```txt
    ┌ API key
@@ -1616,7 +1690,7 @@ STACKIT AI Model Serving มอบสภาพแวดล้อมการโ�
    └ enter
    ```
 
-4. รันคำสั่ง `/models` เพื่อเลือกโมเดลเช่น _Kimi K2 Instruct_
+4. Run the `/models` command to select a model like _Kimi K2 Instruct_.
 
    ```txt
    /models
@@ -1626,15 +1700,15 @@ STACKIT AI Model Serving มอบสภาพแวดล้อมการโ�
 
 ### Venice AI
 
-1. ไปที่ [Venice AI console](https://venice.ai) สร้างบัญชี และสร้างคีย์ API
+1. Head over to the [Venice AI console](https://venice.ai), create an account, and generate an API key.
 
-2. เรียกใช้คำสั่ง `/connect` และค้นหา **Venice AI**
+2. Run the `/connect` command and search for **Venice AI**.
 
    ```txt
    /connect
    ```
 
-3. ป้อนคีย์ Venice AI API ของคุณ
+3. Enter your Venice AI API key.
 
    ```txt
    ┌ API key
@@ -1643,7 +1717,7 @@ STACKIT AI Model Serving มอบสภาพแวดล้อมการโ�
    └ enter
    ```
 
-4. รันคำสั่ง `/models` เพื่อเลือกโมเดลเช่น _Llama 3.3 70B_
+4. Run the `/models` command to select a model like _Llama 3.3 70B_.
 
    ```txt
    /models
@@ -1653,17 +1727,17 @@ STACKIT AI Model Serving มอบสภาพแวดล้อมการโ�
 
 ### Vercel AI Gateway
 
-Vercel AI Gateway ช่วยให้คุณเข้าถึงโมเดลจาก OpenAI, Anthropic, Google, xAI และอื่นๆ อีกมากมายผ่านจุดสิ้นสุดแบบรวม โมเดลถูกนำเสนอในราคาปลีกโดยไม่มีการบวกเพิ่ม
+Vercel AI Gateway lets you access models from OpenAI, Anthropic, Google, xAI, and more through a unified endpoint. Models are offered at list price with no markup.
 
-1. ไปที่ [Vercel dashboard](https://vercel.com/) ไปที่แท็บ **AI Gateway** และคลิก **API keys** เพื่อสร้างคีย์ API ใหม่
+1. Head over to the [Vercel dashboard](https://vercel.com/), navigate to the **AI Gateway** tab, and click **API keys** to create a new API key.
 
-2. เรียกใช้คำสั่ง `/connect` และค้นหา **Vercel AI Gateway**
+2. Run the `/connect` command and search for **Vercel AI Gateway**.
 
    ```txt
    /connect
    ```
 
-3. ป้อนคีย์ Vercel AI Gateway API ของคุณ
+3. Enter your Vercel AI Gateway API key.
 
    ```txt
    ┌ API key
@@ -1672,17 +1746,17 @@ Vercel AI Gateway ช่วยให้คุณเข้าถึงโมเ�
    └ enter
    ```
 
-4. รันคำสั่ง `/models` เพื่อเลือกรุ่น
+4. Run the `/models` command to select a model.
 
    ```txt
    /models
    ```
 
-คุณยังสามารถปรับแต่งโมเดลผ่านการกำหนดค่า opencode ของคุณได้ นี่คือตัวอย่างการระบุลำดับการกำหนดเส้นทางผู้ให้บริการ
+You can also customize models through your CyxCode config. Here's an example of specifying provider routing order.
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "provider": {
     "vercel": {
       "models": {
@@ -1697,27 +1771,27 @@ Vercel AI Gateway ช่วยให้คุณเข้าถึงโมเ�
 }
 ```
 
-ตัวเลือกการกำหนดเส้นทางที่มีประโยชน์บางประการ:
+Some useful routing options:
 
-| ตัวเลือก            | คำอธิบาย                                                   |
-| ------------------- | ---------------------------------------------------------- |
-| `order`             | ลำดับผู้ให้บริการที่จะลอง                                  |
-| `only`              | จำกัดเฉพาะผู้ให้บริการที่ระบุ                              |
-| `zeroDataRetention` | ใช้เฉพาะผู้ให้บริการที่มีนโยบายการเก็บรักษาข้อมูลเป็นศูนย์ |
+| Option              | Description                                          |
+| ------------------- | ---------------------------------------------------- |
+| `order`             | Provider sequence to try                             |
+| `only`              | Restrict to specific providers                       |
+| `zeroDataRetention` | Only use providers with zero data retention policies |
 
 ---
 
 ### xAI
 
-1. ไปที่ [xAI console](https://console.x.ai/) สร้างบัญชี และสร้างคีย์ API
+1. Head over to the [xAI console](https://console.x.ai/), create an account, and generate an API key.
 
-2. เรียกใช้คำสั่ง `/connect` และค้นหา **xAI**
+2. Run the `/connect` command and search for **xAI**.
 
    ```txt
    /connect
    ```
 
-3. ป้อนคีย์ xAI API ของคุณ
+3. Enter your xAI API key.
 
    ```txt
    ┌ API key
@@ -1726,7 +1800,7 @@ Vercel AI Gateway ช่วยให้คุณเข้าถึงโมเ�
    └ enter
    ```
 
-4. รันคำสั่ง `/models` เพื่อเลือกโมเดลเช่น _Grok Beta_
+4. Run the `/models` command to select a model like _Grok Beta_.
 
    ```txt
    /models
@@ -1736,17 +1810,17 @@ Vercel AI Gateway ช่วยให้คุณเข้าถึงโมเ�
 
 ### Z.AI
 
-1. ไปที่ [Z.AI API console](https://z.ai/manage-apikey/apikey-list) สร้างบัญชี และคลิก **Create a new API key**
+1. Head over to the [Z.AI API console](https://z.ai/manage-apikey/apikey-list), create an account, and click **Create a new API key**.
 
-2. เรียกใช้คำสั่ง `/connect` และค้นหา **Z.AI**
+2. Run the `/connect` command and search for **Z.AI**.
 
    ```txt
    /connect
    ```
 
-   หากคุณสมัครรับ **GLM Coding Plan** ให้เลือก **Z.AI Coding Plan**
+   If you are subscribed to the **GLM Coding Plan**, select **Z.AI Coding Plan**.
 
-3. ป้อนคีย์ Z.AI API ของคุณ
+3. Enter your Z.AI API key.
 
    ```txt
    ┌ API key
@@ -1755,7 +1829,7 @@ Vercel AI Gateway ช่วยให้คุณเข้าถึงโมเ�
    └ enter
    ```
 
-4. รันคำสั่ง `/models` เพื่อเลือกโมเดลเช่น _GLM-4.7_
+4. Run the `/models` command to select a model like _GLM-4.7_.
 
    ```txt
    /models
@@ -1765,15 +1839,15 @@ Vercel AI Gateway ช่วยให้คุณเข้าถึงโมเ�
 
 ### ZenMux
 
-1. ไปที่ [ZenMux dashboard](https://zenmux.ai/settings/keys) คลิก **Create API Key** และคัดลอกคีย์
+1. Head over to the [ZenMux dashboard](https://zenmux.ai/settings/keys), click **Create API Key**, and copy the key.
 
-2. เรียกใช้คำสั่ง `/connect` และค้นหา ZenMux
+2. Run the `/connect` command and search for ZenMux.
 
    ```txt
    /connect
    ```
 
-3. ป้อนคีย์ API สำหรับผู้ให้บริการ
+3. Enter the API key for the provider.
 
    ```txt
    ┌ API key
@@ -1782,17 +1856,17 @@ Vercel AI Gateway ช่วยให้คุณเข้าถึงโมเ�
    └ enter
    ```
 
-4. โมเดล ZenMux จำนวนมากถูกโหลดไว้ล่วงหน้าตามค่าเริ่มต้น รันคำสั่ง `/models` เพื่อเลือกโมเดลที่คุณต้องการ
+4. Many ZenMux models are preloaded by default, run the `/models` command to select the one you want.
 
    ```txt
    /models
    ```
 
-   คุณยังสามารถเพิ่มโมเดลเพิ่มเติมผ่านการกำหนดค่า opencode ของคุณได้
+   You can also add additional models through your CyxCode config.
 
    ```json title="opencode.json" {6}
    {
-     "$schema": "https://opencode.ai/config.json",
+     "$schema": "https://cyxcode.ai/config.json",
      "provider": {
        "zenmux": {
          "models": {
@@ -1805,15 +1879,15 @@ Vercel AI Gateway ช่วยให้คุณเข้าถึงโมเ�
 
 ---
 
-## ผู้ให้บริการที่กำหนดเอง
+## Custom provider
 
-หากต้องการเพิ่มผู้ให้บริการที่ **เข้ากันได้กับ OpenAI** ใดๆ ที่ไม่มีรายชื่ออยู่ในคำสั่ง `/connect`:
+To add any **OpenAI-compatible** provider that's not listed in the `/connect` command:
 
 :::tip
-คุณสามารถใช้ผู้ให้บริการที่เข้ากันได้กับ OpenAI กับ opencode ได้ ผู้ให้บริการ AI สมัยใหม่ส่วนใหญ่เสนอ API ที่เข้ากันได้กับ OpenAI
+You can use any OpenAI-compatible provider with CyxCode. Most modern AI providers offer OpenAI-compatible APIs.
 :::
 
-1. เรียกใช้คำสั่ง `/connect` และเลื่อนลงไปที่ **Other**
+1. Run the `/connect` command and scroll down to **Other**.
 
    ```bash
    $ /connect
@@ -1826,7 +1900,7 @@ Vercel AI Gateway ช่วยให้คุณเข้าถึงโมเ�
    └
    ```
 
-2. ป้อน ID เฉพาะสำหรับผู้ให้บริการ
+2. Enter a unique ID for the provider.
 
    ```bash
    $ /connect
@@ -1839,10 +1913,10 @@ Vercel AI Gateway ช่วยให้คุณเข้าถึงโมเ�
    ```
 
    :::note
-   เลือก ID ที่น่าจดจำ คุณจะใช้ ID นี้ในไฟล์กำหนดค่าของคุณ
+   Choose a memorable ID, you'll use this in your config file.
    :::
 
-3. ป้อนคีย์ API สำหรับผู้ให้บริการ
+3. Enter your API key for the provider.
 
    ```bash
    $ /connect
@@ -1856,11 +1930,11 @@ Vercel AI Gateway ช่วยให้คุณเข้าถึงโมเ�
    └
    ```
 
-4. สร้างหรืออัปเดตไฟล์ `opencode.json` ของคุณในไดเร็กทอรีโครงการของคุณ:
+4. Create or update your `opencode.json` file in your project directory:
 
    ```json title="opencode.json" ""myprovider"" {5-15}
    {
-     "$schema": "https://opencode.ai/config.json",
+     "$schema": "https://cyxcode.ai/config.json",
      "provider": {
        "myprovider": {
          "npm": "@ai-sdk/openai-compatible",
@@ -1878,27 +1952,27 @@ Vercel AI Gateway ช่วยให้คุณเข้าถึงโมเ�
    }
    ```
 
-   นี่คือตัวเลือกการกำหนดค่า:
-   - **npm**: แพ็คเกจ AI SDK ที่จะใช้ `@ai-sdk/openai-compatible` สำหรับผู้ให้บริการที่เข้ากันได้กับ OpenAI
-   - **name**: ชื่อที่แสดงใน UI
-   - **models**: โมเดลที่มีจำหน่าย
-   - **options.baseURL**: URL จุดสิ้นสุด API
-   - **options.apiKey**: ตั้งค่าคีย์ API ทางเลือก หากไม่ได้ใช้การรับรองความถูกต้อง
-   - **options.headers**: ตั้งค่าส่วนหัวที่กำหนดเองได้ตามต้องการ
+   Here are the configuration options:
+   - **npm**: AI SDK package to use, `@ai-sdk/openai-compatible` for OpenAI-compatible providers (for `/v1/chat/completions`). If your provider/model uses `/v1/responses`, use `@ai-sdk/openai`.
+   - **name**: Display name in UI.
+   - **models**: Available models.
+   - **options.baseURL**: API endpoint URL.
+   - **options.apiKey**: Optionally set the API key, if not using auth.
+   - **options.headers**: Optionally set custom headers.
 
-   ข้อมูลเพิ่มเติมเกี่ยวกับตัวเลือกขั้นสูงในตัวอย่างด้านล่าง
+   More on the advanced options in the example below.
 
-5. รันคำสั่ง `/models` และผู้ให้บริการและโมเดลที่คุณกำหนดเองจะปรากฏในรายการตัวเลือก
+5. Run the `/models` command and your custom provider and models will appear in the selection list.
 
 ---
 
-##### ตัวอย่าง
+##### Example
 
-นี่คือตัวอย่างการตั้งค่าตัวเลือก `apiKey`, `headers` และรุ่น `limit`
+Here's an example setting the `apiKey`, `headers`, and model `limit` options.
 
 ```json title="opencode.json" {9,11,17-20}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "provider": {
     "myprovider": {
       "npm": "@ai-sdk/openai-compatible",
@@ -1924,571 +1998,27 @@ Vercel AI Gateway ช่วยให้คุณเข้าถึงโมเ�
 }
 ```
 
-รายละเอียดการกำหนดค่า:
+Configuration details:
 
-- **apiKey**: ตั้งค่าโดยใช้ไวยากรณ์ตัวแปร `env` [เรียนรู้เพิ่มเติม](/docs/config#env-vars)
-- **headers**: ส่วนหัวที่กำหนดเองที่ส่งไปกับแต่ละคำขอ
-- **limit.context**: โทเค็นอินพุตสูงสุดที่โมเดลยอมรับ
-- **limit.output**: โทเค็นสูงสุดที่โมเดลสามารถสร้างได้
+- **apiKey**: Set using `env` variable syntax, [learn more](/docs/config#env-vars).
+- **headers**: Custom headers sent with each request.
+- **limit.context**: Maximum input tokens the model accepts.
+- **limit.output**: Maximum tokens the model can generate.
 
-ฟิลด์ `limit` ช่วยให้ OpenCode เข้าใจว่าคุณมีบริบทเหลืออยู่เท่าใด ผู้ให้บริการมาตรฐานจะดึงข้อมูลเหล่านี้จาก models.dev โดยอัตโนมัติ
-
----
-
-## การแก้ไขปัญหา
-
-หากคุณประสบปัญหาในการกำหนดค่าผู้ให้บริการ ให้ตรวจสอบสิ่งต่อไปนี้:
-
-1. **ตรวจสอบการตั้งค่าการรับรองความถูกต้อง**: รัน `opencode auth list` เพื่อดูว่ามีการเพิ่มข้อมูลรับรอง
-   สำหรับผู้ให้บริการในการกำหนดค่าของคุณหรือไม่
-
-   สิ่งนี้ใช้ไม่ได้กับผู้ให้บริการเช่น Amazon Bedrock ซึ่งอาศัยตัวแปรสภาพแวดล้อมสำหรับการตรวจสอบสิทธิ์
-
-2. สำหรับผู้ให้บริการที่กำหนดเอง ให้ตรวจสอบการกำหนดค่า opencode และ:
-   - ตรวจสอบให้แน่ใจว่า ID ผู้ให้บริการที่ใช้ในคำสั่ง `/connect` ตรงกับ ID ในการกำหนดค่า opencode ของคุณ
-   - ใช้แพ็คเกจ npm ที่ถูกต้องสำหรับผู้ให้บริการ ตัวอย่างเช่น ใช้ `@ai-sdk/cerebras` สำหรับ Cerebras และสำหรับผู้ให้บริการอื่นๆ ที่เข้ากันได้กับ OpenAI ให้ใช้ `@ai-sdk/openai-compatible`
-   - ตรวจสอบว่าใช้จุดสิ้นสุด API ที่ถูกต้องในฟิลด์ `options.baseURL`
-
-3. ป้อนคีย์ OpenCode API ของคุณ
-
-   ```txt
-   ┌ API key
-   │
-   │
-   └ enter
-   ```
-
-4. รันคำสั่ง `/models` เพื่อเลือกรุ่นเช่น _Qwen 3 Coder 480B_
-
-   ```txt
-   /models
-   ```
+The `limit` fields allow CyxCode to understand how much context you have left. Standard providers pull these from models.dev automatically.
 
 ---
 
-### เปิดเราเตอร์
+## Troubleshooting
 
-1. ไปที่ [แดชบอร์ด OpenRouter](https://openrouter.ai/settings/keys) คลิก **สร้าง API คีย์** และคัดลอกคีย์
+If you are having trouble with configuring a provider, check the following:
 
-2. เรียกใช้คำสั่ง `/connect` และค้นหา OpenRouter
+1. **Check the auth setup**: Run `cyxcode auth list` to see if the credentials
+   for the provider are added to your config.
 
-   ```txt
-   /connect
-   ```
+   This doesn't apply to providers like Amazon Bedrock, that rely on environment variables for their auth.
 
-3. ป้อนคีย์ API สำหรับผู้ให้บริการ
-
-   ```txt
-   ┌ API key
-   │
-   │
-   └ enter
-   ```
-
-4. OpenRouter หลายรุ่นถูกโหลดไว้ล่วงหน้าตามค่าเริ่มต้น ให้รันคำสั่ง `/models` เพื่อเลือกรุ่นที่คุณต้องการ
-
-   ```txt
-   /models
-   ```
-
-   คุณยังสามารถเพิ่มโมเดลเพิ่มเติมผ่านการกำหนดค่า opencode ของคุณ
-
-   ```json title="opencode.json" {6}
-   {
-     "$schema": "https://opencode.ai/config.json",
-     "provider": {
-       "openrouter": {
-         "models": {
-           "somecoolnewmodel": {}
-         }
-       }
-     }
-   }
-   ```
-
-5. คุณยังสามารถปรับแต่งได้ผ่านการกำหนดค่า opencode ของคุณ นี่คือตัวอย่างการระบุผู้ให้บริการ
-
-   ```json title="opencode.json"
-   {
-     "$schema": "https://opencode.ai/config.json",
-     "provider": {
-       "openrouter": {
-         "models": {
-           "moonshotai/kimi-k2": {
-             "options": {
-               "provider": {
-                 "order": ["baseten"],
-                 "allow_fallbacks": false
-               }
-             }
-           }
-         }
-       }
-     }
-   }
-   ```
-
----
-
-### SAP เอไอคอร์
-
-SAP AI Core ให้การเข้าถึงโมเดลมากกว่า 40 โมเดลจาก OpenAI, Anthropic, Google, Amazon, Meta, Mistral และ AI21 ผ่านแพลตฟอร์มแบบครบวงจร
-
-1. ไปที่ห้องนักบิน [SAP BTP](https://account.hana.ondemand.com/) นำทางไปยังอินสแตนซ์บริการ SAP AI Core ของคุณ และสร้างรหัสบริการ
-
-   :::tip
-   รหัสบริการคือวัตถุ JSON ที่ประกอบด้วย `clientid`, `clientsecret`, `url` และ `serviceurls.AI_API_URL` คุณสามารถค้นหาอินสแตนซ์ AI Core ของคุณได้ภายใต้ **บริการ** > **อินสแตนซ์และการสมัครสมาชิก** ในห้องควบคุม BTP
-   :::
-
-2. รันคำสั่ง `/connect` และค้นหา **SAP AI Core**
-
-   ```txt
-   /connect
-   ```
-
-3. ป้อนรหัสบริการของคุณ JSON
-
-   ```txt
-   ┌ Service key
-   │
-   │
-   └ enter
-   ```
-
-   หรือตั้งค่าตัวแปรสภาพแวดล้อม `AICORE_SERVICE_KEY`:
-
-   ```bash
-   AICORE_SERVICE_KEY='{"clientid":"...","clientsecret":"...","url":"...","serviceurls":{"AI_API_URL":"..."}}' opencode
-   ```
-
-   หรือเพิ่มลงในโปรไฟล์ทุบตีของคุณ:
-
-   ```bash title="~/.bash_profile"
-   export AICORE_SERVICE_KEY='{"clientid":"...","clientsecret":"...","url":"...","serviceurls":{"AI_API_URL":"..."}}'
-   ```
-
-4. ตั้งค่า ID การนำไปใช้งานและกลุ่มทรัพยากรเพิ่มเติม:
-
-   ```bash
-   AICORE_DEPLOYMENT_ID=your-deployment-id AICORE_RESOURCE_GROUP=your-resource-group opencode
-   ```
-
-   :::note
-   การตั้งค่าเหล่านี้เป็นทางเลือกและควรกำหนดค่าตามการตั้งค่า SAP AI Core ของคุณ
-   :::
-
-5. รันคำสั่ง `/models` เพื่อเลือกจากรุ่นที่มีให้เลือกมากกว่า 40 รุ่น
-
-   ```txt
-   /models
-   ```
-
----
-
-### ตำแหน่งข้อมูล AI ของ OVHcloud
-
-1. ไปที่ [แผง OVHcloud](https://ovh.com/manager) ไปที่ส่วน `Public Cloud` `AI & Machine Learning` > `AI Endpoints` และในแท็บ `API Keys` คลิก **สร้างคีย์ API ใหม่**
-
-2. รันคำสั่ง `/connect` และค้นหา **OVHcloud AI Endpoints**
-
-   ```txt
-   /connect
-   ```
-
-3. ป้อนคีย์ OVHcloud AI Endpoints API ของคุณ
-
-   ```txt
-   ┌ API key
-   │
-   │
-   └ enter
-   ```
-
-4. รันคำสั่ง `/models` เพื่อเลือกโมเดลเช่น _gpt-oss-120b_
-
-   ```txt
-   /models
-   ```
-
----
-
-### สเกลเวย์
-
-วิธีใช้ [Scaleway Generative API](https://www.scaleway.com/en/docs/generative-apis/) กับ Opencode:
-
-1. ไปที่ [การตั้งค่า Scaleway Console IAM](https://console.scaleway.com/iam/api-keys) เพื่อสร้างคีย์ API ใหม่
-
-2. รันคำสั่ง `/connect` และค้นหา **Scaleway**
-
-   ```txt
-   /connect
-   ```
-
-3. ป้อนคีย์ Scaleway API ของคุณ
-
-   ```txt
-   ┌ API key
-   │
-   │
-   └ enter
-   ```
-
-4. รันคำสั่ง `/models` เพื่อเลือกโมเดล เช่น _devstral-2-123b-instruct-2512_ หรือ _gpt-oss-120b_
-
-   ```txt
-   /models
-   ```
-
----
-
-### ร่วมกันเอไอ
-
-1. ไปที่ [Together AI console](https://api.together.ai) สร้างบัญชี แล้วคลิก **เพิ่มรหัส**
-
-2. เรียกใช้คำสั่ง `/connect` และค้นหา **Together AI**
-
-   ```txt
-   /connect
-   ```
-
-3. ป้อนคีย์ Together AI API ของคุณ
-
-   ```txt
-   ┌ API key
-   │
-   │
-   └ enter
-   ```
-
-4. รันคำสั่ง `/models` เพื่อเลือกโมเดลเช่น _Kimi K2 Instruct_
-
-   ```txt
-   /models
-   ```
-
----
-
-### เวนิส เอไอ
-
-1. ไปที่ [คอนโซล AI ของเวนิส](https://venice.ai) สร้างบัญชี และสร้างคีย์ API
-
-2. รันคำสั่ง `/connect` และค้นหา **Venice AI**
-
-   ```txt
-   /connect
-   ```
-
-3. ป้อนคีย์ Venice AI API ของคุณ
-
-   ```txt
-   ┌ API key
-   │
-   │
-   └ enter
-   ```
-
-4. รันคำสั่ง `/models` เพื่อเลือกโมเดลเช่น _Llama 3.3 70B_
-
-   ```txt
-   /models
-   ```
-
----
-
-### เกตเวย์ AI ของ Vercel
-
-Vercel AI Gateway ช่วยให้คุณเข้าถึงโมเดลจาก OpenAI, Anthropic, Google, xAI และอื่นๆ อีกมากมายผ่านจุดสิ้นสุดแบบรวม โมเดลมีจำหน่ายในราคาปลีกโดยไม่มีส่วนเพิ่ม
-
-1. ไปที่ [แดชบอร์ด Vercel](https://vercel.com/) ไปที่แท็บ **เกตเวย์ AI** และคลิก **API คีย์** เพื่อสร้างคีย์ API ใหม่
-
-2. รันคำสั่ง `/connect` และค้นหา **Vercel AI Gateway**
-
-   ```txt
-   /connect
-   ```
-
-3. ป้อนคีย์ Vercel AI Gateway API ของคุณ
-
-   ```txt
-   ┌ API key
-   │
-   │
-   └ enter
-   ```
-
-4. รันคำสั่ง `/models` เพื่อเลือกรุ่น
-
-   ```txt
-   /models
-   ```
-
-คุณยังสามารถปรับแต่งโมเดลผ่านการกำหนดค่า opencode ของคุณได้อีกด้วย นี่คือตัวอย่างการระบุลำดับการกำหนดเส้นทางของผู้ให้บริการ
-
-```json title="opencode.json"
-{
-  "$schema": "https://opencode.ai/config.json",
-  "provider": {
-    "vercel": {
-      "models": {
-        "anthropic/claude-sonnet-4": {
-          "options": {
-            "order": ["anthropic", "vertex"]
-          }
-        }
-      }
-    }
-  }
-}
-```
-
-ตัวเลือกการกำหนดเส้นทางที่มีประโยชน์:
-
-| ตัวเลือก            | คำอธิบาย                                                |
-| ------------------- | ------------------------------------------------------- |
-| `order`             | ลำดับผู้ให้บริการที่จะลอง                               |
-| `only`              | จำกัดเฉพาะผู้ให้บริการบางราย                            |
-| `zeroDataRetention` | ใช้ผู้ให้บริการที่ไม่มีนโยบายการเก็บรักษาข้อมูลเท่านั้น |
-
----
-
-### xAI
-
-1. ไปที่ [xAI console](https://console.x.ai/) สร้างบัญชี และสร้างคีย์ API
-
-2. รันคำสั่ง `/connect` และค้นหา **xAI**
-
-   ```txt
-   /connect
-   ```
-
-3. ป้อนคีย์ xAI API ของคุณ
-
-   ```txt
-   ┌ API key
-   │
-   │
-   └ enter
-   ```
-
-4. รันคำสั่ง `/models` เพื่อเลือกโมเดลเช่น _Grok Beta_
-
-   ```txt
-   /models
-   ```
-
----
-
-### ซี.เอ.ไอ
-
-1. ไปที่ [Z.AI API console](https://z.ai/manage-apikey/apikey-list) สร้างบัญชี และคลิก **สร้างคีย์ API ใหม่**
-
-2. รันคำสั่ง `/connect` และค้นหา **Z.AI**
-
-   ```txt
-   /connect
-   ```
-
-   หากคุณสมัครสมาชิก **GLM Coding Plan** ให้เลือก **Z.AI Coding Plan**
-
-3. ป้อนคีย์ Z.AI API ของคุณ
-
-   ```txt
-   ┌ API key
-   │
-   │
-   └ enter
-   ```
-
-4. รันคำสั่ง `/models` เพื่อเลือกโมเดลเช่น _GLM-4.7_
-
-   ```txt
-   /models
-   ```
-
----
-
-### ZenMux
-
-1. ไปที่ [แดชบอร์ด ZenMux](https://zenmux.ai/settings/keys) คลิก **สร้าง API คีย์** และคัดลอกคีย์
-
-2. รันคำสั่ง `/connect` และค้นหา ZenMux
-
-   ```txt
-   /connect
-   ```
-
-3. ป้อนคีย์ API สำหรับผู้ให้บริการ
-
-   ```txt
-   ┌ API key
-   │
-   │
-   └ enter
-   ```
-
-4. ZenMux หลายรุ่นถูกโหลดไว้ล่วงหน้าตามค่าเริ่มต้น รันคำสั่ง `/models` เพื่อเลือกรุ่นที่คุณต้องการ
-
-   ```txt
-   /models
-   ```
-
-   คุณยังสามารถเพิ่มโมเดลเพิ่มเติมผ่านการกำหนดค่า opencode ของคุณ
-
-   ```json title="opencode.json" {6}
-   {
-     "$schema": "https://opencode.ai/config.json",
-     "provider": {
-       "zenmux": {
-         "models": {
-           "somecoolnewmodel": {}
-         }
-       }
-     }
-   }
-   ```
-
----
-
-## ผู้ให้บริการที่กำหนดเอง
-
-หากต้องการเพิ่มผู้ให้บริการ **รองรับ OpenAI** ที่ไม่อยู่ในคำสั่ง `/connect`:
-
-:::tip
-คุณสามารถใช้ผู้ให้บริการที่เข้ากันได้กับ OpenAI ด้วย opencode ผู้ให้บริการ AI สมัยใหม่ส่วนใหญ่เสนอ API ที่เข้ากันได้กับ OpenAI
-:::
-
-1. เรียกใช้คำสั่ง `/connect` และเลื่อนลงไปที่ **อื่นๆ**
-
-   ```bash
-   $ /connect
-
-   ┌  Add credential
-   │
-   ◆  Select provider
-   │  ...
-   │  ● Other
-   └
-   ```
-
-2. ป้อนรหัสเฉพาะสำหรับผู้ให้บริการ
-
-   ```bash
-   $ /connect
-
-   ┌  Add credential
-   │
-   ◇  Enter provider id
-   │  myprovider
-   └
-   ```
-
-   :::note
-   เลือก ID ที่น่าจดจำ คุณจะใช้รหัสนี้ในไฟล์กำหนดค่าของคุณ
-   :::
-
-3. ป้อนรหัส API ของคุณสำหรับผู้ให้บริการ
-
-   ```bash
-   $ /connect
-
-   ┌  Add credential
-   │
-   ▲  This only stores a credential for myprovider - you will need to configure it in opencode.json, check the docs for examples.
-   │
-   ◇  Enter your API key
-   │  sk-...
-   └
-   ```
-
-4. สร้างหรืออัปเดตไฟล์ `opencode.json` ในไดเรกทอรีโครงการของคุณ:
-
-   ```json title="opencode.json" ""myprovider"" {5-15}
-   {
-     "$schema": "https://opencode.ai/config.json",
-     "provider": {
-       "myprovider": {
-         "npm": "@ai-sdk/openai-compatible",
-         "name": "My AI ProviderDisplay Name",
-         "options": {
-           "baseURL": "https://api.myprovider.com/v1"
-         },
-         "models": {
-           "my-model-name": {
-             "name": "My Model Display Name"
-           }
-         }
-       }
-     }
-   }
-   ```
-
-   นี่คือตัวเลือกการกำหนดค่า:
-   - **npm**: แพ็คเกจ AI SDK ที่จะใช้ `@ai-sdk/openai-compatible` สำหรับผู้ให้บริการที่เข้ากันได้กับ OpenAI
-   - **ชื่อ**: ชื่อที่แสดงใน UI
-   - **รุ่น**: รุ่นที่มีจำหน่าย
-   - **options.baseURL**: API ปลายทาง URL
-   - **options.apiKey**: ตั้งค่าคีย์ API หรือไม่ก็ได้ หากไม่ได้ใช้การตรวจสอบสิทธิ์
-   - **options.headers**: ตั้งค่าส่วนหัวที่กำหนดเองหรือไม่ก็ได้
-
-   ข้อมูลเพิ่มเติมเกี่ยวกับตัวเลือกขั้นสูงในตัวอย่างด้านล่าง
-
-5. รันคำสั่ง `/models` จากนั้นผู้ให้บริการและโมเดลที่คุณกำหนดเองจะปรากฏในรายการตัวเลือก
-
----
-
-##### ตัวอย่าง
-
-นี่คือตัวอย่างการตั้งค่าตัวเลือก `apiKey`, `headers` และโมเดล `limit`
-
-```json title="opencode.json" {9,11,17-20}
-{
-  "$schema": "https://opencode.ai/config.json",
-  "provider": {
-    "myprovider": {
-      "npm": "@ai-sdk/openai-compatible",
-      "name": "My AI ProviderDisplay Name",
-      "options": {
-        "baseURL": "https://api.myprovider.com/v1",
-        "apiKey": "{env:ANTHROPIC_API_KEY}",
-        "headers": {
-          "Authorization": "Bearer custom-token"
-        }
-      },
-      "models": {
-        "my-model-name": {
-          "name": "My Model Display Name",
-          "limit": {
-            "context": 200000,
-            "output": 65536
-          }
-        }
-      }
-    }
-  }
-}
-```
-
-รายละเอียดการกำหนดค่า:
-
-- **apiKey**: ตั้งค่าโดยใช้ไวยากรณ์ของตัวแปร `env` [เรียนรู้เพิ่มเติม](/docs/config#env-vars)
-- **ส่วนหัว**: ส่วนหัวที่กำหนดเองส่งไปพร้อมกับคำขอแต่ละรายการ
-- **limit.context**: Input Tokens สูงสุดที่โมเดลยอมรับ
-- **limit.output**: Output Tokens สูงสุดที่โมเดลสามารถสร้างได้
-
-ช่อง `limit` ช่วยให้ OpenCode เข้าใจบริบทที่คุณเหลืออยู่ ผู้ให้บริการมาตรฐานจะดึงข้อมูลเหล่านี้จาก models.dev โดยอัตโนมัติ
-
----
-
-## การแก้ไขปัญหา
-
-หากคุณประสบปัญหาในการกำหนดค่าผู้ให้บริการ ให้ตรวจสอบสิ่งต่อไปนี้:
-
-1. **ตรวจสอบการตั้งค่าการรับรองความถูกต้อง**: เรียกใช้ `opencode auth list` เพื่อดูว่ามีข้อมูลรับรองหรือไม่
-   สำหรับผู้ให้บริการจะถูกเพิ่มในการกำหนดค่าของคุณ
-
-   สิ่งนี้ใช้ไม่ได้กับผู้ให้บริการอย่าง Amazon Bedrock ที่ต้องอาศัยตัวแปรสภาพแวดล้อมสำหรับการตรวจสอบสิทธิ์
-
-2. สำหรับผู้ให้บริการแบบกำหนดเอง ให้ตรวจสอบการกำหนดค่า opencode และ:
-   - ตรวจสอบให้แน่ใจว่า ID ผู้ให้บริการที่ใช้ในคำสั่ง `/connect` ตรงกับ ID ในการกำหนดค่า opencode ของคุณ
-   - มีการใช้แพ็คเกจ npm ที่ถูกต้องสำหรับผู้ให้บริการ ตัวอย่างเช่น ใช้ `@ai-sdk/cerebras` สำหรับ Cerebras และสำหรับผู้ให้บริการรายอื่นที่เข้ากันได้กับ OpenAI ให้ใช้ `@ai-sdk/openai-compatible`
-   - ตรวจสอบว่ามีการใช้จุดสิ้นสุด API ที่ถูกต้องในช่อง `options.baseURL`
+2. For custom providers, check the CyxCode config and:
+   - Make sure the provider ID used in the `/connect` command matches the ID in your CyxCode config.
+   - The right npm package is used for the provider. For example, use `@ai-sdk/cerebras` for Cerebras. And for all other OpenAI-compatible providers, use `@ai-sdk/openai-compatible` (for `/v1/chat/completions`); if a model uses `/v1/responses`, use `@ai-sdk/openai`. For mixed setups under one provider, you can override per model via `provider.npm`.
+   - Check correct API endpoint is used in the `options.baseURL` field.

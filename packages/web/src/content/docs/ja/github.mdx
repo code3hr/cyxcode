@@ -1,46 +1,46 @@
 ---
 title: GitHub
-description: GitHub の問題とプルリクエストで OpenCode を使用します。
+description: Use CyxCode in GitHub issues and pull-requests.
 ---
 
-OpenCode は GitHub ワークフローと統合します。コメントで `/opencode` または `/oc` に言及すると、OpenCode が GitHub Actions ランナー内でタスクを実行します。
-
----
-
-## 機能
-
-- **問題のトリアージ**: OpenCode に問題を調べて説明してもらいます。
-- **修正と実装**: OpenCode に問題の修正または機能の実装を依頼します。そして、新しいブランチで動作し、すべての変更を含む PR を送信します。
-- **安全**: OpenCode は GitHub のランナー内で実行されます。
+CyxCode integrates with your GitHub workflow. Mention `/CyxCode` or `/oc` in your comment, and CyxCode will execute tasks within your GitHub Actions runner.
 
 ---
 
-## インストール
+## Features
 
-GitHub リポジトリにあるプロジェクトで次のコマンドを実行します。
+- **Triage issues**: Ask CyxCode to look into an issue and explain it to you.
+- **Fix and implement**: Ask CyxCode to fix an issue or implement a feature. And it will work in a new branch and submits a PR with all the changes.
+- **Secure**: CyxCode runs inside your GitHub's runners.
+
+---
+
+## Installation
+
+Run the following command in a project that is in a GitHub repo:
 
 ```bash
-opencode github install
+cyxcode github install
 ```
 
-ここでは、GitHub アプリのインストール、ワークフローの作成、シークレットの設定について説明します。
+This will walk you through installing the GitHub app, creating the workflow, and setting up secrets.
 
 ---
 
-### 手動セットアップ
+### Manual Setup
 
-または、手動で設定することもできます。
+Or you can set it up manually.
 
-1. **GitHub アプリをインストールします**
+1. **Install the GitHub app**
 
-[**github.com/apps/opencode-agent**](https://github.com/apps/opencode-agent) にアクセスしてください。ターゲットリポジトリにインストールされていることを確認してください。
+   Head over to [**github.com/apps/CyxCode-agent**](https://github.com/apps/CyxCode-agent). Make sure it's installed on the target repository.
 
-2. **ワークフローを追加**
+2. **Add the workflow**
 
-次のワークフローファイルをリポジトリの `.github/workflows/opencode.yml` に追加します。適切な `model` と必要な API キーを `env` に設定してください。
+   Add the following workflow file to `.github/workflows/CyxCode.yml` in your repo. Make sure to set the appropriate `model` and required API keys in `env`.
 
-```yml title=".github/workflows/opencode.yml" {24,26}
-   name: opencode
+   ```yml title=".github/workflows/CyxCode.yml" {24,26}
+   name: CyxCode
 
    on:
      issue_comment:
@@ -49,10 +49,10 @@ opencode github install
        types: [created]
 
    jobs:
-     opencode:
+     CyxCode:
        if: |
          contains(github.event.comment.body, '/oc') ||
-         contains(github.event.comment.body, '/opencode')
+         contains(github.event.comment.body, '/CyxCode')
        runs-on: ubuntu-latest
        permissions:
          id-token: write
@@ -63,70 +63,70 @@ opencode github install
               fetch-depth: 1
               persist-credentials: false
 
-          - name: Run OpenCode
-           uses: anomalyco/opencode/github@latest
+          - name: Run CyxCode
+           uses: code3hr/cyxcode/github@latest
            env:
              ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
            with:
              model: anthropic/claude-sonnet-4-20250514
              # share: true
              # github_token: xxxx
-```
+   ```
 
-3. **API キーをシークレットに保存する**
+3. **Store the API keys in secrets**
 
-組織またはプロジェクトの**設定**で、左側の**シークレットと変数**を展開し、**アクション**を選択します。そして、必要な API キーを追加します。
-
----
-
-## 設定
-
-- `model`: OpenCode で使用するモデル。 `provider/model` の形式をとります。これは**必須**です。
-- `agent`: 使用するエージェント。プライマリエージェントである必要があります。見つからない場合は、設定から `default_agent` にフォールバックするか、`"build"` にフォールバックします。
-- `share`: OpenCode セッションを共有するかどうか。パブリックリポジトリのデフォルトは **true** です。
-- `prompt`: デフォルトの動作をオーバーライドするためのオプションのカスタムプロンプト。これを使用して、OpenCode がリクエストを処理する方法をカスタマイズします。
-- `token`: コメントの作成、変更のコミット、プルリクエストのオープンなどの操作を実行するためのオプションの GitHub アクセストークン。デフォルトでは、OpenCode は OpenCode GitHub アプリからのインストールアクセストークンを使用するため、コミット、コメント、プルリクエストはアプリからのものとして表示されます。
-
-あるいは、OpenCode GitHub アプリをインストールせずに、GitHub Action ランナーの [組み込み `GITHUB_TOKEN`](https://docs.github.com/en/actions/tutorials/authenticate-with-github_token) を使用することもできます。ワークフローで必要な権限を必ず付与してください。
-
-```yaml
-permissions:
-  id-token: write
-  contents: write
-  pull-requests: write
-  issues: write
-```
-
-必要に応じて、[パーソナルアクセストークン](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens)(PAT) を使用することもできます。
+   In your organization or project **settings**, expand **Secrets and variables** on the left and select **Actions**. And add the required API keys.
 
 ---
 
-## サポートされているイベント
+## Configuration
 
-OpenCode は、次の GitHub イベントによってトリガーできます。
+- `model`: The model to use with CyxCode. Takes the format of `provider/model`. This is **required**.
+- `agent`: The agent to use. Must be a primary agent. Falls back to `default_agent` from config or `"build"` if not found.
+- `share`: Whether to share the CyxCode session. Defaults to **true** for public repositories.
+- `prompt`: Optional custom prompt to override the default behavior. Use this to customize how CyxCode processes requests.
+- `token`: Optional GitHub access token for performing operations such as creating comments, committing changes, and opening pull requests. By default, CyxCode uses the installation access token from the CyxCode GitHub App, so commits, comments, and pull requests appear as coming from the app.
 
-| イベントの種類                | トリガー                            | 詳細                                                                                                                                                        |
-| ----------------------------- | ----------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `issue_comment`               | 問題または PR についてコメントする  | コメントで `/opencode` または `/oc` について言及してください。 OpenCode はコンテキストを読み取り、ブランチを作成したり、PR を開いたり、返信したりできます。 |
-| `pull_request_review_comment` | PR 内の特定のコード行にコメントする | コードをレビューするときに、`/opencode` または `/oc` について言及します。 OpenCode は、ファイルパス、行番号、および diff コンテキストを受け取ります。       |
-| `issues`                      | 問題がオープンまたは編集されました  | 問題が作成または変更されると、OpenCode が自動的にトリガーされます。 `prompt` 入力が必要です。                                                               |
-| `pull_request`                | PR がオープンまたは更新されました   | PR が開かれる、同期される、または再度開かれるときに、OpenCode を自動的にトリガーします。自動レビューに役立ちます。                                          |
-| `schedule`                    | Cron ベースのスケジュール           | スケジュールに従って OpenCode を実行します。 `prompt` 入力が必要です。出力はログと PR に送られます (コメントする問題はありません)。                         |
-| `workflow_dispatch`           | GitHub UI からの手動トリガー        | [アクション] タブから OpenCode をオンデマンドでトリガーします。 `prompt` 入力が必要です。出力はログと PR に送られます。                                     |
+  Alternatively, you can use the GitHub Action runner's [built-in `GITHUB_TOKEN`](https://docs.github.com/en/actions/tutorials/authenticate-with-github_token) without installing the CyxCode GitHub App. Just make sure to grant the required permissions in your workflow:
 
-### スケジュールの例
+  ```yaml
+  permissions:
+    id-token: write
+    contents: write
+    pull-requests: write
+    issues: write
+  ```
 
-スケジュールに従って OpenCode を実行し、自動化されたタスクを実行します。
+  You can also use a [personal access tokens](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens)(PAT) if preferred.
 
-```yaml title=".github/workflows/opencode-scheduled.yml"
-name: Scheduled OpenCode Task
+---
+
+## Supported Events
+
+CyxCode can be triggered by the following GitHub events:
+
+| Event Type                    | Triggered By                           | Details                                                                                                           |
+| ----------------------------- | -------------------------------------- | ----------------------------------------------------------------------------------------------------------------- |
+| `issue_comment`               | Comment on an issue or PR              | Mention `/CyxCode` or `/oc` in your comment. CyxCode reads context and can create branches, open PRs, or reply. |
+| `pull_request_review_comment` | Comment on specific code lines in a PR | Mention `/CyxCode` or `/oc` while reviewing code. CyxCode receives file path, line numbers, and diff context.   |
+| `issues`                      | Issue opened or edited                 | Automatically trigger CyxCode when issues are created or modified. Requires `prompt` input.                      |
+| `pull_request`                | PR opened or updated                   | Automatically trigger CyxCode when PRs are opened, synchronized, or reopened. Useful for automated reviews.      |
+| `schedule`                    | Cron-based schedule                    | Run CyxCode on a schedule. Requires `prompt` input. Output goes to logs and PRs (no issue to comment on).        |
+| `workflow_dispatch`           | Manual trigger from GitHub UI          | Trigger CyxCode on demand via Actions tab. Requires `prompt` input. Output goes to logs and PRs.                 |
+
+### Schedule Example
+
+Run CyxCode on a schedule to perform automated tasks:
+
+```yaml title=".github/workflows/CyxCode-scheduled.yml"
+name: Scheduled CyxCode Task
 
 on:
   schedule:
     - cron: "0 9 * * 1" # Every Monday at 9am UTC
 
 jobs:
-  opencode:
+  CyxCode:
     runs-on: ubuntu-latest
     permissions:
       id-token: write
@@ -139,8 +139,8 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: Run OpenCode
-        uses: anomalyco/opencode/github@latest
+      - name: Run CyxCode
+        uses: code3hr/cyxcode/github@latest
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
         with:
@@ -150,16 +150,16 @@ jobs:
             If you find issues worth addressing, open an issue to track them.
 ```
 
-スケジュールされたイベントの場合、指示を抽出するためのコメントがないため、`prompt` 入力は **必須** です。スケジュールされたワークフローは、権限チェックのためのユーザーコンテキストなしで実行されるため、OpenCode がブランチまたは PR を作成することが予想される場合、ワークフローは `contents: write` および `pull-requests: write` を付与する必要があります。
+For scheduled events, the `prompt` input is **required** since there's no comment to extract instructions from. Scheduled workflows run without a user context to permission-check, so the workflow must grant `contents: write` and `pull-requests: write` if you expect CyxCode to create branches or PRs.
 
 ---
 
-### プルリクエストの例
+### Pull Request Example
 
-PR が開かれるか更新されるときに、PR を自動的にレビューします。
+Automatically review PRs when they are opened or updated:
 
-```yaml title=".github/workflows/opencode-review.yml"
-name: opencode-review
+```yaml title=".github/workflows/CyxCode-review.yml"
+name: CyxCode-review
 
 on:
   pull_request:
@@ -177,7 +177,7 @@ jobs:
       - uses: actions/checkout@v6
         with:
           persist-credentials: false
-      - uses: anomalyco/opencode/github@latest
+      - uses: code3hr/cyxcode/github@latest
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -191,15 +191,15 @@ jobs:
             - Suggest improvements
 ```
 
-`pull_request` イベントの場合、`prompt` が指定されていない場合、OpenCode はデフォルトでプルリクエストをレビューします。
+For `pull_request` events, if no `prompt` is provided, CyxCode defaults to reviewing the pull request.
 
 ---
 
-### Issueのトリアージの例
+### Issues Triage Example
 
-新しい問題を自動的に優先順位付けします。この例では、スパムを減らすために 30 日より古いアカウントにフィルターを適用します。
+Automatically triage new issues. This example filters to accounts older than 30 days to reduce spam:
 
-```yaml title=".github/workflows/opencode-triage.yml"
+```yaml title=".github/workflows/CyxCode-triage.yml"
 name: Issue Triage
 
 on:
@@ -233,7 +233,7 @@ jobs:
         with:
           persist-credentials: false
 
-      - uses: anomalyco/opencode/github@latest
+      - uses: code3hr/cyxcode/github@latest
         if: steps.check.outputs.result == 'true'
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
@@ -246,16 +246,16 @@ jobs:
             Otherwise, do not comment.
 ```
 
-`issues` イベントの場合、指示を抽出するためのコメントがないため、`prompt` 入力は **必須** です。
+For `issues` events, the `prompt` input is **required** since there's no comment to extract instructions from.
 
 ---
 
-## カスタムプロンプト
+## Custom prompts
 
-デフォルトのプロンプトをオーバーライドして、ワークフローに合わせて OpenCode の動作をカスタマイズします。
+Override the default prompt to customize CyxCode's behavior for your workflow.
 
-```yaml title=".github/workflows/opencode.yml"
-- uses: anomalyco/opencode/github@latest
+```yaml title=".github/workflows/CyxCode.yml"
+- uses: code3hr/cyxcode/github@latest
   with:
     model: anthropic/claude-sonnet-4-5
     prompt: |
@@ -265,58 +265,57 @@ jobs:
       - Suggest improvements
 ```
 
-これは、プロジェクトに関連する特定のレビュー基準、コーディング標準、または重点分野を強制するのに役立ちます。
+This is useful for enforcing specific review criteria, coding standards, or focus areas relevant to your project.
 
 ---
 
-## 例
+## Examples
 
-GitHub で OpenCode を使用する方法の例をいくつか示します。
+Here are some examples of how you can use CyxCode in GitHub.
 
-- **Issueの説明**
+- **Explain an issue**
 
-このコメントを GitHub の問題に追加します。
+  Add this comment in a GitHub issue.
 
-```
-  /opencode explain this issue
-```
+  ```
+  /CyxCode explain this issue
+  ```
 
-OpenCode は、すべてのコメントを含むスレッド全体を読み取り、明確な説明を返信します。
+  CyxCode will read the entire thread, including all comments, and reply with a clear explanation.
 
-- **Issueの修正**
+- **Fix an issue**
 
-GitHub の問題で次のように言います。
+  In a GitHub issue, say:
 
-```
-  /opencode fix this
-```
+  ```
+  /CyxCode fix this
+  ```
 
-そして、OpenCode は新しいブランチを作成し、変更を実装し、変更を含む PR を開きます。
+  And CyxCode will create a new branch, implement the changes, and open a PR with the changes.
 
-- **PR をレビューして変更を加える**
+- **Review PRs and make changes**
 
-GitHub PR に次のコメントを残してください。
+  Leave the following comment on a GitHub PR.
 
-```
+  ```
   Delete the attachment from S3 when the note is removed /oc
-```
+  ```
 
-OpenCode は要求された変更を実装し、同じ PR にコミットします。
+  CyxCode will implement the requested change and commit it to the same PR.
 
-- **特定のコード行のレビュー**
+- **Review specific code lines**
 
-PR の「ファイル」タブのコード行に直接コメントを残します。 OpenCode は、ファイル、行番号、および diff コンテキストを自動的に検出して、正確な応答を提供します。
+  Leave a comment directly on code lines in the PR's "Files" tab. CyxCode automatically detects the file, line numbers, and diff context to provide precise responses.
 
-```
+  ```
   [Comment on specific lines in Files tab]
   /oc add error handling here
-```
+  ```
 
-特定の行にコメントすると、OpenCode は以下を受け取ります。
+  When commenting on specific lines, CyxCode receives:
+  - The exact file being reviewed
+  - The specific lines of code
+  - The surrounding diff context
+  - Line number information
 
-- レビューされている正確なファイル
-- コードの特定の行
-- 周囲の差分コンテキスト
-- 行番号情報
-
-これにより、ファイルパスや行番号を手動で指定する必要がなく、よりターゲットを絞ったリクエストが可能になります。
+  This allows for more targeted requests without needing to specify file paths or line numbers manually.

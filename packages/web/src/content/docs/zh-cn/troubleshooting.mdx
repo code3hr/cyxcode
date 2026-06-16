@@ -1,279 +1,280 @@
 ---
-title: 故障排除
-description: 常见问题及其解决方法。
+title: Troubleshooting
+description: Common issues and how to resolve them.
 ---
 
-要调试 OpenCode 的问题，请先检查其存储在磁盘上的日志和本地数据。
+To debug issues with CyxCode, start by checking the logs and local data it stores on disk.
 
 ---
 
-## 日志
+## Logs
 
-日志文件写入位置：
+Log files are written to:
 
 - **macOS/Linux**: `~/.local/share/opencode/log/`
-- **Windows**: 按 `WIN+R` 并粘贴 `%USERPROFILE%\.local\share\opencode\log`
+- **Windows**: Press `WIN+R` and paste `%USERPROFILE%\.local\share\opencode\log`
 
-日志文件以时间戳命名（例如 `2025-01-09T123456.log`），并保留最近的 10 个日志文件。
+Log files are named with timestamps (e.g., `2025-01-09T123456.log`) and the most recent 10 log files are kept.
 
-你可以通过 `--log-level` 命令行选项设置日志级别以获取更详细的调试信息。例如：`opencode --log-level DEBUG`。
+You can set the log level with the `--log-level` command-line option to get more detailed debug information. For example, `cyxcode --log-level DEBUG`.
 
 ---
 
-## 存储
+## Storage
 
-OpenCode 将会话数据和其他应用数据存储在磁盘上：
+CyxCode stores session data and other application data on disk at:
 
 - **macOS/Linux**: `~/.local/share/opencode/`
-- **Windows**: 按 `WIN+R` 并粘贴 `%USERPROFILE%\.local\share\opencode`
+- **Windows**: Press `WIN+R` and paste `%USERPROFILE%\.local\share\opencode`
 
-该目录包含：
+This directory contains:
 
-- `auth.json` - 身份验证数据，如 API 密钥、OAuth Token
-- `log/` - 应用日志
-- `project/` - 项目特定数据，如会话和消息数据
-  - 如果项目位于 Git 仓库中，则存储在 `./<project-slug>/storage/`
-  - 如果不是 Git 仓库，则存储在 `./global/storage/`
-
----
-
-## 桌面应用
-
-OpenCode Desktop 会在后台运行一个本地 OpenCode 服务器（即 `opencode-cli` 附属进程）。大多数问题是由插件异常、缓存损坏或错误的服务器设置引起的。
-
-### 快速检查
-
-- 完全退出并重新启动应用。
-- 如果应用显示错误页面，请点击**重新启动**并复制错误详情。
-- 仅限 macOS：`OpenCode` 菜单 -> **Reload Webview**（当 UI 空白或冻结时有效）。
+- `auth.json` - Authentication data like API keys, OAuth tokens
+- `log/` - Application logs
+- `project/` - Project-specific data like session and message data
+  - If the project is within a Git repo, it is stored in `./<project-slug>/storage/`
+  - If it is not a Git repo, it is stored in `./global/storage/`
 
 ---
 
-### 禁用插件
+## Desktop app
 
-如果桌面应用在启动时崩溃、卡住或行为异常，请先禁用插件。
+CyxCode Desktop runs a local CyxCode server (the `opencode-cli` sidecar) in the background. Most issues are caused by a misbehaving plugin, a corrupted cache, or a bad server setting.
 
-#### 检查全局配置
+### Quick checks
 
-打开你的全局配置文件，查找 `plugin` 键。
+- Fully quit and relaunch the app.
+- If the app shows an error screen, click **Restart** and copy the error details.
+- macOS only: `cyxcode` menu -> **Reload Webview** (helps if the UI is blank/frozen).
 
-- **macOS/Linux**: `~/.config/opencode/opencode.jsonc`（或 `~/.config/opencode/opencode.json`）
-- **macOS/Linux**（旧版安装）: `~/.local/share/opencode/opencode.jsonc`
-- **Windows**: 按 `WIN+R` 并粘贴 `%USERPROFILE%\.config\opencode\opencode.jsonc`
+---
 
-如果你配置了插件，请通过移除该键或将其设置为空数组来临时禁用它们：
+### Disable plugins
+
+If the desktop app is crashing on launch, hanging, or behaving strangely, start by disabling plugins.
+
+#### Check the global config
+
+Open your global config file and look for a `plugin` key.
+
+- **macOS/Linux**: `~/.config/opencode/opencode.jsonc` (or `~/.config/opencode/opencode.json`)
+- **macOS/Linux** (older installs): `~/.local/share/opencode/opencode.jsonc`
+- **Windows**: Press `WIN+R` and paste `%USERPROFILE%\.config\opencode\opencode.jsonc`
+
+If you have plugins configured, temporarily disable them by removing the key or setting it to an empty array:
 
 ```jsonc
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "plugin": [],
 }
 ```
 
-#### 检查插件目录
+#### Check plugin directories
 
-OpenCode 还可以从磁盘加载本地插件。临时将这些插件移走（或重命名文件夹），然后重新启动桌面应用：
+CyxCode can also load local plugins from disk. Temporarily move these out of the way (or rename the folder) and restart the desktop app:
 
-- **全局插件**
+- **Global plugins**
   - **macOS/Linux**: `~/.config/opencode/plugins/`
-  - **Windows**: 按 `WIN+R` 并粘贴 `%USERPROFILE%\.config\opencode\plugins`
-- **项目插件**（仅当你使用了项目级配置时）
+  - **Windows**: Press `WIN+R` and paste `%USERPROFILE%\.config\opencode\plugins`
+- **Project plugins** (only if you use per-project config)
   - `<your-project>/.opencode/plugins/`
 
-如果应用恢复正常，请逐个重新启用插件，找出导致问题的那个。
+If the app starts working again, re-enable plugins one at a time to find which one is causing the issue.
 
 ---
 
-### 清除缓存
+### Clear the cache
 
-如果禁用插件没有帮助（或插件安装卡住了），请清除缓存以便 OpenCode 重新构建。
+If disabling plugins doesn't help (or a plugin install is stuck), clear the cache so CyxCode can rebuild it.
 
-1. 完全退出 OpenCode Desktop。
-2. 删除缓存目录：
+1. Quit CyxCode Desktop completely.
+2. Delete the cache directory:
 
-- **macOS**: Finder -> `Cmd+Shift+G` -> 粘贴 `~/.cache/opencode`
-- **Linux**: 删除 `~/.cache/opencode`（或运行 `rm -rf ~/.cache/opencode`）
-- **Windows**: 按 `WIN+R` 并粘贴 `%USERPROFILE%\.cache\opencode`
+- **macOS**: Finder -> `Cmd+Shift+G` -> paste `~/.cache/opencode`
+- **Linux**: delete `~/.cache/opencode` (or run `rm -rf ~/.cache/opencode`)
+- **Windows**: Press `WIN+R` and paste `%USERPROFILE%\.cache\CyxCode`
 
-3. 重新启动 OpenCode Desktop。
-
----
-
-### 修复服务器连接问题
-
-OpenCode Desktop 可以启动自己的本地服务器（默认行为），也可以连接到你配置的服务器 URL。
-
-如果你看到**"Connection Failed"**对话框（或应用始终停留在启动画面），请检查自定义服务器 URL。
-
-#### 清除桌面默认服务器 URL
-
-在主页面上，点击服务器名称（带有状态指示点）以打开服务器选择器。在**默认服务器**部分，点击**清除**。
-
-#### 从配置中移除 `server.port` / `server.hostname`
-
-如果你的 `opencode.json(c)` 包含 `server` 部分，请临时移除该部分并重新启动桌面应用。
-
-#### 检查环境变量
-
-如果你在环境中设置了 `OPENCODE_PORT`，桌面应用将尝试使用该端口作为本地服务器端口。
-
-- 取消设置 `OPENCODE_PORT`（或选择一个空闲端口）并重新启动。
+3. Restart CyxCode Desktop.
 
 ---
 
-### Linux: Wayland / X11 问题
+### Fix server connection issues
 
-在 Linux 上，某些 Wayland 设置可能会导致窗口空白或合成器错误。
+CyxCode Desktop can either start its own local server (default) or connect to a server URL you configured.
 
-- 如果你使用 Wayland 且应用出现空白或崩溃，请尝试使用 `OC_ALLOW_WAYLAND=1` 启动。
-- 如果情况变得更糟，请移除该设置并尝试在 X11 会话下启动。
+If you see a **"Connection Failed"** dialog (or the app never gets past the splash screen), check for a custom server URL.
 
----
+#### Clear the desktop default server URL
 
-### Windows: WebView2 运行时
+From the Home screen, click the server name (with the status dot) to open the Server picker. In the **Default server** section, click **Clear**.
 
-在 Windows 上，OpenCode Desktop 需要 Microsoft Edge **WebView2 Runtime**。如果应用打开后是空白窗口或无法启动，请安装或更新 WebView2 后重试。
+#### Remove `server.port` / `server.hostname` from your config
 
----
+If your `opencode.json(c)` contains a `server` section, temporarily remove it and restart the desktop app.
 
-### Windows: 常见性能问题
+#### Check environment variables
 
-如果你在 Windows 上遇到性能缓慢、文件访问问题或终端问题，请尝试使用 [WSL (Windows Subsystem for Linux)](/docs/windows-wsl)。WSL 提供了一个 Linux 环境，能更好地与 OpenCode 的功能兼容。
+If you have `OPENCODE_PORT` set in your environment, the desktop app will try to use that port for the local server.
 
----
-
-### 通知不显示
-
-OpenCode Desktop 仅在以下情况下显示系统通知：
-
-- 在操作系统设置中已为 OpenCode 启用通知，且
-- 应用窗口未处于焦点状态。
+- Unset `OPENCODE_PORT` (or pick a free port) and restart.
 
 ---
 
-### 重置桌面应用存储（最后手段）
+### Linux: Wayland / X11 issues
 
-如果应用无法启动且你无法从 UI 内部清除设置，请重置桌面应用的保存状态。
+On Linux, some Wayland setups can cause blank windows or compositor errors.
 
-1. 退出 OpenCode Desktop。
-2. 找到并删除以下文件（它们位于 OpenCode Desktop 应用数据目录中）：
-
-- `opencode.settings.dat`（桌面默认服务器 URL）
-- `opencode.global.dat` 和 `opencode.workspace.*.dat`（UI 状态，如最近的服务器/项目）
-
-快速找到该目录：
-
-- **macOS**: Finder -> `Cmd+Shift+G` -> `~/Library/Application Support`（然后搜索上述文件名）
-- **Linux**: 在 `~/.local/share` 下搜索上述文件名
-- **Windows**: 按 `WIN+R` -> `%APPDATA%`（然后搜索上述文件名）
+- If you're on Wayland and the app is blank/crashing, try launching with `OC_ALLOW_WAYLAND=1`.
+- If that makes things worse, remove it and try launching under an X11 session instead.
 
 ---
 
-## 获取帮助
+### Windows: WebView2 runtime
 
-如果你遇到 OpenCode 的问题：
-
-1. **在 GitHub 上报告问题**
-
-   报告 Bug 或请求功能的最佳方式是通过我们的 GitHub 仓库：
-
-   [**github.com/anomalyco/opencode/issues**](https://github.com/anomalyco/opencode/issues)
-
-   在创建新 Issue 之前，请先搜索已有的 Issue，看看你的问题是否已被报告。
-
-2. **加入我们的 Discord**
-
-   如需实时帮助和社区讨论，请加入我们的 Discord 服务器：
-
-   [**opencode.ai/discord**](https://opencode.ai/discord)
+On Windows, CyxCode Desktop requires the Microsoft Edge **WebView2 Runtime**. If the app opens to a blank window or won't start, install/update WebView2 and try again.
 
 ---
 
-## 常见问题
+### Windows: General performance issues
 
-以下是一些常见问题及其解决方法。
-
----
-
-### OpenCode 无法启动
-
-1. 检查日志中的错误消息
-2. 尝试使用 `--print-logs` 运行以在终端中查看输出
-3. 使用 `opencode upgrade` 确保你使用的是最新版本
+If you're experiencing slow performance, file access issues, or terminal problems on Windows, try using [WSL (Windows Subsystem for Linux)](/docs/windows-wsl). WSL provides a Linux environment that works more seamlessly with CyxCode's features.
 
 ---
 
-### 身份验证问题
+### Notifications not showing
 
-1. 尝试在 TUI 中使用 `/connect` 命令重新进行身份验证
-2. 检查你的 API 密钥是否有效
-3. 确保你的网络允许连接到提供商的 API
+CyxCode Desktop only shows system notifications when:
+
+- notifications are enabled for CyxCode in your OS settings, and
+- the app window is not focused.
 
 ---
 
-### 模型不可用
+### Reset desktop app storage (last resort)
 
-1. 检查你是否已通过提供商的身份验证
-2. 验证配置中的模型名称是否正确
-3. 某些模型可能需要特定的访问权限或订阅
+If the app won't start and you can't clear settings from inside the UI, reset the desktop app's saved state.
 
-如果你遇到 `ProviderModelNotFoundError`，很可能是在某处错误地引用了模型。
-模型应按如下方式引用：`<providerId>/<modelId>`
+1. Quit CyxCode Desktop.
+2. Find and delete these files (they live in the CyxCode Desktop app data directory):
 
-示例：
+- `opencode.settings.dat` (desktop default server URL)
+- `opencode.global.dat` and `opencode.workspace.*.dat` (UI state like recent servers/projects)
+
+To find the directory quickly:
+
+- **macOS**: Finder -> `Cmd+Shift+G` -> `~/Library/Application Support` (then search for the filenames above)
+- **Linux**: search under `~/.local/share` for the filenames above
+- **Windows**: Press `WIN+R` -> `%APPDATA%` (then search for the filenames above)
+
+---
+
+## Getting help
+
+If you're experiencing issues with CyxCode:
+
+1. **Report issues on GitHub**
+
+   The best way to report bugs or request features is through our GitHub repository:
+
+   [**github.com/code3hr/cyxcode/issues**](https://github.com/code3hr/cyxcode/issues)
+
+   Before creating a new issue, search existing issues to see if your problem has already been reported.
+
+2. **Join our Discord**
+
+   For real-time help and community discussion, join our Discord server:
+
+   [**cyxcode.ai/discord**](https://cyxcode.ai/discord)
+
+---
+
+## Common issues
+
+Here are some common issues and how to resolve them.
+
+---
+
+### CyxCode won't start
+
+1. Check the logs for error messages
+2. Try running with `--print-logs` to see output in the terminal
+3. Ensure you have the latest version with `cyxcode upgrade`
+
+---
+
+### Authentication issues
+
+1. Try re-authenticating with the `/connect` command in the TUI
+2. Check that your API keys are valid
+3. Ensure your network allows connections to the provider's API
+
+---
+
+### Model not available
+
+1. Check that you've authenticated with the provider
+2. Verify the model name in your config is correct
+3. Some models may require specific access or subscriptions
+
+If you encounter `ProviderModelNotFoundError` you are most likely incorrectly
+referencing a model somewhere.
+Models should be referenced like so: `<providerId>/<modelId>`
+
+Examples:
 
 - `openai/gpt-4.1`
 - `openrouter/google/gemini-2.5-flash`
 - `opencode/kimi-k2`
 
-要查看你有权访问哪些模型，请运行 `opencode models`
+To figure out what models you have access to, run `cyxcode models`
 
 ---
 
 ### ProviderInitError
 
-如果你遇到 ProviderInitError，很可能是配置无效或已损坏。
+If you encounter a ProviderInitError, you likely have an invalid or corrupted configuration.
 
-要解决此问题：
+To resolve this:
 
-1. 首先，按照[提供商指南](/docs/providers)验证你的提供商是否已正确设置
-2. 如果问题仍然存在，请尝试清除已存储的配置：
+1. First, verify your provider is set up correctly by following the [providers guide](/docs/providers)
+2. If the issue persists, try clearing your stored configuration:
 
    ```bash
    rm -rf ~/.local/share/opencode
    ```
 
-   在 Windows 上，按 `WIN+R` 并删除：`%USERPROFILE%\.local\share\opencode`
+   On Windows, press `WIN+R` and delete: `%USERPROFILE%\.local\share\opencode`
 
-3. 在 TUI 中使用 `/connect` 命令重新与提供商进行身份验证。
+3. Re-authenticate with your provider using the `/connect` command in the TUI.
 
 ---
 
-### AI_APICallError 和提供商包问题
+### AI_APICallError and provider package issues
 
-如果你遇到 API 调用错误，可能是由于提供商包过期导致的。OpenCode 会根据需要动态安装提供商包（OpenAI、Anthropic、Google 等）并将它们缓存到本地。
+If you encounter API call errors, this may be due to outdated provider packages. CyxCode dynamically installs provider packages (OpenAI, Anthropic, Google, etc.) as needed and caches them locally.
 
-要解决提供商包问题：
+To resolve provider package issues:
 
-1. 清除提供商包缓存：
+1. Clear the provider package cache:
 
    ```bash
    rm -rf ~/.cache/opencode
    ```
 
-   在 Windows 上，按 `WIN+R` 并删除：`%USERPROFILE%\.cache\opencode`
+   On Windows, press `WIN+R` and delete: `%USERPROFILE%\.cache\CyxCode`
 
-2. 重新启动 OpenCode 以重新安装最新的提供商包
+2. Restart CyxCode to reinstall the latest provider packages
 
-这将强制 OpenCode 下载最新版本的提供商包，通常可以解决模型参数和 API 变更带来的兼容性问题。
+This will force CyxCode to download the most recent versions of provider packages, which often resolves compatibility issues with model parameters and API changes.
 
 ---
 
-### 在 Linux 上复制/粘贴不可用
+### Copy/paste not working on Linux
 
-Linux 用户需要安装以下剪贴板工具之一，复制/粘贴功能才能正常工作：
+Linux users need to have one of the following clipboard utilities installed for copy/paste functionality to work:
 
-**对于 X11 系统：**
+**For X11 systems:**
 
 ```bash
 apt install -y xclip
@@ -281,13 +282,13 @@ apt install -y xclip
 apt install -y xsel
 ```
 
-**对于 Wayland 系统：**
+**For Wayland systems:**
 
 ```bash
 apt install -y wl-clipboard
 ```
 
-**对于无头环境：**
+**For headless environments:**
 
 ```bash
 apt install -y xvfb
@@ -296,4 +297,4 @@ Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &
 export DISPLAY=:99.0
 ```
 
-OpenCode 会检测你是否正在使用 Wayland 并优先使用 `wl-clipboard`，否则将按以下顺序尝试查找剪贴板工具：`xclip` 和 `xsel`。
+CyxCode will detect if you're using Wayland and prefer `wl-clipboard`, otherwise it will try to find clipboard tools in order of: `xclip` and `xsel`.

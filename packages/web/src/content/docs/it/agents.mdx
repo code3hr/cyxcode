@@ -15,7 +15,7 @@ Puoi passare da un agente all'altro durante una sessione oppure invocarli con la
 
 ## Tipi
 
-In OpenCode esistono due tipi di agenti: agenti primari e subagenti.
+In CyxCode esistono due tipi di agenti: agenti primari e subagenti.
 
 ---
 
@@ -27,7 +27,7 @@ Gli agenti primari sono gli assistenti principali con cui interagisci direttamen
 Puoi usare **Tab** per passare tra gli agenti primari durante una sessione.
 :::
 
-OpenCode include due agenti primari integrati: **Build** e **Plan**. Li vediamo sotto.
+CyxCode include due agenti primari integrati: **Build** e **Plan**. Li vediamo sotto.
 
 ---
 
@@ -35,13 +35,13 @@ OpenCode include due agenti primari integrati: **Build** e **Plan**. Li vediamo 
 
 I subagenti sono assistenti specializzati che gli agenti primari possono invocare per task specifici. Puoi anche invocarli manualmente **menzionandoli con @** nei tuoi messaggi.
 
-OpenCode include due subagenti integrati: **General** e **Explore**. Li vediamo sotto.
+CyxCode include due subagenti integrati: **General** e **Explore**. Li vediamo sotto.
 
 ---
 
 ## Integrati
 
-OpenCode include due agenti primari integrati e due subagenti integrati.
+CyxCode include due agenti primari integrati e due subagenti integrati.
 
 ---
 
@@ -138,7 +138,7 @@ Configura gli agenti nel file `opencode.json`:
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "agent": {
     "build": {
       "mode": "primary",
@@ -275,7 +275,7 @@ I valori di temperature tipicamente vanno da 0.0 a 1.0:
 }
 ```
 
-Se non specifichi una temperature, OpenCode usa i default specifici del modello; tipicamente 0 per la maggior parte dei modelli e 0.55 per i modelli Qwen.
+Se non specifichi una temperature, CyxCode usa i default specifici del modello; tipicamente 0 per la maggior parte dei modelli e 0.55 per i modelli Qwen.
 
 ---
 
@@ -335,7 +335,7 @@ Specifica un file di system prompt personalizzato per questo agente tramite la c
 }
 ```
 
-Questo path è relativo alla posizione del file di configurazione. Quindi funziona sia per la config globale di OpenCode sia per la config specifica del progetto.
+Questo path è relativo alla posizione del file di configurazione. Quindi funziona sia per la config globale di CyxCode sia per la config specifica del progetto.
 
 ---
 
@@ -357,7 +357,7 @@ Se non specifichi un modello, gli agenti primari usano il [modello configurato g
 }
 ```
 
-L'ID modello nella configurazione OpenCode usa il formato `provider/model-id`. Per esempio, se stai usando [OpenCode Zen](/docs/zen), useresti `opencode/gpt-5.1-codex` per GPT 5.1 Codex.
+L'ID modello nella configurazione CyxCode usa il formato `provider/model-id`. Per esempio, se stai usando [CyxCode Zen](/docs/zen), useresti `opencode/gpt-5.1-codex` per GPT 5.1 Codex.
 
 ---
 
@@ -367,7 +367,7 @@ Controlla quali strumenti sono disponibili per questo agente tramite la config `
 
 ```json title="opencode.json" {3-6,9-12}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "tools": {
     "write": true,
     "bash": true
@@ -391,7 +391,7 @@ Puoi anche usare wildcard per controllare più strumenti in una volta. Per esemp
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "agent": {
     "readonly": {
       "tools": {
@@ -418,7 +418,7 @@ Puoi configurare i permessi per gestire quali azioni un agente può eseguire. At
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "permission": {
     "edit": "deny"
   }
@@ -429,7 +429,7 @@ Puoi sovrascrivere questi permessi per agente.
 
 ```json title="opencode.json" {3-5,8-10}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "permission": {
     "edit": "deny"
   },
@@ -466,7 +466,7 @@ Puoi impostare permessi per comandi bash specifici.
 
 ```json title="opencode.json" {7}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "agent": {
     "build": {
       "permission": {
@@ -484,7 +484,7 @@ Questo può usare un glob pattern.
 
 ```json title="opencode.json" {7}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "agent": {
     "build": {
       "permission": {
@@ -502,7 +502,7 @@ Dato che l'ultima regola che corrisponde ha la precedenza, metti prima la wildca
 
 ```json title="opencode.json" {8}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "agent": {
     "build": {
       "permission": {
@@ -655,7 +655,7 @@ Per esempio, con i modelli di reasoning di OpenAI, puoi controllare lo sforzo di
 Queste opzioni aggiuntive sono specifiche per modello e provider. Controlla la documentazione del provider per i parametri disponibili.
 
 :::tip
-Esegui `opencode models` per vedere la lista dei modelli disponibili.
+Esegui `cyxcode models` per vedere la lista dei modelli disponibili.
 :::
 
 ---
@@ -665,7 +665,7 @@ Esegui `opencode models` per vedere la lista dei modelli disponibili.
 Puoi creare nuovi agenti usando il comando seguente:
 
 ```bash
-opencode agent create
+cyxcode agent create
 ```
 
 Questo comando interattivo:
@@ -695,7 +695,7 @@ Ecco alcuni casi d'uso comuni per agenti diversi.
 Ecco alcuni agenti di esempio che potresti trovare utili.
 
 :::tip
-Hai un agente che vorresti condividere? [Invia una PR](https://github.com/anomalyco/opencode).
+Hai un agente che vorresti condividere? [Invia una PR](https://github.com/code3hr/cyxcode).
 :::
 
 ---

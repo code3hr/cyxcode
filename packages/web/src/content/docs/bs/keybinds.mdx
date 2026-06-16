@@ -1,13 +1,13 @@
 ---
-title: Prečice tipki
-description: Prilagodite svoje veze tipki.
+title: Keybinds
+description: Customize your keybinds.
 ---
 
-OpenCode ima listu veza tipki koje možete prilagoditi putem `tui.json`.
+cyxcode has a list of keybinds that you can customize through `tui.json`.
 
 ```json title="tui.json"
 {
-  "$schema": "https://opencode.ai/tui.json",
+  "$schema": "https://cyxcode.ai/tui.json",
   "keybinds": {
     "leader": "ctrl+x",
     "app_exit": "ctrl+c,ctrl+d,<leader>q",
@@ -29,9 +29,9 @@ OpenCode ima listu veza tipki koje možete prilagoditi putem `tui.json`.
     "session_interrupt": "escape",
     "session_compact": "<leader>c",
     "session_child_first": "<leader>down",
-    "session_child_cycle": "<leader>right",
-    "session_child_cycle_reverse": "<leader>left",
-    "session_parent": "<leader>up",
+    "session_child_cycle": "right",
+    "session_child_cycle_reverse": "left",
+    "session_parent": "up",
     "messages_page_up": "pageup,ctrl+alt+b",
     "messages_page_down": "pagedown,ctrl+alt+f",
     "messages_line_up": "ctrl+alt+y",
@@ -106,23 +106,25 @@ OpenCode ima listu veza tipki koje možete prilagoditi putem `tui.json`.
 
 ---
 
-## Leader tipka
+## Leader key
 
-OpenCode koristi `leader` (vodeću) tipku za većinu povezivanja tipki. Ovo izbjegava sukobe u vašem terminalu.
+CyxCode uses a `leader` key for most keybinds. This avoids conflicts in your terminal.
 
-Prema zadanim postavkama, `ctrl+x` je vodeća tipka i većina radnji zahtijeva da prvo pritisnete vodeću tipku, a zatim i prečicu. Na primjer, da biste započeli novu sesiju, prvo pritisnite `ctrl+x`, a zatim pritisnite `n`.
+By default, `ctrl+x` is the leader key and most actions require you to first press the leader key and then the shortcut. For example, to start a new session you first press `ctrl+x` and then press `n`.
 
-Ne morate koristiti vodeću tipku za svoje veze tipki, ali preporučujemo da to učinite.
+You don't need to use a leader key for your keybinds but we recommend doing so.
+
+Some navigation keybinds intentionally do not use the leader key by default. For subagent sessions, the defaults are `session_child_first` = `\<leader>down`, `session_child_cycle` = `right`, `session_child_cycle_reverse` = `left`, and `session_parent` = `up`.
 
 ---
 
-## Onemogućavanje prečica tipki
+## Disable keybind
 
-Možete onemogućiti spajanje tipki dodavanjem ključa u `tui.json` s vrijednošću "none".
+You can disable a keybind by adding the key to `tui.json` with a value of "none".
 
 ```json title="tui.json"
 {
-  "$schema": "https://opencode.ai/tui.json",
+  "$schema": "https://cyxcode.ai/tui.json",
   "keybinds": {
     "session_compact": "none"
   }
@@ -131,41 +133,41 @@ Možete onemogućiti spajanje tipki dodavanjem ključa u `tui.json` s vrijednoš
 
 ---
 
-## Prečice za radnu površinu
+## Desktop prompt shortcuts
 
-Unos prompta aplikacije OpenCode za desktop podržava uobičajene prečice u stilu Readline/Emacs za uređivanje teksta. One su ugrađene i trenutno se ne mogu konfigurirati putem `opencode.json`.
+The CyxCode desktop app prompt input supports common Readline/Emacs-style shortcuts for editing text. These are built-in and currently not configurable via `opencode.json`.
 
-| Prečica  | Akcija                                           |
-| -------- | ------------------------------------------------ |
-| `ctrl+a` | Prelazak na početak trenutnog reda               |
-| `ctrl+e` | Prelazak na kraj trenutnog reda                  |
-| `ctrl+b` | Pomjeri kursor za jedan znak unazad              |
-| `ctrl+f` | Pomicanje kursora naprijed za jedan znak         |
-| `alt+b`  | Pomjeri kursor za jednu riječ unazad             |
-| `alt+f`  | Pomjeri kursor za jednu riječ unaprijed          |
-| `ctrl+d` | Izbriši znak ispod kursora                       |
-| `ctrl+k` | Kill do kraja reda                               |
-| `ctrl+u` | Kill do početka reda                             |
-| `ctrl+w` | Kill prethodnu riječ                             |
-| `alt+d`  | Kill sljedeću riječ                              |
-| `ctrl+t` | Transponirajte znakove                           |
-| `ctrl+g` | Otkaži iskakanje / poništi odgovor na pokretanje |
+| Shortcut | Action                                   |
+| -------- | ---------------------------------------- |
+| `ctrl+a` | Move to start of current line            |
+| `ctrl+e` | Move to end of current line              |
+| `ctrl+b` | Move cursor back one character           |
+| `ctrl+f` | Move cursor forward one character        |
+| `alt+b`  | Move cursor back one word                |
+| `alt+f`  | Move cursor forward one word             |
+| `ctrl+d` | Delete character under cursor            |
+| `ctrl+k` | Kill to end of line                      |
+| `ctrl+u` | Kill to start of line                    |
+| `ctrl+w` | Kill previous word                       |
+| `alt+d`  | Kill next word                           |
+| `ctrl+t` | Transpose characters                     |
+| `ctrl+g` | Cancel popovers / abort running response |
 
 ---
 
 ## Shift+Enter
 
-Neki terminali ne šalju modifikatorske tipke sa Enter prema zadanim postavkama. Možda ćete trebati konfigurirati svoj terminal da pošalje `Shift+Enter` kao escape sekvencu.
+Some terminals don't send modifier keys with Enter by default. You may need to configure your terminal to send `Shift+Enter` as an escape sequence.
 
 ### Windows Terminal
 
-Otvorite svoj `settings.json` na:
+Open your `settings.json` at:
 
 ```
 %LOCALAPPDATA%\Packages\Microsoft.WindowsTerminal_8wekyb3d8bbwe\LocalState\settings.json
 ```
 
-Dodajte ovo u niz korijenskog nivoa `actions`:
+Add this to the root-level `actions` array:
 
 ```json
 "actions": [
@@ -179,7 +181,7 @@ Dodajte ovo u niz korijenskog nivoa `actions`:
 ]
 ```
 
-Dodajte ovo u niz korijenskog nivoa `keybindings`:
+Add this to the root-level `keybindings` array:
 
 ```json
 "keybindings": [
@@ -190,4 +192,4 @@ Dodajte ovo u niz korijenskog nivoa `keybindings`:
 ]
 ```
 
-Sačuvajte datoteku i ponovo pokrenite Windows Terminal ili otvorite novu karticu.
+Save the file and restart Windows Terminal or open a new tab.

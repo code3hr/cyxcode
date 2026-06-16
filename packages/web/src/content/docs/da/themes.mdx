@@ -1,108 +1,108 @@
 ---
-title: Temaer
-description: Velg et innebygd tema eller definer ditt eget.
+title: Themes
+description: Select a built-in theme or define your own.
 ---
 
-Med OpenCode kan du velge fra ett av flere innebygde temaer, bruge et tema som tilpasser seg terminaltemaet ditt, eller definere ditt eget tilpassede tema.
+With CyxCode you can select from one of several built-in themes, use a theme that adapts to your terminal theme, or define your own custom theme.
 
-Som standard bruger OpenCode vårt eget `opencode`-tema.
-
----
-
-## Terminalkrav
-
-For at temaer skal vises riktig med fullfarvepalett, må terminalen din støtte **truecolor** (24-biters farver). De fleste moderne terminaler støtter dette som standard, men du må kanskje aktivere det:
-
-- **Tjek støtte**: Kjør `echo $COLORTERM` - den skal gi ut `truecolor` eller `24bit`
-- **Aktiver truecolor**: Sett miljøvariabelen `COLORTERM=truecolor` i shellprofilen din
-- **Terminalkompatibilitet**: Sørg for at terminalemulatoren din støtter 24-bits farver (de fleste moderne terminaler som iTerm2, Alacritty, Kitty, Windows Terminal og nyere versioner av GNOME Terminal gør det)
-
-Uden truecolor-støtte kan temaer vises med redusert farvenøjagtighed eller falde tilbage til nærmeste 256-farvers tilnærming.
+By default, CyxCode uses our own `cyxcode` theme.
 
 ---
 
-## Indbyggede temaer
+## Terminal requirements
 
-OpenCode kommer med flere innebygde temaer.
+For themes to display correctly with their full color palette, your terminal must support **truecolor** (24-bit color). Most modern terminals support this by default, but you may need to enable it:
 
-| Navn                   | Beskrivelse                                                               |
-| ---------------------- | ------------------------------------------------------------------------- |
-| `system`               | Tilpasser seg terminalens bakgrunnsfarve                                  |
-| `tokyonight`           | Basert på [Tokyonight](https://github.com/folke/tokyonight.nvim)-temaet   |
-| `everforest`           | Basert på [Everforest](https://github.com/sainnhe/everforest)-temaet      |
-| `ayu`                  | Basert på [Ayu](https://github.com/ayu-theme) mørke tema                  |
-| `catppuccin`           | Basert på [Catppuccin](https://github.com/catppuccin)-temaet              |
-| `catppuccin-macchiato` | Basert på [Catppuccin](https://github.com/catppuccin)-temaet              |
-| `gruvbox`              | Basert på [Gruvbox](https://github.com/morhetz/gruvbox)-temaet            |
-| `kanagawa`             | Basert på [Kanagawa](https://github.com/rebelot/kanagawa.nvim)-temaet     |
-| `nord`                 | Basert på [Nord](https://github.com/nordtheme/nord)-temaet                |
-| `matrix`               | Hacker-stil grønt på svart tema                                           |
-| `one-dark`             | Basert på [Atom One](https://github.com/Th3Whit3Wolf/one-nvim) Mørkt tema |
+- **Check support**: Run `echo $COLORTERM` - it should output `truecolor` or `24bit`
+- **Enable truecolor**: Set the environment variable `COLORTERM=truecolor` in your shell profile
+- **Terminal compatibility**: Ensure your terminal emulator supports 24-bit color (most modern terminals like iTerm2, Alacritty, Kitty, Windows Terminal, and recent versions of GNOME Terminal do)
 
-Og mer, vi tilføjer stadig til nye temaer.
+Without truecolor support, themes may appear with reduced color accuracy or fall back to the nearest 256-color approximation.
 
 ---
 
-## Systemtema
+## Built-in themes
 
-`system`-temaet er designet for at automatisk tilpasse seg terminalens farvevalg. I motsetning til tradisjonelle temaer som bruger faste farver, er _system_-temaet:
+CyxCode comes with several built-in themes.
 
-- **Genererer gråskala**: Opreter en brugerdefineret gråskala basert på terminalens bakgrunnsfarve, og sikrer optimal kontrast.
-- **Bruger ANSI farver**: Bruger standard ANSI farver (0-15) for syntaksutheving og UI elementer, som respekterer terminalens farvepalett.
-- **Bevarer terminalens standardinnstillinger**: Bruger `none` for tekst- og bakgrunnsfarver for at opretholde terminalens opprinnelige utseende.
+| Name                   | Description                                                                  |
+| ---------------------- | ---------------------------------------------------------------------------- |
+| `system`               | Adapts to your terminal’s background color                                   |
+| `tokyonight`           | Based on the [Tokyonight](https://github.com/folke/tokyonight.nvim) theme    |
+| `everforest`           | Based on the [Everforest](https://github.com/sainnhe/everforest) theme       |
+| `ayu`                  | Based on the [Ayu](https://github.com/ayu-theme) dark theme                  |
+| `catppuccin`           | Based on the [Catppuccin](https://github.com/catppuccin) theme               |
+| `catppuccin-macchiato` | Based on the [Catppuccin](https://github.com/catppuccin) theme               |
+| `gruvbox`              | Based on the [Gruvbox](https://github.com/morhetz/gruvbox) theme             |
+| `kanagawa`             | Based on the [Kanagawa](https://github.com/rebelot/kanagawa.nvim) theme      |
+| `nord`                 | Based on the [Nord](https://github.com/nordtheme/nord) theme                 |
+| `matrix`               | Hacker-style green on black theme                                            |
+| `one-dark`             | Based on the [Atom One](https://github.com/Th3Whit3Wolf/one-nvim) Dark theme |
 
-Systemtemaet er for brugere som:
-
-- Vil at OpenCode skal matche terminalens utseende
-- Brug tilpassede terminalfarveskjemaer
-- Foretrekker et konsistent utseende på tvers av alle terminalapplikasjoner
+And more, we are constantly adding new themes.
 
 ---
 
-## Brug et tema
+## System theme
 
-Du kan velge et tema ved at hente frem temavalg med kommandoen `/theme`. Eller du kan angive det i `tui.json`.
+The `system` theme is designed to automatically adapt to your terminal's color scheme. Unlike traditional themes that use fixed colors, the _system_ theme:
+
+- **Generates gray scale**: Creates a custom gray scale based on your terminal's background color, ensuring optimal contrast.
+- **Uses ANSI colors**: Leverages standard ANSI colors (0-15) for syntax highlighting and UI elements, which respect your terminal's color palette.
+- **Preserves terminal defaults**: Uses `none` for text and background colors to maintain your terminal's native appearance.
+
+The system theme is for users who:
+
+- Want CyxCode to match their terminal's appearance
+- Use custom terminal color schemes
+- Prefer a consistent look across all terminal applications
+
+---
+
+## Using a theme
+
+You can select a theme by bringing up the theme select with the `/theme` command. Or you can specify it in `tui.json`.
 
 ```json title="tui.json" {3}
 {
-  "$schema": "https://opencode.ai/tui.json",
+  "$schema": "https://cyxcode.ai/tui.json",
   "theme": "tokyonight"
 }
 ```
 
 ---
 
-## Brugerdefinerede temaer
+## Custom themes
 
-OpenCode støtter et fleksibelt JSON-basert temasystem som lar brugere enkelt lage og tilpasse temaer.
-
----
-
-### Hierarki
-
-Temaer lastes inn fra flere kataloger i følgende rekkefølge der senere kataloger overstyrer tidligere:
-
-1. **Innebygde temaer** - Disse er innebygd i binæren
-2. **Brugerkonfigurasjonskatalog** - Definert i `~/.config/opencode/themes/*.json` eller `$XDG_CONFIG_HOME/opencode/themes/*.json`
-3. **Prosjektrotkatalog** - Definert i `<project-root>/.opencode/themes/*.json`
-4. **Nuværende arbejdskatalog** - Definert i `./.opencode/themes/*.json`
-
-Hvis flere kataloger inneholder et tema med samme navn, vil temaet fra katalogen med høyere prioritet bli brugt.
+CyxCode supports a flexible JSON-based theme system that allows users to create and customize themes easily.
 
 ---
 
-### Oprettelse af et tema
+### Hierarchy
 
-For at lage et brugerdefineret tema, lag en JSON-fil i en av temakatalogene.
+Themes are loaded from multiple directories in the following order where later directories override earlier ones:
 
-For brugeromfattende temaer:
+1. **Built-in themes** - These are embedded in the binary
+2. **User config directory** - Defined in `~/.config/opencode/themes/*.json` or `$XDG_CONFIG_HOME/opencode/themes/*.json`
+3. **Project root directory** - Defined in the `<project-root>/.opencode/themes/*.json`
+4. **Current working directory** - Defined in `./.opencode/themes/*.json`
+
+If multiple directories contain a theme with the same name, the theme from the directory with higher priority will be used.
+
+---
+
+### Creating a theme
+
+To create a custom theme, create a JSON file in one of the theme directories.
+
+For user-wide themes:
 
 ```bash no-frame
 mkdir -p ~/.config/opencode/themes
 vim ~/.config/opencode/themes/my-theme.json
 ```
 
-Og for prosjektspesifikke temaer.
+And for project-specific themes.
 
 ```bash no-frame
 mkdir -p .opencode/themes
@@ -111,40 +111,40 @@ vim .opencode/themes/my-theme.json
 
 ---
 
-### JSON-format
+### JSON format
 
-Temaer bruger et fleksibelt JSON-format med støtte for:
+Themes use a flexible JSON format with support for:
 
-- **Sekskantfarver**: `"#ffffff"`
-- **ANSI farver**: `3` (0-255)
-- **Farvereferanser**: `"primary"` eller egendefinerte definisjoner
-- **Mørke/lyse varianter**: `{"dark": "#000", "light": "#fff"}`
-- **Ingen farve**: `"none"` - Bruger terminalens standardfarve eller transparent
-
----
-
-### Farvedefinitioner
-
-`defs`-delen er valgfri, og den lar deg definere gjenbrugbare farver som kan refereres til i temaet.
+- **Hex colors**: `"#ffffff"`
+- **ANSI colors**: `3` (0-255)
+- **Color references**: `"primary"` or custom definitions
+- **Dark/light variants**: `{"dark": "#000", "light": "#fff"}`
+- **No color**: `"none"` - Uses the terminal's default color or transparent
 
 ---
 
-### Terminalstandarder
+### Color definitions
 
-Spesialverdien `"none"` kan bruges for hvilken som helst farve for at arve terminalens standardfarve. Dette er spesielt nyttig for at lage temaer som passer sømløst med terminalens farveskjema:
-
-- `"text": "none"` - Bruger terminalens standard forgrunnsfarve
-- `"background": "none"` - Bruger terminalens standard bakgrunnsfarve
+The `defs` section is optional and it allows you to define reusable colors that can be referenced in the theme.
 
 ---
 
-### Eksempel
+### Terminal defaults
 
-Her er et eksempel på et brugerdefineret tema:
+The special value `"none"` can be used for any color to inherit the terminal's default color. This is particularly useful for creating themes that blend seamlessly with your terminal's color scheme:
+
+- `"text": "none"` - Uses terminal's default foreground color
+- `"background": "none"` - Uses terminal's default background color
+
+---
+
+### Example
+
+Here's an example of a custom theme:
 
 ```json title="my-theme.json"
 {
-  "$schema": "https://opencode.ai/theme.json",
+  "$schema": "https://cyxcode.ai/theme.json",
   "defs": {
     "nord0": "#2E3440",
     "nord1": "#3B4252",

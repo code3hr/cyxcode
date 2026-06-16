@@ -3,7 +3,7 @@ title: Web
 description: Tarayıcınızda opencode'u kullanma.
 ---
 
-opencode, tarayıcınızda bir web uygulaması olarak çalışabilir ve bir terminale ihtiyaç duymadan aynı güçlü AI kodlama deneyimini sağlayabilir.
+cyxcode, tarayıcınızda bir web uygulaması olarak çalışabilir ve bir terminale ihtiyaç duymadan aynı güçlü AI kodlama deneyimini sağlayabilir.
 
 ![opencode Web - Yeni Oturum](../../../assets/web/web-homepage-new-session.png)
 
@@ -12,7 +12,7 @@ opencode, tarayıcınızda bir web uygulaması olarak çalışabilir ve bir term
 Aşağıdakileri çalıştırarak web arayüzünü başlatın:
 
 ```bash
-opencode web
+cyxcode web
 ```
 
 Bu, `127.0.0.1` üzerinde rastgele kullanılabilir bir bağlantı noktasına sahip yerel bir sunucuyu başlatır ve opencode'u varsayılan tarayıcınızda otomatik olarak açar.
@@ -22,7 +22,7 @@ Bu, `127.0.0.1` üzerinde rastgele kullanılabilir bir bağlantı noktasına sah
 :::
 
 :::tip[Windows Kullanıcıları]
-En iyi deneyim için PowerShell yerine `opencode web`'yi [WSL](/docs/windows-wsl)'den çalıştırın. Bu, uygun dosya sistemi erişimini ve terminal entegrasyonunu sağlar.
+En iyi deneyim için PowerShell yerine `cyxcode web`'yi [WSL](/docs/windows-wsl)'den çalıştırın. Bu, uygun dosya sistemi erişimini ve terminal entegrasyonunu sağlar.
 :::
 
 ---
@@ -33,10 +33,10 @@ Web sunucusunu komut satırı bayraklarıyla veya [config dosyanızda](/docs/con
 
 ### Port
 
-opencode varsayılan olarak kullanılabilir bir bağlantı noktasını seçer. Bir bağlantı noktası belirtebilirsiniz:
+cyxcode varsayılan olarak kullanılabilir bir bağlantı noktasını seçer. Bir bağlantı noktası belirtebilirsiniz:
 
 ```bash
-opencode web --port 4096
+cyxcode web --port 4096
 ```
 
 ### Ana makine adı
@@ -44,7 +44,7 @@ opencode web --port 4096
 Varsayılan olarak sunucu `127.0.0.1` (yalnızca localhost) öğesine bağlanır. opencode'u ağınızda erişilebilir kılmak için:
 
 ```bash
-opencode web --hostname 0.0.0.0
+cyxcode web --hostname 0.0.0.0
 ```
 
 `0.0.0.0` kullanıldığında, opencode hem yerel hem de ağ adreslerini gösterecektir:
@@ -59,7 +59,7 @@ opencode web --hostname 0.0.0.0
 Sunucunuzun yerel ağda bulunabilir olmasını sağlamak için mDNS'yi etkinleştirin:
 
 ```bash
-opencode web --mdns
+cyxcode web --mdns
 ```
 
 Bu, ana bilgisayar adını otomatik olarak `0.0.0.0` olarak ayarlar ve sunucuyu `opencode.local` olarak tanıtır.
@@ -67,7 +67,7 @@ Bu, ana bilgisayar adını otomatik olarak `0.0.0.0` olarak ayarlar ve sunucuyu 
 Aynı ağ üzerinde birden fazla örneği çalıştıracak şekilde mDNS alan adını özelleştirebilirsiniz:
 
 ```bash
-opencode web --mdns --mdns-domain myproject.local
+cyxcode web --mdns --mdns-domain myproject.local
 ```
 
 ### CORS
@@ -75,7 +75,7 @@ opencode web --mdns --mdns-domain myproject.local
 CORS'a yönelik ek alan adlarına izin vermek için (özel ön uçlar için kullanışlıdır):
 
 ```bash
-opencode web --cors https://example.com
+cyxcode web --cors https://example.com
 ```
 
 ### Kimlik Doğrulaması
@@ -83,7 +83,7 @@ opencode web --cors https://example.com
 Erişimi korumak için `OPENCODE_SERVER_PASSWORD` ortam değişkenini kullanarak bir parola ayarlayın:
 
 ```bash
-OPENCODE_SERVER_PASSWORD=secret opencode web
+OPENCODE_SERVER_PASSWORD=secret cyxcode web
 ```
 
 Kullanıcı adı varsayılan olarak `opencode` şeklindedir ancak `OPENCODE_SERVER_USERNAME` ile değiştirilebilir.
@@ -114,10 +114,10 @@ Bağlı sunucuları ve durumlarını görüntülemek için "Sunucuları Gör" se
 
 ```bash
 # Start the web server
-opencode web --port 4096
+cyxcode web --port 4096
 
 # In another terminal, attach the TUI
-opencode attach http://localhost:4096
+cyxcode attach http://localhost:4096
 ```
 
 Bu, aynı oturumları ve durumu paylaşarak hem web arayüzünü hem de terminali aynı anda kullanmanıza olanak tanır.

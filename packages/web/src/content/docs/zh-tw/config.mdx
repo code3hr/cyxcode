@@ -1,19 +1,19 @@
 ---
-title: 設定
-description: 使用 OpenCode JSON 設定。
+title: Config
+description: Using the CyxCode JSON config.
 ---
 
-您可以使用 JSON 設定檔來設定 OpenCode。
+You can configure CyxCode using a JSON config file.
 
 ---
 
-## 格式
+## Format
 
-OpenCode 支援 **JSON** 和 **JSONC**（帶註解的 JSON）格式。
+CyxCode supports both **JSON** and **JSONC** (JSON with Comments) formats.
 
 ```jsonc title="opencode.jsonc"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "model": "anthropic/claude-sonnet-4-5",
   "autoupdate": true,
   "server": {
@@ -24,48 +24,49 @@ OpenCode 支援 **JSON** 和 **JSONC**（帶註解的 JSON）格式。
 
 ---
 
-## 位置
+## Locations
 
-您可以將設定放置在不同的位置，它們具有不同的優先順序。
+You can place your config in a couple of different locations and they have a
+different order of precedence.
 
 :::note
-設定檔是**合併在一起**的，而不是替換。
+Configuration files are **merged together**, not replaced.
 :::
 
-設定檔是合併在一起的，而不是被替換。來自以下設定位置的設定會被合併。後面的設定僅在鍵衝突時覆寫前面的設定。所有設定中的非衝突設定都會被保留。
+Configuration files are merged together, not replaced. Settings from the following config locations are combined. Later configs override earlier ones only for conflicting keys. Non-conflicting settings from all configs are preserved.
 
-例如，如果您的全域設定設定了 `autoupdate: true`，而您的專案設定設定了 `model: "anthropic/claude-sonnet-4-5"`，則最終設定將包含這兩個設定。
+For example, if your global config sets `autoupdate: true` and your project config sets `model: "anthropic/claude-sonnet-4-5"`, the final configuration will include both settings.
 
 ---
 
-### 優先順序
+### Precedence order
 
-設定來源按以下順序載入（後面的來源覆寫前面的來源）：
+Config sources are loaded in this order (later sources override earlier ones):
 
-1. **遠端設定**（來自 `.well-known/opencode`）- 組織預設值
-2. **全域設定**（`~/.config/opencode/opencode.json`）- 使用者偏好
-3. **自訂設定**（`OPENCODE_CONFIG` 環境變數）- 自訂覆寫
-4. **專案設定**（專案中的 `opencode.json`）- 專案特定設定
-5. **`.opencode` 目錄** - 代理、指令、外掛程式
-6. **內嵌設定**（`OPENCODE_CONFIG_CONTENT` 環境變數）- 執行時覆寫
+1. **Remote config** (from `.well-known/CyxCode`) - organizational defaults
+2. **Global config** (`~/.config/opencode/opencode.json`) - user preferences
+3. **Custom config** (`OPENCODE_CONFIG` env var) - custom overrides
+4. **Project config** (`opencode.json` in project) - project-specific settings
+5. **`.opencode` directories** - agents, commands, plugins
+6. **Inline config** (`OPENCODE_CONFIG_CONTENT` env var) - runtime overrides
 
-這意味著專案設定可以覆寫全域預設值，全域設定可以覆寫遠端組織預設值。
+This means project configs can override global defaults, and global configs can override remote organizational defaults.
 
 :::note
-`.opencode` 和 `~/.config/opencode` 目錄的子目錄使用**複數名稱**：`agents/`、`commands/`、`modes/`、`plugins/`、`skills/`、`tools/` 和 `themes/`。為了向後相容，也支援單數名稱（例如 `agent/`）。
+The `.opencode` and `~/.config/opencode` directories use **plural names** for subdirectories: `agents/`, `commands/`, `modes/`, `plugins/`, `skills/`, `tools/`, and `themes/`. Singular names (e.g., `agent/`) are also supported for backwards compatibility.
 :::
 
 ---
 
-### 遠端
+### Remote
 
-組織可以透過 `.well-known/opencode` 端點提供預設設定。當您使用支援該功能的供應商進行身分驗證時，會自動擷取此設定。
+Organizations can provide default configuration via the `.well-known/CyxCode` endpoint. This is fetched automatically when you authenticate with a provider that supports it.
 
-遠端設定最先載入，作為基礎層。所有其他設定來源（全域、專案）都可以覆寫這些預設值。
+Remote config is loaded first, serving as the base layer. All other config sources (global, project) can override these defaults.
 
-例如，如果您的組織提供了預設停用的 MCP 伺服器：
+For example, if your organization provides MCP servers that are disabled by default:
 
-```json title="Remote config from .well-known/opencode"
+```json title="Remote config from .well-known/CyxCode"
 {
   "mcp": {
     "jira": {
@@ -77,7 +78,7 @@ OpenCode 支援 **JSON** 和 **JSONC**（帶註解的 JSON）格式。
 }
 ```
 
-您可以在本地設定中啟用特定伺服器：
+You can enable specific servers in your local config:
 
 ```json title="opencode.json"
 {
@@ -93,100 +94,101 @@ OpenCode 支援 **JSON** 和 **JSONC**（帶註解的 JSON）格式。
 
 ---
 
-### 全域
+### Global
 
-將全域 OpenCode 設定放在 `~/.config/opencode/opencode.json` 中。使用全域設定來設定使用者層級的偏好，例如主題、供應商或快捷鍵。
+Place your global CyxCode config in `~/.config/opencode/opencode.json`. Use global config for user-wide server/runtime preferences like providers, models, and permissions.
 
-全域設定覆寫遠端組織預設值。
+For TUI-specific settings, use `~/.config/opencode/tui.json`.
+
+Global config overrides remote organizational defaults.
 
 ---
 
-### 專案層級
+### Per project
 
-在專案根目錄中新增 `opencode.json`。專案設定在標準設定檔中具有最高優先級——它會覆寫全域設定和遠端設定。
+Add `opencode.json` in your project root. Project config has the highest precedence among standard config files - it overrides both global and remote configs.
+
+For project-specific TUI settings, add `tui.json` alongside it.
 
 :::tip
-將專案特定設定放在專案的根目錄中。
+Place project specific config in the root of your project.
 :::
 
-當 OpenCode 啟動時，它會在當前目錄中尋找設定檔，或向上遍歷到最近的 Git 目錄。
+When CyxCode starts up, it looks for a config file in the current directory or traverse up to the nearest Git directory.
 
-該設定檔也可以安全地提交到 Git 中，並使用與全域設定相同的 Schema。
+This is also safe to be checked into Git and uses the same schema as the global one.
 
 ---
 
-### 自訂路徑
+### Custom path
 
-使用 `OPENCODE_CONFIG` 環境變數指定自訂設定檔路徑。
+Specify a custom config file path using the `OPENCODE_CONFIG` environment variable.
 
 ```bash
 export OPENCODE_CONFIG=/path/to/my/custom-config.json
-opencode run "Hello world"
+cyxcode run "Hello world"
 ```
 
-自訂設定在優先順序中位於全域設定和專案設定之間載入。
+Custom config is loaded between global and project configs in the precedence order.
 
 ---
 
-### 自訂目錄
+### Custom directory
 
-使用 `OPENCODE_CONFIG_DIR` 環境變數指定自訂設定目錄。該目錄會像標準 `.opencode` 目錄一樣被搜尋代理、指令、模式和外掛程式，並且應遵循相同的結構。
+Specify a custom config directory using the `OPENCODE_CONFIG_DIR`
+environment variable. This directory will be searched for agents, commands,
+modes, and plugins just like the standard `.opencode` directory, and should
+follow the same structure.
 
 ```bash
 export OPENCODE_CONFIG_DIR=/path/to/my/config-directory
-opencode run "Hello world"
+cyxcode run "Hello world"
 ```
 
-自訂目錄在全域設定和 `.opencode` 目錄之後載入，因此**可以覆寫**它們的設定。
+The custom directory is loaded after the global config and `.opencode` directories, so it **can override** their settings.
 
 ---
 
 ## Schema
 
-設定檔具有在 [**`opencode.ai/config.json`**](https://opencode.ai/config.json) 中定義的 Schema。
+The server/runtime config schema is defined in [**`cyxcode.ai/config.json`**](https://cyxcode.ai/config.json).
 
-您的編輯器應該能夠基於該 Schema 進行驗證和自動補全。
+TUI config uses [**`cyxcode.ai/tui.json`**](https://cyxcode.ai/tui.json).
+
+Your editor should be able to validate and autocomplete based on the schema.
 
 ---
 
 ### TUI
 
-您可以透過 `tui` 選項設定 TUI 相關設定。
+Use a dedicated `tui.json` (or `tui.jsonc`) file for TUI-specific settings.
 
-```json title="opencode.json"
+```json title="tui.json"
 {
-  "$schema": "https://opencode.ai/config.json",
-  "tui": {
-    "scroll_speed": 3,
-    "scroll_acceleration": {
-      "enabled": true
-    },
-    "diff_style": "auto"
-  }
+  "$schema": "https://cyxcode.ai/tui.json",
+  "scroll_speed": 3,
+  "scroll_acceleration": {
+    "enabled": true
+  },
+  "diff_style": "auto"
 }
 ```
 
-可用選項：
+Use `OPENCODE_TUI_CONFIG` to point to a custom TUI config file.
 
-- `scroll_acceleration.enabled` - 啟用 macOS 風格的捲動加速。**優先於 `scroll_speed`。**
-- `scroll_speed` - 自訂捲動速度倍率（預設值：`3`，最小值：`1`）。如果 `scroll_acceleration.enabled` 為 `true`，則忽略此選項。
-- `diff_style` - 控制差異呈現方式。`"auto"` 根據終端機寬度自適應，`"stacked"` 始終顯示單列。
+Legacy `theme`, `keybinds`, and `tui` keys in `opencode.json` are deprecated and automatically migrated when possible.
 
-使用 `OPENCODE_TUI_CONFIG` 指向自訂 TUI 設定檔。
-
-`opencode.json` 中的舊版 `theme`、`keybinds` 和 `tui` 鍵已被棄用，並將在可能的情況下自動遷移。
-
-[在此了解更多關於 TUI 的資訊](/docs/tui)。
+[Learn more about TUI configuration here](/docs/tui#configure).
 
 ---
 
-### 伺服器
+### Server
 
-您可以透過 `server` 選項為 `opencode serve` 和 `opencode web` 指令設定伺服器設定。
+You can configure server settings for the `cyxcode serve` and `cyxcode web` commands through the `server` option.
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "server": {
     "port": 4096,
     "hostname": "0.0.0.0",
@@ -197,25 +199,25 @@ opencode run "Hello world"
 }
 ```
 
-可用選項：
+Available options:
 
-- `port` - 監聽連接埠。
-- `hostname` - 監聽主機名稱。當 `mdns` 啟用且未設定主機名稱時，預設為 `0.0.0.0`。
-- `mdns` - 啟用 mDNS 服務探索。這允許網路上的其他裝置發現您的 OpenCode 伺服器。
-- `mdnsDomain` - mDNS 服務的自訂網域名稱。預設為 `opencode.local`。適用於在同一網路上執行多個實例的情境。
-- `cors` - 從基於瀏覽器的用戶端使用 HTTP 伺服器時允許 CORS 的額外來源。值必須是完整的來源（通訊協定 + 主機 + 可選連接埠），例如 `https://app.example.com`。
+- `port` - Port to listen on.
+- `hostname` - Hostname to listen on. When `mdns` is enabled and no hostname is set, defaults to `0.0.0.0`.
+- `mdns` - Enable mDNS service discovery. This allows other devices on the network to discover your CyxCode server.
+- `mdnsDomain` - Custom domain name for mDNS service. Defaults to `opencode.local`. Useful for running multiple instances on the same network.
+- `cors` - Additional origins to allow for CORS when using the HTTP server from a browser-based client. Values must be full origins (scheme + host + optional port), eg `https://app.example.com`.
 
-[在此了解更多關於伺服器的資訊](/docs/server)。
+[Learn more about the server here](/docs/server).
 
 ---
 
-### 工具
+### Tools
 
-您可以透過 `tools` 選項管理 LLM 可以使用的工具。
+You can manage the tools an LLM can use through the `tools` option.
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "tools": {
     "write": false,
     "bash": false
@@ -223,34 +225,35 @@ opencode run "Hello world"
 }
 ```
 
-[在此了解更多關於工具的資訊](/docs/tools)。
+[Learn more about tools here](/docs/tools).
 
 ---
 
-### 模型
+### Models
 
-您可以透過 `provider`、`model` 和 `small_model` 選項在 OpenCode 設定中設定要使用的供應商和模型。
+You can configure the providers and models you want to use in your CyxCode config through the `provider`, `model` and `small_model` options.
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "provider": {},
   "model": "anthropic/claude-sonnet-4-5",
   "small_model": "anthropic/claude-haiku-4-5"
 }
 ```
 
-`small_model` 選項為標題生成等輕量級任務設定單獨的模型。預設情況下，如果您的供應商有更便宜的模型可用，OpenCode 會嘗試使用該模型，否則會回退到您的主模型。
+The `small_model` option configures a separate model for lightweight tasks like title generation. By default, CyxCode tries to use a cheaper model if one is available from your provider, otherwise it falls back to your main model.
 
-供應商選項可以包括 `timeout` 和 `setCacheKey`：
+Provider options can include `timeout`, `chunkTimeout`, and `setCacheKey`:
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "provider": {
     "anthropic": {
       "options": {
         "timeout": 600000,
+        "chunkTimeout": 30000,
         "setCacheKey": true
       }
     }
@@ -258,24 +261,25 @@ opencode run "Hello world"
 }
 ```
 
-- `timeout` - 請求逾時時間，單位為毫秒（預設值：300000）。設定為 `false` 可停用逾時。
-- `setCacheKey` - 確保始終為指定供應商設定快取金鑰。
+- `timeout` - Request timeout in milliseconds (default: 300000). Set to `false` to disable.
+- `chunkTimeout` - Timeout in milliseconds between streamed response chunks. If no chunk arrives in time, the request is aborted.
+- `setCacheKey` - Ensure a cache key is always set for designated provider.
 
-您還可以設定[本地模型](/docs/models#local)。[了解更多](/docs/models)。
+You can also configure [local models](/docs/models#local). [Learn more](/docs/models).
 
 ---
 
-#### 供應商特定選項
+#### Provider-Specific Options
 
-一些供應商支援除通用 `timeout` 和 `apiKey` 設定之外的額外設定選項。
+Some providers support additional configuration options beyond the generic `timeout` and `apiKey` settings.
 
 ##### Amazon Bedrock
 
-Amazon Bedrock 支援 AWS 特定設定：
+Amazon Bedrock supports AWS-specific configuration:
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "provider": {
     "amazon-bedrock": {
       "options": {
@@ -288,40 +292,40 @@ Amazon Bedrock 支援 AWS 特定設定：
 }
 ```
 
-- `region` - Bedrock 的 AWS 區域（預設為 `AWS_REGION` 環境變數或 `us-east-1`）
-- `profile` - 來自 `~/.aws/credentials` 的 AWS 命名設定檔（預設為 `AWS_PROFILE` 環境變數）
-- `endpoint` - VPC 端點的自訂端點 URL。這是通用 `baseURL` 選項使用 AWS 特定術語的別名。如果兩者都指定，`endpoint` 優先。
+- `region` - AWS region for Bedrock (defaults to `AWS_REGION` env var or `us-east-1`)
+- `profile` - AWS named profile from `~/.aws/credentials` (defaults to `AWS_PROFILE` env var)
+- `endpoint` - Custom endpoint URL for VPC endpoints. This is an alias for the generic `baseURL` option using AWS-specific terminology. If both are specified, `endpoint` takes precedence.
 
 :::note
-Bearer Token（`AWS_BEARER_TOKEN_BEDROCK` 或 `/connect`）優先於基於設定檔的身分驗證。詳情請參見[認證優先級](/docs/providers#authentication-precedence)。
+Bearer tokens (`AWS_BEARER_TOKEN_BEDROCK` or `/connect`) take precedence over profile-based authentication. See [authentication precedence](/docs/providers#authentication-precedence) for details.
 :::
 
-[了解更多關於 Amazon Bedrock 設定的資訊](/docs/providers#amazon-bedrock)。
+[Learn more about Amazon Bedrock configuration](/docs/providers#amazon-bedrock).
 
 ---
 
-### 主題
+### Themes
 
-在 `tui.json` 中設定您的 UI 主題。
+Set your UI theme in `tui.json`.
 
 ```json title="tui.json"
 {
-  "$schema": "https://opencode.ai/tui.json",
+  "$schema": "https://cyxcode.ai/tui.json",
   "theme": "tokyonight"
 }
 ```
 
-[在此了解更多](/docs/themes)。
+[Learn more here](/docs/themes).
 
 ---
 
-### 代理
+### Agents
 
-您可以透過 `agent` 選項為特定任務設定專用代理。
+You can configure specialized agents for specific tasks through the `agent` option.
 
 ```jsonc title="opencode.jsonc"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "agent": {
     "code-reviewer": {
       "description": "Reviews code for best practices and potential issues",
@@ -337,55 +341,55 @@ Bearer Token（`AWS_BEARER_TOKEN_BEDROCK` 或 `/connect`）優先於基於設定
 }
 ```
 
-您還可以使用 `~/.config/opencode/agents/` 或 `.opencode/agents/` 中的 Markdown 檔案定義代理。[在此了解更多](/docs/agents)。
+You can also define agents using markdown files in `~/.config/opencode/agents/` or `.opencode/agents/`. [Learn more here](/docs/agents).
 
 ---
 
-### 預設代理
+### Default agent
 
-您可以使用 `default_agent` 選項設定預設代理。當未明確指定代理時，將使用該預設代理。
+You can set the default agent using the `default_agent` option. This determines which agent is used when none is explicitly specified.
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "default_agent": "plan"
 }
 ```
 
-預設代理必須是主代理（不能是子代理）。可以是內建代理（如 `"build"` 或 `"plan"`），也可以是您定義的[自訂代理](/docs/agents)。如果指定的代理不存在或是子代理，OpenCode 將回退到 `"build"` 並發出警告。
+The default agent must be a primary agent (not a subagent). This can be a built-in agent like `"build"` or `"plan"`, or a [custom agent](/docs/agents) you've defined. If the specified agent doesn't exist or is a subagent, CyxCode will fall back to `"build"` with a warning.
 
-此設定適用於所有介面：TUI、CLI（`opencode run`）、桌面應用程式和 GitHub Action。
+This setting applies across all interfaces: TUI, CLI (`cyxcode run`), desktop app, and GitHub Action.
 
 ---
 
-### 分享
+### Sharing
 
-您可以透過 `share` 選項設定[分享](/docs/share)功能。
+You can configure the [share](/docs/share) feature through the `share` option.
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "share": "manual"
 }
 ```
 
-該選項接受：
+This takes:
 
-- `"manual"` - 允許透過指令手動分享（預設）
-- `"auto"` - 自動分享新工作階段
-- `"disabled"` - 完全停用分享
+- `"manual"` - Allow manual sharing via commands (default)
+- `"auto"` - Automatically share new conversations
+- `"disabled"` - Disable sharing entirely
 
-預設情況下，分享設定為手動模式，您需要使用 `/share` 指令明確分享工作階段。
+By default, sharing is set to manual mode where you need to explicitly share conversations using the `/share` command.
 
 ---
 
-### 指令
+### Commands
 
-您可以透過 `command` 選項為重複任務設定自訂指令。
+You can configure custom commands for repetitive tasks through the `command` option.
 
 ```jsonc title="opencode.jsonc"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "command": {
     "test": {
       "template": "Run the full test suite with coverage report and show any failures.\nFocus on the failing tests and suggest fixes.",
@@ -401,48 +405,65 @@ Bearer Token（`AWS_BEARER_TOKEN_BEDROCK` 或 `/connect`）優先於基於設定
 }
 ```
 
-您還可以使用 `~/.config/opencode/commands/` 或 `.opencode/commands/` 中的 Markdown 檔案定義指令。[在此了解更多](/docs/commands)。
+You can also define commands using markdown files in `~/.config/opencode/commands/` or `.opencode/commands/`. [Learn more here](/docs/commands).
 
 ---
 
-### 快捷鍵
+### Keybinds
 
-在 `tui.json` 中自訂快捷鍵。
+Customize keybinds in `tui.json`.
 
 ```json title="tui.json"
 {
-  "$schema": "https://opencode.ai/tui.json",
+  "$schema": "https://cyxcode.ai/tui.json",
   "keybinds": {}
 }
 ```
 
-[在此了解更多](/docs/keybinds)。
+[Learn more here](/docs/keybinds).
 
 ---
 
-### 自動更新
+### Snapshot
 
-OpenCode 啟動時會自動下載新版本。您可以使用 `autoupdate` 選項停用此功能。
+CyxCode uses snapshots to track file changes during agent operations, enabling you to undo and revert changes within a session. Snapshots are enabled by default.
+
+For large repositories or projects with many submodules, the snapshot system can cause slow indexing and significant disk usage as it tracks all changes using an internal git repository. You can disable snapshots using the `snapshot` option.
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
+  "snapshot": false
+}
+```
+
+Note that disabling snapshots means changes made by the agent cannot be rolled back through the UI.
+
+---
+
+### Autoupdate
+
+CyxCode will automatically download any new updates when it starts up. You can disable this with the `autoupdate` option.
+
+```json title="opencode.json"
+{
+  "$schema": "https://cyxcode.ai/config.json",
   "autoupdate": false
 }
 ```
 
-如果您不想自動更新但希望在新版本可用時收到通知，可將 `autoupdate` 設定為 `"notify"`。
-請注意，此功能僅在未透過 Homebrew 等套件管理器安裝時有效。
+If you don't want updates but want to be notified when a new version is available, set `autoupdate` to `"notify"`.
+Notice that this only works if it was not installed using a package manager such as Homebrew.
 
 ---
 
-### 格式化器
+### Formatters
 
-您可以透過 `formatter` 選項設定程式碼格式化器。
+You can configure code formatters through the `formatter` option.
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "formatter": {
     "prettier": {
       "disabled": true
@@ -458,19 +479,19 @@ OpenCode 啟動時會自動下載新版本。您可以使用 `autoupdate` 選項
 }
 ```
 
-[在此了解更多關於格式化器的資訊](/docs/formatters)。
+[Learn more about formatters here](/docs/formatters).
 
 ---
 
-### 權限
+### Permissions
 
-預設情況下，OpenCode **允許所有操作**，無需明確批准。您可以使用 `permission` 選項變更此行為。
+By default, CyxCode **allows all operations** without requiring explicit approval. You can change this using the `permission` option.
 
-例如，要讓 `edit` 和 `bash` 工具需要使用者確認：
+For example, to ensure that the `edit` and `bash` tools require user approval:
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "permission": {
     "edit": "ask",
     "bash": "ask"
@@ -478,17 +499,17 @@ OpenCode 啟動時會自動下載新版本。您可以使用 `autoupdate` 選項
 }
 ```
 
-[在此了解更多關於權限的資訊](/docs/permissions)。
+[Learn more about permissions here](/docs/permissions).
 
 ---
 
-### 壓縮
+### Compaction
 
-您可以透過 `compaction` 選項控制上下文壓縮行為。
+You can control context compaction behavior through the `compaction` option.
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "compaction": {
     "auto": true,
     "prune": true,
@@ -497,150 +518,151 @@ OpenCode 啟動時會自動下載新版本。您可以使用 `autoupdate` 選項
 }
 ```
 
-- `auto` - 當上下文已滿時自動壓縮工作階段（預設值：`true`）。
-- `prune` - 刪除舊的工具輸出以節省 Token（預設值：`true`）。
-- `reserved` - 壓縮時的 Token 緩衝區。保留足夠的窗口以避免壓縮過程中溢出。
+- `auto` - Automatically compact the session when context is full (default: `true`).
+- `prune` - Remove old tool outputs to save tokens (default: `true`).
+- `reserved` - Token buffer for compaction. Leaves enough window to avoid overflow during compaction
 
 ---
 
-### 檔案監看器
+### Watcher
 
-您可以透過 `watcher` 選項設定檔案監看器的忽略模式。
+You can configure file watcher ignore patterns through the `watcher` option.
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "watcher": {
     "ignore": ["node_modules/**", "dist/**", ".git/**"]
   }
 }
 ```
 
-模式遵循 glob 語法。使用此選項可以從檔案監看中排除頻繁變動的目錄。
+Patterns follow glob syntax. Use this to exclude noisy directories from file watching.
 
 ---
 
-### MCP 伺服器
+### MCP servers
 
-您可以透過 `mcp` 選項設定要使用的 MCP 伺服器。
+You can configure MCP servers you want to use through the `mcp` option.
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "mcp": {}
 }
 ```
 
-[在此了解更多](/docs/mcp-servers)。
+[Learn more here](/docs/mcp-servers).
 
 ---
 
-### 外掛程式
+### Plugins
 
-[外掛程式](/docs/plugins)透過自訂工具、掛鉤和整合來擴展 OpenCode。
+[Plugins](/docs/plugins) extend CyxCode with custom tools, hooks, and integrations.
 
-將外掛程式檔案放置在 `.opencode/plugins/` 或 `~/.config/opencode/plugins/` 中。您還可以透過 `plugin` 選項從 npm 載入外掛程式。
+Place plugin files in `.opencode/plugins/` or `~/.config/opencode/plugins/`. You can also load plugins from npm through the `plugin` option.
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "plugin": ["opencode-helicone-session", "@my-org/custom-plugin"]
 }
 ```
 
-[在此了解更多](/docs/plugins)。
+[Learn more here](/docs/plugins).
 
 ---
 
-### 指示
+### Instructions
 
-您可以透過 `instructions` 選項為所使用的模型設定指示。
+You can configure the instructions for the model you're using through the `instructions` option.
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "instructions": ["CONTRIBUTING.md", "docs/guidelines.md", ".cursor/rules/*.md"]
 }
 ```
 
-該選項接受指示檔案路徑和 glob 模式的陣列。[在此了解更多關於規則的資訊](/docs/rules)。
+This takes an array of paths and glob patterns to instruction files. [Learn more
+about rules here](/docs/rules).
 
 ---
 
-### 停用供應商
+### Disabled providers
 
-您可以透過 `disabled_providers` 選項停用自動載入的供應商。當您希望阻止某些供應商被載入（即使其憑證可用）時，此選項非常有用。
+You can disable providers that are loaded automatically through the `disabled_providers` option. This is useful when you want to prevent certain providers from being loaded even if their credentials are available.
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "disabled_providers": ["openai", "gemini"]
 }
 ```
 
 :::note
-`disabled_providers` 優先於 `enabled_providers`。
+The `disabled_providers` takes priority over `enabled_providers`.
 :::
 
-`disabled_providers` 選項接受供應商 ID 的陣列。當某個供應商被停用時：
+The `disabled_providers` option accepts an array of provider IDs. When a provider is disabled:
 
-- 即使設定了環境變數，也不會被載入。
-- 即使透過 `/connect` 指令設定了 API 金鑰，也不會被載入。
-- 該供應商的模型不會出現在模型選擇列表中。
+- It won't be loaded even if environment variables are set.
+- It won't be loaded even if API keys are configured through the `/connect` command.
+- The provider's models won't appear in the model selection list.
 
 ---
 
-### 啟用供應商
+### Enabled providers
 
-您可以透過 `enabled_providers` 選項指定允許使用的供應商白名單。設定後，僅啟用指定的供應商，所有其他供應商將被忽略。
+You can specify an allowlist of providers through the `enabled_providers` option. When set, only the specified providers will be enabled and all others will be ignored.
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "enabled_providers": ["anthropic", "openai"]
 }
 ```
 
-當您希望限制 OpenCode 僅使用特定供應商，而不是逐一停用其他供應商時，此選項非常有用。
+This is useful when you want to restrict CyxCode to only use specific providers rather than disabling them one by one.
 
 :::note
-`disabled_providers` 優先於 `enabled_providers`。
+The `disabled_providers` takes priority over `enabled_providers`.
 :::
 
-如果某個供應商同時出現在 `enabled_providers` 和 `disabled_providers` 中，為了向後相容，`disabled_providers` 優先。
+If a provider appears in both `enabled_providers` and `disabled_providers`, the `disabled_providers` takes priority for backwards compatibility.
 
 ---
 
-### 實驗性功能
+### Experimental
 
-`experimental` 鍵包含正在積極開發中的選項。
+The `experimental` key contains options that are under active development.
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "experimental": {}
 }
 ```
 
 :::caution
-實驗性選項不穩定。它們可能會在不另行通知的情況下被變更或移除。
+Experimental options are not stable. They may change or be removed without notice.
 :::
 
 ---
 
-## 變數
+## Variables
 
-您可以在設定檔中使用變數替換來參照環境變數和檔案內容。
+You can use variable substitution in your config files to reference environment variables and file contents.
 
 ---
 
-### 環境變數
+### Env vars
 
-使用 `{env:VARIABLE_NAME}` 來替換環境變數：
+Use `{env:VARIABLE_NAME}` to substitute environment variables:
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "model": "{env:OPENCODE_MODEL}",
   "provider": {
     "anthropic": {
@@ -653,17 +675,17 @@ OpenCode 啟動時會自動下載新版本。您可以使用 `autoupdate` 選項
 }
 ```
 
-如果環境變數未設定，它將被替換為空字串。
+If the environment variable is not set, it will be replaced with an empty string.
 
 ---
 
-### 檔案
+### Files
 
-使用 `{file:path/to/file}` 來替換檔案內容：
+Use `{file:path/to/file}` to substitute the contents of a file:
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "instructions": ["./custom-instructions.md"],
   "provider": {
     "openai": {
@@ -675,13 +697,13 @@ OpenCode 啟動時會自動下載新版本。您可以使用 `autoupdate` 選項
 }
 ```
 
-檔案路徑可以是：
+File paths can be:
 
-- 相對於設定檔所在目錄的路徑
-- 以 `/` 或 `~` 開頭的絕對路徑
+- Relative to the config file directory
+- Or absolute paths starting with `/` or `~`
 
-這些功能適用於：
+These are useful for:
 
-- 將 API 金鑰等敏感資料保存在單獨的檔案中。
-- 引入大型指示檔案而不會使設定變得雜亂。
-- 在多個設定檔之間共享通用設定片段。
+- Keeping sensitive data like API keys in separate files.
+- Including large instruction files without cluttering your config.
+- Sharing common configuration snippets across multiple config files.

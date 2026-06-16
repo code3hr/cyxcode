@@ -1,47 +1,48 @@
 ---
 title: IDE
-description: Ekstenzija OpenCode za VS Code, Cursor i druge IDE
+description: The CyxCode extension for VS Code, Cursor, and other IDEs
 ---
 
-OpenCode se integriše sa VS kodom, Cursor-om ili bilo kojim IDE-om koji podržava terminal. Samo pokrenite `opencode` u terminalu da započnete.
-
----
-
-## Korištenje
-
-- **Brzo pokretanje**: Koristite `Cmd+Esc` (Mac) ili `Ctrl+Esc` (Windows/Linux) da otvorite OpenCode u prikazu podijeljenog terminala ili fokusirajte postojeću terminalsku sesiju ako je već pokrenuta.
-- **Nova sesija**: Koristite `Cmd+Shift+Esc` (Mac) ili `Ctrl+Shift+Esc` (Windows/Linux) da započnete novu OpenCode terminalsku sesiju, čak i ako je ona već otvorena. Takođe možete kliknuti na dugme OpenCode u korisničkom sučelju.
-- **Svijest o kontekstu**: Automatski dijelite svoj trenutni odabir ili karticu s OpenCode.
-- **Prečice za referencu datoteka**: Koristite `Cmd+Option+K` (Mac) ili `Alt+Ctrl+K` (Linux/Windows) za umetanje referenci datoteka. Na primjer, `@File#L37-42`.
+CyxCode integrates with VS Code, Cursor, or any IDE that supports a terminal. Just run `cyxcode` in the terminal to get started.
 
 ---
 
-## Instalacija
+## Usage
 
-Da biste instalirali OpenCode na VS Code i popularne viljuške kao što su Cursor, Windsurf, VSCodium:
-
-1. Otvorite VS Code
-2. Otvorite integrirani terminal
-3. Pokrenite `opencode` - ekstenzija se automatski instalira
-   Ako s druge strane želite da koristite svoj vlastiti IDE kada pokrenete `/editor` ili `/export` iz TUI-ja, morat ćete postaviti `export EDITOR="code --wait"`. [Saznajte više](/docs/tui/#editor-setup).
+- **Quick Launch**: Use `Cmd+Esc` (Mac) or `Ctrl+Esc` (Windows/Linux) to open CyxCode in a split terminal view, or focus an existing terminal session if one is already running.
+- **New Session**: Use `Cmd+Shift+Esc` (Mac) or `Ctrl+Shift+Esc` (Windows/Linux) to start a new CyxCode terminal session, even if one is already open. You can also click the CyxCode button in the UI.
+- **Context Awareness**: Automatically share your current selection or tab with CyxCode.
+- **File Reference Shortcuts**: Use `Cmd+Option+K` (Mac) or `Alt+Ctrl+K` (Linux/Windows) to insert file references. For example, `@File#L37-42`.
 
 ---
 
-### Ručna instalacija
+## Installation
 
-Potražite **OpenCode** na Extension Marketplaceu i kliknite na **Instaliraj**.
+To install CyxCode on VS Code and popular forks like Cursor, Windsurf, VSCodium:
+
+1. Open VS Code
+2. Open the integrated terminal
+3. Run `cyxcode` - the extension installs automatically
+
+If on the other hand you want to use your own IDE when you run `/editor` or `/export` from the TUI, you'll need to set `export EDITOR="code --wait"`. [Learn more](/docs/tui/#editor-setup).
 
 ---
 
-### Rješavanje problema
+### Manual Install
 
-Ako se ekstenzija ne uspije automatski instalirati:
+Search for **CyxCode** in the Extension Marketplace and click **Install**.
 
-- Uvjerite se da koristite `opencode` u integriranom terminalu.
-- Potvrdite da je CLI za vaš IDE instaliran:
-  - Za VS kod: `code` naredbu
-  - Za Cursor: `cursor` naredba
-  - Za Windsurf: `windsurf` komanda
-  - Za VSCodium: `codium` komanda
-  - Ako ne, pokrenite `Cmd+Shift+P` (Mac) ili `Ctrl+Shift+P` (Windows/Linux) i potražite "Shell Command: Install 'code' command in PATH" (ili ekvivalent za vaš IDE)
-- Osigurajte da VS Code ima dozvolu za instaliranje ekstenzija
+---
+
+### Troubleshooting
+
+If the extension fails to install automatically:
+
+- Ensure you’re running `cyxcode` in the integrated terminal.
+- Confirm the CLI for your IDE is installed:
+  - For VS Code: `code` command
+  - For Cursor: `cursor` command
+  - For Windsurf: `windsurf` command
+  - For VSCodium: `codium` command
+  - If not, run `Cmd+Shift+P` (Mac) or `Ctrl+Shift+P` (Windows/Linux) and search for "Shell Command: Install 'code' command in PATH" (or the equivalent for your IDE)
+- Ensure VS Code has permission to install extensions

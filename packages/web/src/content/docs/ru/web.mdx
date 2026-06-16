@@ -1,132 +1,132 @@
 ---
-title: Интернет
-description: Использование opencode в вашем браузере.
+title: Web
+description: Using CyxCode in your browser.
 ---
 
-opencode может работать как веб-приложение в вашем браузере, обеспечивая такой же мощный опыт кодирования AI без необходимости использования терминала.
+CyxCode can run as a web application in your browser, providing the same powerful AI coding experience without needing a terminal.
 
-![opencode Web — новый сеанс](../../../assets/web/web-homepage-new-session.png)
+![CyxCode Web - New Session](../../../assets/web/web-homepage-new-session.png)
 
-## Начало работы
+## Getting Started
 
-Запустите веб-интерфейс, выполнив:
+Start the web interface by running:
 
 ```bash
-opencode web
+cyxcode web
 ```
 
-Это запустит локальный сервер `127.0.0.1` со случайным доступным портом и автоматически откроет opencode в браузере по умолчанию.
+This starts a local server on `127.0.0.1` with a random available port and automatically opens CyxCode in your default browser.
 
 :::caution
-Если `OPENCODE_SERVER_PASSWORD` не установлен, сервер будет незащищен. Это подходит для локального использования, но его следует настроить для доступа к сети.
+If `OPENCODE_SERVER_PASSWORD` is not set, the server will be unsecured. This is fine for local use but should be set for network access.
 :::
 
-:::tip[Пользователи Windows]
-Для получения наилучших результатов запустите `opencode web` из [WSL](/docs/windows-wsl), а не из PowerShell. Это обеспечивает правильный доступ к файловой системе и интеграцию терминала.
+:::tip[Windows Users]
+For the best experience, run `cyxcode web` from [WSL](/docs/windows-wsl) rather than PowerShell. This ensures proper file system access and terminal integration.
 :::
 
 ---
 
-## Конфигурация
+## Configuration
 
-Вы можете настроить веб-сервер с помощью CLI-флагов или в файле [config file](/docs/config).
+You can configure the web server using command line flags or in your [config file](/docs/config).
 
-### Порт
+### Port
 
-По умолчанию opencode выбирает доступный порт. Вы можете указать порт:
-
-```bash
-opencode web --port 4096
-```
-
-### Имя хоста
-
-По умолчанию сервер привязывается к `127.0.0.1` (только локальный хост). Чтобы сделать opencode доступным в вашей сети:
+By default, CyxCode picks an available port. You can specify a port:
 
 ```bash
-opencode web --hostname 0.0.0.0
+cyxcode web --port 4096
 ```
 
-При использовании `0.0.0.0` opencode будет отображать как локальные, так и сетевые адреса:
+### Hostname
+
+By default, the server binds to `127.0.0.1` (localhost only). To make CyxCode accessible on your network:
+
+```bash
+cyxcode web --hostname 0.0.0.0
+```
+
+When using `0.0.0.0`, CyxCode will display both local and network addresses:
 
 ```
   Local access:       http://localhost:4096
   Network access:     http://192.168.1.100:4096
 ```
 
-### Обнаружение mDNS
+### mDNS Discovery
 
-Включите mDNS, чтобы ваш сервер был доступен для обнаружения в локальной сети:
+Enable mDNS to make your server discoverable on the local network:
 
 ```bash
-opencode web --mdns
+cyxcode web --mdns
 ```
 
-Это автоматически устанавливает имя хоста `0.0.0.0` и объявляет сервер как `opencode.local`.
+This automatically sets the hostname to `0.0.0.0` and advertises the server as `opencode.local`.
 
-Вы можете настроить доменное имя mDNS для запуска нескольких экземпляров в одной сети:
+You can customize the mDNS domain name to run multiple instances on the same network:
 
 ```bash
-opencode web --mdns --mdns-domain myproject.local
+cyxcode web --mdns --mdns-domain myproject.local
 ```
 
 ### CORS
 
-Чтобы разрешить дополнительные домены для CORS (полезно для пользовательских интерфейсов):
+To allow additional domains for CORS (useful for custom frontends):
 
 ```bash
-opencode web --cors https://example.com
+cyxcode web --cors https://example.com
 ```
 
-### Аутентификация
+### Authentication
 
-Чтобы защитить доступ, установите пароль, используя переменную среды `OPENCODE_SERVER_PASSWORD`:
+To protect access, set a password using the `OPENCODE_SERVER_PASSWORD` environment variable:
 
 ```bash
-OPENCODE_SERVER_PASSWORD=secret opencode web
+OPENCODE_SERVER_PASSWORD=secret cyxcode web
 ```
 
-Имя пользователя по умолчанию — `opencode`, но его можно изменить с помощью `OPENCODE_SERVER_USERNAME`.
+The username defaults to `opencode` but can be changed with `OPENCODE_SERVER_USERNAME`.
 
 ---
 
-## Использование веб-интерфейса
+## Using the Web Interface
 
-После запуска веб-интерфейс предоставляет доступ к вашим сеансам opencode.
+Once started, the web interface provides access to your CyxCode sessions.
 
-### Сессии
+### Sessions
 
-Просматривайте свои сеансы и управляйте ими с главной страницы. Вы можете видеть активные сеансы и начинать новые.
+View and manage your sessions from the homepage. You can see active sessions and start new ones.
 
-![opencode Web — активный сеанс](../../../assets/web/web-homepage-active-session.png)
+![CyxCode Web - Active Session](../../../assets/web/web-homepage-active-session.png)
 
-### Статус сервера
+### Server Status
 
-Нажмите «Просмотреть серверы», чтобы просмотреть подключенные серверы и их статус.
+Click "See Servers" to view connected servers and their status.
 
-![opencode Web — см. Серверы](../../../assets/web/web-homepage-see-servers.png)
+![CyxCode Web - See Servers](../../../assets/web/web-homepage-see-servers.png)
 
 ---
 
-## Подключение терминала
+## Attaching a Terminal
 
-Вы можете подключить TUI терминала к работающему веб-серверу:
+You can attach a terminal TUI to a running web server:
 
 ```bash
 # Start the web server
-opencode web --port 4096
+cyxcode web --port 4096
 
 # In another terminal, attach the TUI
-opencode attach http://localhost:4096
+cyxcode attach http://localhost:4096
 ```
 
-Это позволяет вам одновременно использовать веб-интерфейс и терминал, используя одни и те же сеансы и состояние.
+This allows you to use both the web interface and terminal simultaneously, sharing the same sessions and state.
 
 ---
 
-## Конфигурационный файл
+## Config File
 
-Вы также можете настроить параметры сервера в файле конфигурации `opencode.json`:
+You can also configure server settings in your `opencode.json` config file:
 
 ```json
 {
@@ -139,4 +139,4 @@ opencode attach http://localhost:4096
 }
 ```
 
-CLI-флаги имеют приоритет над настройками файла конфигурации.
+Command line flags take precedence over config file settings.

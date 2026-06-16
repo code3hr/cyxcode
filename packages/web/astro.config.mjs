@@ -3,7 +3,6 @@ import { defineConfig } from "astro/config"
 import starlight from "@astrojs/starlight"
 import solidJs from "@astrojs/solid-js"
 import cloudflare from "@astrojs/cloudflare"
-import theme from "toolbeam-docs-theme"
 import config from "./config.mjs"
 import { rehypeHeadingIds } from "@astrojs/markdown-remark"
 import rehypeAutolinkHeadings from "rehype-autolink-headings"
@@ -16,6 +15,7 @@ export default defineConfig({
   output: "server",
   adapter: cloudflare({
     imageService: "passthrough",
+    prerenderEnvironment: "node",
   }),
   devToolbar: {
     enabled: false,
@@ -31,7 +31,7 @@ export default defineConfig({
     configSchema(),
     solidJs(),
     starlight({
-      title: "OpenCode",
+      title: "CyxCode",
       defaultLocale: "root",
       locales: {
         root: {
@@ -40,7 +40,7 @@ export default defineConfig({
           dir: "ltr",
         },
         ar: {
-          label: "العربية",
+          label: "\u0627\u0644\u0639\u0631\u0628\u064a\u0629",
           lang: "ar",
           dir: "rtl",
         },
@@ -75,12 +75,12 @@ export default defineConfig({
           dir: "ltr",
         },
         ja: {
-          label: "日本語",
+          label: "\u65e5\u672c\u8a9e",
           lang: "ja-JP",
           dir: "ltr",
         },
         ko: {
-          label: "한국어",
+          label: "\ud55c\uad6d\uc5b4",
           lang: "ko-KR",
           dir: "ltr",
         },
@@ -100,12 +100,12 @@ export default defineConfig({
           dir: "ltr",
         },
         ru: {
-          label: "Русский",
+          label: "\u0420\u0443\u0441\u0441\u043a\u0438\u0439",
           lang: "ru-RU",
           dir: "ltr",
         },
         th: {
-          label: "ไทย",
+          label: "\u0e44\u0e17\u0e22",
           lang: "th-TH",
           dir: "ltr",
         },
@@ -115,12 +115,12 @@ export default defineConfig({
           dir: "ltr",
         },
         "zh-cn": {
-          label: "简体中文",
+          label: "\u7b80\u4f53\u4e2d\u6587",
           lang: "zh-CN",
           dir: "ltr",
         },
         "zh-tw": {
-          label: "繁體中文",
+          label: "\u7e41\u9ad4\u4e2d\u6587",
           lang: "zh-TW",
           dir: "ltr",
         },
@@ -299,11 +299,6 @@ export default defineConfig({
         Footer: "./src/components/Footer.astro",
         SiteTitle: "./src/components/SiteTitle.astro",
       },
-      plugins: [
-        theme({
-          headerLinks: config.headerLinks,
-        }),
-      ],
     }),
   ],
 })

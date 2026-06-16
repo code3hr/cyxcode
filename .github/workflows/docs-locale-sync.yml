@@ -9,7 +9,7 @@ on:
 
 jobs:
   sync-locales:
-    if: github.actor != 'opencode-agent[bot]'
+    if: github.actor != 'cyxcode-agent[bot]'
     runs-on: blacksmith-4vcpu-ubuntu-2404
     permissions:
       contents: write
@@ -47,11 +47,11 @@ jobs:
             echo "EOF"
           } >> "$GITHUB_OUTPUT"
 
-      - name: Install OpenCode
+      - name: Install CyxCode
         if: steps.changes.outputs.has_changes == 'true'
-        run: curl -fsSL https://opencode.ai/install | bash
+        run: curl -fsSL https://cyxcode.ai/install | bash
 
-      - name: Sync locale docs with OpenCode
+      - name: Sync locale docs with CyxCode
         if: steps.changes.outputs.has_changes == 'true'
         env:
           OPENCODE_API_KEY: ${{ secrets.OPENCODE_API_KEY }}
@@ -66,7 +66,7 @@ jobs:
               }
             }
         run: |
-          opencode run --agent docs --model opencode/gpt-5.3-codex <<'EOF'
+          cyxcode run --agent docs --model opencode/gpt-5.3-codex <<'EOF'
             Update localized docs to match the latest English docs changes.
 
             Changed English doc files:

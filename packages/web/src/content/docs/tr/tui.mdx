@@ -1,22 +1,22 @@
 ---
 title: TUI
-description: OpenCode terminal kullanıcı arayüzünü kullanma.
+description: CyxCode terminal kullanıcı arayüzünü kullanma.
 ---
 
 import { Tabs, TabItem } from "@astrojs/starlight/components"
 
-OpenCode, projelerinizde LLM ile çalışmak için etkileşimli bir terminal arayüzü (TUI) sunar.
+CyxCode, projelerinizde LLM ile çalışmak için etkileşimli bir terminal arayüzü (TUI) sunar.
 
-OpenCode'u çalıştırdığınızda mevcut dizin için TUI başlar.
+CyxCode'u çalıştırdığınızda mevcut dizin için TUI başlar.
 
 ```bash
-opencode
+cyxcode
 ```
 
 İsterseniz belirli bir çalışma dizini için de başlatabilirsiniz.
 
 ```bash
-opencode /path/to/project
+cyxcode /path/to/project
 ```
 
 TUI içine girdiğinizde, bir mesajla istem gönderebilirsiniz.
@@ -57,7 +57,7 @@ Komut çıktısı bir araç sonucu olarak konuşmaya eklenir.
 
 ## Komutlar
 
-OpenCode TUI kullanırken `/` ve ardından komut adını yazarak hızlı eylemler çalıştırabilirsiniz. Örneğin:
+CyxCode TUI kullanırken `/` ve ardından komut adını yazarak hızlı eylemler çalıştırabilirsiniz. Örneğin:
 
 ```bash frame="none"
 /help
@@ -71,7 +71,7 @@ Komutların çoğu, lider tuşu `ctrl+x` olan bir kısayola da sahiptir. [Daha f
 
 ### connect
 
-OpenCode'a bir sağlayıcı ekler. Mevcut sağlayıcıları seçip API anahtarları eklemenizi sağlar.
+CyxCode'a bir sağlayıcı ekler. Mevcut sağlayıcıları seçip API anahtarları eklemenizi sağlar.
 
 ```bash frame="none"
 /connect
@@ -117,7 +117,7 @@ Mesaj yazmak için harici editör açar. `EDITOR` ortam değişkeninde ayarlı e
 
 ### exit
 
-OpenCode'dan çıkar. _Takma adlar_: `/quit`, `/q`
+CyxCode'dan çıkar. _Takma adlar_: `/quit`, `/q`
 
 ```bash frame="none"
 /exit
@@ -357,7 +357,7 @@ TUI davranışını `tui.json` (veya `tui.jsonc`) aracılığıyla özelleştire
 
 ```json title="tui.json"
 {
-  "$schema": "https://opencode.ai/tui.json",
+  "$schema": "https://cyxcode.ai/tui.json",
   "theme": "opencode",
   "keybinds": {
     "leader": "ctrl+x"

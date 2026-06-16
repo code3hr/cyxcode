@@ -1,25 +1,25 @@
 ---
 title: TUI
-description: Использование TUI opencode.
+description: Using the CyxCode terminal user interface.
 ---
 
 import { Tabs, TabItem } from "@astrojs/starlight/components"
 
-opencode предоставляет интерактивный terminal интерфейс или TUI для работы над вашими проектами с помощью LLM.
+CyxCode provides an interactive terminal interface or TUI for working on your projects with an LLM.
 
-Запуск opencode запускает TUI для текущего каталога.
-
-```bash
-opencode
-```
-
-Или вы можете запустить его для определенного рабочего каталога.
+Running CyxCode starts the TUI for the current directory.
 
 ```bash
-opencode /path/to/project
+cyxcode
 ```
 
-Как только вы окажетесь в TUI, вы можете запросить его с помощью сообщения.
+Or you can start it for a specific working directory.
+
+```bash
+cyxcode /path/to/project
+```
+
+Once you're in the TUI, you can prompt it with a message.
 
 ```text
 Give me a quick summary of the codebase.
@@ -27,51 +27,51 @@ Give me a quick summary of the codebase.
 
 ---
 
-## Ссылки на файлы
+## File references
 
-Вы можете ссылаться на файлы в своих сообщениях, используя `@`. Это выполняет нечеткий поиск файлов в текущем рабочем каталоге.
+You can reference files in your messages using `@`. This does a fuzzy file search in the current working directory.
 
 :::tip
-Вы также можете использовать `@` для ссылки на файлы в своих сообщениях.
+You can also use `@` to reference files in your messages.
 :::
 
 ```text "@packages/functions/src/api/index.ts"
 How is auth handled in @packages/functions/src/api/index.ts?
 ```
 
-Содержимое файла добавляется в беседу автоматически.
+The content of the file is added to the conversation automatically.
 
 ---
 
-## Bash-команды
+## Bash commands
 
-Начните сообщение с `!`, чтобы запустить shell-команду.
+Start a message with `!` to run a shell command.
 
 ```bash frame="none"
 !ls -la
 ```
 
-Вывод команды добавляется в диалог как результат работы инструмента.
+The output of the command is added to the conversation as a tool result.
 
 ---
 
-## Команды
+## Commands
 
-При использовании opencode TUI вы можете ввести `/`, а затем имя команды, чтобы быстро выполнить действия. Например:
+When using the CyxCode TUI, you can type `/` followed by a command name to quickly execute actions. For example:
 
 ```bash frame="none"
 /help
 ```
 
-Большинство команд также имеют привязку клавиш с использованием `ctrl+x` в качестве ведущей клавиши, где `ctrl+x` — это ведущая клавиша по умолчанию. [Подробнее ](/docs/keybinds).
+Most commands also have keybind using `ctrl+x` as the leader key, where `ctrl+x` is the default leader key. [Learn more](/docs/keybinds).
 
-Вот все доступные слэш-команды:
+Here are all available slash commands:
 
 ---
 
 ### connect
 
-Добавьте провайдера в opencode. Позволяет выбирать из доступных поставщиков и добавлять их ключи API.
+Add a provider to CyxCode. Allows you to select from available providers and add their API keys.
 
 ```bash frame="none"
 /connect
@@ -81,173 +81,173 @@ How is auth handled in @packages/functions/src/api/index.ts?
 
 ### compact
 
-Сжать текущий сеанс. _Псевдоним_: `/summarize`
+Compact the current session. _Alias_: `/summarize`
 
 ```bash frame="none"
 /compact
 ```
 
-**Привязка клавиш:** `ctrl+x c`
+**Keybind:** `ctrl+x c`
 
 ---
 
 ### details
 
-Переключить детали выполнения инструмента.
+Toggle tool execution details.
 
 ```bash frame="none"
 /details
 ```
 
-**Привязка клавиш:** `ctrl+x d`
+**Keybind:** `ctrl+x d`
 
 ---
 
 ### editor
 
-Открыть внешний редактор для составления сообщений. Использует редактор, установленный в переменной среды `EDITOR`. [Подробнее ](#editor-setup).
+Open external editor for composing messages. Uses the editor set in your `EDITOR` environment variable. [Learn more](#editor-setup).
 
 ```bash frame="none"
 /editor
 ```
 
-**Привязка клавиш:** `ctrl+x e`
+**Keybind:** `ctrl+x e`
 
 ---
 
 ### exit
 
-Выйдите из opencode. _Псевдонимы_: `/quit`, `/q`
+Exit CyxCode. _Aliases_: `/quit`, `/q`
 
 ```bash frame="none"
 /exit
 ```
 
-**Привязка клавиш:** `ctrl+x q`
+**Keybind:** `ctrl+x q`
 
 ---
 
 ### export
 
-Экспортируйте текущий разговор в Markdown и откройте его в редакторе по умолчанию. Использует редактор, установленный в переменной среды `EDITOR`. [Подробнее ](#editor-setup).
+Export current conversation to Markdown and open in your default editor. Uses the editor set in your `EDITOR` environment variable. [Learn more](#editor-setup).
 
 ```bash frame="none"
 /export
 ```
 
-**Привязка клавиш:** `ctrl+x x`
+**Keybind:** `ctrl+x x`
 
 ---
 
 ### help
 
-Показать диалоговое окно помощи.
+Show the help dialog.
 
 ```bash frame="none"
 /help
 ```
 
-**Привязка клавиш:** `ctrl+x h`
+**Keybind:** `ctrl+x h`
 
 ---
 
 ### init
 
-Создайте или обновите файл `AGENTS.md`. [Подробнее ](/docs/rules).
+Create or update `AGENTS.md` file. [Learn more](/docs/rules).
 
 ```bash frame="none"
 /init
 ```
 
-**Привязка клавиш:** `ctrl+x i`
+**Keybind:** `ctrl+x i`
 
 ---
 
 ### models
 
-Перечислите доступные модели.
+List available models.
 
 ```bash frame="none"
 /models
 ```
 
-**Привязка клавиш:** `ctrl+x m`
+**Keybind:** `ctrl+x m`
 
 ---
 
 ### new
 
-Начать новый сеанс. _Псевдоним_: `/clear`
+Start a new session. _Alias_: `/clear`
 
 ```bash frame="none"
 /new
 ```
 
-**Привязка клавиш:** `ctrl+x n`
+**Keybind:** `ctrl+x n`
 
 ---
 
 ### redo
 
-Повторить ранее отмененное сообщение. Доступно только после использования `/undo`.
+Redo a previously undone message. Only available after using `/undo`.
 
 :::tip
-Любые изменения файлов также будут восстановлены.
+Any file changes will also be restored.
 :::
 
-Внутри это использует Git для управления изменениями файлов. Итак, ваш проект ** должен
-быть репозиторием Git**.
+Internally, this uses Git to manage the file changes. So your project **needs to
+be a Git repository**.
 
 ```bash frame="none"
 /redo
 ```
 
-**Привязка клавиш:** `ctrl+x r`
+**Keybind:** `ctrl+x r`
 
 ---
 
 ### sessions
 
-Составляйте список и переключайтесь между сеансами. _Псевдонимы_: `/resume`, `/continue`
+List and switch between sessions. _Aliases_: `/resume`, `/continue`
 
 ```bash frame="none"
 /sessions
 ```
 
-**Привязка клавиш:** `ctrl+x l`
+**Keybind:** `ctrl+x l`
 
 ---
 
 ### share
 
-Поделиться текущим сеансом. [Подробнее](/docs/share).
+Share current session. [Learn more](/docs/share).
 
 ```bash frame="none"
 /share
 ```
 
-**Привязка клавиш:** `ctrl+x s`
+**Keybind:** `ctrl+x s`
 
 ---
 
-### theme
+### themes
 
-Список доступных тем.
+List available themes.
 
 ```bash frame="none"
-/theme
+/themes
 ```
 
-**Привязка клавиш:** `ctrl+x t`
+**Keybind:** `ctrl+x t`
 
 ---
 
 ### thinking
 
-Переключить видимость блоков мышления/рассуждения в разговоре. Если этот параметр включен, вы можете увидеть процесс рассуждения модели для моделей, поддерживающих расширенное мышление.
+Toggle the visibility of thinking/reasoning blocks in the conversation. When enabled, you can see the model's reasoning process for models that support extended thinking.
 
 :::note
-Эта команда только контролирует, будут ли **отображаться** блоки мышления, но не включает и не отключает возможности модели по рассуждению. Чтобы переключить фактические возможности рассуждения, используйте `ctrl+t` для циклического переключения вариантов модели.
+This command only controls whether thinking blocks are **displayed** - it does not enable or disable the model's reasoning capabilities. To toggle actual reasoning capabilities, use `ctrl+t` to cycle through model variants.
 :::
 
 ```bash frame="none"
@@ -258,26 +258,26 @@ How is auth handled in @packages/functions/src/api/index.ts?
 
 ### undo
 
-Отменить последнее сообщение в разговоре. Удаляет самое последнее сообщение пользователя, все последующие ответы и любые изменения файлов.
+Undo last message in the conversation. Removes the most recent user message, all subsequent responses, and any file changes.
 
 :::tip
-Любые внесенные изменения в файле также будут отменены.
+Any file changes made will also be reverted.
 :::
 
-Внутри это использует Git для управления изменениями файлов. Итак, ваш проект ** должен
-быть репозиторием Git**.
+Internally, this uses Git to manage the file changes. So your project **needs to
+be a Git repository**.
 
 ```bash frame="none"
 /undo
 ```
 
-**Привязка клавиш:** `ctrl+x u`
+**Keybind:** `ctrl+x u`
 
 ---
 
 ### unshare
 
-Отменить общий доступ к текущему сеансу. [Подробнее](/docs/share#un-sharing).
+Unshare current session. [Learn more](/docs/share#un-sharing).
 
 ```bash frame="none"
 /unshare
@@ -285,9 +285,9 @@ How is auth handled in @packages/functions/src/api/index.ts?
 
 ---
 
-## Настройка редактора
+## Editor setup
 
-Команды `/editor` и `/export` используют редактор, указанный в переменной среды `EDITOR`.
+Both the `/editor` and `/export` commands use the editor specified in your `EDITOR` environment variable.
 
 <Tabs>
   <TabItem label="Linux/macOS">
@@ -301,8 +301,8 @@ How is auth handled in @packages/functions/src/api/index.ts?
     export EDITOR="code --wait"
     ```
 
-    Чтобы сделать его постоянным, добавьте это в свой профиль shell;
-    `~/.bashrc`, `~/.zshrc` и т. д.
+    To make it permanent, add this to your shell profile;
+    `~/.bashrc`, `~/.zshrc`, etc.
 
   </TabItem>
 
@@ -315,8 +315,8 @@ How is auth handled in @packages/functions/src/api/index.ts?
     set EDITOR=code --wait
     ```
 
-    Чтобы сделать его постоянным, используйте **Свойства системы** > **Среда
-    Переменные**.
+    To make it permanent, use **System Properties** > **Environment
+    Variables**.
 
   </TabItem>
 
@@ -329,38 +329,38 @@ How is auth handled in @packages/functions/src/api/index.ts?
     $env:EDITOR = "code --wait"
     ```
 
-    Чтобы сделать его постоянным, добавьте его в свой профиль PowerShell.
+    To make it permanent, add this to your PowerShell profile.
 
   </TabItem>
 </Tabs>
 
-Популярные варианты редактора включают в себя:
+Popular editor options include:
 
-- `code` — VS Code
-- `cursor` — Cursor
+- `code` - Visual Studio Code
+- `cursor` - Cursor
 - `windsurf` - Windsurf
-- `nvim` - Редактор Neovim
-- `vim` — редактор Vim
-- `nano` — Нано-редактор
-- `notepad` — Блокнот Windows
-- `subl` — Sublime Text
+- `nvim` - Neovim editor
+- `vim` - Vim editor
+- `nano` - Nano editor
+- `notepad` - Windows Notepad
+- `subl` - Sublime Text
 
 :::note
-Некоторые редакторы, такие как VS Code, необходимо запускать с флагом `--wait`.
+Some editors like VS Code need to be started with the `--wait` flag.
 :::
 
-Некоторым редакторам для работы в режиме блокировки необходимы CLI-аргументы. Флаг `--wait` блокирует процесс редактора до его закрытия.
+Some editors need command-line arguments to run in blocking mode. The `--wait` flag makes the editor process block until closed.
 
 ---
 
-## Настройка
+## Configure
 
-Вы можете настроить поведение TUI через `tui.json` (или `tui.jsonc`).
+You can customize TUI behavior through `tui.json` (or `tui.jsonc`).
 
 ```json title="tui.json"
 {
-  "$schema": "https://opencode.ai/tui.json",
-  "theme": "opencode",
+  "$schema": "https://cyxcode.ai/tui.json",
+  "theme": "CyxCode",
   "keybinds": {
     "leader": "ctrl+x"
   },
@@ -372,29 +372,29 @@ How is auth handled in @packages/functions/src/api/index.ts?
 }
 ```
 
-Это отдельный файл от `opencode.json`, который настраивает поведение сервера/выполнения.
+This is separate from `opencode.json`, which configures server/runtime behavior.
 
-### Параметры
+### Options
 
-- `theme` — Устанавливает тему пользовательского интерфейса. [Подробнее](/docs/themes).
-- `keybinds` — Настраивает сочетания клавиш. [Подробнее](/docs/keybinds).
-- `scroll_acceleration.enabled` — включите ускорение прокрутки в стиле macOS для плавной и естественной прокрутки. Если этот параметр включен, скорость прокрутки увеличивается при быстрой прокрутке и остается точной при более медленных движениях. **Этот параметр имеет приоритет над `scroll_speed` и переопределяет его, если он включен.**
-- `scroll_speed` — контролирует скорость прокрутки TUI при использовании команд прокрутки (минимум: `0.001`, поддерживает десятичные значения). По умолчанию `3`. **Примечание. Это игнорируется, если для `scroll_acceleration.enabled` установлено значение `true`.**
-- `diff_style` — Управляет отображением различий. `"auto"` адаптируется к ширине терминала, `"stacked"` всегда показывает одноколоночный макет.
+- `theme` - Sets your UI theme. [Learn more](/docs/themes).
+- `keybinds` - Customizes keyboard shortcuts. [Learn more](/docs/keybinds).
+- `scroll_acceleration.enabled` - Enable macOS-style scroll acceleration for smooth, natural scrolling. When enabled, scroll speed increases with rapid scrolling gestures and stays precise for slower movements. **This setting takes precedence over `scroll_speed` and overrides it when enabled.**
+- `scroll_speed` - Controls how fast the TUI scrolls when using scroll commands (minimum: `0.001`, supports decimal values). Defaults to `3`. **Note: This is ignored if `scroll_acceleration.enabled` is set to `true`.**
+- `diff_style` - Controls diff rendering. `"auto"` adapts to terminal width, `"stacked"` always shows a single-column layout.
 
-Используйте `OPENCODE_TUI_CONFIG` для загрузки пользовательского пути конфигурации TUI.
-
----
-
-## Кастомизация
-
-Вы можете настроить различные аспекты представления TUI, используя палитру команд (`ctrl+x h` или `/help`). Эти настройки сохраняются после перезапуска.
+Use `OPENCODE_TUI_CONFIG` to load a custom TUI config path.
 
 ---
 
-#### Отображение имени пользователя
+## Customization
 
-Включите, будет ли ваше имя пользователя отображаться в сообщениях чата. Доступ к этому через:
+You can customize various aspects of the TUI view using the command palette (`ctrl+x h` or `/help`). These settings persist across restarts.
 
-- Палитра команд: поиск «имя пользователя» или «скрыть имя пользователя».
-- Настройка сохраняется автоматически и будет запоминаться во время сеансов TUI.
+---
+
+#### Username display
+
+Toggle whether your username appears in chat messages. Access this through:
+
+- Command palette: Search for "username" or "hide username"
+- The setting persists automatically and will be remembered across TUI sessions

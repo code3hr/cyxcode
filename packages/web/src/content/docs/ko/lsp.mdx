@@ -1,15 +1,15 @@
 ---
 title: LSP 서버
-description: OpenCode는 LSP 서버와 통합됩니다.
+description: CyxCode는 LSP 서버와 통합됩니다.
 ---
 
-OpenCode는 Language Server Protocol(LSP)과 통합되어 LLM이 코드베이스와 상호작용하도록 돕습니다. 진단 정보를 활용해 LLM에 피드백을 제공합니다.
+CyxCode는 Language Server Protocol(LSP)과 통합되어 LLM이 코드베이스와 상호작용하도록 돕습니다. 진단 정보를 활용해 LLM에 피드백을 제공합니다.
 
 ---
 
 ## 기본 제공 (Built-in)
 
-OpenCode는 널리 사용되는 언어를 위해 여러 built-in LSP 서버를 제공합니다.
+CyxCode는 널리 사용되는 언어를 위해 여러 built-in LSP 서버를 제공합니다.
 
 | LSP 서버           | 확장자                                                              | 요구 사항                                                  |
 | ------------------ | ------------------------------------------------------------------- | ---------------------------------------------------------- |
@@ -57,7 +57,7 @@ OpenCode는 널리 사용되는 언어를 위해 여러 built-in LSP 서버를 �
 
 ## 작동 방식
 
-OpenCode가 파일을 열면 다음과 같이 동작합니다.
+CyxCode가 파일을 열면 다음과 같이 동작합니다.
 
 1. 활성화된 모든 LSP 서버에 대해 파일 확장자를 확인합니다.
 2. 적절한 LSP 서버가 아직 실행 중이지 않다면 시작합니다.
@@ -66,11 +66,11 @@ OpenCode가 파일을 열면 다음과 같이 동작합니다.
 
 ## 구성
 
-OpenCode config의 `lsp` 섹션에서 LSP 서버를 사용자 정의할 수 있습니다.
+CyxCode config의 `lsp` 섹션에서 LSP 서버를 사용자 정의할 수 있습니다.
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "lsp": {}
 }
 ```
@@ -95,7 +95,7 @@ OpenCode config의 `lsp` 섹션에서 LSP 서버를 사용자 정의할 수 있�
 
 ```json title="opencode.json" {5-7}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "lsp": {
     "rust": {
       "env": {
@@ -114,7 +114,7 @@ OpenCode config의 `lsp` 섹션에서 LSP 서버를 사용자 정의할 수 있�
 
 ```json title="opencode.json" {5-9}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "lsp": {
     "typescript": {
       "initialization": {
@@ -139,7 +139,7 @@ OpenCode config의 `lsp` 섹션에서 LSP 서버를 사용자 정의할 수 있�
 
 ```json title="opencode.json" {3}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "lsp": false
 }
 ```
@@ -148,7 +148,7 @@ OpenCode config의 `lsp` 섹션에서 LSP 서버를 사용자 정의할 수 있�
 
 ```json title="opencode.json" {5}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "lsp": {
     "typescript": {
       "disabled": true
@@ -165,7 +165,7 @@ OpenCode config의 `lsp` 섹션에서 LSP 서버를 사용자 정의할 수 있�
 
 ```json title="opencode.json" {4-7}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "lsp": {
     "custom-lsp": {
       "command": ["custom-lsp-server", "--stdio"],

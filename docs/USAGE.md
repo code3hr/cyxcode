@@ -536,7 +536,7 @@ The dashboard dev app is also directly available at
 `http://127.0.0.1:3002/dashboard/`. The backend/API is available at
 `http://127.0.0.1:4096/`.
 
-The split local setup is temporary. `docs/TOFIX-web-entrypoint.md` tracks the
+The split local setup is temporary. `docs/WEB-ENTRYPOINT.md` tracks the
 remaining work to make `cyxcode web --hostname 127.0.0.1 --port 4096` serve the
 app and dashboard consistently as one local web entrypoint.
 

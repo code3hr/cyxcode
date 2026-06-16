@@ -1,46 +1,46 @@
 ---
-title: ACP-støtte
-description: Bruk opencode i en hvilken som helst ACP-kompatibel editor.
+title: ACP Support
+description: Use CyxCode in any ACP-compatible editor.
 ---
 
-OpenCode støtter [Agent Client Protocol](https://agentclientprotocol.com) eller (ACP), slik at du kan bruke den direkte i kompatible editorer og IDE-er.
+CyxCode supports the [Agent Client Protocol](https://agentclientprotocol.com) or (ACP), allowing you to use it directly in compatible editors and IDEs.
 
 :::tip
-For en liste over editorer og verktøy som støtter ACP, sjekk ut [ACP fremdriftsrapport](https://zed.dev/blog/acp-progress-report#available-now).
+For a list of editors and tools that support ACP, check out the [ACP progress report](https://zed.dev/blog/acp-progress-report#available-now).
 :::
 
-ACP er en åpen protokoll som standardiserer kommunikasjon mellom kodeditorer og AI-kodeagenter.
+ACP is an open protocol that standardizes communication between code editors and AI coding agents.
 
 ---
 
-## Konfigurasjon
+## Configure
 
-For å bruke OpenCode via ACP, konfigurer redigeringsprogrammet til å kjøre kommandoen `opencode acp`.
+To use CyxCode via ACP, configure your editor to run the `cyxcode acp` command.
 
-Kommandoen starter OpenCode som en ACP-kompatibel underprosess som kommuniserer med editoren din over JSON-RPC via stdio.
+The command starts CyxCode as an ACP-compatible subprocess that communicates with your editor over JSON-RPC via stdio.
 
-Nedenfor er eksempler på populære editorer som støtter ACP.
+Below are examples for popular editors that support ACP.
 
 ---
 
 ### Zed
 
-Legg til i [Zed](https://zed.dev)-konfigurasjonen (`~/.config/zed/settings.json`):
+Add to your [Zed](https://zed.dev) configuration (`~/.config/zed/settings.json`):
 
 ```json title="~/.config/zed/settings.json"
 {
   "agent_servers": {
-    "OpenCode": {
-      "command": "opencode",
+    "CyxCode": {
+      "command": "cyxcode",
       "args": ["acp"]
     }
   }
 }
 ```
 
-For å åpne den, bruk handlingen `agent: new thread` i **Kommandopaletten**.
+To open it, use the `agent: new thread` action in the **Command Palette**.
 
-Du kan også binde en hurtigtast ved å redigere `keymap.json`:
+You can also bind a keyboard shortcut by editing your `keymap.json`:
 
 ```json title="keymap.json"
 [
@@ -51,9 +51,9 @@ Du kan også binde en hurtigtast ved å redigere `keymap.json`:
         {
           "agent": {
             "custom": {
-              "name": "OpenCode",
+              "name": "CyxCode",
               "command": {
-                "command": "opencode",
+                "command": "cyxcode",
                 "args": ["acp"]
               }
             }
@@ -67,47 +67,47 @@ Du kan også binde en hurtigtast ved å redigere `keymap.json`:
 
 ---
 
-### JetBrains IDE-er
+### JetBrains IDEs
 
-Legg til [JetBrains IDE](https://www.jetbrains.com/) acp.json i henhold til [dokumentasjonen](https://www.jetbrains.com/help/ai-assistant/acp.html):
+Add to your [JetBrains IDE](https://www.jetbrains.com/) acp.json according to the [documentation](https://www.jetbrains.com/help/ai-assistant/acp.html):
 
 ```json title="acp.json"
 {
   "agent_servers": {
-    "OpenCode": {
-      "command": "/absolute/path/bin/opencode",
+    "CyxCode": {
+      "command": "/absolute/path/bin/cyxcode",
       "args": ["acp"]
     }
   }
 }
 ```
 
-For å åpne den, bruk den nye 'OpenCode'-agenten i AI Chat-agentvelgeren.
+To open it, use the new 'CyxCode' agent in the AI Chat agent selector.
 
 ---
 
 ### Avante.nvim
 
-Legg til i [Avante.nvim](https://github.com/yetone/avante.nvim)-konfigurasjonen:
+Add to your [Avante.nvim](https://github.com/yetone/avante.nvim) configuration:
 
 ```lua
 {
   acp_providers = {
-    ["opencode"] = {
-      command = "opencode",
+    ["cyxcode"] = {
+      command = "cyxcode",
       args = { "acp" }
     }
   }
 }
 ```
 
-Hvis du trenger å sende miljøvariabler:
+If you need to pass environment variables:
 
 ```lua {6-8}
 {
   acp_providers = {
-    ["opencode"] = {
-      command = "opencode",
+    ["cyxcode"] = {
+      command = "cyxcode",
       args = { "acp" },
       env = {
         OPENCODE_API_KEY = os.getenv("OPENCODE_API_KEY")
@@ -121,14 +121,14 @@ Hvis du trenger å sende miljøvariabler:
 
 ### CodeCompanion.nvim
 
-For å bruke OpenCode som en ACP-agent i [CodeCompanion.nvim](https://github.com/olimorris/codecompanion.nvim), legg til følgende i Neovim-konfigurasjonen:
+To use CyxCode as an ACP agent in [CodeCompanion.nvim](https://github.com/olimorris/codecompanion.nvim), add the following to your Neovim config:
 
 ```lua
 require("codecompanion").setup({
   interactions = {
     chat = {
       adapter = {
-        name = "opencode",
+        name = "cyxcode",
         model = "claude-sonnet-4",
       },
     },
@@ -136,21 +136,21 @@ require("codecompanion").setup({
 })
 ```
 
-Denne konfigurasjonen setter opp CodeCompanion.nvim til å bruke OpenCode som ACP-agent for chat.
+This config sets up CodeCompanion to use CyxCode as the ACP agent for chat.
 
-Hvis du trenger å sende miljøvariabler (som `OPENCODE_API_KEY`), se [Konfigurere adaptere: miljøvariabler](https://codecompanion.olimorris.dev/getting-started#setting-an-api-key) i CodeCompanion.nvim-dokumentasjonen for fullstendige detaljer.
+If you need to pass environment variables (like `OPENCODE_API_KEY`), refer to [Configuring Adapters: Environment Variables](https://codecompanion.olimorris.dev/getting-started#setting-an-api-key) in the CodeCompanion.nvim documentation for full details.
 
-## Støtte
+## Support
 
-OpenCode fungerer på samme måte via ACP som i terminalen. Alle funksjoner støttes:
+CyxCode works the same via ACP as it does in the terminal. All features are supported:
 
 :::note
-Noen innebygde slash-kommandoer som `/undo` og `/redo` støttes for øyeblikket ikke.
+Some built-in slash commands like `/undo` and `/redo` are currently unsupported.
 :::
 
-- Innebygde verktøy (filoperasjoner, terminalkommandoer, etc.)
-- Egendefinerte verktøy og slash-kommandoer
-- MCP servere konfigurert i OpenCode-konfigurasjonen
-- Prosjektspesifikke regler fra `AGENTS.md`
-- Tilpassede formatere og linters
-- Agenter og tillatelsessystem
+- Built-in tools (file operations, terminal commands, etc.)
+- Custom tools and slash commands
+- MCP servers configured in your CyxCode config
+- Project-specific rules from `AGENTS.md`
+- Custom formatters and linters
+- Agents and permissions system

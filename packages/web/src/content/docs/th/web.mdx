@@ -1,132 +1,132 @@
 ---
-title: เว็บ
-description: การใช้ OpenCode ในเบราว์เซอร์ของคุณ
+title: Web
+description: Using CyxCode in your browser.
 ---
 
-OpenCode สามารถทำงานเป็นเว็บแอปพลิเคชันในเบราว์เซอร์ของคุณได้ โดยมอบประสบการณ์การเขียนโค้ด AI อันทรงพลังแบบเดียวกันโดยไม่ต้องใช้ terminal
+CyxCode can run as a web application in your browser, providing the same powerful AI coding experience without needing a terminal.
 
-![เว็บ OpenCode - เซสชันใหม่](../../../assets/web/web-homepage-new-session.png)
+![CyxCode Web - New Session](../../../assets/web/web-homepage-new-session.png)
 
-## เริ่มต้นใช้งาน
+## Getting Started
 
-เริ่มเว็บอินเตอร์เฟสด้วยการรัน:
+Start the web interface by running:
 
 ```bash
-opencode web
+cyxcode web
 ```
 
-สิ่งนี้จะเริ่มต้นเซิร์ฟเวอร์ท้องถิ่นบน `127.0.0.1` ด้วยพอร์ตที่มีอยู่แบบสุ่มและเปิด OpenCode โดยอัตโนมัติในเบราว์เซอร์เริ่มต้นของคุณ
+This starts a local server on `127.0.0.1` with a random available port and automatically opens CyxCode in your default browser.
 
 :::caution
-หากไม่ได้ตั้งค่า `OPENCODE_SERVER_PASSWORD` เซิร์ฟเวอร์จะไม่ปลอดภัย นี่เป็นเรื่องปกติสำหรับการใช้งานภายในเครื่อง แต่ควรตั้งค่าสำหรับการเข้าถึงเครือข่าย
+If `OPENCODE_SERVER_PASSWORD` is not set, the server will be unsecured. This is fine for local use but should be set for network access.
 :::
 
-:::tip[ผู้ใช้ Windows]
-เพื่อประสบการณ์ที่ดีที่สุด ให้เรียกใช้ `opencode web` จาก [WSL](/docs/windows-wsl) แทนที่จะเป็น PowerShell สิ่งนี้ทำให้มั่นใจได้ถึงการเข้าถึงระบบไฟล์ที่เหมาะสมและการรวม terminal
+:::tip[Windows Users]
+For the best experience, run `cyxcode web` from [WSL](/docs/windows-wsl) rather than PowerShell. This ensures proper file system access and terminal integration.
 :::
 
 ---
 
-## การกำหนดค่า
+## Configuration
 
-คุณสามารถกำหนดค่าเว็บเซิร์ฟเวอร์ได้โดยใช้แฟล็กบรรทัดคำสั่งหรือใน [ไฟล์กำหนดค่า](/docs/config)
+You can configure the web server using command line flags or in your [config file](/docs/config).
 
-### พอร์ต
+### Port
 
-ตามค่าเริ่มต้น OpenCode จะเลือกพอร์ตที่พร้อมใช้งาน คุณสามารถระบุพอร์ต:
-
-```bash
-opencode web --port 4096
-```
-
-### ชื่อโฮสต์
-
-ตามค่าเริ่มต้น เซิร์ฟเวอร์จะเชื่อมโยงกับ `127.0.0.1` (เฉพาะโลคัลโฮสต์เท่านั้น) หากต้องการให้ OpenCode เข้าถึงได้บนเครือข่ายของคุณ:
+By default, CyxCode picks an available port. You can specify a port:
 
 ```bash
-opencode web --hostname 0.0.0.0
+cyxcode web --port 4096
 ```
 
-เมื่อใช้ `0.0.0.0` OpenCode จะแสดงทั้งที่อยู่ในท้องถิ่นและเครือข่าย:
+### Hostname
+
+By default, the server binds to `127.0.0.1` (localhost only). To make CyxCode accessible on your network:
+
+```bash
+cyxcode web --hostname 0.0.0.0
+```
+
+When using `0.0.0.0`, CyxCode will display both local and network addresses:
 
 ```
   Local access:       http://localhost:4096
   Network access:     http://192.168.1.100:4096
 ```
 
-### การค้นพบ mDNS
+### mDNS Discovery
 
-เปิดใช้งาน mDNS เพื่อให้เซิร์ฟเวอร์ของคุณค้นพบได้บนเครือข่ายท้องถิ่น:
+Enable mDNS to make your server discoverable on the local network:
 
 ```bash
-opencode web --mdns
+cyxcode web --mdns
 ```
 
-สิ่งนี้จะตั้งชื่อโฮสต์เป็น `0.0.0.0` โดยอัตโนมัติและโฆษณาเซิร์ฟเวอร์เป็น `opencode.local`
+This automatically sets the hostname to `0.0.0.0` and advertises the server as `opencode.local`.
 
-คุณสามารถปรับแต่งชื่อโดเมน mDNS เพื่อเรียกใช้หลายอินสแตนซ์บนเครือข่ายเดียวกันได้:
+You can customize the mDNS domain name to run multiple instances on the same network:
 
 ```bash
-opencode web --mdns --mdns-domain myproject.local
+cyxcode web --mdns --mdns-domain myproject.local
 ```
 
 ### CORS
 
-หากต้องการอนุญาตโดเมนเพิ่มเติมสำหรับ CORS (มีประโยชน์สำหรับส่วนหน้าที่กำหนดเอง):
+To allow additional domains for CORS (useful for custom frontends):
 
 ```bash
-opencode web --cors https://example.com
+cyxcode web --cors https://example.com
 ```
 
-### การรับรองความถูกต้อง
+### Authentication
 
-เพื่อป้องกันการเข้าถึง ให้ตั้งรหัสผ่านโดยใช้ตัวแปรสภาพแวดล้อม `OPENCODE_SERVER_PASSWORD`:
+To protect access, set a password using the `OPENCODE_SERVER_PASSWORD` environment variable:
 
 ```bash
-OPENCODE_SERVER_PASSWORD=secret opencode web
+OPENCODE_SERVER_PASSWORD=secret cyxcode web
 ```
 
-ชื่อผู้ใช้มีค่าเริ่มต้นเป็น `opencode` แต่สามารถเปลี่ยนได้ด้วย `OPENCODE_SERVER_USERNAME`
+The username defaults to `opencode` but can be changed with `OPENCODE_SERVER_USERNAME`.
 
 ---
 
-## การใช้เว็บอินเตอร์เฟส
+## Using the Web Interface
 
-เมื่อเริ่มต้นแล้ว เว็บอินเตอร์เฟสจะให้สิทธิ์การเข้าถึงเซสชัน OpenCode ของคุณ
+Once started, the web interface provides access to your CyxCode sessions.
 
-### เซสชัน
+### Sessions
 
-ดูและจัดการเซสชันของคุณจากหน้าแรก คุณสามารถดูเซสชันที่ใช้งานอยู่และเริ่มต้นเซสชันใหม่ได้
+View and manage your sessions from the homepage. You can see active sessions and start new ones.
 
-![OpenCode Web - เซสชันที่ใช้งานอยู่](../../../assets/web/web-homepage-active-session.png)
+![CyxCode Web - Active Session](../../../assets/web/web-homepage-active-session.png)
 
-### สถานะเซิร์ฟเวอร์
+### Server Status
 
-คลิก "ดูเซิร์ฟเวอร์" เพื่อดูเซิร์ฟเวอร์ที่เชื่อมต่อและสถานะ
+Click "See Servers" to view connected servers and their status.
 
-![เว็บ OpenCode - ดูเซิร์ฟเวอร์](../../../assets/web/web-homepage-see-servers.png)
+![CyxCode Web - See Servers](../../../assets/web/web-homepage-see-servers.png)
 
 ---
 
-## การต่อ terminal
+## Attaching a Terminal
 
-คุณสามารถแนบ terminal TUI กับเว็บเซิร์ฟเวอร์ที่ทำงานอยู่:
+You can attach a terminal TUI to a running web server:
 
 ```bash
 # Start the web server
-opencode web --port 4096
+cyxcode web --port 4096
 
 # In another terminal, attach the TUI
-opencode attach http://localhost:4096
+cyxcode attach http://localhost:4096
 ```
 
-ซึ่งจะทำให้คุณสามารถใช้ทั้งเว็บอินเทอร์เฟซและ terminal พร้อมกัน โดยแชร์เซสชันและสถานะเดียวกัน
+This allows you to use both the web interface and terminal simultaneously, sharing the same sessions and state.
 
 ---
 
-## ไฟล์กำหนดค่า
+## Config File
 
-คุณยังสามารถกำหนดการตั้งค่าเซิร์ฟเวอร์ในไฟล์กำหนดค่า `opencode.json` ของคุณได้:
+You can also configure server settings in your `opencode.json` config file:
 
 ```json
 {
@@ -139,4 +139,4 @@ opencode attach http://localhost:4096
 }
 ```
 
-ธงบรรทัดคำสั่งมีความสำคัญเหนือกว่าการตั้งค่าไฟล์กำหนดค่า
+Command line flags take precedence over config file settings.

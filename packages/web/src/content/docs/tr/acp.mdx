@@ -1,9 +1,9 @@
 ---
 title: ACP Desteği
-description: opencode'u ACP uyumlu herhangi bir editörde kullanın.
+description: CyxCode'u ACP uyumlu herhangi bir editörde kullanın.
 ---
 
-opencode, [Agent Client Protocol](https://agentclientprotocol.com) veya (ACP) dosyalarını destekleyerek onu doğrudan uyumlu editörlerde ve IDE'lerde kullanmanızı sağlar.
+cyxcode, [Agent Client Protocol](https://agentclientprotocol.com) veya (ACP) dosyalarını destekleyerek onu doğrudan uyumlu editörlerde ve IDE'lerde kullanmanızı sağlar.
 
 :::tip
 ACP'yi destekleyen editörlerin ve araçların listesi için [ACP progress report](https://zed.dev/blog/acp-progress-report#available-now)'e bakın.
@@ -15,7 +15,7 @@ ACP, kod editörleri ile AI kodlama ajanları arasındaki iletişimi standartla�
 
 ## Yapılandırma
 
-opencode'u ACP aracılığıyla kullanmak için düzenleyicinizi `opencode acp` komutunu çalıştıracak şekilde yapılandırın.
+cyxcode'u ACP aracılığıyla kullanmak için düzenleyicinizi `cyxcode acp` komutunu çalıştıracak şekilde yapılandırın.
 
 Komut, opencode'u, editörünüzle stdio aracılığıyla JSON-RPC üzerinden iletişim kuran ACP uyumlu bir alt süreç olarak başlatır.
 
@@ -30,8 +30,8 @@ Aşağıda ACP'yi destekleyen popüler düzenleyicilere ilişkin örnekler veril
 ```json title="~/.config/zed/settings.json"
 {
   "agent_servers": {
-    "OpenCode": {
-      "command": "opencode",
+    "CyxCode": {
+      "command": "cyxcode",
       "args": ["acp"]
     }
   }
@@ -51,9 +51,9 @@ Açmak için **Komut Paleti**'ndeki `agent: new thread` eylemini kullanın.
         {
           "agent": {
             "custom": {
-              "name": "OpenCode",
+              "name": "CyxCode",
               "command": {
-                "command": "opencode",
+                "command": "cyxcode",
                 "args": ["acp"]
               }
             }
@@ -74,15 +74,15 @@ Açmak için **Komut Paleti**'ndeki `agent: new thread` eylemini kullanın.
 ```json title="acp.json"
 {
   "agent_servers": {
-    "OpenCode": {
-      "command": "/absolute/path/bin/opencode",
+    "CyxCode": {
+      "command": "/absolute/path/bin/cyxcode",
       "args": ["acp"]
     }
   }
 }
 ```
 
-Açmak için AI Chat agent seçicisindeki yeni 'OpenCode' ajanını kullanın.
+Açmak için AI Chat agent seçicisindeki yeni 'CyxCode' ajanını kullanın.
 
 ---
 
@@ -121,7 +121,7 @@ Ortam değişkenlerini iletmeniz gerekiyor:
 
 ### CodeCompanion.nvim
 
-opencode'u [CodeCompanion.nvim](https://github.com/olimorris/codecompanion.nvim)'de ACP ajanı olarak kullanmak için Neovim yapılandırmanıza aşağıdakileri ekleyin:
+cyxcode'u [CodeCompanion.nvim](https://github.com/olimorris/codecompanion.nvim)'de ACP ajanı olarak kullanmak için Neovim yapılandırmanıza aşağıdakileri ekleyin:
 
 ```lua
 require("codecompanion").setup({
@@ -142,7 +142,7 @@ Ortam değişkenlerini (`OPENCODE_API_KEY` gibi) iletmeniz gerekiyorsa, tüm ayr
 
 ## Destek
 
-opencode, terminalde olduğu gibi ACP aracılığıyla aynı şekilde çalışır. Tüm özellikler desteklenir:
+cyxcode, terminalde olduğu gibi ACP aracılığıyla aynı şekilde çalışır. Tüm özellikler desteklenir:
 
 :::note
 `/undo` ve `/redo` gibi bazı yerleşik slash komutları şu anda desteklenmemektedir.

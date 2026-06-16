@@ -18,7 +18,7 @@ Vous pouvez basculer entre les modes au cours d'une session ou les configurer da
 
 ## Modes intégrés
 
-opencode est livré avec deux modes intégrés.
+cyxcode est livré avec deux modes intégrés.
 
 ---
 
@@ -59,7 +59,7 @@ Configurez les modes dans votre fichier de configuration `opencode.json` :
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "mode": {
     "build": {
       "model": "anthropic/claude-sonnet-4-20250514",
@@ -247,7 +247,7 @@ Vous pouvez créer vos propres modes personnalisés en les ajoutant à la config
 
 ```json title="opencode.json" {4-14}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "mode": {
     "docs": {
       "prompt": "{file:./prompts/documentation.txt}",

@@ -1,30 +1,30 @@
 ---
 title: CLI
-description: opencode CLI seçenekleri ve komutları.
+description: CyxCode CLI seçenekleri ve komutları.
 ---
 
 import { Tabs, TabItem } from "@astrojs/starlight/components"
 
-opencode CLI herhangi bir argüman olmadan çalıştırıldığında varsayılan olarak [TUI](/docs/tui)'yi başlatır.
+cyxcode CLI herhangi bir argüman olmadan çalıştırıldığında varsayılan olarak [TUI](/docs/tui)'yi başlatır.
 
 ```bash
-opencode
+cyxcode
 ```
 
 Ancak bu sayfada belgelendiği gibi komutları da kabul eder. Bu, opencode ile programlı olarak etkileşim kurmanıza olanak tanır.
 
 ```bash
-opencode run "Explain how closures work in JavaScript"
+cyxcode run "Explain how closures work in JavaScript"
 ```
 
 ---
 
 ### tui
 
-opencode terminal kullanıcı arayüzünü başlatır.
+cyxcode terminal kullanıcı arayüzünü başlatır.
 
 ```bash
-opencode [project]
+cyxcode [project]
 ```
 
 #### Bayraklar
@@ -44,16 +44,16 @@ opencode [project]
 
 ## Komutlar
 
-opencode CLI ayrıca aşağıdaki komutlara da sahiptir.
+cyxcode CLI ayrıca aşağıdaki komutlara da sahiptir.
 
 ---
 
 ### agent
 
-opencode için agent'ları yönetin.
+cyxcode için agent'ları yönetin.
 
 ```bash
-opencode agent [command]
+cyxcode agent [command]
 ```
 
 ---
@@ -63,17 +63,17 @@ opencode agent [command]
 `serve` veya `web` komutlarıyla başlatılan, halihazırda çalışan bir opencode arka uç sunucusuna bir terminal ekleyin.
 
 ```bash
-opencode attach [url]
+cyxcode attach [url]
 ```
 
 Bu, TUI öğesinin uzak bir opencode arka ucuyla kullanılmasına olanak tanır. Örneğin:
 
 ```bash
 # Start the backend server for web/mobile access
-opencode web --port 4096 --hostname 0.0.0.0
+cyxcode web --port 4096 --hostname 0.0.0.0
 
 # In another terminal, attach the TUI to the running backend
-opencode attach http://10.20.30.40:4096
+cyxcode attach http://10.20.30.40:4096
 ```
 
 #### Bayraklar
@@ -90,7 +90,7 @@ opencode attach http://10.20.30.40:4096
 Özel yapılandırmaya sahip yeni bir agent oluşturun.
 
 ```bash
-opencode agent create
+cyxcode agent create
 ```
 
 Bu komut, özel sistem istemi ve araç yapılandırmasıyla yeni bir agent oluşturma konusunda size yol gösterecektir.
@@ -102,7 +102,7 @@ Bu komut, özel sistem istemi ve araç yapılandırmasıyla yeni bir agent oluş
 Mevcut tüm agent'ları listeleyin.
 
 ```bash
-opencode agent list
+cyxcode agent list
 ```
 
 ---
@@ -112,20 +112,20 @@ opencode agent list
 Sağlayıcılar için kimlik bilgilerini ve oturum açmayı yönetme komutu.
 
 ```bash
-opencode auth [command]
+cyxcode auth [command]
 ```
 
 ---
 
 #### login
 
-opencode, [Models.dev](https://models.dev) adresindeki sağlayıcı listesi tarafından desteklenmektedir, dolayısıyla kullanmak istediğiniz herhangi bir sağlayıcı için API anahtarlarını ayarlamak üzere `opencode auth login` kullanabilirsiniz. Bu `~/.local/share/opencode/auth.json`'de saklanıyor.
+cyxcode, [Models.dev](https://models.dev) adresindeki sağlayıcı listesi tarafından desteklenmektedir, dolayısıyla kullanmak istediğiniz herhangi bir sağlayıcı için API anahtarlarını ayarlamak üzere `cyxcode auth login` kullanabilirsiniz. Bu `~/.local/share/opencode/auth.json`'de saklanıyor.
 
 ```bash
-opencode auth login
+cyxcode auth login
 ```
 
-opencode başlatıldığında sağlayıcıları kimlik bilgileri dosyasından yükler. Ayrıca ortam değişkenlerindeki veya projenizdeki `.env` dosyasındaki anahtarları da kullanır.
+cyxcode başlatıldığında sağlayıcıları kimlik bilgileri dosyasından yükler. Ayrıca ortam değişkenlerindeki veya projenizdeki `.env` dosyasındaki anahtarları da kullanır.
 
 ---
 
@@ -134,13 +134,13 @@ opencode başlatıldığında sağlayıcıları kimlik bilgileri dosyasından y�
 Kimlik bilgileri dosyasında depolanan tüm kimliği doğrulanmış sağlayıcıları listeler.
 
 ```bash
-opencode auth list
+cyxcode auth list
 ```
 
 Veya kısa versiyonu.
 
 ```bash
-opencode auth ls
+cyxcode auth ls
 ```
 
 ---
@@ -150,7 +150,7 @@ opencode auth ls
 Bir sağlayıcıyı kimlik bilgileri dosyasından temizleyerek oturumunuzu kapatır.
 
 ```bash
-opencode auth logout
+cyxcode auth logout
 ```
 
 ---
@@ -160,7 +160,7 @@ opencode auth logout
 Depo otomasyonu için GitHub aracısını yönetin.
 
 ```bash
-opencode github [command]
+cyxcode github [command]
 ```
 
 ---
@@ -170,7 +170,7 @@ opencode github [command]
 GitHub aracısını deponuza yükleyin.
 
 ```bash
-opencode github install
+cyxcode github install
 ```
 
 Bu komut gerekli GitHub Actions workflow'unu kurar ve yapılandırma adımlarında size rehberlik eder. [Daha fazla bilgi](/docs/github).
@@ -182,7 +182,7 @@ Bu komut gerekli GitHub Actions workflow'unu kurar ve yapılandırma adımların
 GitHub aracısını çalıştırın. Bu genellikle GitHub Eylemlerinde kullanılır.
 
 ```bash
-opencode github run
+cyxcode github run
 ```
 
 ##### Bayraklar
@@ -199,7 +199,7 @@ opencode github run
 Model Bağlam Protokolü sunucularını yönetin.
 
 ```bash
-opencode mcp [command]
+cyxcode mcp [command]
 ```
 
 ---
@@ -209,7 +209,7 @@ opencode mcp [command]
 Yapılandırmanıza bir MCP sunucusu ekleyin.
 
 ```bash
-opencode mcp add
+cyxcode mcp add
 ```
 
 Bu komut, yerel veya uzak bir MCP sunucusu ekleme konusunda size yol gösterecektir.
@@ -221,13 +221,13 @@ Bu komut, yerel veya uzak bir MCP sunucusu ekleme konusunda size yol gösterecek
 Yapılandırılmış tüm MCP sunucularını ve bağlantı durumlarını listeleyin.
 
 ```bash
-opencode mcp list
+cyxcode mcp list
 ```
 
 Veya kısa versiyonunu kullanın.
 
 ```bash
-opencode mcp ls
+cyxcode mcp ls
 ```
 
 ---
@@ -237,7 +237,7 @@ opencode mcp ls
 OAuth'un etkin olduğu bir MCP sunucusuyla kimlik doğrulaması yapın.
 
 ```bash
-opencode mcp auth [name]
+cyxcode mcp auth [name]
 ```
 
 Sunucu adı belirtmezseniz mevcut OAuth özellikli sunucular arasından seçim yapmanız istenir.
@@ -245,13 +245,13 @@ Sunucu adı belirtmezseniz mevcut OAuth özellikli sunucular arasından seçim y
 Ayrıca OAuth özellikli sunucuları ve bunların kimlik doğrulama durumlarını da listeleyebilirsiniz.
 
 ```bash
-opencode mcp auth list
+cyxcode mcp auth list
 ```
 
 Veya kısa versiyonunu kullanın.
 
 ```bash
-opencode mcp auth ls
+cyxcode mcp auth ls
 ```
 
 ---
@@ -261,7 +261,7 @@ opencode mcp auth ls
 MCP sunucusu için OAuth kimlik bilgilerini kaldırın.
 
 ```bash
-opencode mcp logout [name]
+cyxcode mcp logout [name]
 ```
 
 ---
@@ -271,7 +271,7 @@ opencode mcp logout [name]
 MCP sunucusu için OAuth bağlantı sorunlarının hatalarını ayıklayın.
 
 ```bash
-opencode mcp debug <name>
+cyxcode mcp debug <name>
 ```
 
 ---
@@ -281,7 +281,7 @@ opencode mcp debug <name>
 Yapılandırılmış sağlayıcıların tüm mevcut modellerini listeleyin.
 
 ```bash
-opencode models [provider]
+cyxcode models [provider]
 ```
 
 Bu komut, yapılandırdığınız sağlayıcılardaki modelleri `provider/model` formatında listeler.
@@ -291,7 +291,7 @@ Bu, [config dosyanızda](/docs/config/) kullanmanız gereken tam model adını b
 Modelleri bu sağlayıcıya göre filtrelemek için isteğe bağlı olarak bir sağlayıcı kimliğini iletebilirsiniz.
 
 ```bash
-opencode models anthropic
+cyxcode models anthropic
 ```
 
 #### Bayraklar
@@ -304,7 +304,7 @@ opencode models anthropic
 Önbelleğe alınan model listesini güncellemek için `--refresh` bayrağını kullanın. Bu, bir sağlayıcıya yeni modeller eklendiğinde ve bunları opencode'da görmek istediğinizde kullanışlıdır.
 
 ```bash
-opencode models --refresh
+cyxcode models --refresh
 ```
 
 ---
@@ -314,23 +314,23 @@ opencode models --refresh
 Doğrudan bir istem ileterek opencode'u etkileşimli olmayan modda çalıştırın.
 
 ```bash
-opencode run [message..]
+cyxcode run [message..]
 ```
 
 Bu, komut dosyası oluşturma, otomasyon veya TUI'un tamamını başlatmadan hızlı bir yanıt istediğinizde kullanışlıdır. Örneğin.
 
-```bash "opencode run"
-opencode run Explain the use of context in Go
+```bash "cyxcode run"
+cyxcode run Explain the use of context in Go
 ```
 
-Ayrıca, her çalıştırmada MCP sunucusunun soğuk önyükleme sürelerini önlemek için çalışan bir `opencode serve` örneğine de ekleyebilirsiniz:
+Ayrıca, her çalıştırmada MCP sunucusunun soğuk önyükleme sürelerini önlemek için çalışan bir `cyxcode serve` örneğine de ekleyebilirsiniz:
 
 ```bash
 # Start a headless server in one terminal
-opencode serve
+cyxcode serve
 
 # In another terminal, run commands that attach to it
-opencode run --attach http://localhost:4096 "Explain async/await in JavaScript"
+cyxcode run --attach http://localhost:4096 "Explain async/await in JavaScript"
 ```
 
 #### Bayraklar
@@ -357,7 +357,7 @@ opencode run --attach http://localhost:4096 "Explain async/await in JavaScript"
 API erişimi için headless bir opencode sunucusu başlatır. Tam HTTP arayüzü için [server docs](/docs/server) sayfasına bakın.
 
 ```bash
-opencode serve
+cyxcode serve
 ```
 
 Bu, TUI arayüzü olmadan opencode işlevselliğine API erişimi sağlayan bir HTTP sunucusunu başlatır. HTTP temel kimlik doğrulamasını etkinleştirmek için `OPENCODE_SERVER_PASSWORD` öğesini ayarlayın (kullanıcı adı varsayılan olarak `opencode` şeklindedir).
@@ -375,10 +375,10 @@ Bu, TUI arayüzü olmadan opencode işlevselliğine API erişimi sağlayan bir H
 
 ### session
 
-opencode oturumlarını yönetin.
+cyxcode oturumlarını yönetin.
 
 ```bash
-opencode session [command]
+cyxcode session [command]
 ```
 
 ---
@@ -388,7 +388,7 @@ opencode session [command]
 Tüm opencode oturumlarını listeleyin.
 
 ```bash
-opencode session list
+cyxcode session list
 ```
 
 ##### Bayraklar
@@ -402,10 +402,10 @@ opencode session list
 
 ### stats
 
-opencode oturumlarınız için belirteç kullanımı ve maliyet istatistiklerini gösterin.
+cyxcode oturumlarınız için belirteç kullanımı ve maliyet istatistiklerini gösterin.
 
 ```bash
-opencode stats
+cyxcode stats
 ```
 
 #### Bayraklar
@@ -424,7 +424,7 @@ opencode stats
 Oturum verilerini JSON olarak dışa aktarın.
 
 ```bash
-opencode export [sessionID]
+cyxcode export [sessionID]
 ```
 
 Bir oturum kimliği sağlamazsanız mevcut oturumlar arasından seçim yapmanız istenir.
@@ -436,14 +436,14 @@ Bir oturum kimliği sağlamazsanız mevcut oturumlar arasından seçim yapmanız
 Bir JSON dosyasından veya opencode paylaşımından URL oturum verilerini içe aktarın.
 
 ```bash
-opencode import <file>
+cyxcode import <file>
 ```
 
 Yerel bir dosyadan veya opencode paylaşımından (URL) içe aktarabilirsiniz.
 
 ```bash
-opencode import session.json
-opencode import https://opncd.ai/s/abc123
+cyxcode import session.json
+cyxcode import https://opncd.ai/s/abc123
 ```
 
 ---
@@ -453,7 +453,7 @@ opencode import https://opncd.ai/s/abc123
 Web arayüzüyle başsız bir opencode sunucusu başlatın.
 
 ```bash
-opencode web
+cyxcode web
 ```
 
 Bu, bir HTTP sunucusunu başlatır ve bir web arayüzü aracılığıyla opencode'a erişmek için bir web tarayıcısı açar. HTTP temel kimlik doğrulamasını etkinleştirmek için `OPENCODE_SERVER_PASSWORD` öğesini ayarlayın (kullanıcı adı varsayılan olarak `opencode` şeklindedir).
@@ -474,7 +474,7 @@ Bu, bir HTTP sunucusunu başlatır ve bir web arayüzü aracılığıyla opencod
 Bir ACP (Ajan İstemci Protokolü) sunucusu başlatın.
 
 ```bash
-opencode acp
+cyxcode acp
 ```
 
 Bu komut, nd-JSON kullanarak stdin/stdout aracılığıyla iletişim kuran bir ACP sunucusunu başlatır.
@@ -491,10 +491,10 @@ Bu komut, nd-JSON kullanarak stdin/stdout aracılığıyla iletişim kuran bir A
 
 ### uninstall
 
-opencode'u kaldırın ve ilgili tüm dosyaları kaldırın.
+cyxcode'u kaldırın ve ilgili tüm dosyaları kaldırın.
 
 ```bash
-opencode uninstall
+cyxcode uninstall
 ```
 
 #### Bayraklar
@@ -510,22 +510,22 @@ opencode uninstall
 
 ### upgrade
 
-opencode'u en son sürüme veya belirli bir sürüme günceller.
+cyxcode'u en son sürüme veya belirli bir sürüme günceller.
 
 ```bash
-opencode upgrade [target]
+cyxcode upgrade [target]
 ```
 
 En son sürüme yükseltmek için.
 
 ```bash
-opencode upgrade
+cyxcode upgrade
 ```
 
 Belirli bir sürüme yükseltmek için:
 
 ```bash
-opencode upgrade v0.1.48
+cyxcode upgrade v0.1.48
 ```
 
 #### Bayraklar
@@ -538,7 +538,7 @@ opencode upgrade v0.1.48
 
 ## Global bayraklar
 
-opencode CLI aşağıdaki global bayrakları destekler.
+cyxcode CLI aşağıdaki global bayrakları destekler.
 
 | Bayrak         | Kısa | Tanım                                    |
 | -------------- | ---- | ---------------------------------------- |
@@ -551,7 +551,7 @@ opencode CLI aşağıdaki global bayrakları destekler.
 
 ## Ortam değişkenleri
 
-opencode ortam değişkenleri kullanılarak yapılandırılabilir.
+cyxcode ortam değişkenleri kullanılarak yapılandırılabilir.
 
 | Değişken                              | Tip     | Açıklama                                                                    |
 | ------------------------------------- | ------- | --------------------------------------------------------------------------- |

@@ -1,100 +1,101 @@
 ---
-title: Formatere
-description: OpenCode bruger sprogspecifikke formatere.
+title: Formatters
+description: CyxCode uses language specific formatters.
 ---
 
-OpenCode formaterer automatisk filer, efter de er skrevet eller redigeret ved hjælp af sprogspecifikke formatere. Dette sikrer, at den kode, der genereres, følger kodestilene for dit projekt.
-
----
-
-## Indbyggede
-
-OpenCode leveres med flere indbyggede formatere til populære sprog og rammer. Nedenfor er en liste over de formatere, understøttede filtypenavne og kommandoer eller konfigurationsmuligheder, der har brug for.
-
-| Formater              | Udvidelser                                                                                     | Krav                                                                                                 |
-| --------------------- | ---------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
-| gofmt                 | .go                                                                                            | `gofmt` kommando tilgængelig                                                                         |
-| blande                | .ex,.exs,.eex,.heex,.leex,.neex,.sface                                                         | `mix` kommando tilgængelig                                                                           |
-| smukkere              | .js,.jsx,.ts,.tsx,.html,.css,.md,.json,.yaml og [more](https://prettier.io/docs/en/index.html) | `prettier` afhængighed i `package.json`                                                              |
-| biome                 | .js,.jsx,.ts,.tsx,.html,.css,.md,.json,.yaml og [more](https://biomejs.dev/)                   | `biome.json(c)` konfigurationsfil                                                                    |
-| zig                   | .zig,.zon                                                                                      | `zig` kommando tilgængelig                                                                           |
-| klang-format          | .c,.cpp,.h,.hpp,.ino og [more](https://clang.llvm.org/docs/ClangFormat.html)                   | `.clang-format` konfigurationsfil                                                                    |
-| ktlint                | .kt,.kts                                                                                       | `ktlint` kommando tilgængelig                                                                        |
-| ruff                  | .py,.pyi                                                                                       | `ruff` kommando tilgængelig med konfiguration                                                        |
-| rustfmt               | .rs                                                                                            | `rustfmt` kommando tilgængelig                                                                       |
-| cargofmt              | .rs                                                                                            | `cargo fmt` kommando tilgængelig                                                                     |
-| uv                    | .py,.pyi                                                                                       | `uv` kommando tilgængelig                                                                            |
-| rubocop               | .rb,.rake,.gemspec,.ru                                                                         | `rubocop` kommando tilgængelig                                                                       |
-| standardrb            | .rb,.rake,.gemspec,.ru                                                                         | `standardrb` kommando tilgængelig                                                                    |
-| htmlbeautifier        | .erb,.html.erb                                                                                 | `htmlbeautifier` kommando tilgængelig                                                                |
-| luft                  | .R                                                                                             | `air` kommando tilgængelig                                                                           |
-| dart                  | .dart                                                                                          | `dart` kommando tilgængelig                                                                          |
-| dfmt                  | .d                                                                                             | `dfmt` kommando tilgængelig                                                                          |
-| ocamlformat           | .ml,.mli                                                                                       | `ocamlformat` kommando tilgængelig og `.ocamlformat` config fil                                      |
-| terraform             | .tf,.tfvars                                                                                    | `terraform` kommando tilgængelig                                                                     |
-| glimt                 | .glimt                                                                                         | `gleam` kommando tilgængelig                                                                         |
-| nixfmt                | .nix                                                                                           | `nixfmt` kommando tilgængelig                                                                        |
-| shfmt                 | .sh,.bash                                                                                      | `shfmt` kommando tilgængelig                                                                         |
-| pint                  | .php                                                                                           | `laravel/pint` afhængighed i `composer.json`                                                         |
-| oxfmt (Eksperimentel) | .js,.jsx,.ts,.tsx                                                                              | `oxfmt` afhængighed i `package.json` og en [experimental env variable flag](/docs/cli/#experimental) |
-| ormolu                | .hs                                                                                            | `ormolu` kommando tilgængelig                                                                        |
-
-Så hvis dit projekt har `prettier` i din `package.json`, vil OpenCode automatisk bruge det.
+CyxCode automatically formats files after they are written or edited using language-specific formatters. This ensures that the code that is generated follows the code styles of your project.
 
 ---
 
-## Sådan fungerer det
+## Built-in
 
-Når OpenCode skriver eller redigerer en fil, vil det:
+CyxCode comes with several built-in formatters for popular languages and frameworks. Below is a list of the formatters, supported file extensions, and commands or config options it needs.
 
-1. Kontrollerer filtypenavnet mod alle aktiverede formatere.
-2. Kører den relevante formateringskommando på filen.
-3. Anvender formateringsændringerne automatisk.
+| Formatter            | Extensions                                                                                               | Requirements                                                                                          |
+| -------------------- | -------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
+| air                  | .R                                                                                                       | `air` command available                                                                               |
+| biome                | .js, .jsx, .ts, .tsx, .html, .css, .md, .json, .yaml, and [more](https://biomejs.dev/)                   | `biome.json(c)` config file                                                                           |
+| cargofmt             | .rs                                                                                                      | `cargo fmt` command available                                                                         |
+| clang-format         | .c, .cpp, .h, .hpp, .ino, and [more](https://clang.llvm.org/docs/ClangFormat.html)                       | `.clang-format` config file                                                                           |
+| cljfmt               | .clj, .cljs, .cljc, .edn                                                                                 | `cljfmt` command available                                                                            |
+| dart                 | .dart                                                                                                    | `dart` command available                                                                              |
+| dfmt                 | .d                                                                                                       | `dfmt` command available                                                                              |
+| gleam                | .gleam                                                                                                   | `gleam` command available                                                                             |
+| gofmt                | .go                                                                                                      | `gofmt` command available                                                                             |
+| htmlbeautifier       | .erb, .html.erb                                                                                          | `htmlbeautifier` command available                                                                    |
+| ktlint               | .kt, .kts                                                                                                | `ktlint` command available                                                                            |
+| mix                  | .ex, .exs, .eex, .heex, .leex, .neex, .sface                                                             | `mix` command available                                                                               |
+| nixfmt               | .nix                                                                                                     | `nixfmt` command available                                                                            |
+| ocamlformat          | .ml, .mli                                                                                                | `ocamlformat` command available and `.ocamlformat` config file                                        |
+| ormolu               | .hs                                                                                                      | `ormolu` command available                                                                            |
+| oxfmt (Experimental) | .js, .jsx, .ts, .tsx                                                                                     | `oxfmt` dependency in `package.json` and an [experimental env variable flag](/docs/cli/#experimental) |
+| pint                 | .php                                                                                                     | `laravel/pint` dependency in `composer.json`                                                          |
+| prettier             | .js, .jsx, .ts, .tsx, .html, .css, .md, .json, .yaml, and [more](https://prettier.io/docs/en/index.html) | `prettier` dependency in `package.json`                                                               |
+| rubocop              | .rb, .rake, .gemspec, .ru                                                                                | `rubocop` command available                                                                           |
+| ruff                 | .py, .pyi                                                                                                | `ruff` command available with config                                                                  |
+| rustfmt              | .rs                                                                                                      | `rustfmt` command available                                                                           |
+| shfmt                | .sh, .bash                                                                                               | `shfmt` command available                                                                             |
+| standardrb           | .rb, .rake, .gemspec, .ru                                                                                | `standardrb` command available                                                                        |
+| terraform            | .tf, .tfvars                                                                                             | `terraform` command available                                                                         |
+| uv                   | .py, .pyi                                                                                                | `uv` command available                                                                                |
+| zig                  | .zig, .zon                                                                                               | `zig` command available                                                                               |
 
-Denne proces sker i baggrunden, hvilket sikrer, at dine kodestile vedligeholdes uden nogen manuelle trin.
+So if your project has `prettier` in your `package.json`, CyxCode will automatically use it.
 
 ---
 
-## Konfiguration
+## How it works
 
-Du kan tilpasse formatere gennem afsnittet `formatter` i din OpenCode-konfiguration.
+When CyxCode writes or edits a file, it:
+
+1. Checks the file extension against all enabled formatters.
+2. Runs the appropriate formatter command on the file.
+3. Applies the formatting changes automatically.
+
+This process happens in the background, ensuring your code styles are maintained without any manual steps.
+
+---
+
+## Configure
+
+You can customize formatters through the `formatter` section in your CyxCode config.
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "formatter": {}
 }
 ```
 
-Hver formateringskonfiguration understøtter følgende:
+Each formatter configuration supports the following:
 
-| Ejendom       | Skriv    | Beskrivelse                                                          |
-| ------------- | -------- | -------------------------------------------------------------------- |
-| `disabled`    | boolean  | Indstil dette til `true` for at deaktivere formateringsværktøjet     |
-| `command`     | string[] | Kommandoen til at køre for formatering                               |
-| `environment` | object   | Miljøvariabler, der skal indstilles, når formateringsværktøjet køres |
-| `extensions`  | string[] | Filtypenavne, som denne formaterer skal håndtere                     |
+| Property      | Type     | Description                                             |
+| ------------- | -------- | ------------------------------------------------------- |
+| `disabled`    | boolean  | Set this to `true` to disable the formatter             |
+| `command`     | string[] | The command to run for formatting                       |
+| `environment` | object   | Environment variables to set when running the formatter |
+| `extensions`  | string[] | File extensions this formatter should handle            |
 
-Lad os se på nogle eksempler.
+Let's look at some examples.
 
 ---
 
-### Deaktivering af formatere
+### Disabling formatters
 
-For at deaktivere **alle** formatere globalt, skal du indstille `formatter` til `false`:
+To disable **all** formatters globally, set `formatter` to `false`:
 
 ```json title="opencode.json" {3}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "formatter": false
 }
 ```
 
-For at deaktivere en **specifik** formatter, skal du indstille `disabled` til `true`:
+To disable a **specific** formatter, set `disabled` to `true`:
 
 ```json title="opencode.json" {5}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "formatter": {
     "prettier": {
       "disabled": true
@@ -105,13 +106,13 @@ For at deaktivere en **specifik** formatter, skal du indstille `disabled` til `t
 
 ---
 
-### Brugerdefinerede formatere
+### Custom formatters
 
-Du kan tilsidesætte de indbyggede formattere eller tilføje nye ved at angive kommandoen, miljøvariabler og filtypenavne:
+You can override the built-in formatters or add new ones by specifying the command, environment variables, and file extensions:
 
 ```json title="opencode.json" {4-14}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "formatter": {
     "prettier": {
       "command": ["npx", "prettier", "--write", "$FILE"],
@@ -128,4 +129,4 @@ Du kan tilsidesætte de indbyggede formattere eller tilføje nye ved at angive k
 }
 ```
 
-**`$FILE` pladsholderen** i kommandoen vil blive erstattet med stien til filen, der formateres.
+The **`$FILE` placeholder** in the command will be replaced with the path to the file being formatted.

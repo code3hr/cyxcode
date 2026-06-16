@@ -1,62 +1,62 @@
 ---
-title: エージェントスキル
-description: SKILL.md 定義による再利用可能な動作の定義
+title: "Agent Skills"
+description: "Define reusable behavior via SKILL.md definitions"
 ---
 
-エージェントスキルにより、OpenCode はリポジトリまたはホームディレクトリから再利用可能な命令を検出できます。
-スキルはネイティブの `skill` ツールを介してオンデマンドでロードされます。エージェントは利用可能なスキルを確認し、必要に応じて完全なコンテンツをロードできます。
-
----
-
-## ファイルの配置
-
-スキル名ごとにフォルダーを 1 つ作成し、その中に `SKILL.md` を置きます。
-OpenCode は次の場所を検索します。
-
-- プロジェクト設定: `.opencode/skills/<name>/SKILL.md`
-- グローバル設定: `~/.config/opencode/skills/<name>/SKILL.md`
-- プロジェクト Claude 互換: `.claude/skills/<name>/SKILL.md`
-- グローバル Claude 互換: `~/.claude/skills/<name>/SKILL.md`
-- プロジェクトエージェント互換: `.agents/skills/<name>/SKILL.md`
-- グローバルエージェント互換: `~/.agents/skills/<name>/SKILL.md`
+Agent skills let CyxCode discover reusable instructions from your repo or home directory.
+Skills are loaded on-demand via the native `skill` tool—agents see available skills and can load the full content when needed.
 
 ---
 
-## 検出の仕組み
+## Place files
 
-プロジェクトのローカルパスの場合、OpenCode は現在の作業ディレクトリから git ワークツリーに到達するまで進みます。
-途中で、一致する `skills/*/SKILL.md` を `.opencode/` に読み込み、一致する `.claude/skills/*/SKILL.md` または `.agents/skills/*/SKILL.md` を読み込みます。
+Create one folder per skill name and put a `SKILL.md` inside it.
+cyxcode searches these locations:
 
-グローバル定義は、`~/.config/opencode/skills/*/SKILL.md`、`~/.claude/skills/*/SKILL.md`、および `~/.agents/skills/*/SKILL.md` からもロードされます。
-
----
-
-## フロントマターの記述
-
-各 `SKILL.md` は YAML フロントマターで始まる必要があります。
-次のフィールドのみが認識されます。
-
-- `name` (必須)
-- `description` (必須)
-- `license` (オプション)
-- `compatibility` (オプション)
-- `metadata` (オプション、文字列間のマップ)
-
-不明なフロントマターフィールドは無視されます。
+- Project config: `.opencode/skills/<name>/SKILL.md`
+- Global config: `~/.config/opencode/skills/<name>/SKILL.md`
+- Project Claude-compatible: `.claude/skills/<name>/SKILL.md`
+- Global Claude-compatible: `~/.claude/skills/<name>/SKILL.md`
+- Project agent-compatible: `.agents/skills/<name>/SKILL.md`
+- Global agent-compatible: `~/.agents/skills/<name>/SKILL.md`
 
 ---
 
-## 名前の検証
+## Understand discovery
 
-`name` は次のことを行う必要があります。
+For project-local paths, CyxCode walks up from your current working directory until it reaches the git worktree.
+It loads any matching `skills/*/SKILL.md` in `.opencode/` and any matching `.claude/skills/*/SKILL.md` or `.agents/skills/*/SKILL.md` along the way.
 
-- 1 ～ 64 文字であること
-- 単一のハイフンで区切られた小文字の英数字であること
-- `-` で開始または終了しない
-- 連続した `--` を含まない
-- `SKILL.md` を含むディレクトリ名と一致する
+Global definitions are also loaded from `~/.config/opencode/skills/*/SKILL.md`, `~/.claude/skills/*/SKILL.md`, and `~/.agents/skills/*/SKILL.md`.
 
-同等の正規表現:
+---
+
+## Write frontmatter
+
+Each `SKILL.md` must start with YAML frontmatter.
+Only these fields are recognized:
+
+- `name` (required)
+- `description` (required)
+- `license` (optional)
+- `compatibility` (optional)
+- `metadata` (optional, string-to-string map)
+
+Unknown frontmatter fields are ignored.
+
+---
+
+## Validate names
+
+`name` must:
+
+- Be 1–64 characters
+- Be lowercase alphanumeric with single hyphen separators
+- Not start or end with `-`
+- Not contain consecutive `--`
+- Match the directory name that contains `SKILL.md`
+
+Equivalent regex:
 
 ```text
 ^[a-z0-9]+(-[a-z0-9]+)*$
@@ -64,23 +64,23 @@ OpenCode は次の場所を検索します。
 
 ---
 
-## 長さのルール
+## Follow length rules
 
-`description` は 1 ～ 1024 文字である必要があります。
-エージェントが正しく選択できるように、十分具体的な内容にしてください。
+`description` must be 1-1024 characters.
+Keep it specific enough for the agent to choose correctly.
 
 ---
 
-## 使用例
+## Use an example
 
-次のように `.opencode/skills/git-release/SKILL.md` を作成します。
+Create `.opencode/skills/git-release/SKILL.md` like this:
 
 ```markdown
 ---
 name: git-release
 description: Create consistent releases and changelogs
 license: MIT
-compatibility: opencode
+compatibility: CyxCode
 metadata:
   audience: maintainers
   workflow: github
@@ -100,10 +100,10 @@ Ask clarifying questions if the target versioning scheme is unclear.
 
 ---
 
-## ツールの説明認識
+## Recognize tool description
 
-OpenCode では、`skill` ツールの説明に利用可能なスキルがリストされています。
-各エントリにはスキル名と説明が含まれます。
+cyxcode lists available skills in the `skill` tool description.
+Each entry includes the skill name and description:
 
 ```xml
 <available_skills>
@@ -114,7 +114,7 @@ OpenCode では、`skill` ツールの説明に利用可能なスキルがリス
 </available_skills>
 ```
 
-エージェントはツールを呼び出してスキルをロードします。
+The agent loads a skill by calling the tool:
 
 ```
 skill({ name: "git-release" })
@@ -122,9 +122,9 @@ skill({ name: "git-release" })
 
 ---
 
-## 権限の設定
+## Configure permissions
 
-`opencode.json` のパターンベースの権限を使用して、エージェントがアクセスできるスキルを制御します。
+Control which skills agents can access using pattern-based permissions in `opencode.json`:
 
 ```json
 {
@@ -139,21 +139,21 @@ skill({ name: "git-release" })
 }
 ```
 
-| 許可    | アクション                                                 |
-| ------- | ---------------------------------------------------------- |
-| `allow` | スキルはすぐにロードされます                               |
-| `deny`  | スキルはエージェントから隠蔽され、アクセスは拒否されました |
-| `ask`   | ロードする前にユーザーに承認を求めるメッセージが表示される |
+| Permission | Behavior                                  |
+| ---------- | ----------------------------------------- |
+| `allow`    | Skill loads immediately                   |
+| `deny`     | Skill hidden from agent, access rejected  |
+| `ask`      | User prompted for approval before loading |
 
-パターンはワイルドカードをサポートしています: `internal-*` は `internal-docs`、`internal-tools` などに一致します。
+Patterns support wildcards: `internal-*` matches `internal-docs`, `internal-tools`, etc.
 
 ---
 
-## エージェントごとの上書き
+## Override per agent
 
-特定のエージェントにグローバルのデフォルトとは異なる権限を与えます。
+Give specific agents different permissions than the global defaults.
 
-**カスタムエージェントの場合** (エージェントフロントマター内):
+**For custom agents** (in agent frontmatter):
 
 ```yaml
 ---
@@ -163,7 +163,7 @@ permission:
 ---
 ```
 
-**組み込みエージェントの場合** (`opencode.json` 内):
+**For built-in agents** (in `opencode.json`):
 
 ```json
 {
@@ -181,11 +181,11 @@ permission:
 
 ---
 
-## スキルツールの無効化
+## Disable the skill tool
 
-スキルを使用すべきではないエージェントのスキルを完全に無効にします。
+Completely disable skills for agents that shouldn't use them:
 
-**カスタムエージェントの場合**:
+**For custom agents**:
 
 ```yaml
 ---
@@ -194,7 +194,7 @@ tools:
 ---
 ```
 
-**組み込みエージェントの場合**:
+**For built-in agents**:
 
 ```json
 {
@@ -208,15 +208,15 @@ tools:
 }
 ```
 
-無効にすると、`<available_skills>` セクションが完全に省略されます。
+When disabled, the `<available_skills>` section is omitted entirely.
 
 ---
 
-## 読み込みのトラブルシューティング
+## Troubleshoot loading
 
-スキルが表示されない場合:
+If a skill does not show up:
 
-1. `SKILL.md` のスペルがすべて大文字であることを確認してください
-2. フロントマターに `name` と `description` が含まれていることを確認します
-3. スキル名がすべての場所で一意であることを確認する
-4. 権限を確認してください - `deny` のスキルはエージェントから非表示になります
+1. Verify `SKILL.md` is spelled in all caps
+2. Check that frontmatter includes `name` and `description`
+3. Ensure skill names are unique across all locations
+4. Check permissions—skills with `deny` are hidden from agents

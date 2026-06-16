@@ -1,144 +1,149 @@
 ---
-title: เอเจนต์
-description: เอเจนต์พิเศษและปรับแต่งได้
+title: Agents
+description: Configure and use specialized agents.
 ---
 
-เอเจนต์ (Agent) คือผู้ช่วย AI ที่เชี่ยวชาญในงานเฉพาะด้าน คุณสามารถสร้างเอเจนต์ที่มีเครื่องมือ (tools) ที่เหมาะสมกับงานและคำสั่งระบบ (system prompt) ที่ต้องการได้
+Agents are specialized AI assistants that can be configured for specific tasks and workflows. They allow you to create focused tools with custom prompts, models, and tool access.
 
 :::tip
-ใช้เอเจนต์ **Plan** เพื่อวิเคราะห์โค้ดและตรวจสอบเหตุผลก่อนทำการเปลี่ยนแปลงโค้ดใดๆ
+Use the plan agent to analyze code and review suggestions without making any code changes.
 :::
 
-คุณสามารถสลับเอเจนต์ได้ระหว่างการสนทนาโดยใช้ปุ่ม **Tab** หรือเรียกใช้โดยระบุ `@`
+You can switch between agents during a session or invoke them with the `@` mention.
 
 ---
 
-## ประเภท
+## Types
 
-OpenCode มีเอเจนต์สองประเภท: **Primary Agent** (เอเจนต์หลัก) และ **Subagent** (เอเจนต์ย่อย)
+There are two types of agents in CyxCode; primary agents and subagents.
 
 ---
 
-### Primary Agent (เอเจนต์หลัก)
+### Primary agents
 
-Primary Agent คือผู้ช่วยหลักที่คุณคุยด้วยโดยตรง คุณสามารถวนดูเอเจนต์หลักที่มีอยู่ได้โดยกดปุ่ม **Tab** หรือปุ่ม `switch_agent` ที่ตั้งค่าไว้ เอเจนต์เหล่านี้สามารถจัดการงานที่ซับซ้อนและเข้าถึงเครื่องมือที่มีความเสี่ยงสูงได้ เช่น **Build** ที่มีเครื่องมือทั้งหมด หรือ **Plan** ที่ถูกจำกัดสิทธิ์
+Primary agents are the main assistants you interact with directly. You can cycle through them using the **Tab** key, or your configured `switch_agent` keybind. These agents handle your main conversation. Tool access is configured via permissions — for example, Build has all tools enabled while Plan is restricted.
 
 :::tip
-**Tab** จะเก็บประวัติการสนทนาไว้เมื่อสลับระหว่างเอเจนต์
+You can use the **Tab** key to switch between primary agents during a session.
 :::
 
-OpenCode มีเอเจนต์หลักในตัวได้แก่ **Build** และ **Plan**
-ดูรายละเอียดด้านล่าง
+CyxCode comes with two built-in primary agents, **Build** and **Plan**. We'll
+look at these below.
 
 ---
 
-### Subagent (เอเจนต์ย่อย)
+### Subagents
 
-Subagent คือผู้ช่วยเฉพาะทางที่ Primary Agent สามารถเรียกใช้งานได้ หรือคุณสามารถเรียกใช้โดยตรงโดยพิมพ์ **@** ตามด้วยชื่อเอเจนต์ในข้อความของคุณ
+Subagents are specialized assistants that primary agents can invoke for specific tasks. You can also manually invoke them by **@ mentioning** them in your messages.
 
-OpenCode มี subagent ในตัวได้แก่ **General** และ **Explore**
-
----
-
-## บิวท์อิน
-
-OpenCode มาพร้อมกับเอเจนต์หลักและ subagent ในตัวดังนี้
+CyxCode comes with two built-in subagents, **General** and **Explore**. We'll look at this below.
 
 ---
 
-### Build
+## Built-in
+
+CyxCode comes with two built-in primary agents and two built-in subagents.
+
+---
+
+### Use build
 
 _Mode_: `primary`
 
-เอเจนต์หลักสำหรับ **การพัฒนา** มาพร้อมกับเครื่องมือทั้งหมดเพื่อให้มีสิทธิ์การเข้าถึงไฟล์และคำสั่งระบบโดยสมบูรณ์
+Build is the **default** primary agent with all tools enabled. This is the standard agent for development work where you need full access to file operations and system commands.
 
 ---
 
-### Plan
+### Use plan
 
 _Mode_: `primary`
 
-เอเจนต์ที่ถูกจำกัดสิทธิ์ เน้นการคิดวิเคราะห์และวางแผน โดยป้องกันการเปลี่ยนแปลงไฟล์โดยไม่ได้ตั้งใจ
-เครื่องมือต่อไปนี้จะถูกตั้งค่าเป็น `ask` (ต้องขออนุญาต):
+A restricted agent designed for planning and analysis. We use a permission system to give you more control and prevent unintended changes.
+By default, all of the following are set to `ask`:
 
-- `file edits`: การแก้ไขไฟล์, patch, และการเขียนไฟล์
-- `bash`: คำสั่ง bash ทั้งหมด
+- `file edits`: All writes, patches, and edits
+- `bash`: All bash commands
 
-เอเจนต์นี้มีประโยชน์เมื่อต้องการให้ LLM ตรวจสอบโค้ด หรือสร้างแผนงานก่อนที่จะลงมือทำจริง
+This agent is useful when you want the LLM to analyze code, suggest changes, or create plans without making any actual modifications to your codebase.
 
 ---
 
-### General
+### Use general
 
 _Mode_: `subagent`
 
-เอเจนต์สำหรับตอบคำถามทั่วไปและการคิดวิเคราะห์หลายขั้นตอน อนุญาตให้เข้าถึงเครื่องมือต่างๆ (ยกเว้นการแก้ไขไฟล์) ใช้สิ่งนี้เมื่อต้องการรันงานที่ไม่ต้องแก้ไขโค้ด
+A general-purpose agent for researching complex questions and executing multi-step tasks. Has full tool access (except todo), so it can make file changes when needed. Use this to run multiple units of work in parallel.
 
 ---
 
-### Explore
+### Use explore
 
 _Mode_: `subagent`
 
-เอเจนต์ความเร็วสูงสำหรับอ่านและสำรวจ codebase ใช้สิ่งนี้เมื่อคุณต้องการค้นหาไฟล์อย่างรวดเร็ว, ค้นหาโค้ดด้วยคำสำคัญ, หรือสอบถามเกี่ยวกับโครงสร้าง codebase
+A fast, read-only agent for exploring codebases. Cannot modify files. Use this when you need to quickly find files by patterns, search code for keywords, or answer questions about the codebase.
 
 ---
 
-### Compact
+### Use compaction
 
 _Mode_: `primary`
 
-เอเจนต์ระบบที่มีหน้าที่สรุปประวัติการสนทนาที่ยาวให้สั้นลง โดยยังคงใจความสำคัญไว้
+Hidden system agent that compacts long context into a smaller summary. It runs automatically when needed and is not selectable in the UI.
 
 ---
 
-### Name
+### Use title
 
 _Mode_: `primary`
 
-เอเจนต์ระบบที่มีหน้าที่สร้างชื่อ session ให้สั้นและได้ใจความ ทำงานอัตโนมัติโดยไม่ต้องมี UI
+Hidden system agent that generates short session titles. It runs automatically and is not selectable in the UI.
 
 ---
 
-### Summarize
+### Use summary
 
 _Mode_: `primary`
 
-เอเจนต์ระบบที่มีหน้าที่สร้างสรุปการเปลี่ยนแปลงและงานที่ทำไป ทำงานอัตโนมัติโดยไม่ต้องมี UI
+Hidden system agent that creates session summaries. It runs automatically and is not selectable in the UI.
 
 ---
 
-## การใช้งาน
+## Usage
 
-1. สำหรับ Primary Agent ให้ใช้ปุ่ม **Tab** เพื่อวนดูเอเจนต์ที่มีอยู่ หรือใช้ keybind `switch_agent` ที่คุณตั้งค่าไว้
+1. For primary agents, use the **Tab** key to cycle through them during a session. You can also use your configured `switch_agent` keybind.
 
-2. สำหรับ Subagent:
-   - เรียกใช้โดย Primary Agent โดยอัตโนมัติตามความเหมาะสม
-   - เรียกใช้ด้วยตนเองโดยพิมพ์ **@** ตามด้วยชื่อ subagent ในข้อความของคุณ เช่น
+2. Subagents can be invoked:
+   - **Automatically** by primary agents for specialized tasks based on their descriptions.
+   - Manually by **@ mentioning** a subagent in your message. For example.
 
      ```txt frame="none"
      @general help me search for this function
      ```
 
-3. **การนำทางระหว่าง Agent**: เมื่อ Subagent ทำงานเสร็จและส่งผลลัพธ์กลับมายัง Primary Agent คุณสามารถดูประวัติการทำงานได้:
-   - **\<Leader>+Right** (หรือ `session_child_cycle` keybind) เพื่อวนผ่าน parent → child1 → child2 → ... → parent
-   - **\<Leader>+Left** (หรือ `session_child_cycle_reverse` keybind) เพื่อวนย้อนกลับผ่าน parent ← child1 ← child2 ← ... ← parent
+3. **Navigation between sessions**: When subagents create child sessions, use `session_child_first` (default: **\<Leader>+Down**) to enter the first child session from the parent.
+
+4. Once you are in a child session, use:
+   - `session_child_cycle` (default: **Right**) to cycle to the next child session
+   - `session_child_cycle_reverse` (default: **Left**) to cycle to the previous child session
+   - `session_parent` (default: **Up**) to return to the parent session
+
+   This lets you switch between the main conversation and specialized subagent work.
 
 ---
 
-## การกำหนดค่า
+## Configure
 
-คุณสามารถปรับแต่งเอเจนต์ที่มีอยู่หรือสร้างเอเจนต์ใหม่ได้สองวิธี:
+You can customize the built-in agents or create your own through configuration. Agents can be configured in two ways:
 
 ---
 
 ### JSON
 
-กำหนดค่าเอเจนต์ในไฟล์ `opencode.json` ของคุณ:
+Configure agents in your `opencode.json` config file:
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "agent": {
     "build": {
       "mode": "primary",
@@ -177,10 +182,10 @@ _Mode_: `primary`
 
 ### Markdown
 
-คุณสามารถกำหนดเอเจนต์ด้วยไฟล์ Markdown ได้ใน:
+You can also define agents using markdown files. Place them in:
 
-- ระดับผู้ใช้ (Global): `~/.config/opencode/agents/`
-- ระดับโปรเจ็กต์: `.opencode/agents/`
+- Global: `~/.config/opencode/agents/`
+- Per-project: `.opencode/agents/`
 
 ```markdown title="~/.config/opencode/agents/review.md"
 ---
@@ -204,19 +209,19 @@ You are in code review mode. Focus on:
 Provide constructive feedback without making direct changes.
 ```
 
-ชื่อไฟล์ Markdown จะกลายเป็นชื่อเอเจนต์ เช่น `review.md` สร้างเอเจนต์ `review`
+The markdown file name becomes the agent name. For example, `review.md` creates a `review` agent.
 
 ---
 
-## ตัวเลือก
+## Options
 
-มาดูรายละเอียดของตัวเลือกต่างๆ
+Let's look at these configuration options in detail.
 
 ---
 
-### Description (คำอธิบาย)
+### Description
 
-ใช้ฟิลด์ `description` เพื่ออธิบายว่าเอเจนต์นี้ทำอะไร
+Use the `description` option to provide a brief description of what the agent does and when to use it.
 
 ```json title="opencode.json"
 {
@@ -228,15 +233,15 @@ Provide constructive feedback without making direct changes.
 }
 ```
 
-ฟิลด์นี้ **จำเป็น** สำหรับ JSON
+This is a **required** config option.
 
 ---
 
-### Temperature (อุณหภูมิ)
+### Temperature
 
-ควบคุมความสุ่มและความคิดสร้างสรรค์ของการตอบกลับของ LLM ด้วย `temperature`
+Control the randomness and creativity of the LLM's responses with the `temperature` config.
 
-ค่าที่ต่ำกว่าจะให้ผลลัพธ์ที่แน่นอนและแม่นยำกว่า ส่วนค่าที่สูงกว่าจะให้ความหลากหลายและความคิดสร้างสรรค์มากกว่า
+Lower values make responses more focused and deterministic, while higher values increase creativity and variability.
 
 ```json title="opencode.json"
 {
@@ -251,11 +256,11 @@ Provide constructive feedback without making direct changes.
 }
 ```
 
-ช่วงอุณหภูมิอยู่ระหว่าง 0.0 ถึง 1.0:
+Temperature values typically range from 0.0 to 1.0:
 
-- **0.0-0.2**: แน่นอนและแม่นยำ เหมาะสำหรับการเขียนโค้ดและการวางแผน
-- **0.3-0.5**: สมดุล เหมาะสำหรับการพัฒนาทั่วไป
-- **0.6-1.0**: สร้างสรรค์ เหมาะสำหรับการระดมสมอง
+- **0.0-0.2**: Very focused and deterministic responses, ideal for code analysis and planning
+- **0.3-0.5**: Balanced responses with some creativity, good for general development tasks
+- **0.6-1.0**: More creative and varied responses, useful for brainstorming and exploration
 
 ```json title="opencode.json"
 {
@@ -275,15 +280,15 @@ Provide constructive feedback without making direct changes.
 }
 ```
 
-หมายเหตุ: OpenCode ค่าเริ่มต้นคือ 0 สำหรับโมเดลส่วนใหญ่ และ 0.55 สำหรับโมเดล Qwen
+If no temperature is specified, CyxCode uses model-specific defaults; typically 0 for most models, 0.55 for Qwen models.
 
 ---
 
-### Steps (ขั้นตอน)
+### Max steps
 
-จำกัดจำนวนการวนซ้ำ (iterations) สูงสุดที่เอเจนต์สามารถทำได้ เพื่อควบคุมค่าใช้จ่ายและป้องกันการทำงานไม่รู้จบ
+Control the maximum number of agentic iterations an agent can perform before being forced to respond with text only. This allows users who wish to control costs to set a limit on agentic actions.
 
-หากไม่ได้ตั้งค่านี้ เอเจนต์จะทำงานต่อไปจนกว่างานจะเสร็จหรือผู้ใช้ขัดจังหวะ
+If this is not set, the agent will continue to iterate until the model chooses to stop or the user interrupts the session.
 
 ```json title="opencode.json"
 {
@@ -297,17 +302,17 @@ Provide constructive feedback without making direct changes.
 }
 ```
 
-เมื่อถึงขีดจำกัด เอเจนต์จะได้รับพรอมต์พิเศษเพื่อสรุปงานและสิ่งที่เหลืออยู่
+When the limit is reached, the agent receives a special system prompt instructing it to respond with a summarization of its work and recommended remaining tasks.
 
 :::caution
-ฟิลด์ `maxSteps` แบบเดิมเลิกใช้แล้ว โปรดใช้ `steps` แทน
+The legacy `maxSteps` field is deprecated. Use `steps` instead.
 :::
 
 ---
 
-### Disable (ปิดใช้งาน)
+### Disable
 
-ตั้งค่าเป็น `true` เพื่อปิดการใช้งานเอเจนต์
+Set to `true` to disable the agent.
 
 ```json title="opencode.json"
 {
@@ -321,9 +326,9 @@ Provide constructive feedback without making direct changes.
 
 ---
 
-### พรอมต์
+### Prompt
 
-ระบุ System Prompt สำหรับเอเจนต์นี้ด้วย `prompt`
+Specify a custom system prompt file for this agent with the `prompt` config. The prompt file should contain instructions specific to the agent's purpose.
 
 ```json title="opencode.json"
 {
@@ -335,16 +340,16 @@ Provide constructive feedback without making direct changes.
 }
 ```
 
-รองรับเส้นทางสัมพัทธ์ (Relative paths) ซึ่งทำให้ใช้งานได้สะดวกทั้งในระดับ Global และ Project
+This path is relative to where the config file is located. So this works for both the global CyxCode config and the project specific config.
 
 ---
 
-### Model (โมเดล)
+### Model
 
-ใช้ตัวเลือก `model` เพื่อกำหนดโมเดลเฉพาะสำหรับเอเจนต์นี้ มีประโยชน์เมื่อต้องการใช้โมเดลที่เชี่ยวชาญเฉพาะด้าน หรือโมเดลที่มี Context window ขนาดใหญ่สำหรับการตรวจสอบ codebase
+Use the `model` config to override the model for this agent. Useful for using different models optimized for different tasks. For example, a faster model for planning, a more capable model for implementation.
 
 :::tip
-หากไม่ได้ระบุโมเดล เอเจนต์จะใช้ [โมเดลเริ่มต้น](/docs/config#models) ของ OpenCode
+If you don’t specify a model, primary agents use the [model globally configured](/docs/config#models) while subagents will use the model of the primary agent that invoked the subagent.
 :::
 
 ```json title="opencode.json"
@@ -357,17 +362,19 @@ Provide constructive feedback without making direct changes.
 }
 ```
 
-ID ของโมเดลใช้รูปแบบ `provider/model-id`
+The model ID in your CyxCode config uses the format `provider/model-id`. For example, if you're using [CyxCode Zen](/docs/zen), you would use `opencode/gpt-5.1-codex` for GPT 5.1 Codex.
 
 ---
 
-### เครื่องมือ
+### Tools (deprecated)
 
-กำหนดเครื่องมือที่เอเจนต์สามารถใช้งานได้ด้วย `tools` คุณสามารถระบุชื่อเครื่องมือ หรือใช้ wildcard
+`tools` is **deprecated**. Prefer the agent's [`permission`](#permissions) field for new configs, updates and more fine-grained control.
+
+Allows you to control which tools are available in this agent. You can enable or disable specific tools by setting them to `true` or `false`. In an agent's `tools` config, `true` is equivalent to `{"*": "allow"}` permission and `false` is equivalent to `{"*": "deny"}` permission.
 
 ```json title="opencode.json" {3-6,9-12}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "tools": {
     "write": true,
     "bash": true
@@ -384,14 +391,14 @@ ID ของโมเดลใช้รูปแบบ `provider/model-id`
 ```
 
 :::note
-การกำหนดค่าเครื่องมือในระดับเอเจนต์จะมีความสำคัญเหนือกว่าระดับ Global
+The agent-specific config overrides the global config.
 :::
 
-คุณสามารถใช้ wildcard `*` เพื่อควบคุมเครื่องมือหลายรายการพร้อมกัน เช่น เครื่องมือจากเซิร์ฟเวอร์ MCP:
+You can also use wildcards in legacy `tools` entries to control multiple tools at once. For example, to disable all tools from an MCP server:
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "agent": {
     "readonly": {
       "tools": {
@@ -404,32 +411,32 @@ ID ของโมเดลใช้รูปแบบ `provider/model-id`
 }
 ```
 
-[เรียนรู้เพิ่มเติมเกี่ยวกับเครื่องมือ](/docs/tools)
+[Learn more about tools](/docs/tools).
 
 ---
 
-### Permissions (สิทธิ์)
+### Permissions
 
-กำหนดสิทธิ์สำหรับเครื่องมือที่มีความละเอียดอ่อน เช่น `edit`, `bash` และ `webfetch`:
+You can configure permissions to manage what actions an agent can take. Currently, the permissions for the `edit`, `bash`, and `webfetch` tools can be configured to:
 
-- `"ask"` — ต้องขออนุมัติจากผู้ใช้ก่อน
-- `"allow"` — อนุญาตให้ทำงานได้โดยไม่ต้องถาม
-- `"deny"` — ไม่อนุญาตให้ใช้
+- `"ask"` — Prompt for approval before running the tool
+- `"allow"` — Allow all operations without approval
+- `"deny"` — Disable the tool
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "permission": {
     "edit": "deny"
   }
 }
 ```
 
-คุณสามารถกำหนดสิทธิ์ในระดับเอเจนต์ได้:
+You can override these permissions per agent.
 
 ```json title="opencode.json" {3-5,8-10}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "permission": {
     "edit": "deny"
   },
@@ -443,7 +450,7 @@ ID ของโมเดลใช้รูปแบบ `provider/model-id`
 }
 ```
 
-ใน Markdown agent:
+You can also set permissions in Markdown agents.
 
 ```markdown title="~/.config/opencode/agents/review.md"
 ---
@@ -462,11 +469,11 @@ permission:
 Only analyze code and suggest changes.
 ```
 
-คุณสามารถกำหนดสิทธิ์สำหรับคำสั่ง bash เฉพาะได้:
+You can set permissions for specific bash commands.
 
 ```json title="opencode.json" {7}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "agent": {
     "build": {
       "permission": {
@@ -480,11 +487,11 @@ Only analyze code and suggest changes.
 }
 ```
 
-รองรับ glob patterns:
+This can take a glob pattern.
 
 ```json title="opencode.json" {7}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "agent": {
     "build": {
       "permission": {
@@ -497,11 +504,12 @@ Only analyze code and suggest changes.
 }
 ```
 
-ใช้ `*` wildcard เพื่อตั้งค่าเริ่มต้นสำหรับคำสั่งอื่นๆ ทั้งหมด กฎที่ตรงกันล่าสุดจะมีผลบังคับใช้ (Last match wins):
+And you can also use the `*` wildcard to manage permissions for all commands.
+Since the last matching rule takes precedence, put the `*` wildcard first and specific rules after.
 
 ```json title="opencode.json" {8}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "agent": {
     "build": {
       "permission": {
@@ -515,13 +523,13 @@ Only analyze code and suggest changes.
 }
 ```
 
-[เรียนรู้เพิ่มเติมเกี่ยวกับสิทธิ์](/docs/permissions)
+[Learn more about permissions](/docs/permissions).
 
 ---
 
-### Mode (โหมด)
+### Mode
 
-กำหนดโหมดของเอเจนต์ด้วย `mode`
+Control the agent's mode with the `mode` config. The `mode` option is used to determine how the agent can be used.
 
 ```json title="opencode.json"
 {
@@ -533,13 +541,13 @@ Only analyze code and suggest changes.
 }
 ```
 
-`mode` สามารถเป็น `primary`, `subagent` หรือ `all` หากไม่ระบุ ค่าเริ่มต้นจะเป็น `all`
+The `mode` option can be set to `primary`, `subagent`, or `all`. If no `mode` is specified, it defaults to `all`.
 
 ---
 
-### Hidden (ซ่อน)
+### Hidden
 
-ซ่อน subagent จากเมนู autocomplete `@` ด้วย `hidden: true` มีประโยชน์สำหรับ subagent ภายในที่ถูกเรียกใช้โดยเอเจนต์อื่นผ่านเครื่องมือ task เท่านั้น
+Hide a subagent from the `@` autocomplete menu with `hidden: true`. Useful for internal subagents that should only be invoked programmatically by other agents via the Task tool.
 
 ```json title="opencode.json"
 {
@@ -552,15 +560,17 @@ Only analyze code and suggest changes.
 }
 ```
 
+This only affects user visibility in the autocomplete menu. Hidden agents can still be invoked by the model via the Task tool if permissions allow.
+
 :::note
-ใช้ได้กับเอเจนต์ที่มี `mode: subagent` เท่านั้น
+Only applies to `mode: subagent` agents.
 :::
 
 ---
 
-### Task Permissions (สิทธิ์งาน)
+### Task permissions
 
-กำหนดว่า subagent ใดที่เอเจนต์นี้สามารถเรียกใช้ได้ผ่านเครื่องมือ task ด้วย `permission.task`
+Control which subagents an agent can invoke via the Task tool with `permission.task`. Uses glob patterns for flexible matching.
 
 ```json title="opencode.json"
 {
@@ -579,19 +589,23 @@ Only analyze code and suggest changes.
 }
 ```
 
-หากตั้งเป็น `deny` เอเจนต์จะมองไม่เห็นเครื่องมือ task สำหรับ subagent นั้นๆ
+When set to `deny`, the subagent is removed from the Task tool description entirely, so the model won't attempt to invoke it.
 
 :::tip
-กฎทำงานตามลำดับ และ **กฎที่ตรงกันล่าสุดจะมีผล** ในตัวอย่างข้างต้น `orchestrator-planner` ตรงกับทั้ง `*` (deny) และ `orchestrator-*` (allow) แต่เนื่องจาก `orchestrator-*` มาทีหลัง ผลลัพธ์จึงเป็น `allow`
+Rules are evaluated in order, and the **last matching rule wins**. In the example above, `orchestrator-planner` matches both `*` (deny) and `orchestrator-*` (allow), but since `orchestrator-*` comes after `*`, the result is `allow`.
+:::
+
+:::tip
+Users can always invoke any subagent directly via the `@` autocomplete menu, even if the agent's task permissions would deny it.
 :::
 
 ---
 
-### สี
+### Color
 
-ปรับแต่งสีของเอเจนต์ใน UI ด้วยตัวเลือก `color`
+Customize the agent's visual appearance in the UI with the `color` option. This affects how the agent appears in the interface.
 
-ใช้รหัสสี hex (เช่น `#FF5733`) หรือชื่อสีมาตรฐาน: `primary`, `secondary`, `accent`, `success`, `warning`, `error`, `info`
+Use a valid hex color (e.g., `#FF5733`) or theme color: `primary`, `secondary`, `accent`, `success`, `warning`, `error`, `info`.
 
 ```json title="opencode.json"
 {
@@ -610,7 +624,7 @@ Only analyze code and suggest changes.
 
 ### Top P
 
-ควบคุมความหลากหลายของการตอบกลับด้วยตัวเลือก `top_p`
+Control response diversity with the `top_p` option. Alternative to temperature for controlling randomness.
 
 ```json title="opencode.json"
 {
@@ -622,15 +636,15 @@ Only analyze code and suggest changes.
 }
 ```
 
-ช่วงค่า 0.0 ถึง 1.0 ค่าที่ต่ำกว่าจะเน้นไปที่โทเค็นที่มีความน่าจะเป็นสูง
+Values range from 0.0 to 1.0. Lower values are more focused, higher values more diverse.
 
 ---
 
-### Additional (เพิ่มเติม)
+### Additional
 
-คุณสมบัติอื่นๆ ที่คุณระบุใน object ของเอเจนต์จะถูก **ส่งผ่านโดยตรง** ไปยัง LLM config
+Any other options you specify in your agent configuration will be **passed through directly** to the provider as model options. This allows you to use provider-specific features and parameters.
 
-เช่น สำหรับโมเดลที่มีการให้เหตุผลของ OpenAI:
+For example, with OpenAI's reasoning models, you can control the reasoning effort:
 
 ```json title="opencode.json" {6,7}
 {
@@ -645,53 +659,55 @@ Only analyze code and suggest changes.
 }
 ```
 
-ตรวจสอบเอกสารของแต่ละโมเดลสำหรับตัวเลือกที่รองรับ
+These additional options are model and provider-specific. Check your provider's documentation for available parameters.
 
 :::tip
-ใช้ `opencode models` เพื่อดูรายการตัวเลือกทั้งหมด
+Run `cyxcode models` to see a list of the available models.
 :::
 
 ---
 
-## การสร้างเอเจนต์
+## Create agents
 
-สร้างเอเจนต์ใหม่ด้วยคำสั่ง:
+You can create new agents using the following command:
 
 ```bash
-opencode agent create
+cyxcode agent create
 ```
 
-คำสั่งแบบโต้ตอบจะถาม:
+This interactive command will:
 
-1. สถานที่บันทึก (Global หรือ Project)
-2. คำอธิบายหน้าที่ของเอเจนต์
-3. สร้างพรอมต์และเลือกไอคอนที่เหมาะสม
-4. เลือกเครื่องมือที่เอเจนต์สามารถใช้ได้
-5. สร้างไฟล์ Markdown ของเอเจนต์
-
----
-
-## ตัวอย่างการใช้งาน
-
-ต่อไปนี้เป็นกรณีการใช้งานทั่วไปสำหรับเอเจนต์ต่างๆ
-
-- **Developer**: งานพัฒนาทั่วไป ใช้เครื่องมือทั้งหมด
-- **Planner**: วิเคราะห์และวางแผนโดยไม่ทำการเปลี่ยนแปลง
-- **Reviewer**: ตรวจสอบโค้ดแบบอ่านอย่างเดียว (Read-only)
-- **Debugger**: แก้ไขข้อผิดพลาดโดยเน้นการอ่าน log และทดสอบ
-- **Docs Writer**: เขียนและปรับปรุงเอกสาร
+1. Ask where to save the agent; global or project-specific.
+2. Description of what the agent should do.
+3. Generate an appropriate system prompt and identifier.
+4. Let you select which tools the agent can access.
+5. Finally, create a markdown file with the agent configuration.
 
 ---
 
-## ตัวอย่างเอเจนต์
+## Use cases
 
-นี่คือตัวอย่างเอเจนต์ที่คุณอาจพบว่ามีประโยชน์
+Here are some common use cases for different agents.
+
+- **Build agent**: Full development work with all tools enabled
+- **Plan agent**: Analysis and planning without making changes
+- **Review agent**: Code review with read-only access plus documentation tools
+- **Debug agent**: Focused on investigation with bash and read tools enabled
+- **Docs agent**: Documentation writing with file operations but no system commands
+
+---
+
+## Examples
+
+Here are some example agents you might find useful.
 
 :::tip
-คุณมีเอเจนต์เจ๋งๆ ที่ต้องการแบ่งปันหรือไม่? [ส่ง PR มาที่นี่](https://github.com/anomalyco/opencode)
+Do you have an agent you'd like to share? [Submit a PR](https://github.com/code3hr/cyxcode).
 :::
 
-### Docs Writer
+---
+
+### Documentation agent
 
 ```markdown title="~/.config/opencode/agents/docs-writer.md"
 ---
@@ -713,7 +729,7 @@ Focus on:
 
 ---
 
-### Security Auditor
+### Security auditor
 
 ```markdown title="~/.config/opencode/agents/security-auditor.md"
 ---

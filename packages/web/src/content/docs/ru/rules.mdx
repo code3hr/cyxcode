@@ -1,29 +1,29 @@
 ---
-title: Правила
-description: Установите пользовательские инструкции для opencode.
+title: Rules
+description: Set custom instructions for CyxCode.
 ---
 
-Вы можете предоставить собственные инструкции для opencode, создав файл `AGENTS.md`. Это похоже на правила Cursor. Он содержит инструкции, которые будут включены в контекст LLM для настройки его поведения для вашего конкретного проекта.
+You can provide custom instructions to CyxCode by creating an `AGENTS.md` file. This is similar to Cursor's rules. It contains instructions that will be included in the LLM's context to customize its behavior for your specific project.
 
 ---
 
-## Инициализировать
+## Initialize
 
-Чтобы создать новый файл `AGENTS.md`, вы можете запустить команду `/init` в opencode.
+To create a new `AGENTS.md` file, you can run the `/init` command in CyxCode.
 
 :::tip
-Вам следует закоммитить файл `AGENTS.md` вашего проекта в Git.
+You should commit your project's `AGENTS.md` file to Git.
 :::
 
-Это позволит отсканировать ваш проект и все его содержимое, чтобы понять, о чем этот проект, и сгенерировать с его помощью файл `AGENTS.md`. Это помогает opencode лучше ориентироваться в проекте.
+This will scan your project and all its contents to understand what the project is about and generate an `AGENTS.md` file with it. This helps CyxCode to navigate the project better.
 
-Если у вас есть существующий файл `AGENTS.md`, мы попытаемся добавить его.
+If you have an existing `AGENTS.md` file, this will try to add to it.
 
 ---
 
-## Пример
+## Example
 
-Вы также можете просто создать этот файл вручную. Вот пример того, что вы можете поместить в файл `AGENTS.md`.
+You can also just create this file manually. Here's an example of some things you can put into an `AGENTS.md` file.
 
 ```markdown title="AGENTS.md"
 # SST v3 Monorepo Project
@@ -48,33 +48,33 @@ This is an SST v3 monorepo with TypeScript. The project uses bun workspaces for 
 - Import shared modules using workspace names: `@my-app/core/example`
 ```
 
-Мы добавляем сюда инструкции для конкретного проекта, и они будут доступны всей вашей команде.
+We are adding project-specific instructions here and this will be shared across your team.
 
 ---
 
-## Типы
+## Types
 
-opencode также поддерживает чтение файла `AGENTS.md` из нескольких мест. И это служит разным целям.
+cyxcode also supports reading the `AGENTS.md` file from multiple locations. And this serves different purposes.
 
-### Проект
+### Project
 
-Поместите `AGENTS.md` в корень вашего проекта для правил, специфичных для проекта. Они применяются только тогда, когда вы работаете в этом каталоге или его подкаталогах.
+Place an `AGENTS.md` in your project root for project-specific rules. These only apply when you are working in this directory or its sub-directories.
 
-### Глобальный
+### Global
 
-Вы также можете иметь глобальные правила в файле `~/.config/opencode/AGENTS.md`. Это применяется ко всем сеансам opencode.
+You can also have global rules in a `~/.config/opencode/AGENTS.md` file. This gets applied across all CyxCode sessions.
 
-Поскольку это не коммитится в Git и не передается вашей команде, мы рекомендуем использовать его для указания любых личных правил, которым должен следовать LLM.
+Since this isn't committed to Git or shared with your team, we recommend using this to specify any personal rules that the LLM should follow.
 
-### Совместимость кода Клода
+### Claude Code Compatibility
 
-Для пользователей, переходящих с Claude Code, opencode поддерживает файловые соглашения Claude Code в качестве резерва:
+For users migrating from Claude Code, CyxCode supports Claude Code's file conventions as fallbacks:
 
-- **Правила проекта**: `CLAUDE.md` в каталоге вашего проекта (используется, если `AGENTS.md` не существует).
-- **Глобальные правила**: `~/.claude/CLAUDE.md` (используется, если `~/.config/opencode/AGENTS.md` не существует).
-- **Навыки**: `~/.claude/skills/` — подробности см. в [Навыки агента](/docs/skills/).
+- **Project rules**: `CLAUDE.md` in your project directory (used if no `AGENTS.md` exists)
+- **Global rules**: `~/.claude/CLAUDE.md` (used if no `~/.config/opencode/AGENTS.md` exists)
+- **Skills**: `~/.claude/skills/` — see [Agent Skills](/docs/skills/) for details
 
-Чтобы отключить совместимость Claude Code, установите одну из этих переменных среды:
+To disable Claude Code compatibility, set one of these environment variables:
 
 ```bash
 export OPENCODE_DISABLE_CLAUDE_CODE=1        # Disable all .claude support
@@ -84,64 +84,64 @@ export OPENCODE_DISABLE_CLAUDE_CODE_SKILLS=1 # Disable only .claude/skills
 
 ---
 
-## Приоритет
+## Precedence
 
-Когда opencode запускается, он ищет файлы правил в следующем порядке:
+When CyxCode starts, it looks for rule files in this order:
 
-1. **Локальные файлы** путем перехода вверх из текущего каталога (`AGENTS.md`, `CLAUDE.md`)
-2. **Глобальный файл** в `~/.config/opencode/AGENTS.md`.
-3. **Файл кода Клауда** по адресу `~/.claude/CLAUDE.md` (если не отключено)
+1. **Local files** by traversing up from the current directory (`AGENTS.md`, `CLAUDE.md`)
+2. **Global file** at `~/.config/opencode/AGENTS.md`
+3. **Claude Code file** at `~/.claude/CLAUDE.md` (unless disabled)
 
-Первый совпадающий файл побеждает в каждой категории. Например, если у вас есть и `AGENTS.md`, и `CLAUDE.md`, используется только `AGENTS.md`. Аналогично, `~/.config/opencode/AGENTS.md` имеет приоритет над `~/.claude/CLAUDE.md`.
+The first matching file wins in each category. For example, if you have both `AGENTS.md` and `CLAUDE.md`, only `AGENTS.md` is used. Similarly, `~/.config/opencode/AGENTS.md` takes precedence over `~/.claude/CLAUDE.md`.
 
 ---
 
-## Пользовательские инструкции
+## Custom Instructions
 
-Вы можете указать собственные файлы инструкций в `opencode.json` или в глобальном `~/.config/opencode/opencode.json`. Это позволит вам и вашей команде повторно использовать существующие правила вместо того, чтобы дублировать их на AGENTS.md.
+You can specify custom instruction files in your `opencode.json` or the global `~/.config/opencode/opencode.json`. This allows you and your team to reuse existing rules rather than having to duplicate them to AGENTS.md.
 
-Пример:
+Example:
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "instructions": ["CONTRIBUTING.md", "docs/guidelines.md", ".cursor/rules/*.md"]
 }
 ```
 
-Вы также можете использовать удаленные URL-адреса для загрузки инструкций из Интернета.
+You can also use remote URLs to load instructions from the web.
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "instructions": ["https://raw.githubusercontent.com/my-org/shared-rules/main/style.md"]
 }
 ```
 
-Удаленные инструкции извлекаются с таймаутом в 5 секунд.
+Remote instructions are fetched with a 5 second timeout.
 
-Все файлы инструкций объединяются с вашими файлами `AGENTS.md`.
+All instruction files are combined with your `AGENTS.md` files.
 
 ---
 
-## Ссылки на внешние файлы
+## Referencing External Files
 
-Хотя opencode не анализирует автоматически ссылки на файлы в `AGENTS.md`, аналогичной функциональности можно добиться двумя способами:
+While CyxCode doesn't automatically parse file references in `AGENTS.md`, you can achieve similar functionality in two ways:
 
-### Использование opencode.json
+### Using opencode.json
 
-Рекомендуемый подход — использовать поле `instructions` в `opencode.json`:
+The recommended approach is to use the `instructions` field in `opencode.json`:
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "instructions": ["docs/development-standards.md", "test/testing-guidelines.md", "packages/*/AGENTS.md"]
 }
 ```
 
-### Ручные инструкции в AGENTS.md
+### Manual Instructions in AGENTS.md
 
-Вы можете научить opencode читать внешние файлы, предоставив явные инструкции в файле `AGENTS.md`. Вот практический пример:
+You can teach CyxCode to read external files by providing explicit instructions in your `AGENTS.md`. Here's a practical example:
 
 ```markdown title="AGENTS.md"
 # TypeScript Project Rules
@@ -168,13 +168,13 @@ For testing strategies and coverage requirements: @test/testing-guidelines.md
 Read the following file immediately as it's relevant to all workflows: @rules/general-guidelines.md.
 ```
 
-Такой подход позволяет:
+This approach allows you to:
 
-- Создавайте модульные файлы правил многократного использования.
-- Делитесь правилами между проектами с помощью символических ссылок или подмодулей git.
-- Сохраняйте AGENTS.md кратким, ссылаясь на подробные инструкции.
-- Убедитесь, что opencode загружает файлы только тогда, когда это необходимо для конкретной задачи.
+- Create modular, reusable rule files
+- Share rules across projects via symlinks or git submodules
+- Keep AGENTS.md concise while referencing detailed guidelines
+- Ensure CyxCode loads files only when needed for the specific task
 
 :::tip
-Для монорепозиториев или проектов с общими стандартами использование `opencode.json` с шаблонами glob (например, `packages/*/AGENTS.md`) более удобно в обслуживании, чем инструкции вручную.
+For monorepos or projects with shared standards, using `opencode.json` with glob patterns (like `packages/*/AGENTS.md`) is more maintainable than manual instructions.
 :::

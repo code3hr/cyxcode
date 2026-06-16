@@ -3,7 +3,7 @@ title: Uprawnienia
 description: Kontroluj, które Akcje wymagają zatwierdzenia do uruchomienia.
 ---
 
-opencode używa `permission`, aby uniknąć, czy dana akcja została wykonana automatycznie, zachowana monit lub została zablokowana.
+cyxcode używa `permission`, aby uniknąć, czy dana akcja została wykonana automatycznie, zachowana monit lub została zablokowana.
 
 Od `v1.1.1` starsza stworzona logiczna `tools` jest przestarzała i została stworzona scalona z `permission`. Stara wersja `tools` jest nadal obsługiwana w celu zapewnienia zgodności wstecznej.
 
@@ -25,7 +25,7 @@ Możesz zainstalować uprawnienia globalnie (za pomocą `*`) i znajdującego si�
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "permission": {
     "*": "ask",
     "bash": "allow",
@@ -38,7 +38,7 @@ Możesz także zainstalować wszystkie uprawnienia na raz:
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "permission": "allow"
 }
 ```
@@ -51,7 +51,7 @@ Można skorzystać z różnych działań, które zależą od danych użytkowych.
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "permission": {
     "bash": {
       "*": "ask",
@@ -96,7 +96,7 @@ Na przykład umożliwia dostęp do wszystkiego pod `~/projects/personal/`:
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "permission": {
     "external_directory": {
       "~/projects/personal/**": "allow"
@@ -109,7 +109,7 @@ Każdy dopuszczony tutaj katalog jest dziedziczy tych samych ustawień, co dost�
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "permission": {
     "external_directory": {
       "~/projects/personal/**": "allow"
@@ -191,7 +191,7 @@ Bardziej szczegółowe przykłady dopasowywania wzorców można znaleźć w sekc
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "permission": {
     "bash": {
       "*": "ask",

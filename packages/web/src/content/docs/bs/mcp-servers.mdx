@@ -1,29 +1,33 @@
 ---
-title: MCP serveri
-description: Dodajte lokalne i udaljene MCP alate.
+title: MCP servers
+description: Add local and remote MCP tools.
 ---
 
-Možete dodati vanjske alate u OpenCode koristeći _Model Context Protocol_, ili MCP. OpenCode podržava i lokalne i udaljene servere.
-Jednom dodani, MCP alati su automatski dostupni LLM-u zajedno sa ugrađenim alatima.
+You can add external tools to CyxCode using the _Model Context Protocol_, or MCP. CyxCode supports both local and remote servers.
+
+Once added, MCP tools are automatically available to the LLM alongside built-in tools.
 
 ---
 
-#### Upozorenje
+#### Caveats
 
-Kada koristite MCP server, on dodaje u kontekst. Ovo se može brzo zbrojiti ako imate puno alata. Stoga preporučujemo da pazite koje MCP servere koristite.
+When you use an MCP server, it adds to the context. This can quickly add up if you have a lot of tools. So we recommend being careful with which MCP servers you use.
+
 :::tip
-MCP serveri dodaju vaš kontekst, tako da želite da budete pažljivi s tim koje ćete omogućiti.
+MCP servers add to your context, so you want to be careful with which ones you enable.
 :::
 
-Određeni MCP serveri, poput GitHub MCP servera, mogu dodati mnogo tokena i lako premašiti limit konteksta.
+Certain MCP servers, like the GitHub MCP server, tend to add a lot of tokens and can easily exceed the context limit.
 
-## Omogućavanje
+---
 
-Možete definirati MCP servere u vašoj [OpenCode Config](https://opencode.ai/docs/config/) pod `mcp`. Dodajte svaki MCP sa jedinstvenim imenom. Možete se pozvati na taj MCP po imenu kada tražite LLM.
+## Enable
+
+You can define MCP servers in your [CyxCode Config](https://cyxcode.ai/docs/config/) under `mcp`. Add each MCP with a unique name. You can refer to that MCP by name when prompting the LLM.
 
 ```jsonc title="opencode.jsonc" {6}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "mcp": {
     "name-of-mcp-server": {
       // ...
@@ -36,16 +40,19 @@ Možete definirati MCP servere u vašoj [OpenCode Config](https://opencode.ai/do
 }
 ```
 
-Također možete onemogućiti server postavljanjem `enabled` na `false`. To je korisno kada ga želite privremeno isključiti bez uklanjanja iz konfiguracije.
+You can also disable a server by setting `enabled` to `false`. This is useful if you want to temporarily disable a server without removing it from your config.
 
-### Poništavanje udaljenih zadanih postavki
+---
 
-Organizacije mogu obezbijediti zadane MCP servere preko svoje krajnje tačke `.well-known/opencode`. Ovi serveri mogu biti onemogućeni prema zadanim postavkama, omogućavajući korisnicima da se odluče za one koji su im potrebni.
-Da omogućite određeni server iz udaljene konfiguracije vaše organizacije, dodajte ga u svoju lokalnu konfiguraciju sa `enabled: true`:
+### Overriding remote defaults
+
+Organizations can provide default MCP servers via their `.well-known/CyxCode` endpoint. These servers may be disabled by default, allowing users to opt-in to the ones they need.
+
+To enable a specific server from your organization's remote config, add it to your local config with `enabled: true`:
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "mcp": {
     "jira": {
       "type": "remote",
@@ -56,15 +63,17 @@ Da omogućite određeni server iz udaljene konfiguracije vaše organizacije, dod
 }
 ```
 
-Vrijednosti lokalne konfiguracije nadjačavaju udaljene zadane postavke. Pogledajte [config precedence](/docs/config#precedence-order) za više detalja.
+Your local config values override the remote defaults. See [config precedence](/docs/config#precedence-order) for more details.
 
-## Lokalno
+---
 
-Dodajte lokalne MCP servere koristeći `type` u `"local"` unutar MCP objekta.
+## Local
+
+Add local MCP servers using `type` to `"local"` within the MCP object.
 
 ```jsonc title="opencode.jsonc" {15}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "mcp": {
     "my-local-mcp-server": {
       "type": "local",
@@ -79,12 +88,13 @@ Dodajte lokalne MCP servere koristeći `type` u `"local"` unutar MCP objekta.
 }
 ```
 
-Naredba je način na koji se pokreće lokalni MCP server. Također možete proslijediti listu varijabli okruženja.
-Na primjer, evo kako možete dodati testni [`@modelcontextprotocol/server-everything`](https://www.npmjs.com/package/@modelcontextprotocol/server-everything) MCP server.
+The command is how the local MCP server is started. You can also pass in a list of environment variables as well.
+
+For example, here's how you can add the test [`@modelcontextprotocol/server-everything`](https://www.npmjs.com/package/@modelcontextprotocol/server-everything) MCP server.
 
 ```jsonc title="opencode.jsonc"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "mcp": {
     "mcp_everything": {
       "type": "local",
@@ -94,7 +104,7 @@ Na primjer, evo kako možete dodati testni [`@modelcontextprotocol/server-everyt
 }
 ```
 
-I da ga koristim mogu dodati `use the mcp_everything tool` u svoje upite.
+And to use it I can add `use the mcp_everything tool` to my prompts.
 
 ```txt "mcp_everything"
 use the mcp_everything tool to add the number 3 and 4
@@ -102,26 +112,27 @@ use the mcp_everything tool to add the number 3 and 4
 
 ---
 
-#### Opcije
+#### Options
 
-Ovdje su sve opcije za konfiguriranje lokalnog MCP servera.
-| Opcija | Tip | Obavezno | Opis
-|------------- | ------- | -------- | ----------------------------------------------------------------------------------- |
-| `type` | String | Y | Tip veze sa MCP serverom, mora biti `"local"`. |
-| `command` | Niz | Y | Naredba i argumenti za pokretanje MCP servera. |
-| `environment` | Objekt | | Varijable okruženja koje treba postaviti prilikom pokretanja servera. |
-| `enabled` | Boolean | | Omogućite ili onemogućite MCP server pri pokretanju. |
-| `timeout` | Broj | | Vremensko ograničenje u ms za dohvaćanje alata sa MCP servera. Podrazumevano je 5000 (5 sekundi). |
+Here are all the options for configuring a local MCP server.
+
+| Option        | Type    | Required | Description                                                                         |
+| ------------- | ------- | -------- | ----------------------------------------------------------------------------------- |
+| `type`        | String  | Y        | Type of MCP server connection, must be `"local"`.                                   |
+| `command`     | Array   | Y        | Command and arguments to run the MCP server.                                        |
+| `environment` | Object  |          | Environment variables to set when running the server.                               |
+| `enabled`     | Boolean |          | Enable or disable the MCP server on startup.                                        |
+| `timeout`     | Number  |          | Timeout in ms for fetching tools from the MCP server. Defaults to 5000 (5 seconds). |
 
 ---
 
-## Udaljeno
+## Remote
 
-Dodajte udaljene MCP servere postavljanjem `type` na `"remote"`.
+Add remote MCP servers by setting `type` to `"remote"`.
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "mcp": {
     "my-remote-mcp": {
       "type": "remote",
@@ -135,38 +146,40 @@ Dodajte udaljene MCP servere postavljanjem `type` na `"remote"`.
 }
 ```
 
-`url` je URL udaljenog MCP servera, a kroz opciju `headers` možete proslijediti listu zaglavlja.
+The `url` is the URL of the remote MCP server and with the `headers` option you can pass in a list of headers.
 
-#### Opcije
+---
 
-| Opcija    | Tip     | Obavezno | Opis                                                                                               |
-| --------- | ------- | -------- | -------------------------------------------------------------------------------------------------- |
-| `type`    | String  | Y        | Tip veze sa MCP serverom, mora biti `"remote"`.                                                    |
-| `url`     | String  | Y        | URL udaljenog MCP servera.                                                                         |
-| `enabled` | Boolean |          | Omogućite ili onemogućite MCP server pri pokretanju.                                               |
-| `headers` | Objekt  |          | Zaglavlja za slanje uz zahtjev.                                                                    |
-| `oauth`   | Objekt  |          | Konfiguracija OAuth provjere autentičnosti. Pogledajte odjeljak [OAuth](#oauth) ispod.             |
-| `timeout` | Broj    |          | Vremensko ograničenje u ms za preuzimanje alata sa MCP servera. Podrazumevano je 5000 (5 sekundi). |
+#### Options
+
+| Option    | Type    | Required | Description                                                                         |
+| --------- | ------- | -------- | ----------------------------------------------------------------------------------- |
+| `type`    | String  | Y        | Type of MCP server connection, must be `"remote"`.                                  |
+| `url`     | String  | Y        | URL of the remote MCP server.                                                       |
+| `enabled` | Boolean |          | Enable or disable the MCP server on startup.                                        |
+| `headers` | Object  |          | Headers to send with the request.                                                   |
+| `oauth`   | Object  |          | OAuth authentication configuration. See [OAuth](#oauth) section below.              |
+| `timeout` | Number  |          | Timeout in ms for fetching tools from the MCP server. Defaults to 5000 (5 seconds). |
 
 ---
 
 ## OAuth
 
-OpenCode automatski rukuje OAuth autentifikacijom za udaljene MCP servere. Kada server zahtijeva autentifikaciju, OpenCode će:
+CyxCode automatically handles OAuth authentication for remote MCP servers. When a server requires authentication, CyxCode will:
 
-1. Otkrijte 401 odgovor i pokrenite OAuth tok
-2. Koristite **Dynamic Client Registration (RFC 7591)** ako podržava server
-3. Sigurno čuvajte tokene za buduće zahtjeve
+1. Detect the 401 response and initiate the OAuth flow
+2. Use **Dynamic Client Registration (RFC 7591)** if supported by the server
+3. Store tokens securely for future requests
 
 ---
 
-### Automatski
+### Automatic
 
-Za većinu MCP servera sa omogućenim OAuthom nije potrebna posebna konfiguracija. Samo konfigurirajte udaljeni server:
+For most OAuth-enabled MCP servers, no special configuration is needed. Just configure the remote server:
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "mcp": {
     "my-oauth-server": {
       "type": "remote",
@@ -176,15 +189,17 @@ Za većinu MCP servera sa omogućenim OAuthom nije potrebna posebna konfiguracij
 }
 ```
 
-Ako server zahtijeva autentifikaciju, OpenCode će vas tražiti prijavu pri prvom korištenju. Ako se to ne desi, možete [ručno pokrenuti tok](#authenticating) naredbom `opencode mcp auth <server-name>`.
+If the server requires authentication, CyxCode will prompt you to authenticate when you first try to use it. If not, you can [manually trigger the flow](#authenticating) with `cyxcode mcp auth <server-name>`.
 
-### Prethodno registrirano
+---
 
-Ako imate klijentske vjerodajnice od dobavljača MCP servera, možete ih konfigurirati:
+### Pre-registered
+
+If you have client credentials from the MCP server provider, you can configure them:
 
 ```json title="opencode.json" {7-11}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "mcp": {
     "my-oauth-server": {
       "type": "remote",
@@ -201,36 +216,39 @@ Ako imate klijentske vjerodajnice od dobavljača MCP servera, možete ih konfigu
 
 ---
 
-### Autentifikacija
+### Authenticating
 
-Možete ručno pokrenuti autentifikaciju ili upravljati vjerodajnicama.
-Autentifikacija sa određenim MCP serverom:
+You can manually trigger authentication or manage credentials.
 
-```bash
-opencode mcp auth my-oauth-server
-```
-
-Navedite sve MCP servere i njihov status autentifikacije:
+Authenticate with a specific MCP server:
 
 ```bash
-opencode mcp list
+cyxcode mcp auth my-oauth-server
 ```
 
-Uklonite pohranjene vjerodajnice:
+List all MCP servers and their auth status:
 
 ```bash
-opencode mcp logout my-oauth-server
+cyxcode mcp list
 ```
 
-Komanda `mcp auth` otvara pretraživač za autorizaciju. Nakon odobrenja, OpenCode sigurno čuva tokene u `~/.local/share/opencode/mcp-auth.json`.
+Remove stored credentials:
 
-#### Onemogućavanje OAuth-a
+```bash
+cyxcode mcp logout my-oauth-server
+```
 
-Ako želite onemogućiti automatski OAuth za server (npr. za servere koji umjesto toga koriste API ključeve), postavite `oauth` na `false`:
+The `mcp auth` command will open your browser for authorization. After you authorize, CyxCode will store the tokens securely in `~/.local/share/opencode/mcp-auth.json`.
+
+---
+
+#### Disabling OAuth
+
+If you want to disable automatic OAuth for a server (e.g., for servers that use API keys instead), set `oauth` to `false`:
 
 ```json title="opencode.json" {7}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "mcp": {
     "my-api-key-server": {
       "type": "remote",
@@ -246,40 +264,44 @@ Ako želite onemogućiti automatski OAuth za server (npr. za servere koji umjest
 
 ---
 
-#### OAuth opcije
+#### OAuth Options
 
-| Opcija         | Tip             | Opis                                                                                          |
-| -------------- | --------------- | --------------------------------------------------------------------------------------------- |
-| `oauth`        | Objekt \| false | OAuth konfiguracijski objekt, ili `false` da onemogućite automatsko otkrivanje OAuth.         |
-| `clientId`     | String          | ID OAuth klijenta. Ako nije navedeno, pokušat će se izvršiti dinamička registracija klijenta. |
-| `clientSecret` | String          | Tajna OAuth klijenta, ako to zahtijeva autorizacijski server.                                 |
-| `scope`        | String          | OAuth opseg zahtjeva za vrijeme autorizacije.                                                 |
+| Option         | Type            | Description                                                                      |
+| -------------- | --------------- | -------------------------------------------------------------------------------- |
+| `oauth`        | Object \| false | OAuth config object, or `false` to disable OAuth auto-detection.                 |
+| `clientId`     | String          | OAuth client ID. If not provided, dynamic client registration will be attempted. |
+| `clientSecret` | String          | OAuth client secret, if required by the authorization server.                    |
+| `scope`        | String          | OAuth scopes to request during authorization.                                    |
 
-#### Otklanjanje grešaka
+#### Debugging
 
-Ako udaljeni MCP server ne uspije u autentifikaciji, možete dijagnosticirati probleme pomoću:
+If a remote MCP server is failing to authenticate, you can diagnose issues with:
 
 ```bash
 # View auth status for all OAuth-capable servers
-opencode mcp auth list
+cyxcode mcp auth list
 
 # Debug connection and OAuth flow for a specific server
-opencode mcp debug my-oauth-server
+cyxcode mcp debug my-oauth-server
 ```
 
-Komanda `mcp debug` prikazuje trenutni auth status, testira HTTP povezanost i pokušava OAuth discovery flow.
+The `mcp debug` command shows the current auth status, tests HTTP connectivity, and attempts the OAuth discovery flow.
 
-## Upravljanje
+---
 
-Vaši MCP serveri su dostupni kao alati u OpenCode, zajedno s ugrađenim alatima. Možete njima upravljati kroz OpenCode konfiguraciju kao i bilo kojim drugim alatom.
+## Manage
 
-### Globalno
+Your MCPs are available as tools in CyxCode, alongside built-in tools. So you can manage them through the CyxCode config like any other tool.
 
-To znači da ih možete omogućiti ili onemogućiti globalno.
+---
+
+### Global
+
+This means that you can enable or disable them globally.
 
 ```json title="opencode.json" {14}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "mcp": {
     "my-mcp-foo": {
       "type": "local",
@@ -296,11 +318,11 @@ To znači da ih možete omogućiti ili onemogućiti globalno.
 }
 ```
 
-Također možemo koristiti glob obrazac da onemogućimo sve odgovarajuće MCP-ove.
+We can also use a glob pattern to disable all matching MCPs.
 
 ```json title="opencode.json" {14}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "mcp": {
     "my-mcp-foo": {
       "type": "local",
@@ -317,18 +339,20 @@ Također možemo koristiti glob obrazac da onemogućimo sve odgovarajuće MCP-ov
 }
 ```
 
-Ovdje koristimo glob obrazac `my-mcp*` da onemogućimo sve MCP servere.
+Here we are using the glob pattern `my-mcp*` to disable all MCPs.
 
-### Po agentu
+---
 
-Ako imate veliki broj MCP servera, možda ćete želeti da ih omogućite samo po agentu i da ih onemogućite globalno. Da biste to učinili:
+### Per agent
 
-1. Onemogućite ga kao alat globalno.
-2. U vašem [agent config](/docs/agents#tools), omogućite MCP server kao alat.
+If you have a large number of MCP servers you may want to only enable them per agent and disable them globally. To do this:
+
+1. Disable it as a tool globally.
+2. In your [agent config](/docs/agents#tools), enable the MCP server as a tool.
 
 ```json title="opencode.json" {11, 14-18}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "mcp": {
     "my-mcp": {
       "type": "local",
@@ -351,15 +375,16 @@ Ako imate veliki broj MCP servera, možda ćete želeti da ih omogućite samo po
 
 ---
 
-#### Glob uzorci
+#### Glob patterns
 
-Uzorak glob koristi jednostavne šablone globbiranja regularnih izraza:
+The glob pattern uses simple regex globbing patterns:
 
-- `*` odgovara nuli ili više bilo kojeg znaka (npr. `"my-mcp*"` odgovara `my-mcp_search`, `my-mcp_list`, itd.)
-- `?` odgovara tačno jednom znaku
-- Svi ostali likovi se bukvalno podudaraju
-  :::note
-  MCP serverski alati se registruju sa imenom servera kao prefiksom, tako da onemogućite sve alate za server jednostavno koristite:
+- `*` matches zero or more of any character (e.g., `"my-mcp*"` matches `my-mcp_search`, `my-mcp_list`, etc.)
+- `?` matches exactly one character
+- All other characters match literally
+
+:::note
+MCP server tools are registered with server name as prefix, so to disable all tools for a server simply use:
 
 ```
 "mymcpservername_*": false
@@ -369,17 +394,19 @@ Uzorak glob koristi jednostavne šablone globbiranja regularnih izraza:
 
 ---
 
-## Primjeri
+## Examples
 
-Ispod su primjeri uobičajenih MCP servera. Možete poslati PR ako želite dokumentovati druge servere.
+Below are examples of some common MCP servers. You can submit a PR if you want to document other servers.
+
+---
 
 ### Sentry
 
-Dodajte [Sentry MCP server](https://mcp.sentry.dev) za interakciju sa vašim Sentry projektima i problemima.
+Add the [Sentry MCP server](https://mcp.sentry.dev) to interact with your Sentry projects and issues.
 
 ```json title="opencode.json" {4-8}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "mcp": {
     "sentry": {
       "type": "remote",
@@ -390,14 +417,15 @@ Dodajte [Sentry MCP server](https://mcp.sentry.dev) za interakciju sa vašim Sen
 }
 ```
 
-Nakon dodavanja konfiguracije, autentifikujte se sa Sentry:
+After adding the configuration, authenticate with Sentry:
 
 ```bash
-opencode mcp auth sentry
+cyxcode mcp auth sentry
 ```
 
-Ovo će otvoriti prozor pretraživača da završite OAuth tok i povežete OpenCode sa vašim Sentry nalogom.
-Nakon provjere autentičnosti, možete koristiti Sentry alate u svojim upitima za upite o problemima, projektima i podacima o greškama.
+This will open a browser window to complete the OAuth flow and connect CyxCode to your Sentry account.
+
+Once authenticated, you can use Sentry tools in your prompts to query issues, projects, and error data.
 
 ```txt "use sentry"
 Show me the latest unresolved issues in my project. use sentry
@@ -407,11 +435,11 @@ Show me the latest unresolved issues in my project. use sentry
 
 ### Context7
 
-Dodajte [Context7 MCP server](https://github.com/upstash/context7) za pretraživanje dokumenata.
+Add the [Context7 MCP server](https://github.com/upstash/context7) to search through docs.
 
 ```json title="opencode.json" {4-7}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "mcp": {
     "context7": {
       "type": "remote",
@@ -421,11 +449,11 @@ Dodajte [Context7 MCP server](https://github.com/upstash/context7) za pretraživ
 }
 ```
 
-Ako ste se prijavili za besplatni račun, možete koristiti svoj API ključ i dobiti viša ograničenja stope.
+If you have signed up for a free account, you can use your API key and get higher rate-limits.
 
 ```json title="opencode.json" {7-9}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "mcp": {
     "context7": {
       "type": "remote",
@@ -438,14 +466,15 @@ Ako ste se prijavili za besplatni račun, možete koristiti svoj API ključ i do
 }
 ```
 
-Ovdje pretpostavljamo da imate postavljenu varijablu okruženja `CONTEXT7_API_KEY`.
-Dodajte `use context7` vašim upitima za korištenje Context7 MCP servera.
+Here we are assuming that you have the `CONTEXT7_API_KEY` environment variable set.
+
+Add `use context7` to your prompts to use Context7 MCP server.
 
 ```txt "use context7"
 Configure a Cloudflare Worker script to cache JSON API responses for five minutes. use context7
 ```
 
-Alternativno, možete dodati nešto poput ovoga na svoj [AGENTS.md](/docs/rules/).
+Alternatively, you can add something like this to your [AGENTS.md](/docs/rules/).
 
 ```md title="AGENTS.md"
 When you need to search docs, use `context7` tools.
@@ -455,11 +484,11 @@ When you need to search docs, use `context7` tools.
 
 ### Grep by Vercel
 
-Dodajte [Grep by Vercel](https://grep.app) MCP server za pretraživanje isječaka koda na GitHub.
+Add the [Grep by Vercel](https://grep.app) MCP server to search through code snippets on GitHub.
 
 ```json title="opencode.json" {4-7}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "mcp": {
     "gh_grep": {
       "type": "remote",
@@ -469,13 +498,13 @@ Dodajte [Grep by Vercel](https://grep.app) MCP server za pretraživanje isječak
 }
 ```
 
-Pošto smo naš MCP server nazvali `gh_grep`, možete dodati `use the gh_grep tool` u svoje upite da natjerate agenta da ga koristi.
+Since we named our MCP server `gh_grep`, you can add `use the gh_grep tool` to your prompts to get the agent to use it.
 
 ```txt "use the gh_grep tool"
 What's the right way to set a custom domain in an SST Astro component? use the gh_grep tool
 ```
 
-Alternativno, možete dodati nešto poput ovoga na svoj [AGENTS.md](/docs/rules/).
+Alternatively, you can add something like this to your [AGENTS.md](/docs/rules/).
 
 ```md title="AGENTS.md"
 If you are unsure how to do something, use `gh_grep` to search code examples from GitHub.

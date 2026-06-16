@@ -1,95 +1,132 @@
 ---
 title: Web
-description: Bruke OpenCode i nettleseren din.
+description: Using CyxCode in your browser.
 ---
 
-OpenCode kan kjøres som en nettapplikasjon i nettleseren din, og gir den samme kraftige AI-kodingsopplevelsen uten at du trenger en terminal.
+CyxCode can run as a web application in your browser, providing the same powerful AI coding experience without needing a terminal.
 
-![OpenCode Web - Ny økt](../../../assets/web/web-homepage-new-session.png)
+![CyxCode Web - New Session](../../../assets/web/web-homepage-new-session.png)
 
-## Komme i gang
+## Getting Started
 
-Start web-grensesnittet ved å kjøre:
+Start the web interface by running:
 
 ```bash
-opencode web
+cyxcode web
 ```
 
-Dette starter en lokal server på `127.0.0.1` med en tilfeldig tilgjengelig port og åpner automatisk OpenCode i standard nettleser.
+This starts a local server on `127.0.0.1` with a random available port and automatically opens CyxCode in your default browser.
+
+:::caution
+If `OPENCODE_SERVER_PASSWORD` is not set, the server will be unsecured. This is fine for local use but should be set for network access.
+:::
+
+:::tip[Windows Users]
+For the best experience, run `cyxcode web` from [WSL](/docs/windows-wsl) rather than PowerShell. This ensures proper file system access and terminal integration.
+:::
 
 ---
 
-## Konfigurasjon
+## Configuration
 
-Du kan konfigurere webserveren ved å bruke kommandolinjeflagg eller i [konfigurasjonsfilen](/docs/config).
+You can configure the web server using command line flags or in your [config file](/docs/config).
 
 ### Port
 
-Som standard velger OpenCode en tilgjengelig port. Du kan spesifisere en port:
+By default, CyxCode picks an available port. You can specify a port:
 
 ```bash
-opencode web --port 4096
+cyxcode web --port 4096
 ```
 
-### Vertsnavn
+### Hostname
 
-Som standard binder serveren seg til `127.0.0.1` (kun localhost). Slik gjør du OpenCode tilgjengelig på nettverket ditt:
+By default, the server binds to `127.0.0.1` (localhost only). To make CyxCode accessible on your network:
 
 ```bash
-opencode web --hostname 0.0.0.0
+cyxcode web --hostname 0.0.0.0
 ```
+
+When using `0.0.0.0`, CyxCode will display both local and network addresses:
+
+```
+  Local access:       http://localhost:4096
+  Network access:     http://192.168.1.100:4096
+```
+
+### mDNS Discovery
+
+Enable mDNS to make your server discoverable on the local network:
+
+```bash
+cyxcode web --mdns
+```
+
+This automatically sets the hostname to `0.0.0.0` and advertises the server as `opencode.local`.
+
+You can customize the mDNS domain name to run multiple instances on the same network:
+
+```bash
+cyxcode web --mdns --mdns-domain myproject.local
+```
+
+### CORS
+
+To allow additional domains for CORS (useful for custom frontends):
+
+```bash
+cyxcode web --cors https://example.com
+```
+
+### Authentication
+
+To protect access, set a password using the `OPENCODE_SERVER_PASSWORD` environment variable:
+
+```bash
+OPENCODE_SERVER_PASSWORD=secret cyxcode web
+```
+
+The username defaults to `opencode` but can be changed with `OPENCODE_SERVER_USERNAME`.
 
 ---
 
-### Autentisering
+## Using the Web Interface
 
-For å beskytte tilgang, angi et passord ved hjelp av miljøvariabelen `OPENCODE_SERVER_PASSWORD`:
+Once started, the web interface provides access to your CyxCode sessions.
 
-```bash
-OPENCODE_SERVER_PASSWORD=secret opencode web
-```
+### Sessions
 
-Brukernavnet er satt til `opencode` som standard, men kan endres med `OPENCODE_SERVER_USERNAME`.
+View and manage your sessions from the homepage. You can see active sessions and start new ones.
 
----
+![CyxCode Web - Active Session](../../../assets/web/web-homepage-active-session.png)
 
-## Bruke webgrensesnittet
+### Server Status
 
-Når den er startet, gir nettgrensesnittet tilgang til dine OpenCode-økter.
+Click "See Servers" to view connected servers and their status.
 
-### Sesjoner
-
-Se og administrer øktene dine fra hjemmesiden. Du kan se aktive økter og starte nye.
-
-![OpenCode Web - Active Session](../../../assets/web/web-homepage-active-session.png)
-
-### Serverstatus
-
-Klikk på "Se servere" for å se tilkoblede servere og deres status.
-
-![OpenCode Web - Se servere](../../../assets/web/web-homepage-see-servers.png)
+![CyxCode Web - See Servers](../../../assets/web/web-homepage-see-servers.png)
 
 ---
 
-## Koble til en terminal
+## Attaching a Terminal
 
-Du kan koble en terminal TUI til en kjørende webserver:
+You can attach a terminal TUI to a running web server:
 
 ```bash
 # Start the web server
-opencode web --port 4096
+cyxcode web --port 4096
 
 # In another terminal, attach the TUI
-opencode attach http://localhost:4096
+cyxcode attach http://localhost:4096
 ```
 
-Dette lar deg bruke både nettgrensesnittet og terminalen samtidig, og deler samme økter og tilstand.
+This allows you to use both the web interface and terminal simultaneously, sharing the same sessions and state.
 
 ---
 
-## Konfigurasjonsfil
+## Config File
 
-Du kan også konfigurere serverinnstillinger i `opencode.json` konfigurasjonsfilen:
+You can also configure server settings in your `opencode.json` config file:
 
 ```json
 {
@@ -102,4 +139,4 @@ Du kan også konfigurere serverinnstillinger i `opencode.json` konfigurasjonsfil
 }
 ```
 
-Kommandolinjeflagg har forrang over konfigurasjonsfilinnstillinger.
+Command line flags take precedence over config file settings.

@@ -1,45 +1,46 @@
 ---
-title: ACP サポート
-description: ACP 互換エディターで OpenCode を使用します。
+title: ACP Support
+description: Use CyxCode in any ACP-compatible editor.
 ---
 
-OpenCode は [Agent Client Protocol](https://agentclientprotocol.com) または (ACP) をサポートしているため、互換性のあるエディターや IDE で直接使用できます。
+CyxCode supports the [Agent Client Protocol](https://agentclientprotocol.com) or (ACP), allowing you to use it directly in compatible editors and IDEs.
 
 :::tip
-ACP をサポートするエディターとツールのリストについては、[ACP progress report](https://zed.dev/blog/acp-progress-report#available-now) を参照してください。
+For a list of editors and tools that support ACP, check out the [ACP progress report](https://zed.dev/blog/acp-progress-report#available-now).
 :::
-ACP は、コードエディターと AI コーディングエージェント間の通信を標準化するオープンプロトコルです。
+
+ACP is an open protocol that standardizes communication between code editors and AI coding agents.
 
 ---
 
-## 設定
+## Configure
 
-ACP 経由で OpenCode を使用するには、`opencode acp` コマンドを実行するようにエディタを設定します。
+To use CyxCode via ACP, configure your editor to run the `cyxcode acp` command.
 
-このコマンドは、stdio 経由で JSON-RPC 経由でエディターと通信する ACP 互換のサブプロセスとして OpenCode を開始します。
+The command starts CyxCode as an ACP-compatible subprocess that communicates with your editor over JSON-RPC via stdio.
 
-以下は、ACP をサポートする一般的なエディタの例です。
+Below are examples for popular editors that support ACP.
 
 ---
 
 ### Zed
 
-[Zed](https://zed.dev) 構成 (`~/.config/zed/settings.json`) に追加します。
+Add to your [Zed](https://zed.dev) configuration (`~/.config/zed/settings.json`):
 
 ```json title="~/.config/zed/settings.json"
 {
   "agent_servers": {
-    "OpenCode": {
-      "command": "opencode",
+    "CyxCode": {
+      "command": "cyxcode",
       "args": ["acp"]
     }
   }
 }
 ```
 
-これを開くには、**コマンドパレット**の `agent: new thread` アクションを使用します。
+To open it, use the `agent: new thread` action in the **Command Palette**.
 
-`keymap.json` を編集してキーボードショートカットをバインドすることもできます。
+You can also bind a keyboard shortcut by editing your `keymap.json`:
 
 ```json title="keymap.json"
 [
@@ -50,9 +51,9 @@ ACP 経由で OpenCode を使用するには、`opencode acp` コマンドを実
         {
           "agent": {
             "custom": {
-              "name": "OpenCode",
+              "name": "CyxCode",
               "command": {
-                "command": "opencode",
+                "command": "cyxcode",
                 "args": ["acp"]
               }
             }
@@ -66,47 +67,47 @@ ACP 経由で OpenCode を使用するには、`opencode acp` コマンドを実
 
 ---
 
-### JetBrains IDE
+### JetBrains IDEs
 
-[documentation](https://www.jetbrains.com/help/ai-assistant/acp.html) に従って、[JetBrains IDE](https://www.jetbrains.com/) acp.json に追加します：
+Add to your [JetBrains IDE](https://www.jetbrains.com/) acp.json according to the [documentation](https://www.jetbrains.com/help/ai-assistant/acp.html):
 
 ```json title="acp.json"
 {
   "agent_servers": {
-    "OpenCode": {
-      "command": "/absolute/path/bin/opencode",
+    "CyxCode": {
+      "command": "/absolute/path/bin/cyxcode",
       "args": ["acp"]
     }
   }
 }
 ```
 
-これを開くには、AI Chat エージェントセレクターで新しい「OpenCode」エージェントを使用します。
+To open it, use the new 'CyxCode' agent in the AI Chat agent selector.
 
 ---
 
 ### Avante.nvim
 
-[Avante.nvim](https://github.com/yetone/avante.nvim) 設定に追加:
+Add to your [Avante.nvim](https://github.com/yetone/avante.nvim) configuration:
 
 ```lua
 {
   acp_providers = {
-    ["opencode"] = {
-      command = "opencode",
+    ["cyxcode"] = {
+      command = "cyxcode",
       args = { "acp" }
     }
   }
 }
 ```
 
-環境変数を渡す必要がある場合:
+If you need to pass environment variables:
 
 ```lua {6-8}
 {
   acp_providers = {
-    ["opencode"] = {
-      command = "opencode",
+    ["cyxcode"] = {
+      command = "cyxcode",
       args = { "acp" },
       env = {
         OPENCODE_API_KEY = os.getenv("OPENCODE_API_KEY")
@@ -120,14 +121,14 @@ ACP 経由で OpenCode を使用するには、`opencode acp` コマンドを実
 
 ### CodeCompanion.nvim
 
-[CodeCompanion.nvim](https://github.com/olimorris/codecompanion.nvim) で OpenCode を ACP エージェントとして使用するには、以下を Neovim 構成に追加します。
+To use CyxCode as an ACP agent in [CodeCompanion.nvim](https://github.com/olimorris/codecompanion.nvim), add the following to your Neovim config:
 
 ```lua
 require("codecompanion").setup({
   interactions = {
     chat = {
       adapter = {
-        name = "opencode",
+        name = "cyxcode",
         model = "claude-sonnet-4",
       },
     },
@@ -135,21 +136,21 @@ require("codecompanion").setup({
 })
 ```
 
-この構成は、OpenCode をチャットの ACP エージェントとして使用するように CodeCompanion をセットアップします。
+This config sets up CodeCompanion to use CyxCode as the ACP agent for chat.
 
-環境変数 (`OPENCODE_API_KEY` など) を渡す必要がある場合、詳細については、CodeCompanion.nvim ドキュメントの「[アダプターの構成: 環境変数](https://codecompanion.olimorris.dev/getting-started#setting-an-api-key)」を参照してください。
+If you need to pass environment variables (like `OPENCODE_API_KEY`), refer to [Configuring Adapters: Environment Variables](https://codecompanion.olimorris.dev/getting-started#setting-an-api-key) in the CodeCompanion.nvim documentation for full details.
 
-## サポート
+## Support
 
-OpenCode は、ACP 経由でもターミナル内で動作するのと同じように動作します。すべての機能がサポートされています。
+CyxCode works the same via ACP as it does in the terminal. All features are supported:
 
 :::note
-`/undo` や `/redo` などの一部の組み込みスラッシュコマンドは現在サポートされていません。
+Some built-in slash commands like `/undo` and `/redo` are currently unsupported.
 :::
 
-- 組み込みツール (ファイル操作、ターミナルコマンドなど)
-- カスタムツールとスラッシュコマンド
-- OpenCode 設定で構成された MCP サーバー
-- `AGENTS.md` のプロジェクト固有のルール
-- カスタムフォーマッタとリンター
-- エージェントと権限システム
+- Built-in tools (file operations, terminal commands, etc.)
+- Custom tools and slash commands
+- MCP servers configured in your CyxCode config
+- Project-specific rules from `AGENTS.md`
+- Custom formatters and linters
+- Agents and permissions system

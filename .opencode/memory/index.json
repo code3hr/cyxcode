@@ -4,20 +4,33 @@
     {
       "id": "auth-jwt-bcrypt-middleware",
       "file": "auth-jwt-bcrypt-middleware.md",
-      "tags": ["auth", "jwt", "bcrypt", "middleware", "typescript"],
+      "tags": [
+        "auth",
+        "jwt",
+        "bcrypt",
+        "middleware",
+        "typescript"
+      ],
       "summary": "auth.ts uses JWT with bcrypt for password hashing, middleware at line 50",
       "created": "2026-03-26",
-      "accessed": "2026-03-26",
-      "accessCount": 16
+      "accessed": "2026-06-07",
+      "accessCount": 25,
+      "privacy": "never_send"
     },
     {
       "id": "save-project-memory-in-opencode",
       "file": "save-project-memory-in-opencode.md",
-      "tags": ["opencode", "memory", "index.json", "markdown"],
+      "tags": [
+        "opencode",
+        "memory",
+        "index.json",
+        "markdown"
+      ],
       "summary": "User asked to save a concise project memory in `.opencode/memory/`.",
       "created": "2026-05-18",
-      "accessed": "2026-05-18",
-      "accessCount": 0
+      "accessed": "2026-06-07",
+      "accessCount": 17,
+      "privacy": "private"
     }
   ]
 }

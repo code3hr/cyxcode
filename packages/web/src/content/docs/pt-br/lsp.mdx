@@ -1,101 +1,101 @@
 ---
-title: Servidores LSP
-description: O opencode integra-se aos seus servidores LSP.
+title: LSP Servers
+description: CyxCode integrates with your LSP servers.
 ---
 
-O opencode integra-se ao seu Protocolo de Servidor de Linguagem (LSP) para ajudar o LLM a interagir com sua base de código. Ele usa diagnósticos para fornecer feedback ao LLM.
+CyxCode integrates with your Language Server Protocol (LSP) to help the LLM interact with your codebase. It uses diagnostics to provide feedback to the LLM.
 
 ---
 
-## Integrados
+## Built-in
 
-O opencode vem com vários servidores LSP integrados para linguagens populares:
+CyxCode comes with several built-in LSP servers for popular languages:
 
-| Servidor LSP       | Extensões                                                           | Requisitos                                                               |
-| ------------------ | ------------------------------------------------------------------- | ------------------------------------------------------------------------ |
-| astro              | .astro                                                              | Instala automaticamente para projetos Astro                              |
-| bash               | .sh, .bash, .zsh, .ksh                                              | Instala automaticamente bash-language-server                             |
-| clangd             | .c, .cpp, .cc, .cxx, .c++, .h, .hpp, .hh, .hxx, .h++                | Instala automaticamente para projetos C/C++                              |
-| csharp             | .cs                                                                 | `.NET SDK` instalado                                                     |
-| clojure-lsp        | .clj, .cljs, .cljc, .edn                                            | Comando `clojure-lsp` disponível                                         |
-| dart               | .dart                                                               | Comando `dart` disponível                                                |
-| deno               | .ts, .tsx, .js, .jsx, .mjs                                          | Comando `deno` disponível (detecta automaticamente deno.json/deno.jsonc) |
-| elixir-ls          | .ex, .exs                                                           | Comando `elixir` disponível                                              |
-| eslint             | .ts, .tsx, .js, .jsx, .mjs, .cjs, .mts, .cts, .vue                  | Dependência `eslint` no projeto                                          |
-| fsharp             | .fs, .fsi, .fsx, .fsscript                                          | `.NET SDK` instalado                                                     |
-| gleam              | .gleam                                                              | Comando `gleam` disponível                                               |
-| gopls              | .go                                                                 | Comando `go` disponível                                                  |
-| hls                | .hs, .lhs                                                           | Comando `haskell-language-server-wrapper` disponível                     |
-| jdtls              | .java                                                               | `Java SDK (version 21+)` instalado                                       |
-| julials            | .jl                                                                 | `julia` e `LanguageServer.jl` instalados                                 |
-| kotlin-ls          | .kt, .kts                                                           | Instala automaticamente para projetos Kotlin                             |
-| lua-ls             | .lua                                                                | Instala automaticamente para projetos Lua                                |
-| nixd               | .nix                                                                | Comando `nixd` disponível                                                |
-| ocaml-lsp          | .ml, .mli                                                           | Comando `ocamllsp` disponível                                            |
-| oxlint             | .ts, .tsx, .js, .jsx, .mjs, .cjs, .mts, .cts, .vue, .astro, .svelte | Dependência `oxlint` no projeto                                          |
-| php intelephense   | .php                                                                | Instala automaticamente para projetos PHP                                |
-| prisma             | .prisma                                                             | Comando `prisma` disponível                                              |
-| pyright            | .py, .pyi                                                           | Dependência `pyright` instalada                                          |
-| ruby-lsp (rubocop) | .rb, .rake, .gemspec, .ru                                           | Comandos `ruby` e `gem` disponíveis                                      |
-| rust               | .rs                                                                 | Comando `rust-analyzer` disponível                                       |
-| sourcekit-lsp      | .swift, .objc, .objcpp                                              | `swift` instalado (`xcode` no macOS)                                     |
-| svelte             | .svelte                                                             | Instala automaticamente para projetos Svelte                             |
-| terraform          | .tf, .tfvars                                                        | Instala automaticamente a partir de lançamentos do GitHub                |
-| tinymist           | .typ, .typc                                                         | Instala automaticamente a partir de lançamentos do GitHub                |
-| typescript         | .ts, .tsx, .js, .jsx, .mjs, .cjs, .mts, .cts                        | Dependência `typescript` no projeto                                      |
-| vue                | .vue                                                                | Instala automaticamente para projetos Vue                                |
-| yaml-ls            | .yaml, .yml                                                         | Instala automaticamente o servidor yaml-language-server da Red Hat       |
-| zls                | .zig, .zon                                                          | Comando `zig` disponível                                                 |
+| LSP Server         | Extensions                                                          | Requirements                                                 |
+| ------------------ | ------------------------------------------------------------------- | ------------------------------------------------------------ |
+| astro              | .astro                                                              | Auto-installs for Astro projects                             |
+| bash               | .sh, .bash, .zsh, .ksh                                              | Auto-installs bash-language-server                           |
+| clangd             | .c, .cpp, .cc, .cxx, .c++, .h, .hpp, .hh, .hxx, .h++                | Auto-installs for C/C++ projects                             |
+| csharp             | .cs                                                                 | `.NET SDK` installed                                         |
+| clojure-lsp        | .clj, .cljs, .cljc, .edn                                            | `clojure-lsp` command available                              |
+| dart               | .dart                                                               | `dart` command available                                     |
+| deno               | .ts, .tsx, .js, .jsx, .mjs                                          | `deno` command available (auto-detects deno.json/deno.jsonc) |
+| elixir-ls          | .ex, .exs                                                           | `elixir` command available                                   |
+| eslint             | .ts, .tsx, .js, .jsx, .mjs, .cjs, .mts, .cts, .vue                  | `eslint` dependency in project                               |
+| fsharp             | .fs, .fsi, .fsx, .fsscript                                          | `.NET SDK` installed                                         |
+| gleam              | .gleam                                                              | `gleam` command available                                    |
+| gopls              | .go                                                                 | `go` command available                                       |
+| hls                | .hs, .lhs                                                           | `haskell-language-server-wrapper` command available          |
+| jdtls              | .java                                                               | `Java SDK (version 21+)` installed                           |
+| julials            | .jl                                                                 | `julia` and `LanguageServer.jl` installed                    |
+| kotlin-ls          | .kt, .kts                                                           | Auto-installs for Kotlin projects                            |
+| lua-ls             | .lua                                                                | Auto-installs for Lua projects                               |
+| nixd               | .nix                                                                | `nixd` command available                                     |
+| ocaml-lsp          | .ml, .mli                                                           | `ocamllsp` command available                                 |
+| oxlint             | .ts, .tsx, .js, .jsx, .mjs, .cjs, .mts, .cts, .vue, .astro, .svelte | `oxlint` dependency in project                               |
+| php intelephense   | .php                                                                | Auto-installs for PHP projects                               |
+| prisma             | .prisma                                                             | `prisma` command available                                   |
+| pyright            | .py, .pyi                                                           | `pyright` dependency installed                               |
+| ruby-lsp (rubocop) | .rb, .rake, .gemspec, .ru                                           | `ruby` and `gem` commands available                          |
+| rust               | .rs                                                                 | `rust-analyzer` command available                            |
+| sourcekit-lsp      | .swift, .objc, .objcpp                                              | `swift` installed (`xcode` on macOS)                         |
+| svelte             | .svelte                                                             | Auto-installs for Svelte projects                            |
+| terraform          | .tf, .tfvars                                                        | Auto-installs from GitHub releases                           |
+| tinymist           | .typ, .typc                                                         | Auto-installs from GitHub releases                           |
+| typescript         | .ts, .tsx, .js, .jsx, .mjs, .cjs, .mts, .cts                        | `typescript` dependency in project                           |
+| vue                | .vue                                                                | Auto-installs for Vue projects                               |
+| yaml-ls            | .yaml, .yml                                                         | Auto-installs Red Hat yaml-language-server                   |
+| zls                | .zig, .zon                                                          | `zig` command available                                      |
 
-Os servidores LSP são habilitados automaticamente quando uma das extensões de arquivo acima é detectada e os requisitos são atendidos.
+LSP servers are automatically enabled when one of the above file extensions are detected and the requirements are met.
 
 :::note
-Você pode desabilitar os downloads automáticos do servidor LSP definindo a variável de ambiente `OPENCODE_DISABLE_LSP_DOWNLOAD` como `true`.
+You can disable automatic LSP server downloads by setting the `OPENCODE_DISABLE_LSP_DOWNLOAD` environment variable to `true`.
 :::
 
 ---
 
-## Como Funciona
+## How It Works
 
-Quando o opencode abre um arquivo, ele:
+When CyxCode opens a file, it:
 
-1. Verifica a extensão do arquivo em relação a todos os servidores LSP habilitados.
-2. Inicia o servidor LSP apropriado se não estiver em execução.
+1. Checks the file extension against all enabled LSP servers.
+2. Starts the appropriate LSP server if not already running.
 
 ---
 
-## Configuração
+## Configure
 
-Você pode personalizar os servidores LSP através da seção `lsp` na sua configuração do opencode.
+You can customize LSP servers through the `lsp` section in your CyxCode config.
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "lsp": {}
 }
 ```
 
-Cada servidor LSP suporta o seguinte:
+Each LSP server supports the following:
 
-| Propriedade      | Tipo     | Descrição                                                     |
-| ---------------- | -------- | ------------------------------------------------------------- |
-| `disabled`       | boolean  | Defina como `true` para desabilitar o servidor LSP            |
-| `command`        | string[] | O comando para iniciar o servidor LSP                         |
-| `extensions`     | string[] | Extensões de arquivo que este servidor LSP deve manipular     |
-| `env`            | object   | Variáveis de ambiente a serem definidas ao iniciar o servidor |
-| `initialization` | object   | Opções de inicialização a serem enviadas ao servidor LSP      |
+| Property         | Type     | Description                                       |
+| ---------------- | -------- | ------------------------------------------------- |
+| `disabled`       | boolean  | Set this to `true` to disable the LSP server      |
+| `command`        | string[] | The command to start the LSP server               |
+| `extensions`     | string[] | File extensions this LSP server should handle     |
+| `env`            | object   | Environment variables to set when starting server |
+| `initialization` | object   | Initialization options to send to the LSP server  |
 
-Vamos ver alguns exemplos.
+Let's look at some examples.
 
 ---
 
-### Variáveis de ambiente
+### Environment variables
 
-Use a propriedade `env` para definir variáveis de ambiente ao iniciar o servidor LSP:
+Use the `env` property to set environment variables when starting the LSP server:
 
 ```json title="opencode.json" {5-7}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "lsp": {
     "rust": {
       "env": {
@@ -108,13 +108,13 @@ Use a propriedade `env` para definir variáveis de ambiente ao iniciar o servido
 
 ---
 
-### Opções de inicialização
+### Initialization options
 
-Use a propriedade `initialization` para passar opções de inicialização ao servidor LSP. Estas são configurações específicas do servidor enviadas durante a solicitação `initialize` do LSP:
+Use the `initialization` property to pass initialization options to the LSP server. These are server-specific settings sent during the LSP `initialize` request:
 
 ```json title="opencode.json" {5-9}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "lsp": {
     "typescript": {
       "initialization": {
@@ -128,27 +128,27 @@ Use a propriedade `initialization` para passar opções de inicialização ao se
 ```
 
 :::note
-As opções de inicialização variam de acordo com o servidor LSP. Verifique a documentação do seu servidor LSP para opções disponíveis.
+Initialization options vary by LSP server. Check your LSP server's documentation for available options.
 :::
 
 ---
 
-### Desabilitando servidores LSP
+### Disabling LSP servers
 
-Para desabilitar **todos** os servidores LSP globalmente, defina `lsp` como `false`:
+To disable **all** LSP servers globally, set `lsp` to `false`:
 
 ```json title="opencode.json" {3}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "lsp": false
 }
 ```
 
-Para desabilitar um servidor LSP **específico**, defina `disabled` como `true`:
+To disable a **specific** LSP server, set `disabled` to `true`:
 
 ```json title="opencode.json" {5}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "lsp": {
     "typescript": {
       "disabled": true
@@ -159,13 +159,13 @@ Para desabilitar um servidor LSP **específico**, defina `disabled` como `true`:
 
 ---
 
-### Servidores LSP personalizados
+### Custom LSP servers
 
-Você pode adicionar servidores LSP personalizados especificando o comando e as extensões de arquivo:
+You can add custom LSP servers by specifying the command and file extensions:
 
 ```json title="opencode.json" {4-7}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "lsp": {
     "custom-lsp": {
       "command": ["custom-lsp-server", "--stdio"],
@@ -177,13 +177,13 @@ Você pode adicionar servidores LSP personalizados especificando o comando e as 
 
 ---
 
-## Informações Adicionais
+## Additional Information
 
 ### PHP Intelephense
 
-PHP Intelephense oferece recursos premium através de uma chave de licença. Você pode fornecer uma chave de licença colocando (apenas) a chave em um arquivo de texto em:
+PHP Intelephense offers premium features through a license key. You can provide a license key by placing (only) the key in a text file at:
 
-- No macOS/Linux: `$HOME/intelephense/license.txt`
-- No Windows: `%USERPROFILE%/intelephense/license.txt`
+- On macOS/Linux: `$HOME/intelephense/license.txt`
+- On Windows: `%USERPROFILE%/intelephense/license.txt`
 
-O arquivo deve conter apenas a chave de licença sem conteúdo adicional.
+The file should contain only the license key with no additional content.

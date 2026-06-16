@@ -1,15 +1,15 @@
 ---
 title: Biçimlendiriciler
-description: opencode dile özgü biçimlendiriciler kullanır.
+description: CyxCode dile özgü biçimlendiriciler kullanır.
 ---
 
-opencode, dosyaları dile özgü formatlayıcılar kullanılarak yazıldıktan veya düzenlendikten sonra otomatik olarak formatlar. Bu, oluşturulan kodun projenizin kod stillerine uymasını sağlar.
+cyxcode, dosyaları dile özgü formatlayıcılar kullanılarak yazıldıktan veya düzenlendikten sonra otomatik olarak formatlar. Bu, oluşturulan kodun projenizin kod stillerine uymasını sağlar.
 
 ---
 
 ## Yerleşik
 
-opencode, popüler diller ve çerçeveler için çeşitli yerleşik biçimlendiricilerle birlikte gelir. Aşağıda ihtiyaç duyduğu biçimlendiricilerin, desteklenen dosya uzantılarının ve komutların veya yapılandırma seçeneklerinin bir listesi bulunmaktadır.
+cyxcode, popüler diller ve çerçeveler için çeşitli yerleşik biçimlendiricilerle birlikte gelir. Aşağıda ihtiyaç duyduğu biçimlendiricilerin, desteklenen dosya uzantılarının ve komutların veya yapılandırma seçeneklerinin bir listesi bulunmaktadır.
 
 | Biçimlendirici   | Uzantılar                                                                                                    | Gereksinimler                                                                                          |
 | ---------------- | ------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------ |
@@ -45,7 +45,7 @@ Yani eğer projenizin `package.json` dosyasında `prettier` varsa, opencode bunu
 
 ## Nasıl çalışır?
 
-opencode bir dosyayı yazdığında veya düzenlediğinde:
+cyxcode bir dosyayı yazdığında veya düzenlediğinde:
 
 1. Dosya uzantısını tüm etkin formatlayıcılara göre kontrol eder.
 2. Dosyada uygun biçimlendirici komutunu çalıştırır.
@@ -61,7 +61,7 @@ Biçimlendiricileri opencode yapılandırmanızdaki `formatter` bölümü aracı
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "formatter": {}
 }
 ```
@@ -85,7 +85,7 @@ Bazı örneklere bakalım.
 
 ```json title="opencode.json" {3}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "formatter": false
 }
 ```
@@ -94,7 +94,7 @@ Bazı örneklere bakalım.
 
 ```json title="opencode.json" {5}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "formatter": {
     "prettier": {
       "disabled": true
@@ -111,7 +111,7 @@ Komutu, ortam değişkenlerini ve dosya uzantılarını belirterek yerleşik bi�
 
 ```json title="opencode.json" {4-14}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "formatter": {
     "prettier": {
       "command": ["npx", "prettier", "--write", "$FILE"],

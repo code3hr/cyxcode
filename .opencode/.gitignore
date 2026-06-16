@@ -6,3 +6,6 @@ bun.lock
 package-lock.json
 recall.db*
 cyxwatch/
+cyxcode-learned.json
+cyxcode-stats.json
+wiki/index.json

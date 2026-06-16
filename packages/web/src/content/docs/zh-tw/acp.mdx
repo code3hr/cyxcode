@@ -1,46 +1,46 @@
 ---
-title: ACP 支援
-description: 在任何相容 ACP 的編輯器中使用 OpenCode。
+title: ACP Support
+description: Use CyxCode in any ACP-compatible editor.
 ---
 
-OpenCode 支援 [Agent Client Protocol](https://agentclientprotocol.com)（ACP），允許你直接在相容的編輯器和 IDE 中使用它。
+CyxCode supports the [Agent Client Protocol](https://agentclientprotocol.com) or (ACP), allowing you to use it directly in compatible editors and IDEs.
 
 :::tip
-有關支援 ACP 的編輯器和工具列表，請查看 [ACP 進展報告](https://zed.dev/blog/acp-progress-report#available-now)。
+For a list of editors and tools that support ACP, check out the [ACP progress report](https://zed.dev/blog/acp-progress-report#available-now).
 :::
 
-ACP 是一個開放協議，用於標準化程式碼編輯器與 AI 編碼代理之間的通訊。
+ACP is an open protocol that standardizes communication between code editors and AI coding agents.
 
 ---
 
-## 設定
+## Configure
 
-要透過 ACP 使用 OpenCode，請在編輯器中設定執行 `opencode acp` 命令。
+To use CyxCode via ACP, configure your editor to run the `cyxcode acp` command.
 
-該命令會將 OpenCode 作為相容 ACP 的子程序啟動，透過 stdio 上的 JSON-RPC 與編輯器進行通訊。
+The command starts CyxCode as an ACP-compatible subprocess that communicates with your editor over JSON-RPC via stdio.
 
-以下是支援 ACP 的常用編輯器的設定範例。
+Below are examples for popular editors that support ACP.
 
 ---
 
 ### Zed
 
-新增到你的 [Zed](https://zed.dev) 設定檔（`~/.config/zed/settings.json`）中：
+Add to your [Zed](https://zed.dev) configuration (`~/.config/zed/settings.json`):
 
 ```json title="~/.config/zed/settings.json"
 {
   "agent_servers": {
-    "OpenCode": {
-      "command": "opencode",
+    "CyxCode": {
+      "command": "cyxcode",
       "args": ["acp"]
     }
   }
 }
 ```
 
-開啟方式：在**命令面板**中執行 `agent: new thread` 操作。
+To open it, use the `agent: new thread` action in the **Command Palette**.
 
-你也可以透過編輯 `keymap.json` 來繫結鍵盤快速鍵：
+You can also bind a keyboard shortcut by editing your `keymap.json`:
 
 ```json title="keymap.json"
 [
@@ -51,9 +51,9 @@ ACP 是一個開放協議，用於標準化程式碼編輯器與 AI 編碼代理
         {
           "agent": {
             "custom": {
-              "name": "OpenCode",
+              "name": "CyxCode",
               "command": {
-                "command": "opencode",
+                "command": "cyxcode",
                 "args": ["acp"]
               }
             }
@@ -69,45 +69,45 @@ ACP 是一個開放協議，用於標準化程式碼編輯器與 AI 編碼代理
 
 ### JetBrains IDEs
 
-根據[文件](https://www.jetbrains.com/help/ai-assistant/acp.html)，將以下內容新增到你的 [JetBrains IDE](https://www.jetbrains.com/) 的 acp.json 中：
+Add to your [JetBrains IDE](https://www.jetbrains.com/) acp.json according to the [documentation](https://www.jetbrains.com/help/ai-assistant/acp.html):
 
 ```json title="acp.json"
 {
   "agent_servers": {
-    "OpenCode": {
-      "command": "/absolute/path/bin/opencode",
+    "CyxCode": {
+      "command": "/absolute/path/bin/cyxcode",
       "args": ["acp"]
     }
   }
 }
 ```
 
-開啟方式：在 AI Chat 代理選擇器中選擇新的 'OpenCode' 代理。
+To open it, use the new 'CyxCode' agent in the AI Chat agent selector.
 
 ---
 
 ### Avante.nvim
 
-新增到你的 [Avante.nvim](https://github.com/yetone/avante.nvim) 設定中：
+Add to your [Avante.nvim](https://github.com/yetone/avante.nvim) configuration:
 
 ```lua
 {
   acp_providers = {
-    ["opencode"] = {
-      command = "opencode",
+    ["cyxcode"] = {
+      command = "cyxcode",
       args = { "acp" }
     }
   }
 }
 ```
 
-如果需要傳遞環境變數：
+If you need to pass environment variables:
 
 ```lua {6-8}
 {
   acp_providers = {
-    ["opencode"] = {
-      command = "opencode",
+    ["cyxcode"] = {
+      command = "cyxcode",
       args = { "acp" },
       env = {
         OPENCODE_API_KEY = os.getenv("OPENCODE_API_KEY")
@@ -121,14 +121,14 @@ ACP 是一個開放協議，用於標準化程式碼編輯器與 AI 編碼代理
 
 ### CodeCompanion.nvim
 
-要在 [CodeCompanion.nvim](https://github.com/olimorris/codecompanion.nvim) 中將 OpenCode 用作 ACP 代理，請將以下內容新增到你的 Neovim 設定中：
+To use CyxCode as an ACP agent in [CodeCompanion.nvim](https://github.com/olimorris/codecompanion.nvim), add the following to your Neovim config:
 
 ```lua
 require("codecompanion").setup({
   interactions = {
     chat = {
       adapter = {
-        name = "opencode",
+        name = "cyxcode",
         model = "claude-sonnet-4",
       },
     },
@@ -136,21 +136,21 @@ require("codecompanion").setup({
 })
 ```
 
-此設定將 CodeCompanion 設為使用 OpenCode 作為聊天的 ACP 代理。
+This config sets up CodeCompanion to use CyxCode as the ACP agent for chat.
 
-如果需要傳遞環境變數（如 `OPENCODE_API_KEY`），請參閱 CodeCompanion.nvim 文件中的[設定適配器：環境變數](https://codecompanion.olimorris.dev/getting-started#setting-an-api-key)了解詳細資訊。
+If you need to pass environment variables (like `OPENCODE_API_KEY`), refer to [Configuring Adapters: Environment Variables](https://codecompanion.olimorris.dev/getting-started#setting-an-api-key) in the CodeCompanion.nvim documentation for full details.
 
-## 支援
+## Support
 
-OpenCode 透過 ACP 使用時與在終端機中使用的效果完全一致。所有功能均受支援：
+CyxCode works the same via ACP as it does in the terminal. All features are supported:
 
 :::note
-部分內建斜線命令（如 `/undo` 和 `/redo`）目前暫不支援。
+Some built-in slash commands like `/undo` and `/redo` are currently unsupported.
 :::
 
-- 內建工具（檔案操作、終端機命令等）
-- 自訂工具和斜線命令
-- 在 OpenCode 設定中設定的 MCP 伺服器
-- 來自 `AGENTS.md` 的專案級規則
-- 自訂格式化工具和程式碼檢查工具
-- 代理和權限系統
+- Built-in tools (file operations, terminal commands, etc.)
+- Custom tools and slash commands
+- MCP servers configured in your CyxCode config
+- Project-specific rules from `AGENTS.md`
+- Custom formatters and linters
+- Agents and permissions system

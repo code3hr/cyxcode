@@ -1,66 +1,66 @@
 ---
-title: โหมด
-description: โหมดที่แตกต่างกันสำหรับกรณีการใช้งานที่แตกต่างกัน
+title: Modes
+description: Different modes for different use cases.
 ---
 
 :::caution
-ขณะนี้โหมดได้รับการกำหนดค่าผ่านตัวเลือก `agent` ในการกำหนดค่า opencode ที่
-ตัวเลือก `mode` เลิกใช้แล้ว [เรียนรู้เพิ่มเติม](/docs/agents)
+Modes are now configured through the `agent` option in the CyxCode config. The
+`mode` option is now deprecated. [Learn more](/docs/agents).
 :::
 
-โหมดใน opencode ช่วยให้คุณปรับแต่งพฤติกรรม เครื่องมือ และพร้อมท์สำหรับกรณีการใช้งานที่แตกต่างกันได้
+Modes in CyxCode allow you to customize the behavior, tools, and prompts for different use cases.
 
-มาพร้อมกับโหมดในตัวสองโหมด: **สร้าง** และ **วางแผน** คุณสามารถปรับแต่งได้
-สิ่งเหล่านี้หรือกำหนดค่าของคุณเองผ่านการกำหนดค่า opencode
+It comes with two built-in modes: **build** and **plan**. You can customize
+these or configure your own through the CyxCode config.
 
-คุณสามารถสลับระหว่างโหมดระหว่างเซสชันหรือกำหนดค่าในไฟล์กำหนดค่าของคุณ
+You can switch between modes during a session or configure them in your config file.
 
 ---
 
-## บิวท์อิน
+## Built-in
 
-opencode มาพร้อมกับโหมดในตัวสองโหมด
+CyxCode comes with two built-in modes.
 
 ---
 
 ### Build
 
-Build เป็นโหมด **ค่าเริ่มต้น** โดยที่เครื่องมือทั้งหมดเปิดใช้งานอยู่ นี่คือโหมดมาตรฐานสำหรับงานพัฒนาที่คุณต้องการสิทธิ์เข้าถึงการทำงานของไฟล์และคำสั่งระบบโดยสมบูรณ์
+Build is the **default** mode with all tools enabled. This is the standard mode for development work where you need full access to file operations and system commands.
 
 ---
 
 ### Plan
 
-โหมดจำกัดที่ออกแบบมาเพื่อการวางแผนและการวิเคราะห์ ในโหมดแผน เครื่องมือต่อไปนี้จะถูกปิดใช้งานตามค่าเริ่มต้น:
+A restricted mode designed for planning and analysis. In plan mode, the following tools are disabled by default:
 
-- `write` - ​​ไม่สามารถสร้างไฟล์ใหม่ได้
-- `edit` - ​​ไม่สามารถแก้ไขไฟล์ที่มีอยู่ได้ ยกเว้นไฟล์ที่อยู่ใน `.opencode/plans/*.md` เพื่อดูรายละเอียดแผนงาน
-- `patch` - ​​ไม่สามารถใช้แพตช์ได้
-- `bash` - ​​ไม่สามารถรันคำสั่ง shell ได้
+- `write` - Cannot create new files
+- `edit` - Cannot modify existing files, except for files located at `.opencode/plans/*.md` to detail the plan itself
+- `patch` - Cannot apply patches
+- `bash` - Cannot execute shell commands
 
-โหมดนี้มีประโยชน์เมื่อคุณต้องการให้ AI วิเคราะห์โค้ด แนะนำการเปลี่ยนแปลง หรือสร้างแผนโดยไม่ต้องทำการแก้ไขโค้ดเบสของคุณจริง ๆ
-
----
-
-## การสลับ
-
-คุณสามารถสลับระหว่างโหมดระหว่างเซสชันได้โดยใช้ปุ่ม _Tab_ หรือการเชื่อมโยงคีย์ `switch_mode` ที่คุณกำหนดค่าไว้
-
-ดูเพิ่มเติมที่: [Formatters](/docs/formatters) สำหรับข้อมูลเกี่ยวกับการกำหนดค่าการจัดรูปแบบโค้ด
+This mode is useful when you want the AI to analyze code, suggest changes, or create plans without making any actual modifications to your codebase.
 
 ---
 
-## กำหนดค่า
+## Switching
 
-คุณสามารถปรับแต่งโหมดในตัวหรือสร้างโหมดของคุณเองผ่านการกำหนดค่าได้ โหมดสามารถกำหนดค่าได้สองวิธี:
+You can switch between modes during a session using the _Tab_ key. Or your configured `switch_mode` keybind.
 
-### การกำหนดค่าด้วย JSON
+See also: [Formatters](/docs/formatters) for information about code formatting configuration.
 
-กำหนดค่าโหมดในไฟล์กำหนดค่า `opencode.json` ของคุณ:
+---
+
+## Configure
+
+You can customize the built-in modes or create your own through configuration. Modes can be configured in two ways:
+
+### JSON Configuration
+
+Configure modes in your `opencode.json` config file:
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "mode": {
     "build": {
       "model": "anthropic/claude-sonnet-4-20250514",
@@ -83,12 +83,12 @@ Build เป็นโหมด **ค่าเริ่มต้น** โดย�
 }
 ```
 
-### การกำหนดค่า Markdown
+### Markdown Configuration
 
-คุณยังสามารถกำหนดโหมดโดยใช้ไฟล์ Markdown ได้ วางไว้ใน:
+You can also define modes using markdown files. Place them in:
 
-- ทั่วโลก: `~/.config/opencode/modes/`
-- โครงการ: `.opencode/modes/`
+- Global: `~/.config/opencode/modes/`
+- Project: `.opencode/modes/`
 
 ```markdown title="~/.config/opencode/modes/review.md"
 ---
@@ -110,15 +110,15 @@ You are in code review mode. Focus on:
 Provide constructive feedback without making direct changes.
 ```
 
-ชื่อไฟล์ Markdown จะกลายเป็นชื่อโหมด (เช่น `review.md` สร้างโหมด `review`)
+The markdown file name becomes the mode name (e.g., `review.md` creates a `review` mode).
 
-มาดูรายละเอียดตัวเลือกการกำหนดค่าเหล่านี้กัน
+Let's look at these configuration options in detail.
 
 ---
 
-### Model (โมเดล)
+### Model
 
-ใช้การกำหนดค่า `model` เพื่อแทนที่โมเดลเริ่มต้นสำหรับโหมดนี้ มีประโยชน์สำหรับการใช้โมเดลที่แตกต่างกันซึ่งปรับให้เหมาะกับงานที่แตกต่างกัน ตัวอย่างเช่น โมเดลสำหรับการวางแผนที่เร็วขึ้น โมเดลที่มีความสามารถมากขึ้นสำหรับการนำไปปฏิบัติ
+Use the `model` config to override the default model for this mode. Useful for using different models optimized for different tasks. For example, a faster model for planning, a more capable model for implementation.
 
 ```json title="opencode.json"
 {
@@ -132,9 +132,9 @@ Provide constructive feedback without making direct changes.
 
 ---
 
-### Temperature (อุณหภูมิ)
+### Temperature
 
-ควบคุมการสุ่มและความคิดสร้างสรรค์ของการตอบสนองของ AI ด้วยการกำหนดค่า `temperature` ค่าที่ต่ำกว่าจะทำให้คำตอบมีจุดมุ่งหมายและกำหนดได้มากขึ้น ในขณะที่ค่าที่สูงกว่าจะเพิ่มความคิดสร้างสรรค์และความแปรปรวน
+Control the randomness and creativity of the AI's responses with the `temperature` config. Lower values make responses more focused and deterministic, while higher values increase creativity and variability.
 
 ```json title="opencode.json"
 {
@@ -149,11 +149,11 @@ Provide constructive feedback without making direct changes.
 }
 ```
 
-โดยทั่วไปค่าอุณหภูมิจะอยู่ในช่วงตั้งแต่ 0.0 ถึง 1.0:
+Temperature values typically range from 0.0 to 1.0:
 
-- **0.0-0.2**: การตอบสนองที่มุ่งเน้นและกำหนดไว้อย่างมาก เหมาะสำหรับการวิเคราะห์และวางแผนโค้ด
-- **0.3-0.5**: การตอบสนองที่สมดุลและความคิดสร้างสรรค์บางส่วน เหมาะสำหรับงานพัฒนาทั่วไป
-- **0.6-1.0**: คำตอบที่สร้างสรรค์และหลากหลายยิ่งขึ้น ซึ่งมีประโยชน์สำหรับการระดมความคิดและการสำรวจ
+- **0.0-0.2**: Very focused and deterministic responses, ideal for code analysis and planning
+- **0.3-0.5**: Balanced responses with some creativity, good for general development tasks
+- **0.6-1.0**: More creative and varied responses, useful for brainstorming and exploration
 
 ```json title="opencode.json"
 {
@@ -173,13 +173,13 @@ Provide constructive feedback without making direct changes.
 }
 ```
 
-หากไม่มีการระบุอุณหภูมิ opencode จะใช้ค่าเริ่มต้นเฉพาะรุ่น (โดยทั่วไปจะเป็น 0 สำหรับรุ่นส่วนใหญ่ และ 0.55 สำหรับรุ่น Qwen)
+If no temperature is specified, CyxCode uses model-specific defaults (typically 0 for most models, 0.55 for Qwen models).
 
 ---
 
-### พรอมต์
+### Prompt
 
-ระบุไฟล์พรอมต์ระบบที่กำหนดเองสำหรับโหมดนี้ด้วยการกำหนดค่า `prompt` ไฟล์พร้อมท์ควรมีคำแนะนำเฉพาะสำหรับวัตถุประสงค์ของโหมด
+Specify a custom system prompt file for this mode with the `prompt` config. The prompt file should contain instructions specific to the mode's purpose.
 
 ```json title="opencode.json"
 {
@@ -191,14 +191,14 @@ Provide constructive feedback without making direct changes.
 }
 ```
 
-เส้นทางนี้สัมพันธ์กับตำแหน่งของไฟล์กำหนดค่า ดังนั้นสิ่งนี้จึงใช้ได้กับ
-ทั้งการกำหนดค่า opencode ส่วนกลางและการกำหนดค่าเฉพาะโครงการ
+This path is relative to where the config file is located. So this works for
+both the global CyxCode config and the project specific config.
 
 ---
 
-### เครื่องมือ
+### Tools
 
-ควบคุมว่าเครื่องมือใดบ้างที่พร้อมใช้งานในโหมดนี้ด้วยการกำหนดค่า `tools` คุณสามารถเปิดหรือปิดใช้งานเครื่องมือเฉพาะได้โดยตั้งค่าเป็น `true` หรือ `false`
+Control which tools are available in this mode with the `tools` config. You can enable or disable specific tools by setting them to `true` or `false`.
 
 ```json
 {
@@ -217,39 +217,39 @@ Provide constructive feedback without making direct changes.
 }
 ```
 
-หากไม่มีการระบุเครื่องมือ เครื่องมือทั้งหมดจะถูกเปิดใช้งานตามค่าเริ่มต้น
+If no tools are specified, all tools are enabled by default.
 
 ---
 
-#### เครื่องมือที่มีอยู่
+#### Available tools
 
-นี่คือเครื่องมือทั้งหมดที่สามารถควบคุมได้ผ่านการกำหนดค่าโหมด
+Here are all the tools can be controlled through the mode config.
 
-| เครื่องมือ  | คำอธิบาย                    |
-| ----------- | --------------------------- |
-| `bash`      | ดำเนินการคำสั่ง shell       |
-| `edit`      | แก้ไขไฟล์ที่มีอยู่          |
-| `write`     | สร้างไฟล์ใหม่               |
-| `read`      | อ่านเนื้อหาไฟล์             |
-| `grep`      | ค้นหาเนื้อหาไฟล์            |
-| `glob`      | ค้นหาไฟล์ตามรูปแบบ          |
-| `list`      | แสดงรายการเนื้อหาไดเร็กทอรี |
-| `patch`     | ใช้แพทช์กับไฟล์             |
-| `todowrite` | จัดการรายการสิ่งที่ต้องทำ   |
-| `todoread`  | อ่านรายการสิ่งที่ต้องทำ     |
-| `webfetch`  | ดึงเนื้อหาเว็บ              |
+| Tool        | Description             |
+| ----------- | ----------------------- |
+| `bash`      | Execute shell commands  |
+| `edit`      | Modify existing files   |
+| `write`     | Create new files        |
+| `read`      | Read file contents      |
+| `grep`      | Search file contents    |
+| `glob`      | Find files by pattern   |
+| `list`      | List directory contents |
+| `patch`     | Apply patches to files  |
+| `todowrite` | Manage todo lists       |
+| `todoread`  | Read todo lists         |
+| `webfetch`  | Fetch web content       |
 
 ---
 
-## โหมดกำหนดเอง
+## Custom modes
 
-คุณสามารถสร้างโหมดที่คุณกำหนดเองได้โดยเพิ่มเข้าไปในการกำหนดค่า นี่คือตัวอย่างที่ใช้ทั้งสองวิธี:
+You can create your own custom modes by adding them to the configuration. Here are examples using both approaches:
 
-### ใช้การกำหนดค่า JSON
+### Using JSON configuration
 
 ```json title="opencode.json" {4-14}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "mode": {
     "docs": {
       "prompt": "{file:./prompts/documentation.txt}",
@@ -266,9 +266,9 @@ Provide constructive feedback without making direct changes.
 }
 ```
 
-### การใช้ไฟล์ Markdown
+### Using markdown files
 
-สร้างไฟล์โหมดใน `.opencode/modes/` สำหรับโหมดเฉพาะโครงการหรือ `~/.config/opencode/modes/` สำหรับโหมดทั่วโลก:
+Create mode files in `.opencode/modes/` for project-specific modes or `~/.config/opencode/modes/` for global modes:
 
 ```markdown title=".opencode/modes/debug.md"
 ---
@@ -318,14 +318,14 @@ Priorities:
 
 ---
 
-### กรณีการใช้งาน
+### Use cases
 
-ต่อไปนี้เป็นกรณีการใช้งานทั่วไปสำหรับโหมดต่างๆ
+Here are some common use cases for different modes.
 
-- **Build mode**: งานพัฒนาเต็มรูปแบบโดยเปิดใช้งานเครื่องมือทั้งหมด
-- **Plan mode**: วิเคราะห์และวางแผนโดยไม่ทำการเปลี่ยนแปลง
-- **Review mode**: การตรวจสอบโค้ดพร้อมการเข้าถึงแบบอ่านอย่างเดียวพร้อมเครื่องมือเอกสารประกอบ
-- **Debug mode**: มุ่งเน้นไปที่การตรวจสอบโดยเปิดใช้งานเครื่องมือ bash และอ่าน
-- **Docs mode**: การเขียนเอกสารด้วยการทำงานของไฟล์ แต่ไม่มีคำสั่งระบบ
+- **Build mode**: Full development work with all tools enabled
+- **Plan mode**: Analysis and planning without making changes
+- **Review mode**: Code review with read-only access plus documentation tools
+- **Debug mode**: Focused on investigation with bash and read tools enabled
+- **Docs mode**: Documentation writing with file operations but no system commands
 
-คุณอาจพบว่ารุ่นต่างๆ นั้นดีสำหรับกรณีการใช้งานที่แตกต่างกัน
+You might also find different models are good for different use cases.

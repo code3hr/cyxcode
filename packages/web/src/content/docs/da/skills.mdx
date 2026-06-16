@@ -1,62 +1,62 @@
 ---
-title: "Agentfærdigheder"
-description: "Definer gjenbrugbar atferd via SKILL.md-definisjoner"
+title: "Agent Skills"
+description: "Define reusable behavior via SKILL.md definitions"
 ---
 
-Agentferdigheter lar OpenCode oppdage gjenbrugbare instruksjoner fra repo- eller hjemmekatalogen din.
-Ferdigheter lastes inn på forespørsel via det opprinnelige `skill`-verktøyet – agenter ser tilgængelige ferdigheter og kan laste inn hele innholdet når det er nødvendig.
-
----
-
-## Placer filer
-
-Opret én mappe per ferdighetsnavn og tilføj inn en `SKILL.md` i den.
-OpenCode søker etter disse stedene:
-
-- Prosjektkonfigurasjon: `.opencode/skills/<name>/SKILL.md`
-- Global konfigurasjon: `~/.config/opencode/skills/<name>/SKILL.md`
-- Prosjekt Claude-kompatibel: `.claude/skills/<name>/SKILL.md`
-- Global Claude-kompatibel: `~/.claude/skills/<name>/SKILL.md`
-- Prosjektagent-kompatibel: `.agents/skills/<name>/SKILL.md`
-- Global agent-kompatibel: `~/.agents/skills/<name>/SKILL.md`
+Agent skills let CyxCode discover reusable instructions from your repo or home directory.
+Skills are loaded on-demand via the native `skill` tool—agents see available skills and can load the full content when needed.
 
 ---
 
-## Forstå opdagelsen
+## Place files
 
-For prosjektlokale stier går OpenCode opp fra din nåværende arbejdskatalog til den når git-arbeidstreet.
-Den laster alle matchende `skills/*/SKILL.md` i `.opencode/` og alle matchende `.claude/skills/*/SKILL.md` eller `.agents/skills/*/SKILL.md` underveis.
+Create one folder per skill name and put a `SKILL.md` inside it.
+cyxcode searches these locations:
 
-Globale definisjoner lastes også inn fra `~/.config/opencode/skills/*/SKILL.md`, `~/.claude/skills/*/SKILL.md` og `~/.agents/skills/*/SKILL.md`.
-
----
-
-## Skriv frontmatter
-
-Hver `SKILL.md` må starte med YAML frontmatter.
-Bare disse feltene gjenkjennes:
-
-- `name` (påkrevd)
-- `description` (påkrevd)
-- `license` (valgfritt)
-- `compatibility` (valgfritt)
-- `metadata` (valgfritt, streng-til-streng kart)
-
-Ukjente frontmatter-felter ignoreres.
+- Project config: `.opencode/skills/<name>/SKILL.md`
+- Global config: `~/.config/opencode/skills/<name>/SKILL.md`
+- Project Claude-compatible: `.claude/skills/<name>/SKILL.md`
+- Global Claude-compatible: `~/.claude/skills/<name>/SKILL.md`
+- Project agent-compatible: `.agents/skills/<name>/SKILL.md`
+- Global agent-compatible: `~/.agents/skills/<name>/SKILL.md`
 
 ---
 
-## Bekræft navn
+## Understand discovery
 
-`name` må:
+For project-local paths, CyxCode walks up from your current working directory until it reaches the git worktree.
+It loads any matching `skills/*/SKILL.md` in `.opencode/` and any matching `.claude/skills/*/SKILL.md` or `.agents/skills/*/SKILL.md` along the way.
 
-- Bestå av 1–64 tegn
-- Vær alfanumerisk med små bokstaver med skilletegn med enkelt bindestrek
-- Ikke begynne eller slutte med `-`
-- Ikke inneholde påfølgende `--`
-- Match katalognavnet som inneholder `SKILL.md`
+Global definitions are also loaded from `~/.config/opencode/skills/*/SKILL.md`, `~/.claude/skills/*/SKILL.md`, and `~/.agents/skills/*/SKILL.md`.
 
-Ekvivalent regulært uttrykk:
+---
+
+## Write frontmatter
+
+Each `SKILL.md` must start with YAML frontmatter.
+Only these fields are recognized:
+
+- `name` (required)
+- `description` (required)
+- `license` (optional)
+- `compatibility` (optional)
+- `metadata` (optional, string-to-string map)
+
+Unknown frontmatter fields are ignored.
+
+---
+
+## Validate names
+
+`name` must:
+
+- Be 1–64 characters
+- Be lowercase alphanumeric with single hyphen separators
+- Not start or end with `-`
+- Not contain consecutive `--`
+- Match the directory name that contains `SKILL.md`
+
+Equivalent regex:
 
 ```text
 ^[a-z0-9]+(-[a-z0-9]+)*$
@@ -64,23 +64,23 @@ Ekvivalent regulært uttrykk:
 
 ---
 
-## Følg længdereglerne
+## Follow length rules
 
-`description` må bestå av 1-1024 tegn.
-Hold det spesifikt nok til at agenten kan velge riktig.
+`description` must be 1-1024 characters.
+Keep it specific enough for the agent to choose correctly.
 
 ---
 
-## Brug et eksempel
+## Use an example
 
-Lag `.opencode/skills/git-release/SKILL.md` slik:
+Create `.opencode/skills/git-release/SKILL.md` like this:
 
 ```markdown
 ---
 name: git-release
 description: Create consistent releases and changelogs
 license: MIT
-compatibility: opencode
+compatibility: CyxCode
 metadata:
   audience: maintainers
   workflow: github
@@ -100,10 +100,10 @@ Ask clarifying questions if the target versioning scheme is unclear.
 
 ---
 
-## Genkend værktøjsbeskrivelsen
+## Recognize tool description
 
-OpenCode viser tilgængelige ferdigheter i `skill` verktøybeskrivelsen.
-Hver oppføring inneholder ferdighetsnavnet og beskrivelsen:
+cyxcode lists available skills in the `skill` tool description.
+Each entry includes the skill name and description:
 
 ```xml
 <available_skills>
@@ -114,7 +114,7 @@ Hver oppføring inneholder ferdighetsnavnet og beskrivelsen:
 </available_skills>
 ```
 
-Agenten laster inn en ferdighet ved at kalle verktøyet:
+The agent loads a skill by calling the tool:
 
 ```
 skill({ name: "git-release" })
@@ -122,9 +122,9 @@ skill({ name: "git-release" })
 
 ---
 
-## Konfigurer tilladelser
+## Configure permissions
 
-Kontroller hvilke ferdigheter agenter har tilgang til ved at bruge mønsterbaserte tillatelser i `opencode.json`:
+Control which skills agents can access using pattern-based permissions in `opencode.json`:
 
 ```json
 {
@@ -139,21 +139,21 @@ Kontroller hvilke ferdigheter agenter har tilgang til ved at bruge mønsterbaser
 }
 ```
 
-| Tillatelse | Atferd                                     |
-| ---------- | ------------------------------------------ |
-| `allow`    | Ferdigheter lastes umiddelbart             |
-| `deny`     | Ferdighet skjult for agent, tilgang avvist |
-| `ask`      | Bruger bedt om godkjenning før lasting     |
+| Permission | Behavior                                  |
+| ---------- | ----------------------------------------- |
+| `allow`    | Skill loads immediately                   |
+| `deny`     | Skill hidden from agent, access rejected  |
+| `ask`      | User prompted for approval before loading |
 
-Mønstre støtter jokertegn: `internal-*` samsvarer med `internal-docs`, `internal-tools` osv.
+Patterns support wildcards: `internal-*` matches `internal-docs`, `internal-tools`, etc.
 
 ---
 
-## Tilsidesættelse pr. agent
+## Override per agent
 
-Gi spesifikke agenter andre tillatelser enn de globale standardinnstillingene.
+Give specific agents different permissions than the global defaults.
 
-**For egendefinerte agenter** (i agent frontmatter):
+**For custom agents** (in agent frontmatter):
 
 ```yaml
 ---
@@ -163,7 +163,7 @@ permission:
 ---
 ```
 
-**For innebygde agenter** (i `opencode.json`):
+**For built-in agents** (in `opencode.json`):
 
 ```json
 {
@@ -181,11 +181,11 @@ permission:
 
 ---
 
-## Deaktiver færdighedsværktøjet
+## Disable the skill tool
 
-Deaktiver ferdigheter fullstendig for agenter som ikke bør bruge dem:
+Completely disable skills for agents that shouldn't use them:
 
-**For egendefinerte agenter**:
+**For custom agents**:
 
 ```yaml
 ---
@@ -194,7 +194,7 @@ tools:
 ---
 ```
 
-**For innebygde agenter**:
+**For built-in agents**:
 
 ```json
 {
@@ -208,15 +208,15 @@ tools:
 }
 ```
 
-Når den er deaktivert, blir `<available_skills>`-delen utelatt helt.
+When disabled, the `<available_skills>` section is omitted entirely.
 
 ---
 
-## Fejlfind indlæsning
+## Troubleshoot loading
 
-Hvis en ferdighet ikke vises:
+If a skill does not show up:
 
-1. Kontroller at `SKILL.md` er stavet med store bokstaver
-2. Tjek at frontmatter inkluderer `name` og `description`
-3. Sørg for at ferdighetsnavnene er unike på alle steder
-4. Tjek tillatelser – ferdigheter med `deny` er skjult for agenter
+1. Verify `SKILL.md` is spelled in all caps
+2. Check that frontmatter includes `name` and `description`
+3. Ensure skill names are unique across all locations
+4. Check permissions—skills with `deny` are hidden from agents

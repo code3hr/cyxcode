@@ -1,145 +1,149 @@
 ---
-title: 代理
-description: 設定和使用專門的代理。
+title: Agents
+description: Configure and use specialized agents.
 ---
 
-代理是專門的 AI 助手，可以針對特定任務和工作流程進行設定。它們允許您建立具有自訂提示詞、模型和工具存取權限的專用工具。
+Agents are specialized AI assistants that can be configured for specific tasks and workflows. They allow you to create focused tools with custom prompts, models, and tool access.
 
 :::tip
-使用 Plan 代理來分析程式碼和審查建議，而不會進行任何程式碼變更。
+Use the plan agent to analyze code and review suggestions without making any code changes.
 :::
 
-您可以在工作階段期間切換代理，或使用 `@` 提及來呼叫它們。
+You can switch between agents during a session or invoke them with the `@` mention.
 
 ---
 
-## 類型
+## Types
 
-OpenCode 中有兩種類型的代理：主代理和子代理。
+There are two types of agents in CyxCode; primary agents and subagents.
 
 ---
 
-### 主代理
+### Primary agents
 
-主代理是您直接互動的主要助手。您可以使用 **Tab** 鍵或設定的 `switch_agent` 快速鍵來循環切換它們。這些代理處理您的主要對話。工具存取透過權限進行設定——例如，Build 啟用了所有工具，而 Plan 則受到限制。
+Primary agents are the main assistants you interact with directly. You can cycle through them using the **Tab** key, or your configured `switch_agent` keybind. These agents handle your main conversation. Tool access is configured via permissions — for example, Build has all tools enabled while Plan is restricted.
 
 :::tip
-您可以在工作階段期間使用 **Tab** 鍵在主代理之間切換。
+You can use the **Tab** key to switch between primary agents during a session.
 :::
 
-OpenCode 內建了兩個主代理：**Build** 和 **Plan**。我們將在下面介紹它們。
+CyxCode comes with two built-in primary agents, **Build** and **Plan**. We'll
+look at these below.
 
 ---
 
-### 子代理
+### Subagents
 
-子代理是主代理可以呼叫來執行特定任務的專業助手。您也可以透過在訊息中 **@ 提及**它們來手動呼叫。
+Subagents are specialized assistants that primary agents can invoke for specific tasks. You can also manually invoke them by **@ mentioning** them in your messages.
 
-OpenCode 內建了兩個子代理：**General** 和 **Explore**。我們將在下面介紹它們。
-
----
-
-## 內建代理
-
-OpenCode 內建了兩個主代理和兩個子代理。
+CyxCode comes with two built-in subagents, **General** and **Explore**. We'll look at this below.
 
 ---
 
-### 使用 Build
+## Built-in
 
-_模式_：`primary`
-
-Build 是啟用了所有工具的**預設**主代理。這是用於需要完全存取檔案操作和系統命令的開發工作的標準代理。
+CyxCode comes with two built-in primary agents and two built-in subagents.
 
 ---
 
-### 使用 Plan
+### Use build
 
-_模式_：`primary`
+_Mode_: `primary`
 
-一個專為規劃和分析設計的受限代理。我們使用權限系統來為您提供更多控制權，並防止意外變更。
-預設情況下，以下所有項均設為 `ask`：
-
-- `file edits`：所有寫入、補丁和編輯
-- `bash`：所有 bash 命令
-
-當您希望 LLM 分析程式碼、建議變更或建立計畫，而不對程式碼庫進行任何實際修改時，此代理非常有用。
+Build is the **default** primary agent with all tools enabled. This is the standard agent for development work where you need full access to file operations and system commands.
 
 ---
 
-### 使用 General
+### Use plan
 
-_模式_：`subagent`
+_Mode_: `primary`
 
-一個用於研究複雜問題和執行多步驟任務的通用代理。擁有完整的工具存取權限（todo 除外），因此可以在需要時修改檔案。可用於並行執行多個工作單元。
+A restricted agent designed for planning and analysis. We use a permission system to give you more control and prevent unintended changes.
+By default, all of the following are set to `ask`:
 
----
+- `file edits`: All writes, patches, and edits
+- `bash`: All bash commands
 
-### 使用 Explore
-
-_模式_：`subagent`
-
-一個用於探索程式碼庫的快速唯讀代理。無法修改檔案。當您需要按模式快速查找檔案、搜尋程式碼中的關鍵字或回答有關程式碼庫的問題時，請使用此代理。
+This agent is useful when you want the LLM to analyze code, suggest changes, or create plans without making any actual modifications to your codebase.
 
 ---
 
-### 使用 Compaction
+### Use general
 
-_模式_：`primary`
+_Mode_: `subagent`
 
-隱藏的系統代理，將長上下文壓縮為較小的摘要。它會在需要時自動執行，且無法在 UI 中選擇。
-
----
-
-### 使用 Title
-
-_模式_：`primary`
-
-隱藏的系統代理，用於產生簡短的工作階段標題。它會自動執行，且無法在 UI 中選擇。
+A general-purpose agent for researching complex questions and executing multi-step tasks. Has full tool access (except todo), so it can make file changes when needed. Use this to run multiple units of work in parallel.
 
 ---
 
-### 使用 Summary
+### Use explore
 
-_模式_：`primary`
+_Mode_: `subagent`
 
-隱藏的系統代理，用於建立工作階段摘要。它會自動執行，且無法在 UI 中選擇。
+A fast, read-only agent for exploring codebases. Cannot modify files. Use this when you need to quickly find files by patterns, search code for keywords, or answer questions about the codebase.
 
 ---
 
-## 用法
+### Use compaction
 
-1. 對於主代理，在工作階段期間使用 **Tab** 鍵循環切換。您也可以使用設定的 `switch_agent` 快速鍵。
+_Mode_: `primary`
 
-2. 子代理可以透過以下方式呼叫：
-   - 由主代理根據其描述**自動**呼叫以執行專門任務。
-   - 透過在訊息中 **@ 提及**子代理來手動呼叫。例如：
+Hidden system agent that compacts long context into a smaller summary. It runs automatically when needed and is not selectable in the UI.
+
+---
+
+### Use title
+
+_Mode_: `primary`
+
+Hidden system agent that generates short session titles. It runs automatically and is not selectable in the UI.
+
+---
+
+### Use summary
+
+_Mode_: `primary`
+
+Hidden system agent that creates session summaries. It runs automatically and is not selectable in the UI.
+
+---
+
+## Usage
+
+1. For primary agents, use the **Tab** key to cycle through them during a session. You can also use your configured `switch_agent` keybind.
+
+2. Subagents can be invoked:
+   - **Automatically** by primary agents for specialized tasks based on their descriptions.
+   - Manually by **@ mentioning** a subagent in your message. For example.
 
      ```txt frame="none"
      @general help me search for this function
      ```
 
-3. **工作階段間導覽**：當子代理建立自己的子工作階段時，您可以使用以下方式在父工作階段和所有子工作階段之間導覽：
-   - **\<Leader>+Right**（或設定的 `session_child_cycle` 快速鍵）向前循環：父工作階段 → 子工作階段1 → 子工作階段2 → ... → 父工作階段
-   - **\<Leader>+Left**（或設定的 `session_child_cycle_reverse` 快速鍵）向後循環：父工作階段 ← 子工作階段1 ← 子工作階段2 ← ... ← 父工作階段
+3. **Navigation between sessions**: When subagents create child sessions, use `session_child_first` (default: **\<Leader>+Down**) to enter the first child session from the parent.
 
-   這使您可以在主對話和專門的子代理工作之間無縫切換。
+4. Once you are in a child session, use:
+   - `session_child_cycle` (default: **Right**) to cycle to the next child session
+   - `session_child_cycle_reverse` (default: **Left**) to cycle to the previous child session
+   - `session_parent` (default: **Up**) to return to the parent session
+
+   This lets you switch between the main conversation and specialized subagent work.
 
 ---
 
-## 設定
+## Configure
 
-您可以自訂內建代理或透過設定建立自己的代理。代理可以透過兩種方式進行設定：
+You can customize the built-in agents or create your own through configuration. Agents can be configured in two ways:
 
 ---
 
 ### JSON
 
-在 `opencode.json` 設定檔中設定代理：
+Configure agents in your `opencode.json` config file:
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "agent": {
     "build": {
       "mode": "primary",
@@ -178,10 +182,10 @@ _模式_：`primary`
 
 ### Markdown
 
-您還可以使用 Markdown 檔案定義代理。將它們放在：
+You can also define agents using markdown files. Place them in:
 
-- 全域：`~/.config/opencode/agents/`
-- 專案級：`.opencode/agents/`
+- Global: `~/.config/opencode/agents/`
+- Per-project: `.opencode/agents/`
 
 ```markdown title="~/.config/opencode/agents/review.md"
 ---
@@ -205,19 +209,19 @@ You are in code review mode. Focus on:
 Provide constructive feedback without making direct changes.
 ```
 
-Markdown 檔案名稱即為代理名稱。例如，`review.md` 會建立一個名為 `review` 的代理。
+The markdown file name becomes the agent name. For example, `review.md` creates a `review` agent.
 
 ---
 
-## 選項
+## Options
 
-讓我們詳細了解這些設定選項。
+Let's look at these configuration options in detail.
 
 ---
 
-### 描述
+### Description
 
-使用 `description` 選項提供代理的功能及使用場景的簡要描述。
+Use the `description` option to provide a brief description of what the agent does and when to use it.
 
 ```json title="opencode.json"
 {
@@ -229,15 +233,15 @@ Markdown 檔案名稱即為代理名稱。例如，`review.md` 會建立一個�
 }
 ```
 
-這是一個**必需的**設定選項。
+This is a **required** config option.
 
 ---
 
-### 溫度
+### Temperature
 
-使用 `temperature` 設定控制 LLM 回應的隨機性和創造力。
+Control the randomness and creativity of the LLM's responses with the `temperature` config.
 
-較低的值使回應更加集中和確定，而較高的值則增加創造力和多樣性。
+Lower values make responses more focused and deterministic, while higher values increase creativity and variability.
 
 ```json title="opencode.json"
 {
@@ -252,11 +256,11 @@ Markdown 檔案名稱即為代理名稱。例如，`review.md` 會建立一個�
 }
 ```
 
-溫度值通常範圍為 0.0 到 1.0：
+Temperature values typically range from 0.0 to 1.0:
 
-- **0.0-0.2**：非常集中和確定性的回應，適合程式碼分析和規劃
-- **0.3-0.5**：平衡的回應，兼顧一定創造力，適合一般開發任務
-- **0.6-1.0**：更有創造力和多樣性的回應，適合腦力激盪和探索
+- **0.0-0.2**: Very focused and deterministic responses, ideal for code analysis and planning
+- **0.3-0.5**: Balanced responses with some creativity, good for general development tasks
+- **0.6-1.0**: More creative and varied responses, useful for brainstorming and exploration
 
 ```json title="opencode.json"
 {
@@ -276,15 +280,15 @@ Markdown 檔案名稱即為代理名稱。例如，`review.md` 會建立一個�
 }
 ```
 
-如果未指定溫度，OpenCode 將使用模型特定的預設值；大多數模型通常為 0，Qwen 模型為 0.55。
+If no temperature is specified, CyxCode uses model-specific defaults; typically 0 for most models, 0.55 for Qwen models.
 
 ---
 
-### 最大步數
+### Max steps
 
-控制代理在被強制以純文字回應之前可以執行的最大代理迭代次數。這允許希望控制成本的使用者對代理操作設定限制。
+Control the maximum number of agentic iterations an agent can perform before being forced to respond with text only. This allows users who wish to control costs to set a limit on agentic actions.
 
-如果未設定此選項，代理將持續迭代，直到模型選擇停止或使用者中斷工作階段。
+If this is not set, the agent will continue to iterate until the model chooses to stop or the user interrupts the session.
 
 ```json title="opencode.json"
 {
@@ -298,17 +302,17 @@ Markdown 檔案名稱即為代理名稱。例如，`review.md` 會建立一個�
 }
 ```
 
-當達到限制時，代理會收到一個特殊的系統提示詞，指示其回覆工作摘要和建議的剩餘任務。
+When the limit is reached, the agent receives a special system prompt instructing it to respond with a summarization of its work and recommended remaining tasks.
 
 :::caution
-舊版 `maxSteps` 欄位已棄用。請改用 `steps`。
+The legacy `maxSteps` field is deprecated. Use `steps` instead.
 :::
 
 ---
 
-### 停用
+### Disable
 
-設為 `true` 以停用代理。
+Set to `true` to disable the agent.
 
 ```json title="opencode.json"
 {
@@ -322,9 +326,9 @@ Markdown 檔案名稱即為代理名稱。例如，`review.md` 會建立一個�
 
 ---
 
-### 提示詞
+### Prompt
 
-使用 `prompt` 設定為代理指定自訂系統提示詞檔案。提示詞檔案應包含針對代理用途的具體指令。
+Specify a custom system prompt file for this agent with the `prompt` config. The prompt file should contain instructions specific to the agent's purpose.
 
 ```json title="opencode.json"
 {
@@ -336,16 +340,16 @@ Markdown 檔案名稱即為代理名稱。例如，`review.md` 會建立一個�
 }
 ```
 
-此路徑相對於設定檔所在位置。因此它同時適用於全域 OpenCode 設定和專案級設定。
+This path is relative to where the config file is located. So this works for both the global CyxCode config and the project specific config.
 
 ---
 
-### 模型
+### Model
 
-使用 `model` 設定為代理覆寫模型。適用於針對不同任務使用不同的最佳化模型。例如，用更快的模型進行規劃，用更強大的模型進行實作。
+Use the `model` config to override the model for this agent. Useful for using different models optimized for different tasks. For example, a faster model for planning, a more capable model for implementation.
 
 :::tip
-如果您不指定模型，主代理將使用[全域設定的模型](/docs/config#models)，而子代理將使用呼叫它的主代理所使用的模型。
+If you don’t specify a model, primary agents use the [model globally configured](/docs/config#models) while subagents will use the model of the primary agent that invoked the subagent.
 :::
 
 ```json title="opencode.json"
@@ -358,17 +362,19 @@ Markdown 檔案名稱即為代理名稱。例如，`review.md` 會建立一個�
 }
 ```
 
-OpenCode 設定中的模型 ID 使用 `provider/model-id` 格式。例如，如果您使用 [OpenCode Zen](/docs/zen)，則可以使用 `opencode/gpt-5.1-codex` 來表示 GPT 5.1 Codex。
+The model ID in your CyxCode config uses the format `provider/model-id`. For example, if you're using [CyxCode Zen](/docs/zen), you would use `opencode/gpt-5.1-codex` for GPT 5.1 Codex.
 
 ---
 
-### 工具
+### Tools (deprecated)
 
-使用 `tools` 設定控制代理中可用的工具。您可以透過將特定工具設為 `true` 或 `false` 來啟用或停用它們。
+`tools` is **deprecated**. Prefer the agent's [`permission`](#permissions) field for new configs, updates and more fine-grained control.
+
+Allows you to control which tools are available in this agent. You can enable or disable specific tools by setting them to `true` or `false`. In an agent's `tools` config, `true` is equivalent to `{"*": "allow"}` permission and `false` is equivalent to `{"*": "deny"}` permission.
 
 ```json title="opencode.json" {3-6,9-12}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "tools": {
     "write": true,
     "bash": true
@@ -385,14 +391,14 @@ OpenCode 設定中的模型 ID 使用 `provider/model-id` 格式。例如，如�
 ```
 
 :::note
-代理級設定會覆寫全域設定。
+The agent-specific config overrides the global config.
 :::
 
-您還可以使用萬用字元同時控制多個工具。例如，要停用 MCP 伺服器中的所有工具：
+You can also use wildcards in legacy `tools` entries to control multiple tools at once. For example, to disable all tools from an MCP server:
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "agent": {
     "readonly": {
       "tools": {
@@ -405,32 +411,32 @@ OpenCode 設定中的模型 ID 使用 `provider/model-id` 格式。例如，如�
 }
 ```
 
-[了解更多關於工具的資訊](/docs/tools)。
+[Learn more about tools](/docs/tools).
 
 ---
 
-### 權限
+### Permissions
 
-您可以設定權限來管理代理可以執行的操作。目前，`edit`、`bash` 和 `webfetch` 工具的權限可以設定為：
+You can configure permissions to manage what actions an agent can take. Currently, the permissions for the `edit`, `bash`, and `webfetch` tools can be configured to:
 
-- `"ask"` — 執行工具前提示審批
-- `"allow"` — 允許所有操作，無需審批
-- `"deny"` — 停用該工具
+- `"ask"` — Prompt for approval before running the tool
+- `"allow"` — Allow all operations without approval
+- `"deny"` — Disable the tool
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "permission": {
     "edit": "deny"
   }
 }
 ```
 
-您可以按代理覆寫這些權限。
+You can override these permissions per agent.
 
 ```json title="opencode.json" {3-5,8-10}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "permission": {
     "edit": "deny"
   },
@@ -444,7 +450,7 @@ OpenCode 設定中的模型 ID 使用 `provider/model-id` 格式。例如，如�
 }
 ```
 
-您還可以在 Markdown 代理中設定權限。
+You can also set permissions in Markdown agents.
 
 ```markdown title="~/.config/opencode/agents/review.md"
 ---
@@ -463,11 +469,11 @@ permission:
 Only analyze code and suggest changes.
 ```
 
-您可以為特定的 bash 命令設定權限。
+You can set permissions for specific bash commands.
 
 ```json title="opencode.json" {7}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "agent": {
     "build": {
       "permission": {
@@ -481,11 +487,11 @@ Only analyze code and suggest changes.
 }
 ```
 
-這可以使用 glob 模式。
+This can take a glob pattern.
 
 ```json title="opencode.json" {7}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "agent": {
     "build": {
       "permission": {
@@ -498,12 +504,12 @@ Only analyze code and suggest changes.
 }
 ```
 
-您還可以使用 `*` 萬用字元來管理所有命令的權限。
-由於最後匹配的規則優先，請將 `*` 萬用字元放在前面，將具體規則放在後面。
+And you can also use the `*` wildcard to manage permissions for all commands.
+Since the last matching rule takes precedence, put the `*` wildcard first and specific rules after.
 
 ```json title="opencode.json" {8}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "agent": {
     "build": {
       "permission": {
@@ -517,13 +523,13 @@ Only analyze code and suggest changes.
 }
 ```
 
-[了解更多關於權限的資訊](/docs/permissions)。
+[Learn more about permissions](/docs/permissions).
 
 ---
 
-### 模式
+### Mode
 
-使用 `mode` 設定控制代理的模式。`mode` 選項用於確定代理的使用方式。
+Control the agent's mode with the `mode` config. The `mode` option is used to determine how the agent can be used.
 
 ```json title="opencode.json"
 {
@@ -535,13 +541,13 @@ Only analyze code and suggest changes.
 }
 ```
 
-`mode` 選項可以設為 `primary`、`subagent` 或 `all`。如果未指定 `mode`，則預設為 `all`。
+The `mode` option can be set to `primary`, `subagent`, or `all`. If no `mode` is specified, it defaults to `all`.
 
 ---
 
-### 隱藏
+### Hidden
 
-使用 `hidden: true` 將子代理從 `@` 自動補全選單中隱藏。適用於只應由其他代理透過 Task 工具以程式化方式呼叫的內部子代理。
+Hide a subagent from the `@` autocomplete menu with `hidden: true`. Useful for internal subagents that should only be invoked programmatically by other agents via the Task tool.
 
 ```json title="opencode.json"
 {
@@ -554,17 +560,17 @@ Only analyze code and suggest changes.
 }
 ```
 
-這僅影響自動補全選單中的使用者可見性。如果權限允許，模型仍然可以透過 Task 工具呼叫隱藏的代理。
+This only affects user visibility in the autocomplete menu. Hidden agents can still be invoked by the model via the Task tool if permissions allow.
 
 :::note
-僅適用於 `mode: subagent` 的代理。
+Only applies to `mode: subagent` agents.
 :::
 
 ---
 
-### 任務權限
+### Task permissions
 
-使用 `permission.task` 控制代理可以透過 Task 工具呼叫哪些子代理。使用 glob 模式進行靈活匹配。
+Control which subagents an agent can invoke via the Task tool with `permission.task`. Uses glob patterns for flexible matching.
 
 ```json title="opencode.json"
 {
@@ -583,23 +589,23 @@ Only analyze code and suggest changes.
 }
 ```
 
-當設為 `deny` 時，子代理將從 Task 工具描述中完全移除，因此模型不會嘗試呼叫它。
+When set to `deny`, the subagent is removed from the Task tool description entirely, so the model won't attempt to invoke it.
 
 :::tip
-規則按順序評估，**最後匹配的規則優先**。在上面的範例中，`orchestrator-planner` 同時匹配 `*`（deny）和 `orchestrator-*`（allow），但由於 `orchestrator-*` 在 `*` 之後，所以結果為 `allow`。
+Rules are evaluated in order, and the **last matching rule wins**. In the example above, `orchestrator-planner` matches both `*` (deny) and `orchestrator-*` (allow), but since `orchestrator-*` comes after `*`, the result is `allow`.
 :::
 
 :::tip
-使用者始終可以透過 `@` 自動補全選單直接呼叫任何子代理，即使代理的任務權限會拒絕它。
+Users can always invoke any subagent directly via the `@` autocomplete menu, even if the agent's task permissions would deny it.
 :::
 
 ---
 
-### 顏色
+### Color
 
-使用 `color` 選項自訂代理在 UI 中的視覺外觀。這會影響代理在介面中的顯示方式。
+Customize the agent's visual appearance in the UI with the `color` option. This affects how the agent appears in the interface.
 
-使用有效的十六進位顏色（例如 `#FF5733`）或主題顏色：`primary`、`secondary`、`accent`、`success`、`warning`、`error`、`info`。
+Use a valid hex color (e.g., `#FF5733`) or theme color: `primary`, `secondary`, `accent`, `success`, `warning`, `error`, `info`.
 
 ```json title="opencode.json"
 {
@@ -618,7 +624,7 @@ Only analyze code and suggest changes.
 
 ### Top P
 
-使用 `top_p` 選項控制回應多樣性。這是控制隨機性的溫度替代方案。
+Control response diversity with the `top_p` option. Alternative to temperature for controlling randomness.
 
 ```json title="opencode.json"
 {
@@ -630,15 +636,15 @@ Only analyze code and suggest changes.
 }
 ```
 
-值範圍從 0.0 到 1.0。較低的值更加集中，較高的值更加多樣化。
+Values range from 0.0 to 1.0. Lower values are more focused, higher values more diverse.
 
 ---
 
-### 其他選項
+### Additional
 
-您在代理設定中指定的任何其他選項都將作為模型選項**直接傳遞**給提供商。這允許您使用提供商特定的功能和參數。
+Any other options you specify in your agent configuration will be **passed through directly** to the provider as model options. This allows you to use provider-specific features and parameters.
 
-例如，使用 OpenAI 的推理模型時，您可以控制推理力度：
+For example, with OpenAI's reasoning models, you can control the reasoning effort:
 
 ```json title="opencode.json" {6,7}
 {
@@ -653,55 +659,55 @@ Only analyze code and suggest changes.
 }
 ```
 
-這些附加選項是模型和提供商特定的。請查閱您的提供商文件以取得可用參數。
+These additional options are model and provider-specific. Check your provider's documentation for available parameters.
 
 :::tip
-執行 `opencode models` 查看可用模型列表。
+Run `cyxcode models` to see a list of the available models.
 :::
 
 ---
 
-## 建立代理
+## Create agents
 
-您可以使用以下命令建立新代理：
+You can create new agents using the following command:
 
 ```bash
-opencode agent create
+cyxcode agent create
 ```
 
-此互動式命令將：
+This interactive command will:
 
-1. 詢問代理的儲存位置——全域或專案級。
-2. 描述代理應該做什麼。
-3. 產生合適的系統提示詞和識別碼。
-4. 讓您選擇代理可以存取哪些工具。
-5. 最後，建立一個包含代理設定的 Markdown 檔案。
-
----
-
-## 使用場景
-
-以下是不同代理的一些常見使用場景。
-
-- **Build 代理**：啟用所有工具的完整開發工作
-- **Plan 代理**：分析和規劃，不進行任何變更
-- **Review 代理**：具有唯讀存取權限和文件工具的程式碼審查
-- **Debug 代理**：專注於問題排查，啟用 bash 和讀取工具
-- **Docs 代理**：文件編寫，具有檔案操作但不使用系統命令
+1. Ask where to save the agent; global or project-specific.
+2. Description of what the agent should do.
+3. Generate an appropriate system prompt and identifier.
+4. Let you select which tools the agent can access.
+5. Finally, create a markdown file with the agent configuration.
 
 ---
 
-## 範例
+## Use cases
 
-以下是一些您可能會覺得有用的範例代理。
+Here are some common use cases for different agents.
+
+- **Build agent**: Full development work with all tools enabled
+- **Plan agent**: Analysis and planning without making changes
+- **Review agent**: Code review with read-only access plus documentation tools
+- **Debug agent**: Focused on investigation with bash and read tools enabled
+- **Docs agent**: Documentation writing with file operations but no system commands
+
+---
+
+## Examples
+
+Here are some example agents you might find useful.
 
 :::tip
-您有想要分享的代理嗎？[提交 PR](https://github.com/anomalyco/opencode)。
+Do you have an agent you'd like to share? [Submit a PR](https://github.com/code3hr/cyxcode).
 :::
 
 ---
 
-### 文件代理
+### Documentation agent
 
 ```markdown title="~/.config/opencode/agents/docs-writer.md"
 ---
@@ -723,7 +729,7 @@ Focus on:
 
 ---
 
-### 安全稽核代理
+### Security auditor
 
 ```markdown title="~/.config/opencode/agents/security-auditor.md"
 ---

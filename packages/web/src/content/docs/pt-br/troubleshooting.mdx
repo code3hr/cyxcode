@@ -1,279 +1,280 @@
 ---
-title: Solução de Problemas
-description: Problemas comuns e como resolvê-los.
+title: Troubleshooting
+description: Common issues and how to resolve them.
 ---
 
-Para depurar problemas com o opencode, comece verificando os logs e os dados locais que ele armazena no disco.
+To debug issues with CyxCode, start by checking the logs and local data it stores on disk.
 
 ---
 
 ## Logs
 
-Os arquivos de log são gravados em:
+Log files are written to:
 
 - **macOS/Linux**: `~/.local/share/opencode/log/`
-- **Windows**: Pressione `WIN+R` e cole `%USERPROFILE%\.local\share\opencode\log`
+- **Windows**: Press `WIN+R` and paste `%USERPROFILE%\.local\share\opencode\log`
 
-Os arquivos de log são nomeados com timestamps (por exemplo, `2025-01-09T123456.log`) e os 10 arquivos de log mais recentes são mantidos.
+Log files are named with timestamps (e.g., `2025-01-09T123456.log`) and the most recent 10 log files are kept.
 
-Você pode definir o nível de log com a opção de linha de comando `--log-level` para obter informações de depuração mais detalhadas. Por exemplo, `opencode --log-level DEBUG`.
+You can set the log level with the `--log-level` command-line option to get more detailed debug information. For example, `cyxcode --log-level DEBUG`.
 
 ---
 
-## Armazenamento
+## Storage
 
-O opencode armazena dados de sessão e outros dados do aplicativo no disco em:
+CyxCode stores session data and other application data on disk at:
 
 - **macOS/Linux**: `~/.local/share/opencode/`
-- **Windows**: Pressione `WIN+R` e cole `%USERPROFILE%\.local\share\opencode`
+- **Windows**: Press `WIN+R` and paste `%USERPROFILE%\.local\share\opencode`
 
-Este diretório contém:
+This directory contains:
 
-- `auth.json` - Dados de autenticação como chaves de API, tokens OAuth
-- `log/` - Logs do aplicativo
-- `project/` - Dados específicos do projeto, como dados de sessão e mensagens
-  - Se o projeto estiver dentro de um repositório Git, ele é armazenado em `./<project-slug>/storage/`
-  - Se não for um repositório Git, ele é armazenado em `./global/storage/`
-
----
-
-## Aplicativo de Desktop
-
-O opencode Desktop executa um servidor opencode local (o sidecar `opencode-cli`) em segundo plano. A maioria dos problemas é causada por um plugin com mau funcionamento, um cache corrompido ou uma configuração de servidor incorreta.
-
-### Verificações rápidas
-
-- Saia completamente do aplicativo e reinicie-o.
-- Se o aplicativo mostrar uma tela de erro, clique em **Reiniciar** e copie os detalhes do erro.
-- Apenas macOS: menu `OpenCode` -> **Recarregar Webview** (ajuda se a interface estiver em branco/congelada).
+- `auth.json` - Authentication data like API keys, OAuth tokens
+- `log/` - Application logs
+- `project/` - Project-specific data like session and message data
+  - If the project is within a Git repo, it is stored in `./<project-slug>/storage/`
+  - If it is not a Git repo, it is stored in `./global/storage/`
 
 ---
 
-### Desativando plugins
+## Desktop app
 
-Se o aplicativo de desktop estiver travando ao iniciar, pendurado ou se comportando de maneira estranha, comece desativando os plugins.
+CyxCode Desktop runs a local CyxCode server (the `opencode-cli` sidecar) in the background. Most issues are caused by a misbehaving plugin, a corrupted cache, or a bad server setting.
 
-#### Verificando a configuração global
+### Quick checks
 
-Abra seu arquivo de configuração global e procure uma chave `plugin`.
+- Fully quit and relaunch the app.
+- If the app shows an error screen, click **Restart** and copy the error details.
+- macOS only: `cyxcode` menu -> **Reload Webview** (helps if the UI is blank/frozen).
 
-- **macOS/Linux**: `~/.config/opencode/opencode.jsonc` (ou `~/.config/opencode/opencode.json`)
-- **macOS/Linux** (instalações mais antigas): `~/.local/share/opencode/opencode.jsonc`
-- **Windows**: Pressione `WIN+R` e cole `%USERPROFILE%\.config\opencode\opencode.jsonc`
+---
 
-Se você tiver plugins configurados, desative-os temporariamente removendo a chave ou definindo-a como um array vazio:
+### Disable plugins
+
+If the desktop app is crashing on launch, hanging, or behaving strangely, start by disabling plugins.
+
+#### Check the global config
+
+Open your global config file and look for a `plugin` key.
+
+- **macOS/Linux**: `~/.config/opencode/opencode.jsonc` (or `~/.config/opencode/opencode.json`)
+- **macOS/Linux** (older installs): `~/.local/share/opencode/opencode.jsonc`
+- **Windows**: Press `WIN+R` and paste `%USERPROFILE%\.config\opencode\opencode.jsonc`
+
+If you have plugins configured, temporarily disable them by removing the key or setting it to an empty array:
 
 ```jsonc
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "plugin": [],
 }
 ```
 
-#### Verificando os diretórios de plugins
+#### Check plugin directories
 
-O opencode também pode carregar plugins locais do disco. Mova-os temporariamente para fora do caminho (ou renomeie a pasta) e reinicie o aplicativo de desktop:
+CyxCode can also load local plugins from disk. Temporarily move these out of the way (or rename the folder) and restart the desktop app:
 
-- **Plugins globais**
+- **Global plugins**
   - **macOS/Linux**: `~/.config/opencode/plugins/`
-  - **Windows**: Pressione `WIN+R` e cole `%USERPROFILE%\.config\opencode\plugins`
-- **Plugins de projeto** (apenas se você usar configuração por projeto)
+  - **Windows**: Press `WIN+R` and paste `%USERPROFILE%\.config\opencode\plugins`
+- **Project plugins** (only if you use per-project config)
   - `<your-project>/.opencode/plugins/`
 
-Se o aplicativo voltar a funcionar, reative os plugins um por um para descobrir qual está causando o problema.
+If the app starts working again, re-enable plugins one at a time to find which one is causing the issue.
 
 ---
 
-### Limpando o cache
+### Clear the cache
 
-Se desativar plugins não ajudar (ou se a instalação de um plugin estiver travada), limpe o cache para que o opencode possa reconstruí-lo.
+If disabling plugins doesn't help (or a plugin install is stuck), clear the cache so CyxCode can rebuild it.
 
-1. Saia completamente do opencode Desktop.
-2. Exclua o diretório de cache:
+1. Quit CyxCode Desktop completely.
+2. Delete the cache directory:
 
-- **macOS**: Finder -> `Cmd+Shift+G` -> cole `~/.cache/opencode`
-- **Linux**: exclua `~/.cache/opencode` (ou execute `rm -rf ~/.cache/opencode`)
-- **Windows**: Pressione `WIN+R` e cole `%USERPROFILE%\.cache\opencode`
+- **macOS**: Finder -> `Cmd+Shift+G` -> paste `~/.cache/opencode`
+- **Linux**: delete `~/.cache/opencode` (or run `rm -rf ~/.cache/opencode`)
+- **Windows**: Press `WIN+R` and paste `%USERPROFILE%\.cache\CyxCode`
 
-3. Reinicie o opencode Desktop.
-
----
-
-### Corrigindo problemas de conexão com o servidor
-
-O opencode Desktop pode iniciar seu próprio servidor local (padrão) ou conectar-se a uma URL de servidor que você configurou.
-
-Se você ver um diálogo **"Conexão Falhou"** (ou o aplicativo nunca passa da tela de inicialização), verifique se há uma URL de servidor personalizada.
-
-#### Limpando a URL do servidor padrão do desktop
-
-Na tela inicial, clique no nome do servidor (com o ponto de status) para abrir o seletor de Servidor. Na seção **Servidor padrão**, clique em **Limpar**.
-
-#### Removendo `server.port` / `server.hostname` da sua configuração
-
-Se seu `opencode.json(c)` contiver uma seção `server`, remova-a temporariamente e reinicie o aplicativo de desktop.
-
-#### Verificando as variáveis de ambiente
-
-Se você tiver `OPENCODE_PORT` definido em seu ambiente, o aplicativo de desktop tentará usar essa porta para o servidor local.
-
-- Desfaça `OPENCODE_PORT` (ou escolha uma porta livre) e reinicie.
+3. Restart CyxCode Desktop.
 
 ---
 
-### Linux: Problemas com Wayland / X11
+### Fix server connection issues
 
-No Linux, algumas configurações do Wayland podem causar janelas em branco ou erros de compositor.
+CyxCode Desktop can either start its own local server (default) or connect to a server URL you configured.
 
-- Se você estiver no Wayland e o aplicativo estiver em branco/travando, tente iniciar com `OC_ALLOW_WAYLAND=1`.
-- Se isso piorar as coisas, remova e tente iniciar sob uma sessão X11.
+If you see a **"Connection Failed"** dialog (or the app never gets past the splash screen), check for a custom server URL.
 
----
+#### Clear the desktop default server URL
 
-### Windows: Runtime do WebView2
+From the Home screen, click the server name (with the status dot) to open the Server picker. In the **Default server** section, click **Clear**.
 
-No Windows, o opencode Desktop requer o **WebView2 Runtime** do Microsoft Edge. Se o aplicativo abrir em uma janela em branco ou não iniciar, instale/atualize o WebView2 e tente novamente.
+#### Remove `server.port` / `server.hostname` from your config
 
----
+If your `opencode.json(c)` contains a `server` section, temporarily remove it and restart the desktop app.
 
-### Windows: Problemas gerais de desempenho
+#### Check environment variables
 
-Se você estiver enfrentando desempenho lento, problemas de acesso a arquivos ou problemas no terminal no Windows, tente usar [WSL (Windows Subsystem for Linux)](/docs/windows-wsl). O WSL fornece um ambiente Linux que funciona de forma mais integrada com os recursos do opencode.
+If you have `OPENCODE_PORT` set in your environment, the desktop app will try to use that port for the local server.
 
----
-
-### Notificações não aparecendo
-
-O opencode Desktop só mostra notificações do sistema quando:
-
-- as notificações estão habilitadas para o opencode nas configurações do seu sistema operacional, e
-- a janela do aplicativo não está focada.
+- Unset `OPENCODE_PORT` (or pick a free port) and restart.
 
 ---
 
-### Redefinindo o armazenamento do aplicativo de desktop (último recurso)
+### Linux: Wayland / X11 issues
 
-Se o aplicativo não iniciar e você não conseguir limpar as configurações pela interface, redefina o estado salvo do aplicativo de desktop.
+On Linux, some Wayland setups can cause blank windows or compositor errors.
 
-1. Saia do opencode Desktop.
-2. Encontre e exclua estes arquivos (eles estão no diretório de dados do aplicativo opencode Desktop):
-
-- `opencode.settings.dat` (URL do servidor padrão do desktop)
-- `opencode.global.dat` e `opencode.workspace.*.dat` (estado da interface como servidores/projetos recentes)
-
-Para encontrar o diretório rapidamente:
-
-- **macOS**: Finder -> `Cmd+Shift+G` -> `~/Library/Application Support` (depois pesquise pelos nomes dos arquivos acima)
-- **Linux**: pesquise em `~/.local/share` pelos nomes dos arquivos acima
-- **Windows**: Pressione `WIN+R` -> `%APPDATA%` (depois pesquise pelos nomes dos arquivos acima)
+- If you're on Wayland and the app is blank/crashing, try launching with `OC_ALLOW_WAYLAND=1`.
+- If that makes things worse, remove it and try launching under an X11 session instead.
 
 ---
 
-## Obtendo ajuda
+### Windows: WebView2 runtime
 
-Se você estiver enfrentando problemas com o opencode:
-
-1. **Relatar problemas no GitHub**
-
-   A melhor maneira de relatar bugs ou solicitar recursos é através do nosso repositório no GitHub:
-
-   [**github.com/anomalyco/opencode/issues**](https://github.com/anomalyco/opencode/issues)
-
-   Antes de criar um novo problema, pesquise problemas existentes para ver se seu problema já foi relatado.
-
-2. **Junte-se ao nosso Discord**
-
-   Para ajuda em tempo real e discussão da comunidade, junte-se ao nosso servidor Discord:
-
-   [**opencode.ai/discord**](https://opencode.ai/discord)
+On Windows, CyxCode Desktop requires the Microsoft Edge **WebView2 Runtime**. If the app opens to a blank window or won't start, install/update WebView2 and try again.
 
 ---
 
-## Problemas comuns
+### Windows: General performance issues
 
-Aqui estão alguns problemas comuns e como resolvê-los.
-
----
-
-### O opencode não inicia
-
-1. Verifique os logs em busca de mensagens de erro
-2. Tente executar com `--print-logs` para ver a saída no terminal
-3. Certifique-se de que você tem a versão mais recente com `opencode upgrade`
+If you're experiencing slow performance, file access issues, or terminal problems on Windows, try using [WSL (Windows Subsystem for Linux)](/docs/windows-wsl). WSL provides a Linux environment that works more seamlessly with CyxCode's features.
 
 ---
 
-### Problemas de autenticação
+### Notifications not showing
 
-1. Tente reautenticar com o comando `/connect` na TUI
-2. Verifique se suas chaves de API são válidas
-3. Certifique-se de que sua rede permite conexões com a API do provedor
+CyxCode Desktop only shows system notifications when:
+
+- notifications are enabled for CyxCode in your OS settings, and
+- the app window is not focused.
 
 ---
 
-### Modelo não disponível
+### Reset desktop app storage (last resort)
 
-1. Verifique se você se autenticou com o provedor
-2. Verifique se o nome do modelo em sua configuração está correto
-3. Alguns modelos podem exigir acesso ou assinaturas específicas
+If the app won't start and you can't clear settings from inside the UI, reset the desktop app's saved state.
 
-Se você encontrar `ProviderModelNotFoundError`, é mais provável que você esteja referenciando um modelo incorretamente em algum lugar.
-Os modelos devem ser referenciados assim: `<providerId>/<modelId>`
+1. Quit CyxCode Desktop.
+2. Find and delete these files (they live in the CyxCode Desktop app data directory):
 
-Exemplos:
+- `opencode.settings.dat` (desktop default server URL)
+- `opencode.global.dat` and `opencode.workspace.*.dat` (UI state like recent servers/projects)
+
+To find the directory quickly:
+
+- **macOS**: Finder -> `Cmd+Shift+G` -> `~/Library/Application Support` (then search for the filenames above)
+- **Linux**: search under `~/.local/share` for the filenames above
+- **Windows**: Press `WIN+R` -> `%APPDATA%` (then search for the filenames above)
+
+---
+
+## Getting help
+
+If you're experiencing issues with CyxCode:
+
+1. **Report issues on GitHub**
+
+   The best way to report bugs or request features is through our GitHub repository:
+
+   [**github.com/code3hr/cyxcode/issues**](https://github.com/code3hr/cyxcode/issues)
+
+   Before creating a new issue, search existing issues to see if your problem has already been reported.
+
+2. **Join our Discord**
+
+   For real-time help and community discussion, join our Discord server:
+
+   [**cyxcode.ai/discord**](https://cyxcode.ai/discord)
+
+---
+
+## Common issues
+
+Here are some common issues and how to resolve them.
+
+---
+
+### CyxCode won't start
+
+1. Check the logs for error messages
+2. Try running with `--print-logs` to see output in the terminal
+3. Ensure you have the latest version with `cyxcode upgrade`
+
+---
+
+### Authentication issues
+
+1. Try re-authenticating with the `/connect` command in the TUI
+2. Check that your API keys are valid
+3. Ensure your network allows connections to the provider's API
+
+---
+
+### Model not available
+
+1. Check that you've authenticated with the provider
+2. Verify the model name in your config is correct
+3. Some models may require specific access or subscriptions
+
+If you encounter `ProviderModelNotFoundError` you are most likely incorrectly
+referencing a model somewhere.
+Models should be referenced like so: `<providerId>/<modelId>`
+
+Examples:
 
 - `openai/gpt-4.1`
 - `openrouter/google/gemini-2.5-flash`
 - `opencode/kimi-k2`
 
-Para descobrir quais modelos você tem acesso, execute `opencode models`
+To figure out what models you have access to, run `cyxcode models`
 
 ---
 
 ### ProviderInitError
 
-Se você encontrar um ProviderInitError, provavelmente você tem uma configuração inválida ou corrompida.
+If you encounter a ProviderInitError, you likely have an invalid or corrupted configuration.
 
-Para resolver isso:
+To resolve this:
 
-1. Primeiro, verifique se seu provedor está configurado corretamente seguindo o [guia de provedores](/docs/providers)
-2. Se o problema persistir, tente limpar sua configuração armazenada:
+1. First, verify your provider is set up correctly by following the [providers guide](/docs/providers)
+2. If the issue persists, try clearing your stored configuration:
 
    ```bash
    rm -rf ~/.local/share/opencode
    ```
 
-   No Windows, pressione `WIN+R` e exclua: `%USERPROFILE%\.local\share\opencode`
+   On Windows, press `WIN+R` and delete: `%USERPROFILE%\.local\share\opencode`
 
-3. Reautentique-se com seu provedor usando o comando `/connect` na TUI.
+3. Re-authenticate with your provider using the `/connect` command in the TUI.
 
 ---
 
-### AI_APICallError e problemas com pacotes de provedores
+### AI_APICallError and provider package issues
 
-Se você encontrar erros de chamada de API, isso pode ser devido a pacotes de provedores desatualizados. O opencode instala dinamicamente pacotes de provedores (OpenAI, Anthropic, Google, etc.) conforme necessário e os armazena em cache localmente.
+If you encounter API call errors, this may be due to outdated provider packages. CyxCode dynamically installs provider packages (OpenAI, Anthropic, Google, etc.) as needed and caches them locally.
 
-Para resolver problemas com pacotes de provedores:
+To resolve provider package issues:
 
-1. Limpe o cache do pacote de provedores:
+1. Clear the provider package cache:
 
    ```bash
    rm -rf ~/.cache/opencode
    ```
 
-   No Windows, pressione `WIN+R` e exclua: `%USERPROFILE%\.cache\opencode`
+   On Windows, press `WIN+R` and delete: `%USERPROFILE%\.cache\CyxCode`
 
-2. Reinicie o opencode para reinstalar os pacotes de provedores mais recentes
+2. Restart CyxCode to reinstall the latest provider packages
 
-Isso forçará o opencode a baixar as versões mais recentes dos pacotes de provedores, o que muitas vezes resolve problemas de compatibilidade com parâmetros de modelo e alterações na API.
+This will force CyxCode to download the most recent versions of provider packages, which often resolves compatibility issues with model parameters and API changes.
 
 ---
 
-### Copiar/colar não funciona no Linux
+### Copy/paste not working on Linux
 
-Usuários do Linux precisam ter um dos seguintes utilitários de área de transferência instalados para que a funcionalidade de copiar/colar funcione:
+Linux users need to have one of the following clipboard utilities installed for copy/paste functionality to work:
 
-**Para sistemas X11:**
+**For X11 systems:**
 
 ```bash
 apt install -y xclip
@@ -281,13 +282,13 @@ apt install -y xclip
 apt install -y xsel
 ```
 
-**Para sistemas Wayland:**
+**For Wayland systems:**
 
 ```bash
 apt install -y wl-clipboard
 ```
 
-**Para ambientes sem cabeça:**
+**For headless environments:**
 
 ```bash
 apt install -y xvfb
@@ -296,4 +297,4 @@ Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &
 export DISPLAY=:99.0
 ```
 
-O opencode detectará se você está usando Wayland e preferirá `wl-clipboard`, caso contrário, tentará encontrar ferramentas de área de transferência na ordem: `xclip` e `xsel`.
+CyxCode will detect if you're using Wayland and prefer `wl-clipboard`, otherwise it will try to find clipboard tools in order of: `xclip` and `xsel`.

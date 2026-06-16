@@ -1,128 +1,128 @@
 ---
-title: Deling
-description: Del dine OpenCode-samtaler.
+title: Share
+description: Share your CyxCode conversations.
 ---
 
-OpenCodes delingsfunksjon lar deg lage offentlige lenker til dine OpenCode-samtaler, slik at du kan samarbeide med lagkamerater eller få hjelp fra andre.
+CyxCode's share feature allows you to create public links to your CyxCode conversations, so you can collaborate with teammates or get help from others.
 
 :::note
-Delte samtaler er offentlig tilgængelige for alle med linken.
+Shared conversations are publicly accessible to anyone with the link.
 :::
 
 ---
 
-## Sådan fungerer det
+## How it works
 
-Når du deler en samtale, OpenCode:
+When you share a conversation, CyxCode:
 
-1. Opreter en unik offentlig URL for sessionen din
-2. Synkroniserer samtaleloggen din til serverne våre
-3. Gør samtalen tilgængelig via den delbare lenken — `opncd.ai/s/<share-id>`
-
----
-
-## Tilstande
-
-OpenCode støtter tre delingsmoduser som kontrollerer hvordan samtaler deles:
+1. Creates a unique public URL for your session
+2. Syncs your conversation history to our servers
+3. Makes the conversation accessible via the shareable link — `opncd.ai/s/<share-id>`
 
 ---
 
-### Manuel (standard)
+## Sharing
 
-Som standard bruger OpenCode manuell delingsmodus. Sessioner deles ikke automatisk, men du kan dele dem manuelt ved at bruge kommandoen `/share`:
+CyxCode supports three sharing modes that control how conversations are shared:
+
+---
+
+### Manual (default)
+
+By default, CyxCode uses manual sharing mode. Sessions are not shared automatically, but you can manually share them using the `/share` command:
 
 ```
 /share
 ```
 
-Dette vil generere en unik URL som vil bli kopiert til utklippstavlen din.
+This will generate a unique URL that'll be copied to your clipboard.
 
-For at eksplisitt angi manuell modus i [konfigurasjonsfilen](/docs/config):
+To explicitly set manual mode in your [config file](/docs/config):
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "share": "manual"
 }
 ```
 
 ---
 
-### Automatisk deling
+### Auto-share
 
-Du kan aktivere automatisk deling for alle nye samtaler ved at sette alternativet `share` til `"auto"` i [konfigurasjonsfilen](/docs/config):
+You can enable automatic sharing for all new conversations by setting the `share` option to `"auto"` in your [config file](/docs/config):
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "share": "auto"
 }
 ```
 
-Med automatisk deling aktivert, vil hver nye samtale automatisk bli delt og en kobling vil bli generert.
+With auto-share enabled, every new conversation will automatically be shared and a link will be generated.
 
 ---
 
-### Deaktiveret
+### Disabled
 
-Du kan deaktivere deling helt ved at sette alternativet `share` til `"disabled"` i [konfigurasjonsfilen](/docs/config):
+You can disable sharing entirely by setting the `share` option to `"disabled"` in your [config file](/docs/config):
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "share": "disabled"
 }
 ```
 
-For at håndheve dette på tvers av teamet ditt for et gitt prosjekt, tilføj det til `opencode.json` i prosjektet ditt og tjek inn i Git.
+To enforce this across your team for a given project, add it to the `opencode.json` in your project and check into Git.
 
 ---
 
-## Ophæv deling
+## Un-sharing
 
-Slik slutter du at dele en samtale og fjerner den fra offentlig tilgang:
+To stop sharing a conversation and remove it from public access:
 
 ```
 /unshare
 ```
 
-Dette vil fjerne delelinken og slette dataene knyttet til samtalen.
+This will remove the share link and delete the data related to the conversation.
 
 ---
 
-## Privatliv
+## Privacy
 
-Det er et par ting du må huske på når du deler en samtale.
-
----
-
-### Datalagring
-
-Delte samtaler forblir tilgængelige til du eksplisitt opphever deling av dem. Dette
-inkluderer:
-
-- Full samtalehistorikk
-- Alle meldinger og svar
-- Metadata for sessioner
+There are a few things to keep in mind when sharing a conversation.
 
 ---
 
-### Anbefalinger
+### Data retention
 
-- Del kun samtaler som ikke inneholder sensitiv informasjon.
-- Se gjennom samtaleinnholdet før du deler.
-- Opphev deling av samtaler når samarbeidet er fullført.
-- Unngå at dele samtaler med proprietær kode eller konfidensielle data.
-- For sensitive prosjekter, deaktiver deling helt.
+Shared conversations remain accessible until you explicitly unshare them. This
+includes:
+
+- Full conversation history
+- All messages and responses
+- Session metadata
 
 ---
 
-## For virksomheder
+### Recommendations
 
-For bedriftsimplementeringer kan delingsfunksjonen være:
+- Only share conversations that don't contain sensitive information.
+- Review conversation content before sharing.
+- Unshare conversations when collaboration is complete.
+- Avoid sharing conversations with proprietary code or confidential data.
+- For sensitive projects, disable sharing entirely.
 
-- **Deaktivert** helt for overholdelse av sikkerhet
-- **Begrenset** til brugere som kun er autentisert gjennom SSO
-- **Selvvert** på din egen infrastruktur
+---
 
-[Finn ut mer](/docs/enterprise) om brug av opencode i organisasjonen din.
+## For enterprises
+
+For enterprise deployments, the share feature can be:
+
+- **Disabled** entirely for security compliance
+- **Restricted** to users authenticated through SSO only
+- **Self-hosted** on your own infrastructure
+
+[Learn more](/docs/enterprise) about using CyxCode in your organization.

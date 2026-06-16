@@ -1,127 +1,128 @@
 ---
-title: 分享
-description: 分享您的 OpenCode 對話。
+title: Share
+description: Share your CyxCode conversations.
 ---
 
-OpenCode 的分享功能允許您建立指向 OpenCode 對話的公開連結，方便與團隊成員協作或向他人尋求幫助。
+CyxCode's share feature allows you to create public links to your CyxCode conversations, so you can collaborate with teammates or get help from others.
 
 :::note
-共享的對話對任何擁有連結的人都是公開可存取的。
+Shared conversations are publicly accessible to anyone with the link.
 :::
 
 ---
 
-## 工作原理
+## How it works
 
-當您分享一段對話時，OpenCode 會：
+When you share a conversation, CyxCode:
 
-1. 為您的工作階段建立一個唯一的公開 URL
-2. 將您的對話歷史同步到我們的伺服器
-3. 透過可分享的連結使對話可存取 — `opncd.ai/s/<share-id>`
-
----
-
-## 分享模式
-
-OpenCode 支援三種分享模式，用於控制對話的共享方式：
+1. Creates a unique public URL for your session
+2. Syncs your conversation history to our servers
+3. Makes the conversation accessible via the shareable link — `opncd.ai/s/<share-id>`
 
 ---
 
-### 手動模式（預設）
+## Sharing
 
-預設情況下，OpenCode 使用手動分享模式。工作階段不會自動共享，但您可以使用 `/share` 指令手動分享：
+CyxCode supports three sharing modes that control how conversations are shared:
+
+---
+
+### Manual (default)
+
+By default, CyxCode uses manual sharing mode. Sessions are not shared automatically, but you can manually share them using the `/share` command:
 
 ```
 /share
 ```
 
-這將產生一個唯一的 URL 並複製到您的剪貼簿。
+This will generate a unique URL that'll be copied to your clipboard.
 
-要在[設定檔](/docs/config)中明確設定手動模式：
+To explicitly set manual mode in your [config file](/docs/config):
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "share": "manual"
 }
 ```
 
 ---
 
-### 自動分享
+### Auto-share
 
-您可以在[設定檔](/docs/config)中將 `share` 選項設定為 `"auto"`，為所有新對話啟用自動分享：
+You can enable automatic sharing for all new conversations by setting the `share` option to `"auto"` in your [config file](/docs/config):
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "share": "auto"
 }
 ```
 
-啟用自動分享後，每個新對話都會自動共享並產生連結。
+With auto-share enabled, every new conversation will automatically be shared and a link will be generated.
 
 ---
 
-### 停用
+### Disabled
 
-您可以在[設定檔](/docs/config)中將 `share` 選項設定為 `"disabled"`，完全停用分享功能：
+You can disable sharing entirely by setting the `share` option to `"disabled"` in your [config file](/docs/config):
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "share": "disabled"
 }
 ```
 
-要在團隊中對特定專案強制執行此設定，請將其新增到專案的 `opencode.json` 檔案中並提交到 Git。
+To enforce this across your team for a given project, add it to the `opencode.json` in your project and check into Git.
 
 ---
 
-## 取消分享
+## Un-sharing
 
-要停止分享對話並將其從公開存取中移除：
+To stop sharing a conversation and remove it from public access:
 
 ```
 /unshare
 ```
 
-這將移除分享連結並刪除與該對話相關的資料。
+This will remove the share link and delete the data related to the conversation.
 
 ---
 
-## 隱私
+## Privacy
 
-分享對話時需要注意以下幾點。
-
----
-
-### 資料保留
-
-共享的對話在您明確取消分享之前將一直保持可存取狀態。這包括：
-
-- 完整的對話歷史
-- 所有訊息和回覆
-- 工作階段中繼資料
+There are a few things to keep in mind when sharing a conversation.
 
 ---
 
-### 建議
+### Data retention
 
-- 僅分享不包含敏感資訊的對話。
-- 分享前請檢查對話內容。
-- 協作完成後請取消分享。
-- 避免分享包含專有程式碼或機密資料的對話。
-- 對於敏感專案，請完全停用分享功能。
+Shared conversations remain accessible until you explicitly unshare them. This
+includes:
+
+- Full conversation history
+- All messages and responses
+- Session metadata
 
 ---
 
-## 企業版
+### Recommendations
 
-對於企業部署，分享功能可以：
+- Only share conversations that don't contain sensitive information.
+- Review conversation content before sharing.
+- Unshare conversations when collaboration is complete.
+- Avoid sharing conversations with proprietary code or confidential data.
+- For sensitive projects, disable sharing entirely.
 
-- 出於安全合規考量**完全停用**
-- **限制**為僅通過 SSO 身分驗證的使用者可用
-- **自行託管**在您自己的基礎架構上
+---
 
-[了解更多](/docs/enterprise)關於在您的組織中使用 OpenCode 的資訊。
+## For enterprises
+
+For enterprise deployments, the share feature can be:
+
+- **Disabled** entirely for security compliance
+- **Restricted** to users authenticated through SSO only
+- **Self-hosted** on your own infrastructure
+
+[Learn more](/docs/enterprise) about using CyxCode in your organization.

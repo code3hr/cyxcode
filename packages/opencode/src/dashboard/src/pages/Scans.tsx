@@ -1,6 +1,6 @@
-import { Component, createSignal, createEffect, Show, For, onCleanup } from "solid-js"
+import { Component, createSignal, createEffect, createMemo, Show, For, onCleanup } from "solid-js"
 import { useParams } from "@solidjs/router"
-import { scansApi, type ScanResult } from "../api/client"
+import { scansApi, vulnApi, type ScanResult, type VulnArtifactSummary } from "../api/client"
 import { DataTable, type Column } from "../components/shared/DataTable"
 import { sseClient } from "../api/sse"
 
@@ -12,6 +12,7 @@ const Scans: Component = () => {
   const [selectedScan, setSelectedScan] = createSignal<ScanResult | null>(null)
   const [loading, setLoading] = createSignal(true)
   const [error, setError] = createSignal<string | null>(null)
+  const vuln = createMemo(() => parse(selectedScan()))
 
   const fetchScans = async () => {
     setLoading(true)
@@ -33,6 +34,24 @@ const Scans: Component = () => {
     if (result.data) {
       setSelectedScan(result.data.scan)
     }
+  }
+
+  const download = async (id: string) => {
+    const res = await vulnApi.artifact(id)
+    if (res.error) {
+      setError(res.error)
+      return
+    }
+    if (!res.data) return
+    const item = res.data.artifact
+    const body = item.content ?? JSON.stringify(item.sarif ?? item.document ?? item.report, null, 2)
+    const type = item.format === "html" ? "text/html" : "application/json"
+    const url = URL.createObjectURL(new Blob([body], { type }))
+    const a = document.createElement("a")
+    a.href = url
+    a.download = item.name
+    a.click()
+    URL.revokeObjectURL(url)
   }
 
   createEffect(() => {
@@ -115,10 +134,10 @@ const Scans: Component = () => {
     },
     {
       key: "hosts",
-      header: "Hosts",
+      header: "Results",
       width: "80px",
       render: (s) => (
-        <span class="text-gray-300">{s.hosts.length}</span>
+        <span class="text-gray-300">{count(s)}</span>
       ),
     },
     {
@@ -239,59 +258,191 @@ const Scans: Component = () => {
                 </div>
               </Show>
 
-              {/* Hosts */}
-              <div>
-                <div class="text-sm text-gray-400 mb-2">
-                  Discovered Hosts ({selectedScan()!.hosts.length})
-                </div>
-                <div class="space-y-3 max-h-96 overflow-y-auto">
-                  <For each={selectedScan()!.hosts}>
-                    {(host) => (
-                      <div class="bg-gray-900 p-3 rounded-lg">
-                        <div class="flex items-center justify-between mb-2">
-                          <div class="font-medium text-gray-100">
-                            {host.address}
-                            {host.hostname && (
-                              <span class="text-gray-400 ml-2">({host.hostname})</span>
-                            )}
+              <Show when={selectedScan()!.scanType === "vuln"}>
+                <Show
+                  when={vuln()}
+                  fallback={
+                    <div class="bg-gray-900 p-3 rounded-lg text-sm text-gray-400">
+                      No vulnerability detail payload was saved for this scan.
+                    </div>
+                  }
+                >
+                  {(data) => (
+                    <div class="space-y-4">
+                      <div class="grid grid-cols-3 gap-3">
+                        <div class="bg-gray-900 p-3 rounded-lg">
+                          <div class="text-xs text-gray-500">Dependency</div>
+                          <div class="text-lg font-semibold text-gray-100">
+                            {data().dependency?.findingCount ?? 0}
                           </div>
-                          <span
-                            class={`badge ${
-                              host.status === "up" ? "bg-green-900 text-green-200" : "bg-gray-700 text-gray-400"
-                            }`}
-                          >
-                            {host.status}
-                          </span>
                         </div>
-
-                        <Show when={host.ports.length > 0}>
-                          <div class="text-xs text-gray-400 mb-1">
-                            {host.ports.filter((p) => p.state === "open").length} open ports
+                        <div class="bg-gray-900 p-3 rounded-lg">
+                          <div class="text-xs text-gray-500">Code</div>
+                          <div class="text-lg font-semibold text-gray-100">
+                            {data().code?.findingCount ?? 0}
                           </div>
-                          <div class="grid grid-cols-2 gap-1">
-                            <For each={host.ports.filter((p) => p.state === "open").slice(0, 10)}>
-                              {(port) => (
-                                <div class="text-sm text-gray-300">
-                                  <span class="text-blue-400">{port.portid}</span>
-                                  <span class="text-gray-500">/{port.protocol}</span>
-                                  {port.service?.name && (
-                                    <span class="text-gray-400 ml-1">{port.service.name}</span>
-                                  )}
+                        </div>
+                        <div class="bg-gray-900 p-3 rounded-lg">
+                          <div class="text-xs text-gray-500">Files</div>
+                          <div class="text-lg font-semibold text-gray-100">
+                            {data().code?.filesScanned ?? 0}
+                          </div>
+                        </div>
+                      </div>
+
+                      <Show when={data().severity || data().gate}>
+                        <div class="bg-gray-900 p-3 rounded-lg">
+                          <div class="grid grid-cols-5 gap-3 text-sm">
+                            <div>
+                              <div class="text-xs text-gray-500">Critical</div>
+                              <div class="text-red-300 font-semibold">{data().severity?.critical ?? 0}</div>
+                            </div>
+                            <div>
+                              <div class="text-xs text-gray-500">High</div>
+                              <div class="text-orange-300 font-semibold">{data().severity?.high ?? 0}</div>
+                            </div>
+                            <div>
+                              <div class="text-xs text-gray-500">Medium</div>
+                              <div class="text-yellow-300 font-semibold">{data().severity?.medium ?? 0}</div>
+                            </div>
+                            <div>
+                              <div class="text-xs text-gray-500">Low</div>
+                              <div class="text-blue-300 font-semibold">{data().severity?.low ?? 0}</div>
+                            </div>
+                            <div>
+                              <div class="text-xs text-gray-500">Gate</div>
+                              <div class={data().gate?.passed === false ? "text-red-300 font-semibold" : "text-emerald-300 font-semibold"}>
+                                {data().gate ? (data().gate!.passed ? "Pass" : "Fail") : "-"}
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </Show>
+
+                      <Show when={data().artifacts?.length}>
+                        <div>
+                          <div class="text-sm text-gray-400 mb-2">Artifacts</div>
+                          <div class="space-y-2">
+                            <For each={data().artifacts ?? []}>
+                              {(item) => (
+                                <div class="bg-gray-900 p-3 rounded-lg flex items-center justify-between gap-3">
+                                  <div class="min-w-0">
+                                    <div class="text-sm text-gray-100 truncate">{item.name}</div>
+                                    <div class="text-xs text-gray-500">{new Date(item.createdAt).toLocaleString()}</div>
+                                  </div>
+                                  <button class="btn btn-secondary text-xs" onClick={() => download(item.id)}>
+                                    Download
+                                  </button>
                                 </div>
                               )}
                             </For>
-                            <Show when={host.ports.filter((p) => p.state === "open").length > 10}>
-                              <div class="text-sm text-gray-500">
-                                +{host.ports.filter((p) => p.state === "open").length - 10} more
-                              </div>
-                            </Show>
                           </div>
-                        </Show>
-                      </div>
-                    )}
-                  </For>
+                        </div>
+                      </Show>
+
+                      <Show when={data().dependency?.findings?.length}>
+                        <div>
+                          <div class="text-sm text-gray-400 mb-2">Top Dependency CVEs</div>
+                          <div class="space-y-2">
+                            <For each={data().dependency?.findings?.slice(0, 8) ?? []}>
+                              {(item) => (
+                                <div class="bg-gray-900 p-3 rounded-lg">
+                                  <div class="flex items-center justify-between gap-3">
+                                    <div class="text-sm text-gray-100 truncate">
+                                      {item.package}@{item.version}
+                                    </div>
+                                    <span class="badge bg-red-900 text-red-200">{item.severity}</span>
+                                  </div>
+                                  <div class="text-xs text-gray-500 mt-1">
+                                    {item.relationship} {item.cves?.slice(0, 3).join(", ")}
+                                  </div>
+                                </div>
+                              )}
+                            </For>
+                          </div>
+                        </div>
+                      </Show>
+
+                      <Show when={data().code?.findings?.length}>
+                        <div>
+                          <div class="text-sm text-gray-400 mb-2">Code And Config Indicators</div>
+                          <div class="space-y-2">
+                            <For each={data().code?.findings?.slice(0, 8) ?? []}>
+                              {(item) => (
+                                <div class="bg-gray-900 p-3 rounded-lg">
+                                  <div class="flex items-center justify-between gap-3">
+                                    <div class="text-sm text-gray-100 truncate">{item.title}</div>
+                                    <span class="badge bg-orange-900 text-orange-200">{item.severity}</span>
+                                  </div>
+                                  <div class="text-xs text-gray-500 mt-1">
+                                    {item.file}:{item.line} {item.confidence}
+                                  </div>
+                                </div>
+                              )}
+                            </For>
+                          </div>
+                        </div>
+                      </Show>
+                    </div>
+                  )}
+                </Show>
+              </Show>
+
+              {/* Hosts */}
+              <Show when={selectedScan()!.scanType !== "vuln"}>
+                <div>
+                  <div class="text-sm text-gray-400 mb-2">
+                    Discovered Hosts ({selectedScan()!.hosts.length})
+                  </div>
+                  <div class="space-y-3 max-h-96 overflow-y-auto">
+                    <For each={selectedScan()!.hosts}>
+                      {(host) => (
+                        <div class="bg-gray-900 p-3 rounded-lg">
+                          <div class="flex items-center justify-between mb-2">
+                            <div class="font-medium text-gray-100">
+                              {host.address}
+                              {host.hostname && (
+                                <span class="text-gray-400 ml-2">({host.hostname})</span>
+                              )}
+                            </div>
+                            <span
+                              class={`badge ${
+                                host.status === "up" ? "bg-green-900 text-green-200" : "bg-gray-700 text-gray-400"
+                              }`}
+                            >
+                              {host.status}
+                            </span>
+                          </div>
+
+                          <Show when={host.ports.length > 0}>
+                            <div class="text-xs text-gray-400 mb-1">
+                              {host.ports.filter((p) => p.state === "open").length} open ports
+                            </div>
+                            <div class="grid grid-cols-2 gap-1">
+                              <For each={host.ports.filter((p) => p.state === "open").slice(0, 10)}>
+                                {(port) => (
+                                  <div class="text-sm text-gray-300">
+                                    <span class="text-blue-400">{port.portid}</span>
+                                    <span class="text-gray-500">/{port.protocol}</span>
+                                    {port.service?.name && (
+                                      <span class="text-gray-400 ml-1">{port.service.name}</span>
+                                    )}
+                                  </div>
+                                )}
+                              </For>
+                              <Show when={host.ports.filter((p) => p.state === "open").length > 10}>
+                                <div class="text-sm text-gray-500">
+                                  +{host.ports.filter((p) => p.state === "open").length - 10} more
+                                </div>
+                              </Show>
+                            </div>
+                          </Show>
+                        </div>
+                      )}
+                    </For>
+                  </div>
                 </div>
-              </div>
+              </Show>
 
               <div class="text-xs text-gray-500 pt-2 border-t border-gray-700">
                 Started: {new Date(selectedScan()!.startTime).toLocaleString()}
@@ -305,6 +456,59 @@ const Scans: Component = () => {
       </div>
     </div>
   )
+}
+
+type Raw = {
+  artifacts?: VulnArtifactSummary[]
+  severity?: {
+    critical: number
+    high: number
+    medium: number
+    low: number
+  }
+  gate?: {
+    failOn: "critical" | "high" | "medium" | "low"
+    passed: boolean
+    blocked: number
+  }
+  dependency?: {
+    packageCount?: number
+    findingCount?: number
+    findings?: Array<{
+      package: string
+      version: string
+      severity: string
+      relationship: string
+      cves?: string[]
+    }>
+  }
+  code?: {
+    filesScanned?: number
+    findingCount?: number
+    findings?: Array<{
+      title: string
+      severity: string
+      confidence: string
+      file: string
+      line: number
+      cves?: string[]
+    }>
+  }
+}
+
+function parse(scan: ScanResult | null): Raw | null {
+  if (scan?.scanType !== "vuln" || !scan.rawOutput) return null
+  try {
+    return JSON.parse(scan.rawOutput) as Raw
+  } catch {
+    return null
+  }
+}
+
+function count(scan: ScanResult) {
+  if (scan.scanType !== "vuln") return scan.hosts.length
+  const data = parse(scan)
+  return (data?.dependency?.findingCount ?? 0) + (data?.code?.findingCount ?? 0)
 }
 
 export default Scans

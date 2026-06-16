@@ -1,6 +1,6 @@
 ---
 title: Kurallar
-description: opencode için özel talimatları ayarlayın.
+description: CyxCode için özel talimatları ayarlayın.
 ---
 
 Bir `AGENTS.md` dosyası oluşturarak opencode için özel talimatlar verebilirsiniz. Bu, Cursor rules yaklaşımına benzer. Özel projeniz için davranışını özelleştirmek amacıyla LLM'in içeriğine dahil edilecek talimatları içerir.
@@ -54,7 +54,7 @@ Buraya projeye özel talimatlar ekliyoruz ve bu, ekibiniz arasında paylaşılac
 
 ## Türler
 
-opencode ayrıca `AGENTS.md` dosyasının birden fazla konumdan okunmasını da destekler. Ve bu farklı amaçlara hizmet ediyor.
+cyxcode ayrıca `AGENTS.md` dosyasının birden fazla konumdan okunmasını da destekler. Ve bu farklı amaçlara hizmet ediyor.
 
 ### Proje
 
@@ -68,7 +68,7 @@ Bu Git'e kaydedilmediği veya ekibinizle paylaşılmadığı için, LLM'ın uyma
 
 ### Claude Code uyumluluğu
 
-opencode, Claude Code'dan geçiş yapan kullanıcılar için yedek olarak Claude Code'un dosya kurallarını destekler:
+cyxcode, Claude Code'dan geçiş yapan kullanıcılar için yedek olarak Claude Code'un dosya kurallarını destekler:
 
 - **Proje kuralları**: Proje dizininizdeki `CLAUDE.md` (`AGENTS.md` yoksa kullanılır)
 - **Global kurallar**: `~/.claude/CLAUDE.md` (`~/.config/opencode/AGENTS.md` yoksa kullanılır)
@@ -104,7 +104,7 @@ Her kategoride ilk eşleşen dosya kazanır. Örneğin, hem `AGENTS.md` hem de `
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "instructions": ["CONTRIBUTING.md", "docs/guidelines.md", ".cursor/rules/*.md"]
 }
 ```
@@ -113,7 +113,7 @@ Web'den talimatlar yüklemek için uzak URL'leri de kullanabilirsiniz.
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "instructions": ["https://raw.githubusercontent.com/my-org/shared-rules/main/style.md"]
 }
 ```
@@ -134,7 +134,7 @@ Opencode, `AGENTS.md`'daki dosya referanslarını otomatik olarak ayrıştırmas
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "instructions": ["docs/development-standards.md", "test/testing-guidelines.md", "packages/*/AGENTS.md"]
 }
 ```

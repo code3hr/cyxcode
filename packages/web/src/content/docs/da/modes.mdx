@@ -1,66 +1,66 @@
 ---
-title: Tilstande
-description: Forskellige tilstande til forskellige anvendelsestilfælde.
+title: Modes
+description: Different modes for different use cases.
 ---
 
 :::caution
-Tilstande er nu konfigureret gennem indstillingen `agent` i opencode-konfigurationen. De
-`mode` mulighed er nu forældet. [Learn more](/docs/agents).
+Modes are now configured through the `agent` option in the CyxCode config. The
+`mode` option is now deprecated. [Learn more](/docs/agents).
 :::
 
-Tilstande i opencode giver dig mulighed for at tilpasse adfærd, værktøjer og prompter til forskellige brugstilfælde.
+Modes in CyxCode allow you to customize the behavior, tools, and prompts for different use cases.
 
-Den kommer med to indbyggede tilstande: **build** og **plan**. Du kan tilpasse
-disse eller konfigurer dine egne gennem opencode-konfigurationen.
+It comes with two built-in modes: **build** and **plan**. You can customize
+these or configure your own through the CyxCode config.
 
-Du kan skifte mellem tilstande under en session eller konfigurere dem i din konfigurationsfil.
-
----
-
-## Indbyggede
-
-opencode leveres med to indbyggede tilstande.
+You can switch between modes during a session or configure them in your config file.
 
 ---
 
-### Byg
+## Built-in
 
-Byg er **standard**-tilstanden med alle værktøjer aktiveret. Dette er standardtilstanden for udviklingsarbejde, hvor du har brug for fuld adgang til filhandlinger og systemkommandoer.
+CyxCode comes with two built-in modes.
+
+---
+
+### Build
+
+Build is the **default** mode with all tools enabled. This is the standard mode for development work where you need full access to file operations and system commands.
 
 ---
 
 ### Plan
 
-En begrænset tilstand designet til planlægning og analyse. I plantilstand er følgende værktøjer deaktiveret som standard:
+A restricted mode designed for planning and analysis. In plan mode, the following tools are disabled by default:
 
-- `write` - Kan ikke oprette nye filer
-- `edit` - Kan ikke ændre eksisterende filer, undtagen filer placeret på `.opencode/plans/*.md` for at detaljere selve planen
-- `patch` - Kan ikke anvende patches
-- `bash` - Kan ikke udføre shell-kommandoer
+- `write` - Cannot create new files
+- `edit` - Cannot modify existing files, except for files located at `.opencode/plans/*.md` to detail the plan itself
+- `patch` - Cannot apply patches
+- `bash` - Cannot execute shell commands
 
-Denne tilstand er nyttig, når du vil have AI til at analysere kode, foreslå ændringer eller oprette planer uden at foretage egentlige ændringer af din kodebase.
-
----
-
-## Skift
-
-Du kan skifte mellem tilstande under en session ved at bruge _Tab_-tasten. Eller din konfigurerede `switch_mode` nøglebinding.
-
-Se også: [Formatters](/docs/formatters) for information om konfiguration af kodeformatering.
+This mode is useful when you want the AI to analyze code, suggest changes, or create plans without making any actual modifications to your codebase.
 
 ---
 
-## Konfiguration
+## Switching
 
-Du kan tilpasse de indbyggede tilstande eller oprette dine egne gennem konfiguration. Tilstande kan konfigureres på to måder:
+You can switch between modes during a session using the _Tab_ key. Or your configured `switch_mode` keybind.
 
-### JSON-konfiguration
+See also: [Formatters](/docs/formatters) for information about code formatting configuration.
 
-Konfigurer tilstande i din `opencode.json`-konfigurationsfil:
+---
+
+## Configure
+
+You can customize the built-in modes or create your own through configuration. Modes can be configured in two ways:
+
+### JSON Configuration
+
+Configure modes in your `opencode.json` config file:
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "mode": {
     "build": {
       "model": "anthropic/claude-sonnet-4-20250514",
@@ -83,12 +83,12 @@ Konfigurer tilstande i din `opencode.json`-konfigurationsfil:
 }
 ```
 
-### Markdown-konfiguration
+### Markdown Configuration
 
-Du kan også definere tilstande ved hjælp af markdown-filer. Placer dem i:
+You can also define modes using markdown files. Place them in:
 
-- Globalt: `~/.config/opencode/modes/`
-- Projekt: `.opencode/modes/`
+- Global: `~/.config/opencode/modes/`
+- Project: `.opencode/modes/`
 
 ```markdown title="~/.config/opencode/modes/review.md"
 ---
@@ -110,15 +110,15 @@ You are in code review mode. Focus on:
 Provide constructive feedback without making direct changes.
 ```
 
-Markdown-filnavnet bliver tilstandsnavnet (f.eks. opretter `review.md` en `review`-tilstand).
+The markdown file name becomes the mode name (e.g., `review.md` creates a `review` mode).
 
-Lad os se nærmere på disse konfigurationsmuligheder.
+Let's look at these configuration options in detail.
 
 ---
 
 ### Model
 
-Brug `model`-konfigurationen til at tilsidesætte standardmodellen for denne tilstand. Nyttigt til brug af forskellige modeller optimeret til forskellige opgaver. For eksempel en hurtigere model til planlægning, en mere dygtig model til implementering.
+Use the `model` config to override the default model for this mode. Useful for using different models optimized for different tasks. For example, a faster model for planning, a more capable model for implementation.
 
 ```json title="opencode.json"
 {
@@ -132,9 +132,9 @@ Brug `model`-konfigurationen til at tilsidesætte standardmodellen for denne til
 
 ---
 
-### Temperatur
+### Temperature
 
-Styr tilfældigheden og kreativiteten af ​​AI's svar med `temperature`-konfigurationen. Lavere værdier gør svar mere fokuserede og deterministiske, mens højere værdier øger kreativitet og variabilitet.
+Control the randomness and creativity of the AI's responses with the `temperature` config. Lower values make responses more focused and deterministic, while higher values increase creativity and variability.
 
 ```json title="opencode.json"
 {
@@ -149,11 +149,11 @@ Styr tilfældigheden og kreativiteten af ​​AI's svar med `temperature`-konfi
 }
 ```
 
-Temperaturværdier varierer typisk fra 0,0 til 1,0:
+Temperature values typically range from 0.0 to 1.0:
 
-- **0.0-0.2**: Meget fokuserede og deterministiske svar, ideel til kodeanalyse og planlægning
-- **0,3-0,5**: Afbalancerede svar med en vis kreativitet, god til generelle udviklingsopgaver
-- **0.6-1.0**: Mere kreative og varierede svar, nyttige til brainstorming og udforskning
+- **0.0-0.2**: Very focused and deterministic responses, ideal for code analysis and planning
+- **0.3-0.5**: Balanced responses with some creativity, good for general development tasks
+- **0.6-1.0**: More creative and varied responses, useful for brainstorming and exploration
 
 ```json title="opencode.json"
 {
@@ -173,13 +173,13 @@ Temperaturværdier varierer typisk fra 0,0 til 1,0:
 }
 ```
 
-Hvis der ikke er angivet nogen temperatur, bruger opencode modelspecifikke standarder (typisk 0 for de fleste modeller, 0,55 for Qwen-modeller).
+If no temperature is specified, CyxCode uses model-specific defaults (typically 0 for most models, 0.55 for Qwen models).
 
 ---
 
 ### Prompt
 
-Angiv en brugerdefineret systempromptfil for denne tilstand med `prompt`-konfigurationen. Promptfilen skal indeholde instruktioner, der er specifikke for tilstandens formål.
+Specify a custom system prompt file for this mode with the `prompt` config. The prompt file should contain instructions specific to the mode's purpose.
 
 ```json title="opencode.json"
 {
@@ -191,14 +191,14 @@ Angiv en brugerdefineret systempromptfil for denne tilstand med `prompt`-konfigu
 }
 ```
 
-Denne sti er i forhold til, hvor konfigurationsfilen er placeret. Så dette virker for
-både den globale opencode-konfiguration og den projektspecifikke konfiguration.
+This path is relative to where the config file is located. So this works for
+both the global CyxCode config and the project specific config.
 
 ---
 
-### Værktøjer
+### Tools
 
-Kontroller, hvilke værktøjer der er tilgængelige i denne tilstand med `tools`-konfigurationen. Du kan aktivere eller deaktivere specifikke værktøjer ved at indstille dem til `true` eller `false`.
+Control which tools are available in this mode with the `tools` config. You can enable or disable specific tools by setting them to `true` or `false`.
 
 ```json
 {
@@ -217,39 +217,39 @@ Kontroller, hvilke værktøjer der er tilgængelige i denne tilstand med `tools`
 }
 ```
 
-Hvis der ikke er angivet nogen værktøjer, er alle værktøjer aktiveret som standard.
+If no tools are specified, all tools are enabled by default.
 
 ---
 
-#### Tilgængelige værktøjer
+#### Available tools
 
-Her er alle de værktøjer, der kan styres gennem tilstandskonfigurationen.
+Here are all the tools can be controlled through the mode config.
 
-| Værktøj     | Beskrivelse                |
-| ----------- | -------------------------- |
-| `bash`      | Udfør shell-kommandoer     |
-| `edit`      | Rediger eksisterende filer |
-| `write`     | Opret nye filer            |
-| `read`      | Læs filindhold             |
-| `grep`      | Søg filindhold             |
-| `glob`      | Find filer efter mønster   |
-| `list`      | Liste biblioteksindhold    |
-| `patch`     | Anvend patches til filer   |
-| `todowrite` | Administrer todo-lister    |
-| `todoread`  | Læs todo-lister            |
-| `webfetch`  | Hent webindhold            |
+| Tool        | Description             |
+| ----------- | ----------------------- |
+| `bash`      | Execute shell commands  |
+| `edit`      | Modify existing files   |
+| `write`     | Create new files        |
+| `read`      | Read file contents      |
+| `grep`      | Search file contents    |
+| `glob`      | Find files by pattern   |
+| `list`      | List directory contents |
+| `patch`     | Apply patches to files  |
+| `todowrite` | Manage todo lists       |
+| `todoread`  | Read todo lists         |
+| `webfetch`  | Fetch web content       |
 
 ---
 
-## Brugerdefinerede tilstande
+## Custom modes
 
-Du kan oprette dine egne brugerdefinerede tilstande ved at tilføje dem til konfigurationen. Her er eksempler, der bruger begge tilgange:
+You can create your own custom modes by adding them to the configuration. Here are examples using both approaches:
 
-### Brug af JSON-konfiguration
+### Using JSON configuration
 
 ```json title="opencode.json" {4-14}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "mode": {
     "docs": {
       "prompt": "{file:./prompts/documentation.txt}",
@@ -266,9 +266,9 @@ Du kan oprette dine egne brugerdefinerede tilstande ved at tilføje dem til konf
 }
 ```
 
-### Brug af markdown-filer
+### Using markdown files
 
-Opret tilstandsfiler i `.opencode/modes/` for projektspecifikke tilstande eller `~/.config/opencode/modes/` for globale tilstande:
+Create mode files in `.opencode/modes/` for project-specific modes or `~/.config/opencode/modes/` for global modes:
 
 ```markdown title=".opencode/modes/debug.md"
 ---
@@ -318,14 +318,14 @@ Priorities:
 
 ---
 
-### Brugsscenarier
+### Use cases
 
-Her er nogle almindelige brugstilfælde for forskellige tilstande.
+Here are some common use cases for different modes.
 
-- **Build mode**: Fuldt udviklingsarbejde med alle værktøjer aktiveret
-- **Plantilstand**: Analyse og planlægning uden at foretage ændringer
-- **Anmeldelsestilstand**: Kodegennemgang med skrivebeskyttet adgang plus dokumentationsværktøjer
-- **Fejlretningstilstand**: Fokuseret på undersøgelse med bash og læseværktøjer aktiveret
-- **Docs-tilstand**: Dokumentationsskrivning med filhandlinger, men ingen systemkommandoer
+- **Build mode**: Full development work with all tools enabled
+- **Plan mode**: Analysis and planning without making changes
+- **Review mode**: Code review with read-only access plus documentation tools
+- **Debug mode**: Focused on investigation with bash and read tools enabled
+- **Docs mode**: Documentation writing with file operations but no system commands
 
-Du kan også finde ud af, at forskellige modeller er gode til forskellige brugssituationer.
+You might also find different models are good for different use cases.

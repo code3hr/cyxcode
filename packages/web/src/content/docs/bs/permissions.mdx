@@ -1,30 +1,31 @@
 ---
-title: Dozvole
-description: Kontrolirajte koje radnje zahtijevaju odobrenje za pokretanje.
+title: Permissions
+description: Control which actions require approval to run.
 ---
 
-OpenCode koristi `permission` konfiguraciju da odluči da li će se određena radnja pokrenuti automatski, zatražiti od vas ili biti blokirana.
-Od `v1.1.1`, naslijeđena `tools` logička konfiguracija je zastarjela i spojena je u `permission`. Stara `tools` konfiguracija je još uvijek podržana za kompatibilnost unatrag.
+CyxCode uses the `permission` config to decide whether a given action should run automatically, prompt you, or be blocked.
 
----
-
-## Akcije
-
-Svako pravilo dozvole rješava jedno od:
-
-- `"allow"` — pokrenuti bez odobrenja
-- `"ask"` — upit za odobrenje
-- `"deny"` — blokiraj akciju
+As of `v1.1.1`, the legacy `tools` boolean config is deprecated and has been merged into `permission`. The old `tools` config is still supported for backwards compatibility.
 
 ---
 
-## Konfiguracija
+## Actions
 
-Dozvole možete postaviti globalno (sa `*`) i nadjačati određene alate.
+Each permission rule resolves to one of:
+
+- `"allow"` — run without approval
+- `"ask"` — prompt for approval
+- `"deny"` — block the action
+
+---
+
+## Configuration
+
+You can set permissions globally (with `*`), and override specific tools.
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "permission": {
     "*": "ask",
     "bash": "allow",
@@ -33,24 +34,24 @@ Dozvole možete postaviti globalno (sa `*`) i nadjačati određene alate.
 }
 ```
 
-Također možete postaviti sve dozvole odjednom:
+You can also set all permissions at once:
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "permission": "allow"
 }
 ```
 
 ---
 
-## Granularna pravila (sintaksa objekta)
+## Granular Rules (Object Syntax)
 
-Za većinu dozvola, možete koristiti objekt za primjenu različitih radnji na osnovu unosa alata.
+For most permissions, you can use an object to apply different actions based on the tool input.
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "permission": {
     "bash": {
       "*": "ask",
@@ -67,33 +68,35 @@ Za većinu dozvola, možete koristiti objekt za primjenu različitih radnji na o
 }
 ```
 
-Pravila se procjenjuju na osnovu podudaranja uzorka, pri čemu **pobjeđuje **poslednje odgovarajuće pravilo\*\_. Uobičajeni obrazac je da se prvo pravilo `"*"` stavi sveobuhvatno, a poslije njega konkretnija pravila.
+Rules are evaluated by pattern match, with the **last matching rule winning**. A common pattern is to put the catch-all `"*"` rule first, and more specific rules after it.
 
-### Zamjenski znakovi
+### Wildcards
 
-Uzorci dozvola koriste jednostavno podudaranje zamjenskih znakova:
+Permission patterns use simple wildcard matching:
 
-- `*` odgovara nula ili više bilo kojeg znaka
-- `?` odgovara tačno jednom znaku
-- Svi ostali likovi se bukvalno podudaraju
+- `*` matches zero or more of any character
+- `?` matches exactly one character
+- All other characters match literally
 
-### Proširenje kućnog direktorija
+### Home Directory Expansion
 
-Možete koristiti `~` ili `$HOME` na početku obrasca da referencirate svoj početni direktorij. Ovo je posebno korisno za [`external_directory`](#external-directories) pravila.
+You can use `~` or `$HOME` at the start of a pattern to reference your home directory. This is particularly useful for [`external_directory`](#external-directories) rules.
 
 - `~/projects/*` -> `/Users/username/projects/*`
 - `$HOME/projects/*` -> `/Users/username/projects/*`
 - `~` -> `/Users/username`
 
-### Vanjski direktoriji
+### External Directories
 
-Koristite `external_directory` da dozvolite pozive alata koji dodiruju putanje izvan radnog direktorija gdje je OpenCode pokrenut. Ovo se odnosi na bilo koji alat koji uzima putanju kao ulaz (na primjer `read`, `edit`, `list`, `glob`, `grep` i mnoge `bash` komande).
-Proširenje kuće (poput `~/...`) utiče samo na način na koji je obrazac napisan. Ne čini vanjsku stazu dijelom trenutnog radnog prostora, tako da staze izvan radnog direktorija i dalje moraju biti dozvoljene preko `external_directory`.
-Na primjer, ovo omogućava pristup svemu pod `~/projects/personal/`:
+Use `external_directory` to allow tool calls that touch paths outside the working directory where CyxCode was started. This applies to any tool that takes a path as input (for example `read`, `edit`, `list`, `glob`, `grep`, and many `bash` commands).
+
+Home expansion (like `~/...`) only affects how a pattern is written. It does not make an external path part of the current workspace, so paths outside the working directory must still be allowed via `external_directory`.
+
+For example, this allows access to everything under `~/projects/personal/`:
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "permission": {
     "external_directory": {
       "~/projects/personal/**": "allow"
@@ -102,11 +105,11 @@ Na primjer, ovo omogućava pristup svemu pod `~/projects/personal/`:
 }
 ```
 
-Svaki direktorij koji je ovdje dozvoljen nasljeđuje iste zadane postavke kao trenutni radni prostor. Pošto je [`read` zadano na `allow`](#defaults), čitanje je također dozvoljeno za unose pod `external_directory` osim ako se ne poništi. Dodajte eksplicitna pravila kada bi alat trebao biti ograničen na ovim stazama, kao što je blokiranje uređivanja uz zadržavanje čitanja:
+Any directory allowed here inherits the same defaults as the current workspace. Since [`read` defaults to `allow`](#defaults), reads are also allowed for entries under `external_directory` unless overridden. Add explicit rules when a tool should be restricted in these paths, such as blocking edits while keeping reads:
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "permission": {
     "external_directory": {
       "~/projects/personal/**": "allow"
@@ -118,36 +121,39 @@ Svaki direktorij koji je ovdje dozvoljen nasljeđuje iste zadane postavke kao tr
 }
 ```
 
-Držite ovu listu fokusiranom na pouzdane putanje, a dodatna allow/deny pravila dodajte po potrebi za druge alate (npr. `bash`).
-
-## Dostupne dozvole
-
-Dozvole OpenCode su označene imenom alata, plus nekoliko sigurnosnih mjera:
-
-- `read` — čitanje datoteke (odgovara putanji datoteke)
-- `edit` — sve izmjene fajlova (pokriva `edit`, `write`, `patch`, `multiedit`)
-- `glob` — globbiranje fajla (odgovara glob uzorku)
-- `grep` — pretraga sadržaja (podudara se sa regularnim izrazom)
-- `list` — lista fajlova u direktorijumu (podudara se sa putanjom direktorijuma)
-- `bash` — izvođenje komandi ljuske (podudara se s raščlanjenim komandama kao što je `git status --porcelain`)
-- `task` — pokretanje subagenta (odgovara tipu podagenta)
-- `skill` — učitavanje vještine (odgovara nazivu vještine)
-- `lsp` — pokretanje LSP upita (trenutno negranularno)
-- `todoread`, `todowrite` — čitanje/ažuriranje liste obaveza
-- `webfetch` — dohvaćanje URL-a (odgovara URL-u)
-- `websearch`, `codesearch` — pretraživanje weba/koda (odgovara upitu)
-- `external_directory` — pokreće se kada alat dodirne staze izvan radnog direktorija projekta
-- `doom_loop` — aktivira se kada se isti poziv alata ponovi 3 puta sa identičnim unosom
+Keep the list focused on trusted paths, and layer extra allow or deny rules as needed for other tools (for example `bash`).
 
 ---
 
-## Zadane postavke
+## Available Permissions
 
-Ako ništa ne navedete, OpenCode počinje od dozvoljenih zadanih vrijednosti:
+cyxcode permissions are keyed by tool name, plus a couple of safety guards:
 
-- Većina dozvola je zadana na `"allow"`.
-- `doom_loop` i `external_directory` zadano na `"ask"`.
-- `read` je `"allow"`, ali `.env` fajlovi su po defaultu odbijeni:
+- `read` — reading a file (matches the file path)
+- `edit` — all file modifications (covers `edit`, `write`, `patch`, `multiedit`)
+- `glob` — file globbing (matches the glob pattern)
+- `grep` — content search (matches the regex pattern)
+- `list` — listing files in a directory (matches the directory path)
+- `bash` — running shell commands (matches parsed commands like `git status --porcelain`)
+- `task` — launching subagents (matches the subagent type)
+- `skill` — loading a skill (matches the skill name)
+- `lsp` — running LSP queries (currently non-granular)
+- `todoread`, `todowrite` — reading/updating the todo list
+- `wikiread`, `wikiwrite` — reading/updating project wiki notes
+- `webfetch` — fetching a URL (matches the URL)
+- `websearch`, `codesearch` — web/code search (matches the query)
+- `external_directory` — triggered when a tool touches paths outside the project working directory
+- `doom_loop` — triggered when the same tool call repeats 3 times with identical input
+
+---
+
+## Defaults
+
+If you don’t specify anything, CyxCode starts from permissive defaults:
+
+- Most permissions default to `"allow"`.
+- `doom_loop` and `external_directory` default to `"ask"`.
+- `read` is `"allow"`, but `.env` files are denied by default:
 
 ```json title="opencode.json"
 {
@@ -164,27 +170,29 @@ Ako ništa ne navedete, OpenCode počinje od dozvoljenih zadanih vrijednosti:
 
 ---
 
-## Šta radi “Ask”
+## What “Ask” Does
 
-Kada OpenCode zatraži odobrenje, korisničko sučelje nudi tri ishoda:
+When CyxCode prompts for approval, the UI offers three outcomes:
 
-- `once` — odobri samo ovaj zahtjev
-- `always` — odobri buduće zahtjeve koji odgovaraju predloženim obrascima (za ostatak trenutne OpenCode sesije)
-- `reject` — odbiti zahtjev
-  Skup obrazaca koje bi `always` odobrio pruža alat (na primjer, bash odobrenja obično stavljaju na bijelu listu sigurni prefiks komande kao što je `git status*`).
+- `once` — approve just this request
+- `always` — approve future requests matching the suggested patterns (for the rest of the current CyxCode session)
+- `reject` — deny the request
+
+The set of patterns that `always` would approve is provided by the tool (for example, bash approvals typically whitelist a safe command prefix like `git status*`).
 
 ---
 
-## Agenti
+## Agents
 
-Možete nadjačati dozvole po agentu. Dozvole agenta su spojene sa globalnom konfiguracijom, a pravila agenta imaju prednost. [Saznajte više](/docs/agents#permissions) o dozvolama agenta.
+You can override permissions per agent. Agent permissions are merged with the global config, and agent rules take precedence. [Learn more](/docs/agents#permissions) about agent permissions.
+
 :::note
-Pogledajte gornji odjeljak [Granularna pravila (sintaksa objekata)](#granular-rules-object-syntax) za detaljnije primjere podudaranja uzoraka.
+Refer to the [Granular Rules (Object Syntax)](#granular-rules-object-syntax) section above for more detailed pattern matching examples.
 :::
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "permission": {
     "bash": {
       "*": "ask",
@@ -210,7 +218,7 @@ Pogledajte gornji odjeljak [Granularna pravila (sintaksa objekata)](#granular-ru
 }
 ```
 
-Također možete konfigurirati dozvole agenta u Markdownu:
+You can also configure agent permissions in Markdown:
 
 ```markdown title="~/.config/opencode/agents/review.md"
 ---
@@ -226,5 +234,5 @@ Only analyze code and suggest changes.
 ```
 
 :::tip
-Koristite podudaranje uzoraka za naredbe s argumentima. `"grep *"` dozvoljava `grep pattern file.txt`, dok bi ga samo `"grep"` blokirao. Naredbe poput `git status` rade za zadano ponašanje, ali zahtijevaju eksplicitnu dozvolu (kao `"git status *"`) kada se prosljeđuju argumenti.
+Use pattern matching for commands with arguments. `"grep *"` allows `grep pattern file.txt`, while `"grep"` alone would block it. Commands like `git status` work for default behavior but require explicit permission (like `"git status *"`) when arguments are passed.
 :::

@@ -1,77 +1,77 @@
 ---
 title: TUI
-description: Usando a interface de usuário de terminal opencode.
+description: Using the CyxCode terminal user interface.
 ---
 
 import { Tabs, TabItem } from "@astrojs/starlight/components"
 
-O opencode fornece uma interface de terminal interativa ou TUI para trabalhar em seus projetos com um LLM.
+CyxCode provides an interactive terminal interface or TUI for working on your projects with an LLM.
 
-Executar opencode inicia o TUI para o diretório atual.
-
-```bash
-opencode
-```
-
-Ou você pode iniciá-lo para um diretório de trabalho específico.
+Running CyxCode starts the TUI for the current directory.
 
 ```bash
-opencode /path/to/project
+cyxcode
 ```
 
-Uma vez que você esteja no TUI, você pode solicitar com uma mensagem.
+Or you can start it for a specific working directory.
+
+```bash
+cyxcode /path/to/project
+```
+
+Once you're in the TUI, you can prompt it with a message.
 
 ```text
-Faça um resumo rápido da base de código.
+Give me a quick summary of the codebase.
 ```
 
 ---
 
-## Referências de arquivos
+## File references
 
-Você pode referenciar arquivos em suas mensagens usando `@`. Isso faz uma busca difusa de arquivos no diretório de trabalho atual.
+You can reference files in your messages using `@`. This does a fuzzy file search in the current working directory.
 
 :::tip
-Você também pode usar `@` para referenciar arquivos em suas mensagens.
+You can also use `@` to reference files in your messages.
 :::
 
 ```text "@packages/functions/src/api/index.ts"
-Como a autenticação é tratada em @packages/functions/src/api/index.ts?
+How is auth handled in @packages/functions/src/api/index.ts?
 ```
 
-O conteúdo do arquivo é adicionado à conversa automaticamente.
+The content of the file is added to the conversation automatically.
 
 ---
 
-## Comandos Bash
+## Bash commands
 
-Comece uma mensagem com `!` para executar um comando de shell.
+Start a message with `!` to run a shell command.
 
 ```bash frame="none"
 !ls -la
 ```
 
-A saída do comando é adicionada à conversa como um resultado de ferramenta.
+The output of the command is added to the conversation as a tool result.
 
 ---
 
-## Comandos
+## Commands
 
-Ao usar o TUI do opencode, você pode digitar `/` seguido pelo nome de um comando para executar ações rapidamente. Por exemplo:
+When using the CyxCode TUI, you can type `/` followed by a command name to quickly execute actions. For example:
 
 ```bash frame="none"
 /help
 ```
 
-A maioria dos comandos também possui atalhos usando `ctrl+x` como a tecla líder, onde `ctrl+x` é a tecla líder padrão. [Saiba mais](/docs/keybinds).
+Most commands also have keybind using `ctrl+x` as the leader key, where `ctrl+x` is the default leader key. [Learn more](/docs/keybinds).
 
-Aqui estão todos os comandos de barra disponíveis:
+Here are all available slash commands:
 
 ---
 
 ### connect
 
-Adicione um provedor ao opencode. Permite que você selecione entre os provedores disponíveis e adicione suas chaves de API.
+Add a provider to CyxCode. Allows you to select from available providers and add their API keys.
 
 ```bash frame="none"
 /connect
@@ -81,172 +81,173 @@ Adicione um provedor ao opencode. Permite que você selecione entre os provedore
 
 ### compact
 
-Compacte a sessão atual. _Alias_: `/summarize`
+Compact the current session. _Alias_: `/summarize`
 
 ```bash frame="none"
 /compact
 ```
 
-**Atalho:** `ctrl+x c`
+**Keybind:** `ctrl+x c`
 
 ---
 
 ### details
 
-Alternar detalhes da execução da ferramenta.
+Toggle tool execution details.
 
 ```bash frame="none"
 /details
 ```
 
-**Atalho:** `ctrl+x d`
+**Keybind:** `ctrl+x d`
 
 ---
 
 ### editor
 
-Abra um editor externo para compor mensagens. Usa o editor definido na sua variável de ambiente `EDITOR`. [Saiba mais](#editor-setup).
+Open external editor for composing messages. Uses the editor set in your `EDITOR` environment variable. [Learn more](#editor-setup).
 
 ```bash frame="none"
 /editor
 ```
 
-**Atalho:** `ctrl+x e`
+**Keybind:** `ctrl+x e`
 
 ---
 
 ### exit
 
-Saia do opencode. _Aliases_: `/quit`, `/q`
+Exit CyxCode. _Aliases_: `/quit`, `/q`
 
 ```bash frame="none"
 /exit
 ```
 
-**Atalho:** `ctrl+x q`
+**Keybind:** `ctrl+x q`
 
 ---
 
 ### export
 
-Exporte a conversa atual para Markdown e abra no seu editor padrão. Usa o editor definido na sua variável de ambiente `EDITOR`. [Saiba mais](#editor-setup).
+Export current conversation to Markdown and open in your default editor. Uses the editor set in your `EDITOR` environment variable. [Learn more](#editor-setup).
 
 ```bash frame="none"
 /export
 ```
 
-**Atalho:** `ctrl+x x`
+**Keybind:** `ctrl+x x`
 
 ---
 
 ### help
 
-Mostre o diálogo de ajuda.
+Show the help dialog.
 
 ```bash frame="none"
 /help
 ```
 
-**Atalho:** `ctrl+x h`
+**Keybind:** `ctrl+x h`
 
 ---
 
 ### init
 
-Crie ou atualize o arquivo `AGENTS.md`. [Saiba mais](/docs/rules).
+Create or update `AGENTS.md` file. [Learn more](/docs/rules).
 
 ```bash frame="none"
 /init
 ```
 
-**Atalho:** `ctrl+x i`
+**Keybind:** `ctrl+x i`
 
 ---
 
 ### models
 
-Liste os modelos disponíveis.
+List available models.
 
 ```bash frame="none"
 /models
 ```
 
-**Atalho:** `ctrl+x m`
+**Keybind:** `ctrl+x m`
 
 ---
 
 ### new
 
-Inicie uma nova sessão. _Alias_: `/clear`
+Start a new session. _Alias_: `/clear`
 
 ```bash frame="none"
 /new
 ```
 
-**Atalho:** `ctrl+x n`
+**Keybind:** `ctrl+x n`
 
 ---
 
 ### redo
 
-Refaça uma mensagem anteriormente desfeita. Disponível apenas após usar `/undo`.
+Redo a previously undone message. Only available after using `/undo`.
 
 :::tip
-Quaisquer alterações de arquivo também serão restauradas.
+Any file changes will also be restored.
 :::
 
-Internamente, isso usa Git para gerenciar as alterações de arquivo. Portanto, seu projeto **precisa ser um repositório Git**.
+Internally, this uses Git to manage the file changes. So your project **needs to
+be a Git repository**.
 
 ```bash frame="none"
 /redo
 ```
 
-**Atalho:** `ctrl+x r`
+**Keybind:** `ctrl+x r`
 
 ---
 
 ### sessions
 
-Liste e alterne entre sessões. _Aliases_: `/resume`, `/continue`
+List and switch between sessions. _Aliases_: `/resume`, `/continue`
 
 ```bash frame="none"
 /sessions
 ```
 
-**Atalho:** `ctrl+x l`
+**Keybind:** `ctrl+x l`
 
 ---
 
 ### share
 
-Compartilhe a sessão atual. [Saiba mais](/docs/share).
+Share current session. [Learn more](/docs/share).
 
 ```bash frame="none"
 /share
 ```
 
-**Atalho:** `ctrl+x s`
+**Keybind:** `ctrl+x s`
 
 ---
 
 ### themes
 
-Liste os temas disponíveis.
+List available themes.
 
 ```bash frame="none"
 /themes
 ```
 
-**Atalho:** `ctrl+x t`
+**Keybind:** `ctrl+x t`
 
 ---
 
 ### thinking
 
-Alternar a visibilidade dos blocos de pensamento/razão na conversa. Quando ativado, você pode ver o processo de raciocínio do modelo para modelos que suportam pensamento estendido.
+Toggle the visibility of thinking/reasoning blocks in the conversation. When enabled, you can see the model's reasoning process for models that support extended thinking.
 
 :::note
-Este comando apenas controla se os blocos de pensamento são **exibidos** - não ativa ou desativa as capacidades de raciocínio do modelo. Para alternar as capacidades reais de raciocínio, use `ctrl+t` para alternar entre variantes do modelo.
+This command only controls whether thinking blocks are **displayed** - it does not enable or disable the model's reasoning capabilities. To toggle actual reasoning capabilities, use `ctrl+t` to cycle through model variants.
 :::
 
 ```bash frame="none"
@@ -257,25 +258,26 @@ Este comando apenas controla se os blocos de pensamento são **exibidos** - não
 
 ### undo
 
-Desfaça a última mensagem na conversa. Remove a mensagem mais recente do usuário, todas as respostas subsequentes e quaisquer alterações de arquivo.
+Undo last message in the conversation. Removes the most recent user message, all subsequent responses, and any file changes.
 
 :::tip
-Quaisquer alterações de arquivo feitas também serão revertidas.
+Any file changes made will also be reverted.
 :::
 
-Internamente, isso usa Git para gerenciar as alterações de arquivo. Portanto, seu projeto **precisa ser um repositório Git**.
+Internally, this uses Git to manage the file changes. So your project **needs to
+be a Git repository**.
 
 ```bash frame="none"
 /undo
 ```
 
-**Atalho:** `ctrl+x u`
+**Keybind:** `ctrl+x u`
 
 ---
 
 ### unshare
 
-Descompartilhe a sessão atual. [Saiba mais](/docs/share#un-sharing).
+Unshare current session. [Learn more](/docs/share#un-sharing).
 
 ```bash frame="none"
 /unshare
@@ -283,23 +285,23 @@ Descompartilhe a sessão atual. [Saiba mais](/docs/share#un-sharing).
 
 ---
 
-## Configuração do Editor
+## Editor setup
 
-Tanto os comandos `/editor` quanto `/export` usam o editor especificado na sua variável de ambiente `EDITOR`.
+Both the `/editor` and `/export` commands use the editor specified in your `EDITOR` environment variable.
 
 <Tabs>
   <TabItem label="Linux/macOS">
     ```bash
-    # Exemplo para nano ou vim
+    # Example for nano or vim
     export EDITOR=nano
     export EDITOR=vim
 
-    # Para editores GUI, VS Code, Cursor, VSCodium, Windsurf, Zed, etc.
-    # inclua --wait
+    # For GUI editors, VS Code, Cursor, VSCodium, Windsurf, Zed, etc.
+    # include --wait
     export EDITOR="code --wait"
     ```
 
-    Para torná-lo permanente, adicione isso ao seu perfil de shell;
+    To make it permanent, add this to your shell profile;
     `~/.bashrc`, `~/.zshrc`, etc.
 
   </TabItem>
@@ -308,12 +310,13 @@ Tanto os comandos `/editor` quanto `/export` usam o editor especificado na sua v
     ```bash
     set EDITOR=notepad
 
-    # Para editores GUI, VS Code, Cursor, VSCodium, Windsurf, Zed, etc.
-    # inclua --wait
+    # For GUI editors, VS Code, Cursor, VSCodium, Windsurf, Zed, etc.
+    # include --wait
     set EDITOR=code --wait
     ```
 
-    Para torná-lo permanente, use **Propriedades do Sistema** > **Variáveis de Ambiente**.
+    To make it permanent, use **System Properties** > **Environment
+    Variables**.
 
   </TabItem>
 
@@ -321,43 +324,43 @@ Tanto os comandos `/editor` quanto `/export` usam o editor especificado na sua v
     ```powershell
     $env:EDITOR = "notepad"
 
-    # Para editores GUI, VS Code, Cursor, VSCodium, Windsurf, Zed, etc.
-    # inclua --wait
+    # For GUI editors, VS Code, Cursor, VSCodium, Windsurf, Zed, etc.
+    # include --wait
     $env:EDITOR = "code --wait"
     ```
 
-    Para torná-lo permanente, adicione isso ao seu perfil do PowerShell.
+    To make it permanent, add this to your PowerShell profile.
 
   </TabItem>
 </Tabs>
 
-As opções de editor populares incluem:
+Popular editor options include:
 
-- `code` - VS Code
+- `code` - Visual Studio Code
 - `cursor` - Cursor
 - `windsurf` - Windsurf
-- `nvim` - Editor Neovim
-- `vim` - Editor Vim
-- `nano` - Editor Nano
-- `notepad` - Bloco de Notas do Windows
+- `nvim` - Neovim editor
+- `vim` - Vim editor
+- `nano` - Nano editor
+- `notepad` - Windows Notepad
 - `subl` - Sublime Text
 
 :::note
-Alguns editores como o VS Code precisam ser iniciados com a flag `--wait`.
+Some editors like VS Code need to be started with the `--wait` flag.
 :::
 
-Alguns editores precisam de argumentos de linha de comando para rodar em modo bloqueante. A flag `--wait` faz com que o processo do editor bloqueie até ser fechado.
+Some editors need command-line arguments to run in blocking mode. The `--wait` flag makes the editor process block until closed.
 
 ---
 
-## Configuração
+## Configure
 
-Você pode personalizar o comportamento do TUI através de `tui.json` (ou `tui.jsonc`).
+You can customize TUI behavior through `tui.json` (or `tui.jsonc`).
 
 ```json title="tui.json"
 {
-  "$schema": "https://opencode.ai/tui.json",
-  "theme": "opencode",
+  "$schema": "https://cyxcode.ai/tui.json",
+  "theme": "CyxCode",
   "keybinds": {
     "leader": "ctrl+x"
   },
@@ -369,29 +372,29 @@ Você pode personalizar o comportamento do TUI através de `tui.json` (ou `tui.j
 }
 ```
 
-Isso é separado do `opencode.json`, que configura o comportamento do servidor/runtime.
+This is separate from `opencode.json`, which configures server/runtime behavior.
 
-### Opções
+### Options
 
-- `theme` - Define o tema da sua interface. [Saiba mais](/docs/themes).
-- `keybinds` - Personaliza atalhos de teclado. [Saiba mais](/docs/keybinds).
-- `scroll_acceleration.enabled` - Ative a aceleração de rolagem no estilo macOS para uma rolagem suave e natural. Quando ativado, a velocidade de rolagem aumenta com gestos de rolagem rápidos e permanece precisa para movimentos mais lentos. **Esta configuração tem precedência sobre `scroll_speed` e a substitui quando ativada.**
-- `scroll_speed` - Controla quão rápido o TUI rola ao usar comandos de rolagem (mínimo: `0.001`, suporta valores decimais). O padrão é `3`. **Nota: Isso é ignorado se `scroll_acceleration.enabled` estiver definido como `true`.**
-- `diff_style` - Controla a renderização de diffs. `"auto"` se adapta à largura do terminal, `"stacked"` sempre mostra um layout de coluna única.
+- `theme` - Sets your UI theme. [Learn more](/docs/themes).
+- `keybinds` - Customizes keyboard shortcuts. [Learn more](/docs/keybinds).
+- `scroll_acceleration.enabled` - Enable macOS-style scroll acceleration for smooth, natural scrolling. When enabled, scroll speed increases with rapid scrolling gestures and stays precise for slower movements. **This setting takes precedence over `scroll_speed` and overrides it when enabled.**
+- `scroll_speed` - Controls how fast the TUI scrolls when using scroll commands (minimum: `0.001`, supports decimal values). Defaults to `3`. **Note: This is ignored if `scroll_acceleration.enabled` is set to `true`.**
+- `diff_style` - Controls diff rendering. `"auto"` adapts to terminal width, `"stacked"` always shows a single-column layout.
 
-Use `OPENCODE_TUI_CONFIG` para carregar um caminho de configuração TUI personalizado.
-
----
-
-## Personalização
-
-Você pode personalizar vários aspectos da visualização do TUI usando a paleta de comandos (`ctrl+x h` ou `/help`). Essas configurações persistem entre reinicializações.
+Use `OPENCODE_TUI_CONFIG` to load a custom TUI config path.
 
 ---
 
-#### Exibição do nome de usuário
+## Customization
 
-Alternar se seu nome de usuário aparece nas mensagens de chat. Acesse isso através de:
+You can customize various aspects of the TUI view using the command palette (`ctrl+x h` or `/help`). These settings persist across restarts.
 
-- Paleta de comandos: Pesquise por "username" ou "hide username"
-- A configuração persiste automaticamente e será lembrada entre as sessões do TUI
+---
+
+#### Username display
+
+Toggle whether your username appears in chat messages. Access this through:
+
+- Command palette: Search for "username" or "hide username"
+- The setting persists automatically and will be remembered across TUI sessions

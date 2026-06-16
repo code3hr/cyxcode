@@ -1,168 +1,170 @@
 ---
-title: Корпоративное использование
-description: Безопасное использование opencode в вашей организации.
+title: Enterprise
+description: Using CyxCode securely in your organization.
 ---
 
 import config from "../../../../config.mjs"
 export const email = `mailto:${config.email}`
 
-opencode Enterprise предназначен для организаций, которые хотят быть уверены, что их код и данные никогда не покинут инфраструктуру. Это можно сделать с помощью централизованной конфигурации, которая интегрируется с вашим единым входом и внутренним шлюзом AI.
+CyxCode Enterprise is for organizations that want to ensure that their code and data never leaves their infrastructure. It can do this by using a centralized config that integrates with your SSO and internal AI gateway.
 
 :::note
-opencode не хранит ваш код или контекстные данные.
+CyxCode does not store any of your code or context data.
 :::
 
-Чтобы начать работу с opencode Enterprise:
+To get started with CyxCode Enterprise:
 
-1. Проведите испытание внутри своей команды.
-2. **<a href={email}>Свяжитесь с нами</a>**, чтобы обсудить цены и варианты внедрения.
-
----
-
-## Пробная версия
-
-opencode имеет открытый исходный код и не хранит ваш код или контекстные данные, поэтому ваши разработчики могут просто [приступить к работе](/docs/) и провести пробную версию.
+1. Do a trial internally with your team.
+2. **<a href={email}>Contact us</a>** to discuss pricing and implementation options.
 
 ---
 
-### Обработка данных
+## Trial
 
-**opencode не хранит ваш код или контекстные данные.** Вся обработка происходит локально или посредством прямых вызовов API к вашему провайдеру ИИ.
-
-Это означает, что пока вы используете поставщика, которому доверяете, или внутреннего
-Шлюз AI позволяет безопасно использовать opencode.
-
-Единственное предостережение — это дополнительная функция `/share`.
+CyxCode is open source and does not store any of your code or context data, so your developers can simply [get started](/docs/) and carry out a trial.
 
 ---
 
-#### Обмен беседами
+### Data handling
 
-Если пользователь включает функцию `/share`, разговор и связанные с ним данные отправляются в службу, которую мы используем для размещения этих общих страниц на opencode.ai.
+**CyxCode does not store your code or context data.** All processing happens locally or through direct API calls to your AI provider.
 
-В настоящее время данные передаются через периферийную сеть нашей CDN и кэшируются на периферии рядом с вашими пользователями.
+This means that as long as you are using a provider you trust, or an internal
+AI gateway, you can use CyxCode securely.
 
-Мы рекомендуем вам отключить эту функцию для пробной версии.
+The only caveat here is the optional `/share` feature.
+
+---
+
+#### Sharing conversations
+
+If a user enables the `/share` feature, the conversation and the data associated with it are sent to the service we use to host these share pages at cyxcode.ai.
+
+The data is currently served through our CDN's edge network, and is cached on the edge near your users.
+
+We recommend you disable this for your trial.
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "share": "disabled"
 }
 ```
 
-[Подробнее о совместном использовании](/docs/share).
+[Learn more about sharing](/docs/share).
 
 ---
 
-### Владение кодом
+### Code ownership
 
-**Вы являетесь владельцем всего кода, созданного opencode.** Никаких лицензионных ограничений или претензий на право собственности нет.
-
----
-
-## Цены
-
-Мы используем модель «на рабочее место» для opencode Enterprise. Если у вас есть собственный шлюз LLM, мы не взимаем плату за используемые токены. Для получения более подробной информации о ценах и вариантах реализации **<a href={email}>свяжитесь с нами</a>**.
+**You own all code produced by CyxCode.** There are no licensing restrictions or ownership claims.
 
 ---
 
-## Развертывание
+## Pricing
 
-После завершения пробной версии и готовности использовать opencode на
-вашей организации, вы можете **<a href={email}>связаться с нами</a>**, чтобы обсудить
-цены и варианты реализации.
+We use a per-seat model for CyxCode Enterprise. If you have your own LLM gateway, we do not charge for tokens used. For further details about pricing and implementation options, **<a href={email}>contact us</a>**.
 
 ---
 
-### Центральная конфигурация
+## Deployment
 
-Мы можем настроить opencode для использования единой центральной конфигурации для всей вашей организации.
-
-Эта централизованная конфигурация может интегрироваться с вашим поставщиком единого входа и гарантирует всем пользователям доступ только к вашему внутреннему шлюзу AI.
-
----
-
-### Интеграция SSO
-
-Через центральную конфигурацию opencode может интегрироваться с провайдером единого входа вашей организации для аутентификации.
-
-Это позволяет opencode получать учетные данные для вашего внутреннего шлюза AI через существующую систему управления идентификацией.
+Once you have completed your trial and you are ready to use CyxCode at
+your organization, you can **<a href={email}>contact us</a>** to discuss
+pricing and implementation options.
 
 ---
 
-### Внутренний шлюз AI
+### Central Config
 
-Благодаря центральной конфигурации opencode также можно настроить на использование только вашего внутреннего шлюза AI.
+We can set up CyxCode to use a single central config for your entire organization.
 
-Вы также можете отключить всех других поставщиков ИИ, гарантируя, что все запросы будут проходить через утвержденную инфраструктуру вашей организации.
-
----
-
-### Самостоятельный хостинг
-
-Хотя мы рекомендуем отключить страницы общего доступа, чтобы гарантировать, что ваши данные никогда не покинут вашу организацию, мы также можем помочь вам самостоятельно разместить их в вашей инфраструктуре.
-
-В настоящее время это находится в нашей дорожной карте. Если вы заинтересованы, **<a href={email}>дайте нам знать</a>**.
+This centralized config can integrate with your SSO provider and ensures all users access only your internal AI gateway.
 
 ---
 
-## Часто задаваемые вопросы
+### SSO integration
+
+Through the central config, CyxCode can integrate with your organization's SSO provider for authentication.
+
+This allows CyxCode to obtain credentials for your internal AI gateway through your existing identity management system.
+
+---
+
+### Internal AI gateway
+
+With the central config, CyxCode can also be configured to use only your internal AI gateway.
+
+You can also disable all other AI providers, ensuring all requests go through your organization's approved infrastructure.
+
+---
+
+### Self-hosting
+
+While we recommend disabling the share pages to ensure your data never leaves
+your organization, we can also help you self-host them on your infrastructure.
+
+This is currently on our roadmap. If you're interested, **<a href={email}>let us know</a>**.
+
+---
+
+## FAQ
 
 <details>
-<summary>Что такое opencode Enterprise?</summary>
+<summary>What is CyxCode Enterprise?</summary>
 
-opencode Enterprise предназначен для организаций, которые хотят быть уверены, что их код и данные никогда не покинут инфраструктуру. Это можно сделать с помощью централизованной конфигурации, которая интегрируется с вашим единым входом и внутренним шлюзом AI.
+CyxCode Enterprise is for organizations that want to ensure that their code and data never leaves their infrastructure. It can do this by using a centralized config that integrates with your SSO and internal AI gateway.
 
 </details>
 
 <details>
-<summary>Как начать работу с opencode Enterprise?</summary>
+<summary>How do I get started with CyxCode Enterprise?</summary>
 
-Просто начните с внутреннего испытания со своей командой. opencode по умолчанию не сохраняет ваш код или контекстные данные, что упрощает начало работы.
+Simply start with an internal trial with your team. CyxCode by default does not store your code or context data, making it easy to get started.
 
-Затем **<a href={email}>свяжитесь с нами</a>**, чтобы обсудить цены и варианты внедрения.
-
-</details>
-
-<details>
-<summary>Как работает корпоративное ценообразование?</summary>
-
-Мы предлагаем корпоративные цены за рабочее место. Если у вас есть собственный шлюз LLM, мы не взимаем плату за используемые токены. Для получения более подробной информации **<a href={email}>свяжитесь с нами</a>**, чтобы получить индивидуальное предложение, соответствующее потребностям вашей организации.
+Then **<a href={email}>contact us</a>** to discuss pricing and implementation options.
 
 </details>
 
 <details>
-<summary>Защищены ли мои данные с помощью opencode Enterprise?</summary>
+<summary>How does enterprise pricing work?</summary>
 
-Да. opencode не хранит ваш код или контекстные данные. Вся обработка происходит локально или посредством прямых вызовов API вашего провайдера ИИ. Благодаря централизованной настройке и интеграции единого входа ваши данные остаются в безопасности в инфраструктуре вашей организации.
+We offer per-seat enterprise pricing. If you have your own LLM gateway, we do not charge for tokens used. For further details, **<a href={email}>contact us</a>** for a custom quote based on your organization's needs.
 
 </details>
 
 <details>
-<summary>Можем ли мы использовать собственный частный реестр NPM?</summary>
+<summary>Is my data secure with CyxCode Enterprise?</summary>
 
-opencode поддерживает частные реестры npm посредством встроенной поддержки файлов `.npmrc` Bun. Если ваша организация использует частный реестр, такой как JFrog Artifactory, Nexus или аналогичный, убедитесь, что разработчики прошли аутентификацию перед запуском opencode.
+Yes. CyxCode does not store your code or context data. All processing happens locally or through direct API calls to your AI provider. With central config and SSO integration, your data remains secure within your organization's infrastructure.
 
-Чтобы настроить аутентификацию с помощью вашего частного реестра:
+</details>
+
+<details>
+<summary>Can we use our own private NPM registry?</summary>
+
+CyxCode supports private npm registries through Bun's native `.npmrc` file support. If your organization uses a private registry, such as JFrog Artifactory, Nexus, or similar, ensure developers are authenticated before running CyxCode.
+
+To set up authentication with your private registry:
 
 ```bash
 npm login --registry=https://your-company.jfrog.io/api/npm/npm-virtual/
 ```
 
-При этом создается `~/.npmrc` с данными аутентификации. opencode автоматически подхватит его.
+This creates `~/.npmrc` with authentication details. CyxCode will automatically
+pick this up.
 
 :::caution
-Перед запуском opencode вы должны войти в частный реестр.
+You must be logged into the private registry before running CyxCode.
 :::
 
-Альтернативно вы можете вручную настроить файл `.npmrc`:
+Alternatively, you can manually configure a `.npmrc` file:
 
 ```bash title="~/.npmrc"
 registry=https://your-company.jfrog.io/api/npm/npm-virtual/
 //your-company.jfrog.io/api/npm/npm-virtual/:_authToken=${NPM_AUTH_TOKEN}
 ```
 
-Разработчики должны войти в частный реестр перед запуском opencode, чтобы гарантировать возможность установки пакетов из корпоративного реестра.
+Developers must be logged into the private registry before running CyxCode to ensure packages can be installed from your enterprise registry.
 
 </details>

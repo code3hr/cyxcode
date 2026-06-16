@@ -557,7 +557,7 @@ export namespace ACP {
         },
         authMethods: [authMethod],
         agentInfo: {
-          name: "OpenCode",
+          name: "CyxCode",
           version: Installation.VERSION,
         },
       }

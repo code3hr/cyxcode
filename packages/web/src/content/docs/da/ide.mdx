@@ -1,48 +1,48 @@
 ---
 title: IDE
-description: OpenCode-udvidelsen til VS Code, Cursor og andre IDE'er
+description: The CyxCode extension for VS Code, Cursor, and other IDEs
 ---
 
-OpenCode integreres med VS Code, Cursor eller enhver IDE, der understøtter en terminal. Bare kør `opencode` i terminalen for at komme i gang.
+CyxCode integrates with VS Code, Cursor, or any IDE that supports a terminal. Just run `cyxcode` in the terminal to get started.
 
 ---
 
-## Brug
+## Usage
 
-- **Hurtig start**: Brug `Cmd+Esc` (Mac) eller `Ctrl+Esc` (Windows/Linux) til at åbne OpenCode i en delt terminalvisning, eller fokuser en eksisterende terminalsession, hvis en allerede kører.
-- **Ny session**: Brug `Cmd+Shift+Esc` (Mac) eller `Ctrl+Shift+Esc` (Windows/Linux) til at starte en ny OpenCode terminalsession, mulighed en allerede er åben. Du kan også klikke på knappen OpenCode i brugergrænsefladen.
-- **Kontekstbevidsthed**: Del automatisk dit nuværende valg eller din fane med OpenCode.
-- **Filreferencegenveje**: Brug `Cmd+Option+K` (Mac) eller `Alt+Ctrl+K` (Linux/Windows) til at indsætte filreferencer. For eksempel `@File#L37-42`.
+- **Quick Launch**: Use `Cmd+Esc` (Mac) or `Ctrl+Esc` (Windows/Linux) to open CyxCode in a split terminal view, or focus an existing terminal session if one is already running.
+- **New Session**: Use `Cmd+Shift+Esc` (Mac) or `Ctrl+Shift+Esc` (Windows/Linux) to start a new CyxCode terminal session, even if one is already open. You can also click the CyxCode button in the UI.
+- **Context Awareness**: Automatically share your current selection or tab with CyxCode.
+- **File Reference Shortcuts**: Use `Cmd+Option+K` (Mac) or `Alt+Ctrl+K` (Linux/Windows) to insert file references. For example, `@File#L37-42`.
 
 ---
 
 ## Installation
 
-Sådan installeres OpenCode på VS Code og populære gafler som Cursor, Windsurf, VSCodium:
+To install CyxCode on VS Code and popular forks like Cursor, Windsurf, VSCodium:
 
-1. Åbn VS Code
-2. Åbn den integrerede terminal
-3. Kør `opencode` - udvidelsen installeres automatisk
+1. Open VS Code
+2. Open the integrated terminal
+3. Run `cyxcode` - the extension installs automatically
 
-Hvis du på den anden side vil bruge din egen IDE, når du kører `/editor` eller `/export` fra TUI, skal du indstille `export EDITOR="code --wait"`. [Learn more](/docs/tui/#editor-setup).
-
----
-
-### Manuel installation
-
-Søg efter **OpenCode** i Extension Marketplace, og klik på **Installer**.
+If on the other hand you want to use your own IDE when you run `/editor` or `/export` from the TUI, you'll need to set `export EDITOR="code --wait"`. [Learn more](/docs/tui/#editor-setup).
 
 ---
 
-### Fejlfinding
+### Manual Install
 
-Hvis udvidelsen ikke kan installeres automatisk:
+Search for **CyxCode** in the Extension Marketplace and click **Install**.
 
-- Sørg for, at du kører `opencode` i den integrerede terminal.
-- Bekræft, at CLI for din IDE er installeret:
-  - For VS Code: `code` kommando
-  - For Cursor: `cursor` kommando
-  - For Windsurf: `windsurf` kommando
-  - For VSCodium: `codium` kommando
-  - Hvis ikke, så kør `Cmd+Shift+P` (Mac) eller `Ctrl+Shift+P` (Windows/Linux) og søg efter "Shell Command: Install 'code' command in PATH" (eller tilsvarende for din IDE)
-- Sørg for, at VS Code har tilladelse til at installere udvidelser
+---
+
+### Troubleshooting
+
+If the extension fails to install automatically:
+
+- Ensure you’re running `cyxcode` in the integrated terminal.
+- Confirm the CLI for your IDE is installed:
+  - For VS Code: `code` command
+  - For Cursor: `cursor` command
+  - For Windsurf: `windsurf` command
+  - For VSCodium: `codium` command
+  - If not, run `Cmd+Shift+P` (Mac) or `Ctrl+Shift+P` (Windows/Linux) and search for "Shell Command: Install 'code' command in PATH" (or the equivalent for your IDE)
+- Ensure VS Code has permission to install extensions

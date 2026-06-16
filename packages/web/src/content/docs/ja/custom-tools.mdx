@@ -1,33 +1,33 @@
 ---
-title: カスタムツール
-description: LLM が OpenCode で呼び出すことができるツールを作成します。
+title: Custom Tools
+description: Create tools the LLM can call in CyxCode.
 ---
 
-カスタムツールは、会話中に LLM が呼び出すことができる作成した関数です。これらは、OpenCode の[組み込みツール](/docs/tools) (`read`、`write`、`bash` など) と連携して動作します。
-
----
-
-## ツールの作成
-
-ツールは **TypeScript** または **JavaScript** ファイルとして定義されます。ただし、ツール定義では**任意の言語**で記述されたスクリプトを呼び出すことができます。TypeScript または JavaScript はツール定義自体にのみ使用されます。
+Custom tools are functions you create that the LLM can call during conversations. They work alongside CyxCode's [built-in tools](/docs/tools) like `read`, `write`, and `bash`.
 
 ---
 
-### 場所
+## Creating a tool
 
-それらは次のように定義できます。
-
-- ローカルでは、プロジェクトの `.opencode/tools/` ディレクトリに配置します。
-- または、グローバルに、それらを `~/.config/opencode/tools/` に配置します。
+Tools are defined as **TypeScript** or **JavaScript** files. However, the tool definition can invoke scripts written in **any language** — TypeScript or JavaScript is only used for the tool definition itself.
 
 ---
 
-### 構造
+### Location
 
-ツールを作成する最も簡単な方法は、型安全性と検証を提供する `tool()` ヘルパーを使用することです。
+They can be defined:
+
+- Locally by placing them in the `.opencode/tools/` directory of your project.
+- Or globally, by placing them in `~/.config/opencode/tools/`.
+
+---
+
+### Structure
+
+The easiest way to create tools is using the `tool()` helper which provides type-safety and validation.
 
 ```ts title=".opencode/tools/database.ts" {1}
-import { tool } from "@opencode-ai/plugin"
+import { tool } from "@cyxcode/plugin"
 
 export default tool({
   description: "Query the project database",
@@ -41,16 +41,16 @@ export default tool({
 })
 ```
 
-**ファイル名**は**ツール名**になります。上記により `database` ツールが作成されます。
+The **filename** becomes the **tool name**. The above creates a `database` tool.
 
 ---
 
-#### ファイルごとに複数のツール
+#### Multiple tools per file
 
-単一のファイルから複数のツールをエクスポートすることもできます。各エクスポートは **`<filename>_<exportname>`** という名前の **別のツール** になります。
+You can also export multiple tools from a single file. Each export becomes **a separate tool** with the name **`<filename>_<exportname>`**:
 
 ```ts title=".opencode/tools/math.ts"
-import { tool } from "@opencode-ai/plugin"
+import { tool } from "@cyxcode/plugin"
 
 export const add = tool({
   description: "Add two numbers",
@@ -75,18 +75,18 @@ export const multiply = tool({
 })
 ```
 
-これにより、`math_add` と `math_multiply` という 2 つのツールが作成されます。
+This creates two tools: `math_add` and `math_multiply`.
 
 ---
 
-#### 組み込みツールとの名前の衝突
+#### Name collisions with built-in tools
 
-カスタムツールはツール名でキー設定されます。カスタムツールが組み込みツールと同じ名前を使用する場合、カスタムツールが優先されます。
+Custom tools are keyed by tool name. If a custom tool uses the same name as a built-in tool, the custom tool takes precedence.
 
-たとえば、このファイルは組み込みの `bash` ツールを置き換えます。
+For example, this file replaces the built-in `bash` tool:
 
 ```ts title=".opencode/tools/bash.ts"
-import { tool } from "@opencode-ai/plugin"
+import { tool } from "@cyxcode/plugin"
 
 export default tool({
   description: "Restricted bash wrapper",
@@ -100,14 +100,14 @@ export default tool({
 ```
 
 :::note
-組み込みツールを意図的に置き換えたい場合を除き、一意の名前を使用することをお勧めします。組み込みツールを無効にしたいがオーバーライドしたくない場合は、[権限](/docs/permissions) を使用してください。
+Prefer unique names unless you intentionally want to replace a built-in tool. If you want to disable a built in tool but not override it, use [permissions](/docs/permissions).
 :::
 
 ---
 
-### 引数
+### Arguments
 
-引数の型を定義するには、`tool.schema` (つまり [Zod](https://zod.dev)) を使用できます。
+You can use `tool.schema`, which is just [Zod](https://zod.dev), to define argument types.
 
 ```ts "tool.schema"
 args: {
@@ -115,7 +115,7 @@ args: {
 }
 ```
 
-[Zod](https://zod.dev) を直接インポートしてプレーンオブジェクトを返すこともできます。
+You can also import [Zod](https://zod.dev) directly and return a plain object:
 
 ```ts {6}
 import { z } from "zod"
@@ -134,12 +134,12 @@ export default {
 
 ---
 
-### コンテキスト
+### Context
 
-ツールは現在のセッションに関するコンテキストを受け取ります。
+Tools receive context about the current session:
 
 ```ts title=".opencode/tools/project.ts" {8}
-import { tool } from "@opencode-ai/plugin"
+import { tool } from "@cyxcode/plugin"
 
 export default tool({
   description: "Get project information",
@@ -152,18 +152,18 @@ export default tool({
 })
 ```
 
-セッションの作業ディレクトリには `context.directory` を使用します。
-git ワークツリーのルートには `context.worktree` を使用します。
+Use `context.directory` for the session working directory.
+Use `context.worktree` for the git worktree root.
 
 ---
 
-## 例
+## Examples
 
-### Python でのツールの作成
+### Write a tool in Python
 
-ツールは任意の言語で作成できます。以下は、Python を使用して 2 つの数値を加算する例です。
+You can write your tools in any language you want. Here's an example that adds two numbers using Python.
 
-まず、ツールを Python スクリプトとして作成します。
+First, create the tool as a Python script:
 
 ```python title=".opencode/tools/add.py"
 import sys
@@ -173,10 +173,10 @@ b = int(sys.argv[2])
 print(a + b)
 ```
 
-次に、それを呼び出すツール定義を作成します。
+Then create the tool definition that invokes it:
 
 ```ts title=".opencode/tools/python-add.ts" {10}
-import { tool } from "@opencode-ai/plugin"
+import { tool } from "@cyxcode/plugin"
 import path from "path"
 
 export default tool({
@@ -193,4 +193,4 @@ export default tool({
 })
 ```
 
-ここでは、[`Bun.$`](https://bun.com/docs/runtime/shell) ユーティリティを使用して Python スクリプトを実行しています。
+Here we are using the [`Bun.$`](https://bun.com/docs/runtime/shell) utility to run the Python script.

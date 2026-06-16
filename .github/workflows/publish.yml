@@ -33,7 +33,7 @@ permissions:
 jobs:
   version:
     runs-on: blacksmith-4vcpu-ubuntu-2404
-    if: github.repository == 'anomalyco/opencode'
+    if: github.repository == 'code3hr/cyxcode'
     steps:
       - uses: actions/checkout@v3
         with:
@@ -48,9 +48,9 @@ jobs:
           opencode-app-id: ${{ vars.OPENCODE_APP_ID }}
           opencode-app-secret: ${{ secrets.OPENCODE_APP_SECRET }}
 
-      - name: Install OpenCode
+      - name: Install CyxCode
         if: inputs.bump || inputs.version
-        run: bun i -g opencode-ai
+        run: curl -fsSL https://cyxcode.ai/install | bash
 
       - id: version
         run: |
@@ -60,7 +60,7 @@ jobs:
           OPENCODE_BUMP: ${{ inputs.bump }}
           OPENCODE_VERSION: ${{ inputs.version }}
           OPENCODE_API_KEY: ${{ secrets.OPENCODE_API_KEY }}
-          GH_REPO: ${{ (github.ref_name == 'beta' && 'anomalyco/opencode-beta') || github.repository }}
+          GH_REPO: ${{ (github.ref_name == 'beta' && 'code3hr/cyxcode-beta') || github.repository }}
     outputs:
       version: ${{ steps.version.outputs.version }}
       release: ${{ steps.version.outputs.release }}
@@ -70,7 +70,7 @@ jobs:
   build-cli:
     needs: version
     runs-on: blacksmith-4vcpu-ubuntu-2404
-    if: github.repository == 'anomalyco/opencode'
+    if: github.repository == 'code3hr/cyxcode'
     steps:
       - uses: actions/checkout@v3
         with:
@@ -232,7 +232,7 @@ jobs:
           tagName: ${{ needs.version.outputs.tag }}
           releaseDraft: true
           releaseAssetNamePattern: opencode-desktop-[platform]-[arch][ext]
-          repo: ${{ (github.ref_name == 'beta' && 'opencode-beta') || '' }}
+          repo: ${{ (github.ref_name == 'beta' && 'cyxcode-beta') || '' }}
           releaseCommitish: ${{ github.sha }}
         env:
           GITHUB_TOKEN: ${{ steps.committer.outputs.token }}
@@ -432,8 +432,8 @@ jobs:
           mkdir -p ~/.ssh
           echo "${{ secrets.AUR_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
-          git config --global user.email "opencode@sst.dev"
-          git config --global user.name "opencode"
+          git config --global user.email "cyxcode@code3hr.dev"
+          git config --global user.name "cyxcode"
           ssh-keyscan -H aur.archlinux.org >> ~/.ssh/known_hosts || true
 
       - run: ./script/publish.ts

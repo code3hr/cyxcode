@@ -1,79 +1,79 @@
 ---
 title: Plugins
-description: Skriv dine egne plugins for at udvide OpenCode.
+description: Write your own plugins to extend CyxCode.
 ---
 
-Plugins giver dig mulighed for at udvide OpenCode ved at tilslutte sig forskellige begivenheder og tilpasse adfærd. Du kan oprette plugins for at tilføje nye funktioner, integrere med eksterne tjenester eller ændre OpenCodes standardadfærd.
+Plugins allow you to extend CyxCode by hooking into various events and customizing behavior. You can create plugins to add new features, integrate with external services, or modify CyxCode's default behavior.
 
-For eksempler, tjek [plugins](/docs/ecosystem#plugins) oprettet af fællesskabet.
-
----
-
-## Brug af plugin
-
-Der er to måder at indlæse plugins på.
+For examples, check out the [plugins](/docs/ecosystem#plugins) created by the community.
 
 ---
 
-### Fra lokale filer
+## Use a plugin
 
-Placer JavaScript- eller TypeScript-filer i plugin-mappen.
-
-- `.opencode/plugins/` - Plugins på projektniveau
-- `~/.config/opencode/plugins/` - Globale plugins
-
-Filer i disse mapper indlæses automatisk ved opstart.
+There are two ways to load plugins.
 
 ---
 
-### Fra npm
+### From local files
 
-Angiv npm-pakker i din konfigurationsfil.
+Place JavaScript or TypeScript files in the plugin directory.
+
+- `.opencode/plugins/` - Project-level plugins
+- `~/.config/opencode/plugins/` - Global plugins
+
+Files in these directories are automatically loaded at startup.
+
+---
+
+### From npm
+
+Specify npm packages in your config file.
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
-  "plugin": ["opencode-helicone-session", "opencode-wakatime", "@my-org/custom-plugin"]
+  "$schema": "https://cyxcode.ai/config.json",
+  "plugin": ["opencode-helicone-session", "CyxCode-wakatime", "@my-org/custom-plugin"]
 }
 ```
 
-Både almindelige og omfangsrige npm-pakker understøttes.
+Both regular and scoped npm packages are supported.
 
-Gennemse tilgængelige plugins i [ecosystem](/docs/ecosystem#plugins).
-
----
-
-### Installation af plugins
-
-**npm plugins** installeres automatisk ved hjælp af Bun ved opstart. Pakker og deres afhængigheder cachelagres i `~/.cache/opencode/node_modules/`.
-
-**Lokale plugins** indlæses direkte fra plugin-biblioteket. For at bruge eksterne pakker skal du oprette en `package.json` i din konfigurationsmappe (se [Dependencies](#dependencies)), eller udgive pluginnet til npm og [add it to your config](/docs/config#plugins).
+Browse available plugins in the [ecosystem](/docs/ecosystem#plugins).
 
 ---
 
-### Indlæsningsrækkefølge
+### How plugins are installed
 
-Plugins indlæses fra alle kilder, og alle hooks kører i rækkefølge. Indlæsningsrækkefølgen er:
+**npm plugins** are installed automatically using Bun at startup. Packages and their dependencies are cached in `~/.cache/opencode/node_modules/`.
 
-1. Global konfiguration (`~/.config/opencode/opencode.json`)
-2. Projektkonfiguration (`opencode.json`)
-3. Global plugin-mappe (`~/.config/opencode/plugins/`)
-4. Projekt plugin bibliotek (`.opencode/plugins/`)
-
-Dublerede npm-pakker med samme navn og version indlæses én gang. Et lokalt plugin og et npm plugin med lignende navne indlæses dog hver for sig.
+**Local plugins** are loaded directly from the plugin directory. To use external packages, you must create a `package.json` within your config directory (see [Dependencies](#dependencies)), or publish the plugin to npm and [add it to your config](/docs/config#plugins).
 
 ---
 
-## Oprettelse af plugin
+### Load order
 
-Et plugin er et **JavaScript/TypeScript modul**, der eksporterer et eller flere plugin
-funktioner. Hver funktion modtager et kontekstobjekt og returnerer et hooks-objekt.
+Plugins are loaded from all sources and all hooks run in sequence. The load order is:
+
+1. Global config (`~/.config/opencode/opencode.json`)
+2. Project config (`opencode.json`)
+3. Global plugin directory (`~/.config/opencode/plugins/`)
+4. Project plugin directory (`.opencode/plugins/`)
+
+Duplicate npm packages with the same name and version are loaded once. However, a local plugin and an npm plugin with similar names are both loaded separately.
 
 ---
 
-### Afhængigheder
+## Create a plugin
 
-Lokale plugins og brugerdefinerede værktøjer kan bruge eksterne npm-pakker. Tilføj en `package.json` til din konfigurationsmappe med de afhængigheder, du har brug for.
+A plugin is a **JavaScript/TypeScript module** that exports one or more plugin
+functions. Each function receives a context object and returns a hooks object.
+
+---
+
+### Dependencies
+
+Local plugins and custom tools can use external npm packages. Add a `package.json` to your config directory with the dependencies you need.
 
 ```json title=".opencode/package.json"
 {
@@ -83,7 +83,7 @@ Lokale plugins og brugerdefinerede værktøjer kan bruge eksterne npm-pakker. Ti
 }
 ```
 
-OpenCode kører `bun install` ved opstart for at installere disse. Dine plugins og værktøjer kan derefter importere dem.
+CyxCode runs `bun install` at startup to install these. Your plugins and tools can then import them.
 
 ```ts title=".opencode/plugins/my-plugin.ts"
 import { escape } from "shescape"
@@ -101,7 +101,7 @@ export const MyPlugin = async (ctx) => {
 
 ---
 
-### Grundlæggende struktur
+### Basic structure
 
 ```js title=".opencode/plugins/example.js"
 export const MyPlugin = async ({ project, client, $, directory, worktree }) => {
@@ -113,22 +113,22 @@ export const MyPlugin = async ({ project, client, $, directory, worktree }) => {
 }
 ```
 
-Plugin-funktionen modtager:
+The plugin function receives:
 
-- `project`: Den aktuelle projektinformation.
-- `directory`: Den aktuelle arbejdsmappe.
-- `worktree`: Git worktree-stien.
-- `client`: En opencode SDK klient til interaktion med AI.
-- `$`: Buns [shell API](https://bun.com/docs/runtime/shell) til udførelse af kommandoer.
+- `project`: The current project information.
+- `directory`: The current working directory.
+- `worktree`: The git worktree path.
+- `client`: An CyxCode SDK client for interacting with the AI.
+- `$`: Bun's [shell API](https://bun.com/docs/runtime/shell) for executing commands.
 
 ---
 
-### TypeScript-understøttelse
+### TypeScript support
 
-For TypeScript-plugins kan du importere typer fra plugin-pakken:
+For TypeScript plugins, you can import types from the plugin package:
 
 ```ts title="my-plugin.ts" {1}
-import type { Plugin } from "@opencode-ai/plugin"
+import type { Plugin } from "@cyxcode/plugin"
 
 export const MyPlugin: Plugin = async ({ project, client, $, directory, worktree }) => {
   return {
@@ -139,45 +139,45 @@ export const MyPlugin: Plugin = async ({ project, client, $, directory, worktree
 
 ---
 
-### Begivenheder
+### Events
 
-Plugins kan abonnere på begivenheder som vist nedenfor i afsnittet Eksempler. Her er en liste over de forskellige arrangementer.
+Plugins can subscribe to events as seen below in the Examples section. Here is a list of the different events available.
 
-#### Kommandohændelser
+#### Command Events
 
 - `command.executed`
 
-#### Filhændelser
+#### File Events
 
 - `file.edited`
 - `file.watcher.updated`
 
-#### Installationshændelser
+#### Installation Events
 
 - `installation.updated`
 
-#### LSP-hændelser
+#### LSP Events
 
 - `lsp.client.diagnostics`
 - `lsp.updated`
 
-#### Beskedhændelser
+#### Message Events
 
 - `message.part.removed`
 - `message.part.updated`
 - `message.removed`
 - `message.updated`
 
-#### Tilladelseshændelser
+#### Permission Events
 
 - `permission.asked`
 - `permission.replied`
 
-#### Serverhændelser
+#### Server Events
 
 - `server.connected`
 
-#### Sessionshændelser
+#### Session Events
 
 - `session.created`
 - `session.compacted`
@@ -188,20 +188,20 @@ Plugins kan abonnere på begivenheder som vist nedenfor i afsnittet Eksempler. H
 - `session.status`
 - `session.updated`
 
-#### Todo-hændelser
+#### Todo Events
 
 - `todo.updated`
 
-#### Shell-hændelser
+#### Shell Events
 
 - `shell.env`
 
-#### Værktøjshændelser
+#### Tool Events
 
 - `tool.execute.after`
 - `tool.execute.before`
 
-#### TUI-hændelser
+#### TUI Events
 
 - `tui.prompt.append`
 - `tui.command.execute`
@@ -209,15 +209,15 @@ Plugins kan abonnere på begivenheder som vist nedenfor i afsnittet Eksempler. H
 
 ---
 
-## Eksempler
+## Examples
 
-Her er nogle eksempler på plugins, du kan bruge til at udvide opencode.
+Here are some examples of plugins you can use to extend CyxCode.
 
 ---
 
-### Send meddelelser
+### Send notifications
 
-Send meddelelser, når visse hændelser indtræffer:
+Send notifications when certain events occur:
 
 ```js title=".opencode/plugins/notification.js"
 export const NotificationPlugin = async ({ project, client, $, directory, worktree }) => {
@@ -225,24 +225,24 @@ export const NotificationPlugin = async ({ project, client, $, directory, worktr
     event: async ({ event }) => {
       // Send notification on session completion
       if (event.type === "session.idle") {
-        await $`osascript -e 'display notification "Session completed!" with title "opencode"'`
+        await $`osascript -e 'display notification "Session completed!" with title "CyxCode"'`
       }
     },
   }
 }
 ```
 
-Vi bruger `osascript` til at køre AppleScript på macOS. Her bruger vi det til at sende notifikationer.
+We are using `osascript` to run AppleScript on macOS. Here we are using it to send notifications.
 
 :::note
-Hvis du bruger OpenCode desktop-appen, kan den sende systemmeddelelser automatisk, når et svar er klar, eller når en session fejler.
+If you’re using the CyxCode desktop app, it can send system notifications automatically when a response is ready or when a session errors.
 :::
 
 ---
 
-### .env-beskyttelse
+### .env protection
 
-Undgå opencode i at læse `.env` filer:
+Prevent CyxCode from reading `.env` files:
 
 ```javascript title=".opencode/plugins/env-protection.js"
 export const EnvProtection = async ({ project, client, $, directory, worktree }) => {
@@ -258,9 +258,9 @@ export const EnvProtection = async ({ project, client, $, directory, worktree })
 
 ---
 
-### Injicer miljøvariabler
+### Inject environment variables
 
-Injicer miljøvariabler i al shell-udførelse (AI-værktøjer og brugerterminaler):
+Inject environment variables into all shell execution (AI tools and user terminals):
 
 ```javascript title=".opencode/plugins/inject-env.js"
 export const InjectEnvPlugin = async () => {
@@ -275,12 +275,12 @@ export const InjectEnvPlugin = async () => {
 
 ---
 
-### Brugerdefinerede værktøjer
+### Custom tools
 
-Plugins kan også tilføje brugerdefinerede værktøjer til opencode:
+Plugins can also add custom tools to CyxCode:
 
 ```ts title=".opencode/plugins/custom-tools.ts"
-import { type Plugin, tool } from "@opencode-ai/plugin"
+import { type Plugin, tool } from "@cyxcode/plugin"
 
 export const CustomToolsPlugin: Plugin = async (ctx) => {
   return {
@@ -300,23 +300,23 @@ export const CustomToolsPlugin: Plugin = async (ctx) => {
 }
 ```
 
-`tool`-hjælperen opretter et brugerdefineret værktøj, som opencode kan kalde. Det tager en Zod-skemafunktion og returnerer en værktøjsdefinition med:
+The `tool` helper creates a custom tool that CyxCode can call. It takes a Zod schema function and returns a tool definition with:
 
-- `description`: Hvad værktøjet gør
-- `args`: Zod-skema for værktøjets argumenter
-- `execute`: Funktion, der kører, når værktøjet kaldes
+- `description`: What the tool does
+- `args`: Zod schema for the tool's arguments
+- `execute`: Function that runs when the tool is called
 
-Dine tilpassede værktøjer vil være tilgængelige for opencode sammen med indbyggede værktøjer.
+Your custom tools will be available to CyxCode alongside built-in tools.
 
 :::note
-Hvis et plugin-værktøj bruger samme navn som et indbygget værktøj, har plugin-værktøjet forrang.
+If a plugin tool uses the same name as a built-in tool, the plugin tool takes precedence.
 :::
 
 ---
 
-### Logning
+### Logging
 
-Brug `client.app.log()` i stedet for `console.log` til struktureret logning:
+Use `client.app.log()` instead of `console.log` for structured logging:
 
 ```ts title=".opencode/plugins/my-plugin.ts"
 export const MyPlugin = async ({ client }) => {
@@ -331,16 +331,16 @@ export const MyPlugin = async ({ client }) => {
 }
 ```
 
-Niveauer: `debug`, `info`, `warn`, `error`. Se [SDK documentation](https://opencode.ai/docs/sdk) for detaljer.
+Levels: `debug`, `info`, `warn`, `error`. See [SDK documentation](https://cyxcode.ai/docs/sdk) for details.
 
 ---
 
-### Komprimerings-hooks
+### Compaction hooks
 
-Tilpas konteksten inkluderet, når en session komprimeres:
+Customize the context included when a session is compacted:
 
 ```ts title=".opencode/plugins/compaction.ts"
-import type { Plugin } from "@opencode-ai/plugin"
+import type { Plugin } from "@cyxcode/plugin"
 
 export const CompactionPlugin: Plugin = async (ctx) => {
   return {
@@ -359,12 +359,12 @@ Include any state that should persist across compaction:
 }
 ```
 
-`experimental.session.compacting` krogen affyres, før LLM genererer en fortsættelsesoversigt. Brug den til at injicere domænespecifik kontekst, som standardkomprimeringsprompten ville gå glip af.
+The `experimental.session.compacting` hook fires before the LLM generates a continuation summary. Use it to inject domain-specific context that the default compaction prompt would miss.
 
-Du kan også erstatte komprimeringsprompten helt ved at indstille `output.prompt`:
+You can also replace the compaction prompt entirely by setting `output.prompt`:
 
 ```ts title=".opencode/plugins/custom-compaction.ts"
-import type { Plugin } from "@opencode-ai/plugin"
+import type { Plugin } from "@cyxcode/plugin"
 
 export const CustomCompactionPlugin: Plugin = async (ctx) => {
   return {
@@ -386,4 +386,4 @@ Format as a structured prompt that a new agent can use to resume work.
 }
 ```
 
-Når `output.prompt` er indstillet, erstatter den standardkompressionsprompten fuldstændigt. `output.context`-arrayet ignoreres i dette tilfælde.
+When `output.prompt` is set, it completely replaces the default compaction prompt. The `output.context` array is ignored in this case.

@@ -1,145 +1,149 @@
 ---
-title: Agenti
-description: Konfigurirajte i koristite specijalizirane agente.
+title: Agents
+description: Configure and use specialized agents.
 ---
 
-Agenti su specijalizirani AI asistenti koji se mogu konfigurirati za specifične zadatke i tokove posla. Oni vam omogućavaju da kreirate fokusirane alate sa prilagođenim upitima, modelima i pristupom alatima.
+Agents are specialized AI assistants that can be configured for specific tasks and workflows. They allow you to create focused tools with custom prompts, models, and tool access.
 
 :::tip
-Koristite agenta plana za analizu koda i pregled prijedloga bez ikakvih promjena koda.
+Use the plan agent to analyze code and review suggestions without making any code changes.
 :::
 
-Možete se prebacivati ​​između agenata tokom sesije ili ih pozvati spominjanjem `@`.
+You can switch between agents during a session or invoke them with the `@` mention.
 
 ---
 
-## Vrste
+## Types
 
-Postoje dvije vrste agenata u OpenCode: primarni agenti i podagenti.
+There are two types of agents in CyxCode; primary agents and subagents.
 
 ---
 
-### Primarni agenti
+### Primary agents
 
-Primarni agenti su glavni pomoćnici s kojima direktno komunicirate. Možete se kretati kroz njih pomoću tipke **Tab** ili vašeg konfigurisanog povezivanja tipki `switch_agent`. Ovi agenti vode vaš glavni razgovor. Pristup alatima se konfiguriše putem dozvola — na primjer, Build ima omogućene sve alate dok je Plan ograničen.
+Primary agents are the main assistants you interact with directly. You can cycle through them using the **Tab** key, or your configured `switch_agent` keybind. These agents handle your main conversation. Tool access is configured via permissions — for example, Build has all tools enabled while Plan is restricted.
 
 :::tip
-Možete koristiti tipku **Tab** za prebacivanje između primarnih agenata tokom sesije.
+You can use the **Tab** key to switch between primary agents during a session.
 :::
 
-OpenCode dolazi sa dva ugrađena primarna agenta, **Build** i **Plan**. Pogledat ćemo ih u nastavku.
+CyxCode comes with two built-in primary agents, **Build** and **Plan**. We'll
+look at these below.
 
 ---
 
-### Subagenti
+### Subagents
 
-Subagenti su specijalizovani pomoćnici koje primarni agenti mogu pozvati za određene zadatke. Možete ih i ručno pozvati **@ spominjanjem** u svojim porukama.
+Subagents are specialized assistants that primary agents can invoke for specific tasks. You can also manually invoke them by **@ mentioning** them in your messages.
 
-OpenCode dolazi sa dva ugrađena subagenta, **General** i **Explore**. Ovo ćemo pogledati u nastavku.
-
----
-
-## Ugrađeni
-
-OpenCode dolazi sa dva ugrađena primarna agenta i dva ugrađena subagenta.
+CyxCode comes with two built-in subagents, **General** and **Explore**. We'll look at this below.
 
 ---
 
-### Build agent
+## Built-in
 
-_Režim_: `primary`
-
-Build je **podrazumevani** primarni agent sa svim omogućenim alatima. Ovo je standardni agent za razvojni rad gdje vam je potreban pun pristup operacijama datoteka i sistemskim komandama.
+CyxCode comes with two built-in primary agents and two built-in subagents.
 
 ---
 
-### Plan agent
+### Use build
 
-_Režim_: `primary`
+_Mode_: `primary`
 
-Ograničeni agent dizajniran za planiranje i analizu. Koristimo sistem dozvola kako bismo vam pružili veću kontrolu i spriječili neželjene promjene.
-Prema zadanim postavkama, sve sljedeće je postavljeno na `ask`:
-
-- `file edits`: Sva upisivanja, zakrpe i uređivanja
-- `bash`: Sve bash komande
-
-Ovaj agent je koristan kada želite da LLM analizira kod, predloži promjene ili kreira planove bez stvarnih modifikacija vaše baze koda.
+Build is the **default** primary agent with all tools enabled. This is the standard agent for development work where you need full access to file operations and system commands.
 
 ---
 
-### General agent
+### Use plan
 
-_Režim_: `subagent`
+_Mode_: `primary`
 
-Agent opće namjene za istraživanje složenih pitanja i izvršavanje zadataka u više koraka. Ima potpuni pristup alatima (osim todo), tako da može mijenjati fajlove kada je to potrebno. Koristite ovo za paralelno pokretanje više jedinica rada.
+A restricted agent designed for planning and analysis. We use a permission system to give you more control and prevent unintended changes.
+By default, all of the following are set to `ask`:
 
----
+- `file edits`: All writes, patches, and edits
+- `bash`: All bash commands
 
-### Explore agent
-
-_Režim_: `subagent`
-
-Brzi agent samo za čitanje za istraživanje kodnih baza. Nije moguće mijenjati fajlove. Koristite ovo kada trebate brzo pronaći datoteke po uzorku, pretražiti kod za ključne riječi ili odgovoriti na pitanja o bazi kodova.
+This agent is useful when you want the LLM to analyze code, suggest changes, or create plans without making any actual modifications to your codebase.
 
 ---
 
-### Compaction agent
+### Use general
 
-_Režim_: `primary`
+_Mode_: `subagent`
 
-Skriveni sistemski agent koji sažima dugi kontekst u manji sažetak. Pokreće se automatski kada je potrebno i ne može se odabrati u korisničkom interfejsu.
-
----
-
-### Title agent
-
-_Režim_: `primary`
-
-Skriveni sistemski agent koji generiše kratke naslove sesija. Pokreće se automatski i ne može se odabrati u korisničkom interfejsu.
+A general-purpose agent for researching complex questions and executing multi-step tasks. Has full tool access (except todo), so it can make file changes when needed. Use this to run multiple units of work in parallel.
 
 ---
 
-### Summary agent
+### Use explore
 
-_Režim_: `primary`
+_Mode_: `subagent`
 
-Skriveni sistemski agent koji kreira sažetke sesije. Pokreće se automatski i ne može se odabrati u korisničkom interfejsu.
+A fast, read-only agent for exploring codebases. Cannot modify files. Use this when you need to quickly find files by patterns, search code for keywords, or answer questions about the codebase.
 
 ---
 
-## Korištenje
+### Use compaction
 
-1. Za primarne agente, koristite taster **Tab** za kretanje kroz njih tokom sesije. Također možete koristiti svoju konfiguriranu vezu tipke `switch_agent`.
+_Mode_: `primary`
 
-2. Subagenti se mogu pozvati:
-   - **Automatski** od strane primarnih agenata za specijalizovane zadatke na osnovu njihovih opisa.
-   - Ručno **@ spominjanjem** subagenta u vašoj poruci. Na primjer.
+Hidden system agent that compacts long context into a smaller summary. It runs automatically when needed and is not selectable in the UI.
+
+---
+
+### Use title
+
+_Mode_: `primary`
+
+Hidden system agent that generates short session titles. It runs automatically and is not selectable in the UI.
+
+---
+
+### Use summary
+
+_Mode_: `primary`
+
+Hidden system agent that creates session summaries. It runs automatically and is not selectable in the UI.
+
+---
+
+## Usage
+
+1. For primary agents, use the **Tab** key to cycle through them during a session. You can also use your configured `switch_agent` keybind.
+
+2. Subagents can be invoked:
+   - **Automatically** by primary agents for specialized tasks based on their descriptions.
+   - Manually by **@ mentioning** a subagent in your message. For example.
 
      ```txt frame="none"
      @general help me search for this function
      ```
 
-3. **Navigacija između sesija**: Kada subagenti kreiraju vlastite podređene sesije, možete se kretati između roditeljske sesije i svih podređenih sesija koristeći:
-   - **\<Leader>+Right** (ili vaša konfigurirana `session_child_cycle` veza) za kretanje naprijed kroz roditelj → dijete1 → dijete2 → ... → roditelj
-   - **\<Leader>+Left** (ili vaše konfigurirano povezivanje tipki `session_child_cycle_reverse`) za kretanje unazad kroz roditelj ← dijete1 ← dijete2 ← ... ← roditelj
+3. **Navigation between sessions**: When subagents create child sessions, use `session_child_first` (default: **\<Leader>+Down**) to enter the first child session from the parent.
 
-   Ovo vam omogućava neprimetno prebacivanje između glavnog razgovora i rada specijalizovanog podagenta.
+4. Once you are in a child session, use:
+   - `session_child_cycle` (default: **Right**) to cycle to the next child session
+   - `session_child_cycle_reverse` (default: **Left**) to cycle to the previous child session
+   - `session_parent` (default: **Up**) to return to the parent session
+
+   This lets you switch between the main conversation and specialized subagent work.
 
 ---
 
-## Konfiguracija
+## Configure
 
-Možete prilagoditi ugrađene agente ili kreirati vlastite kroz konfiguraciju. Agenti se mogu konfigurisati na dva načina:
+You can customize the built-in agents or create your own through configuration. Agents can be configured in two ways:
 
 ---
 
 ### JSON
 
-Konfigurirajte agente u svom konfiguracijskom fajlu `opencode.json`:
+Configure agents in your `opencode.json` config file:
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "agent": {
     "build": {
       "mode": "primary",
@@ -178,10 +182,10 @@ Konfigurirajte agente u svom konfiguracijskom fajlu `opencode.json`:
 
 ### Markdown
 
-Također možete definirati agente koristeći markdown datoteke. Stavite ih u:
+You can also define agents using markdown files. Place them in:
 
-- Globalno: `~/.config/opencode/agents/`
-- Po projektu: `.opencode/agents/`
+- Global: `~/.config/opencode/agents/`
+- Per-project: `.opencode/agents/`
 
 ```markdown title="~/.config/opencode/agents/review.md"
 ---
@@ -205,19 +209,19 @@ You are in code review mode. Focus on:
 Provide constructive feedback without making direct changes.
 ```
 
-Ime markdown datoteke postaje ime agenta. Na primjer, `review.md` kreira `review` agenta.
+The markdown file name becomes the agent name. For example, `review.md` creates a `review` agent.
 
 ---
 
-## Opcije
+## Options
 
-Pogledajmo ove opcije konfiguracije detaljno.
+Let's look at these configuration options in detail.
 
 ---
 
-### Opis
+### Description
 
-Koristite opciju `description` da pružite kratak opis onoga što agent radi i kada ga koristiti.
+Use the `description` option to provide a brief description of what the agent does and when to use it.
 
 ```json title="opencode.json"
 {
@@ -229,15 +233,15 @@ Koristite opciju `description` da pružite kratak opis onoga što agent radi i k
 }
 ```
 
-Ovo je **obavezna** opcija konfiguracije.
+This is a **required** config option.
 
 ---
 
-### Temperatura
+### Temperature
 
-Kontrolišite slučajnost i kreativnost odgovora LLM-a pomoću `temperature` konfiguracije.
+Control the randomness and creativity of the LLM's responses with the `temperature` config.
 
-Niže vrijednosti čine odgovore fokusiranijim i determinističkim, dok više vrijednosti povećavaju kreativnost i varijabilnost.
+Lower values make responses more focused and deterministic, while higher values increase creativity and variability.
 
 ```json title="opencode.json"
 {
@@ -252,11 +256,11 @@ Niže vrijednosti čine odgovore fokusiranijim i determinističkim, dok više vr
 }
 ```
 
-Vrijednosti temperature se obično kreću od 0.0 do 1.0:
+Temperature values typically range from 0.0 to 1.0:
 
-- **0.0-0.2**: Vrlo fokusirani i deterministički odgovori, idealni za analizu i planiranje koda
-- **0.3-0.5**: Uravnoteženi odgovori sa malo kreativnosti, dobro za opšte razvojne zadatke
-- **0.6-1.0**: Kreativniji i raznovrsniji odgovori, korisni za razmišljanje i istraživanje
+- **0.0-0.2**: Very focused and deterministic responses, ideal for code analysis and planning
+- **0.3-0.5**: Balanced responses with some creativity, good for general development tasks
+- **0.6-1.0**: More creative and varied responses, useful for brainstorming and exploration
 
 ```json title="opencode.json"
 {
@@ -276,15 +280,15 @@ Vrijednosti temperature se obično kreću od 0.0 do 1.0:
 }
 ```
 
-Ako temperatura nije navedena, OpenCode koristi standardne postavke specifične za model; obično 0 za većinu modela, 0.55 za Qwen modele.
+If no temperature is specified, CyxCode uses model-specific defaults; typically 0 for most models, 0.55 for Qwen models.
 
 ---
 
-### Maksimalan broj koraka
+### Max steps
 
-Kontrolirajte maksimalni broj iteracija agenta koje agent može izvesti prije nego što bude prisiljen da odgovori samo tekstom. Ovo omogućava korisnicima koji žele kontrolirati troškove da postave ograničenje na akcije agenta.
+Control the maximum number of agentic iterations an agent can perform before being forced to respond with text only. This allows users who wish to control costs to set a limit on agentic actions.
 
-Ako ovo nije postavljeno, agent će nastaviti iterirati sve dok model ne odluči da se zaustavi ili korisnik ne prekine sesiju.
+If this is not set, the agent will continue to iterate until the model chooses to stop or the user interrupts the session.
 
 ```json title="opencode.json"
 {
@@ -298,17 +302,17 @@ Ako ovo nije postavljeno, agent će nastaviti iterirati sve dok model ne odluči
 }
 ```
 
-Kada se dostigne ograničenje, agent prima poseban sistemski prompt koji ga upućuje da odgovori sa rezimeom svog rada i preporučenim preostalim zadacima.
+When the limit is reached, the agent receives a special system prompt instructing it to respond with a summarization of its work and recommended remaining tasks.
 
 :::caution
-Naslijeđeno polje `maxSteps` je zastarjelo. Umjesto toga koristite `steps`.
+The legacy `maxSteps` field is deprecated. Use `steps` instead.
 :::
 
 ---
 
-### Onemogućavanje
+### Disable
 
-Postavite na `true` da onemogućite agenta.
+Set to `true` to disable the agent.
 
 ```json title="opencode.json"
 {
@@ -322,9 +326,9 @@ Postavite na `true` da onemogućite agenta.
 
 ---
 
-### Upit
+### Prompt
 
-Navedite prilagođenu sistemsku prompt datoteku za ovog agenta sa `prompt` konfiguracijom. Datoteka s promptom treba da sadrži upute specifične za svrhu agenta.
+Specify a custom system prompt file for this agent with the `prompt` config. The prompt file should contain instructions specific to the agent's purpose.
 
 ```json title="opencode.json"
 {
@@ -336,16 +340,16 @@ Navedite prilagođenu sistemsku prompt datoteku za ovog agenta sa `prompt` konfi
 }
 ```
 
-Ova putanja je relativna u odnosu na mjesto gdje se nalazi konfiguracijski fajl. Dakle, ovo radi i za globalnu OpenCode konfiguraciju i za konfiguraciju specifične za projekat.
+This path is relative to where the config file is located. So this works for both the global CyxCode config and the project specific config.
 
 ---
 
 ### Model
 
-Koristite `model` konfiguraciju da nadjačate model za ovog agenta. Korisno za korištenje različitih modela optimiziranih za različite zadatke. Na primjer, brži model za planiranje, sposobniji model za implementaciju.
+Use the `model` config to override the model for this agent. Useful for using different models optimized for different tasks. For example, a faster model for planning, a more capable model for implementation.
 
 :::tip
-Ako ne navedete model, primarni agenti koriste [model globalno konfiguriran](/docs/config#models) dok će podagenti koristiti model primarnog agenta koji je pozvao subagenta.
+If you don’t specify a model, primary agents use the [model globally configured](/docs/config#models) while subagents will use the model of the primary agent that invoked the subagent.
 :::
 
 ```json title="opencode.json"
@@ -358,17 +362,19 @@ Ako ne navedete model, primarni agenti koriste [model globalno konfiguriran](/do
 }
 ```
 
-ID modela u vašoj OpenCode konfiguraciji koristi format `provider/model-id`. Na primjer, ako koristite [OpenCode Zen](/docs/zen), koristili biste `opencode/gpt-5.1-codex` za GPT 5.1 Codex.
+The model ID in your CyxCode config uses the format `provider/model-id`. For example, if you're using [CyxCode Zen](/docs/zen), you would use `opencode/gpt-5.1-codex` for GPT 5.1 Codex.
 
 ---
 
-### Alati
+### Tools (deprecated)
 
-Kontrolirajte koji su alati dostupni u ovom agentu koristeći konfiguraciju `tools`. Možete omogućiti ili onemogućiti određene alate tako što ćete ih postaviti na `true` ili `false`.
+`tools` is **deprecated**. Prefer the agent's [`permission`](#permissions) field for new configs, updates and more fine-grained control.
+
+Allows you to control which tools are available in this agent. You can enable or disable specific tools by setting them to `true` or `false`. In an agent's `tools` config, `true` is equivalent to `{"*": "allow"}` permission and `false` is equivalent to `{"*": "deny"}` permission.
 
 ```json title="opencode.json" {3-6,9-12}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "tools": {
     "write": true,
     "bash": true
@@ -385,14 +391,14 @@ Kontrolirajte koji su alati dostupni u ovom agentu koristeći konfiguraciju `too
 ```
 
 :::note
-Konfiguracija specifična za agenta poništava globalnu konfiguraciju.
+The agent-specific config overrides the global config.
 :::
 
-Također možete koristiti zamjenske znakove za kontrolu više alata odjednom. Na primjer, da onemogućite sve alate sa MCP servera:
+You can also use wildcards in legacy `tools` entries to control multiple tools at once. For example, to disable all tools from an MCP server:
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "agent": {
     "readonly": {
       "tools": {
@@ -405,32 +411,32 @@ Također možete koristiti zamjenske znakove za kontrolu više alata odjednom. N
 }
 ```
 
-[Saznajte više o alatima](/docs/tools).
+[Learn more about tools](/docs/tools).
 
 ---
 
-### Dozvole
+### Permissions
 
-Možete konfigurirati dozvole za upravljanje radnjama koje agent može poduzeti. Trenutno se dozvole za alate `edit`, `bash` i `webfetch` mogu konfigurirati na:
+You can configure permissions to manage what actions an agent can take. Currently, the permissions for the `edit`, `bash`, and `webfetch` tools can be configured to:
 
-- `"ask"` — Zatražite odobrenje prije pokretanja alata
-- `"allow"` — Dozvoli sve operacije bez odobrenja
-- `"deny"` — Onemogućite alat
+- `"ask"` — Prompt for approval before running the tool
+- `"allow"` — Allow all operations without approval
+- `"deny"` — Disable the tool
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "permission": {
     "edit": "deny"
   }
 }
 ```
 
-Možete nadjačati ove dozvole po agentu.
+You can override these permissions per agent.
 
 ```json title="opencode.json" {3-5,8-10}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "permission": {
     "edit": "deny"
   },
@@ -444,7 +450,7 @@ Možete nadjačati ove dozvole po agentu.
 }
 ```
 
-Također možete postaviti dozvole u Markdown agentima.
+You can also set permissions in Markdown agents.
 
 ```markdown title="~/.config/opencode/agents/review.md"
 ---
@@ -463,11 +469,11 @@ permission:
 Only analyze code and suggest changes.
 ```
 
-Možete postaviti dozvole za određene bash komande.
+You can set permissions for specific bash commands.
 
 ```json title="opencode.json" {7}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "agent": {
     "build": {
       "permission": {
@@ -481,11 +487,11 @@ Možete postaviti dozvole za određene bash komande.
 }
 ```
 
-Ovo može koristiti glob uzorak.
+This can take a glob pattern.
 
 ```json title="opencode.json" {7}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "agent": {
     "build": {
       "permission": {
@@ -498,12 +504,12 @@ Ovo može koristiti glob uzorak.
 }
 ```
 
-Također možete koristiti zamjenski znak `*` za kontrolu dozvola za sve komande.
-Budući da posljednje podudarno pravilo ima prednost, prvo postavite zamjenski znak `*`, a zatim navedena pravila.
+And you can also use the `*` wildcard to manage permissions for all commands.
+Since the last matching rule takes precedence, put the `*` wildcard first and specific rules after.
 
 ```json title="opencode.json" {8}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "agent": {
     "build": {
       "permission": {
@@ -517,13 +523,13 @@ Budući da posljednje podudarno pravilo ima prednost, prvo postavite zamjenski z
 }
 ```
 
-[Saznajte više o dozvolama](/docs/permissions).
+[Learn more about permissions](/docs/permissions).
 
 ---
 
-### Način rada
+### Mode
 
-Kontrolirajte način rada agenta koristeći konfiguraciju `mode`. Opcija `mode` se koristi da specificira kako se agent može koristiti.
+Control the agent's mode with the `mode` config. The `mode` option is used to determine how the agent can be used.
 
 ```json title="opencode.json"
 {
@@ -535,13 +541,13 @@ Kontrolirajte način rada agenta koristeći konfiguraciju `mode`. Opcija `mode` 
 }
 ```
 
-Opcija `mode` se može postaviti na `primary`, `subagent` ili `all`. Ako `mode` nije specificirano, podrazumevano je `all`.
+The `mode` option can be set to `primary`, `subagent`, or `all`. If no `mode` is specified, it defaults to `all`.
 
 ---
 
-### Skriveno
+### Hidden
 
-Sakrij podagenta iz `@` menija za automatsko dovršavanje sa `hidden: true`. Korisno za interne podagente koje bi drugi agenti trebali programski pozvati samo preko Task alata.
+Hide a subagent from the `@` autocomplete menu with `hidden: true`. Useful for internal subagents that should only be invoked programmatically by other agents via the Task tool.
 
 ```json title="opencode.json"
 {
@@ -554,17 +560,17 @@ Sakrij podagenta iz `@` menija za automatsko dovršavanje sa `hidden: true`. Kor
 }
 ```
 
-Ovo utiče samo na vidljivost korisnika u meniju za automatsko dovršavanje. Skriveni agenti se i dalje mogu pozvati od strane modela putem alata Task ako dozvole to dozvoljavaju.
+This only affects user visibility in the autocomplete menu. Hidden agents can still be invoked by the model via the Task tool if permissions allow.
 
 :::note
-Odnosi se samo na `mode: subagent` agente.
+Only applies to `mode: subagent` agents.
 :::
 
 ---
 
-### Dozvole zadataka
+### Task permissions
 
-Kontrolirajte koje podagente agent može pozvati preko Task alata sa `permission.task`. Koristi glob uzorke za fleksibilno uparivanje.
+Control which subagents an agent can invoke via the Task tool with `permission.task`. Uses glob patterns for flexible matching.
 
 ```json title="opencode.json"
 {
@@ -583,23 +589,23 @@ Kontrolirajte koje podagente agent može pozvati preko Task alata sa `permission
 }
 ```
 
-Kada se postavi na `deny`, subagent se u potpunosti uklanja iz opisa alata za zadatak, tako da ga model neće pokušati pozvati.
+When set to `deny`, the subagent is removed from the Task tool description entirely, so the model won't attempt to invoke it.
 
 :::tip
-Pravila se procjenjuju po redoslijedu i **posljednje odgovarajuće pravilo pobjeđuje**. U gornjem primjeru, `orchestrator-planner` odgovara i `*` (deny) i `orchestrator-*` (allow), ali pošto `orchestrator-*` dolazi nakon `*`, rezultat je `allow`.
+Rules are evaluated in order, and the **last matching rule wins**. In the example above, `orchestrator-planner` matches both `*` (deny) and `orchestrator-*` (allow), but since `orchestrator-*` comes after `*`, the result is `allow`.
 :::
 
 :::tip
-Korisnici uvijek mogu pozvati bilo kojeg subagenta direktno preko `@` menija za autodovršavanje, čak i ako bi dozvole za zadatak agenta to uskratile.
+Users can always invoke any subagent directly via the `@` autocomplete menu, even if the agent's task permissions would deny it.
 :::
 
 ---
 
-### Boja
+### Color
 
-Prilagodite vizualni izgled agenta u korisničkom sučelju s opcijom `color`. Ovo utiče na to kako se agent pojavljuje u interfejsu.
+Customize the agent's visual appearance in the UI with the `color` option. This affects how the agent appears in the interface.
 
-Koristite važeću heksadecimalnu boju (npr. `#FF5733`) ili boju teme: `primary`, `secondary`, `accent`, `success`, `warning`, `error`, `info`.
+Use a valid hex color (e.g., `#FF5733`) or theme color: `primary`, `secondary`, `accent`, `success`, `warning`, `error`, `info`.
 
 ```json title="opencode.json"
 {
@@ -618,7 +624,7 @@ Koristite važeću heksadecimalnu boju (npr. `#FF5733`) ili boju teme: `primary`
 
 ### Top P
 
-Kontrolirajte raznolikost odgovora s opcijom `top_p`. Alternativa temperaturi za kontrolu nasumice.
+Control response diversity with the `top_p` option. Alternative to temperature for controlling randomness.
 
 ```json title="opencode.json"
 {
@@ -630,15 +636,15 @@ Kontrolirajte raznolikost odgovora s opcijom `top_p`. Alternativa temperaturi za
 }
 ```
 
-Vrijednosti se kreću od 0.0 do 1.0. Niže vrijednosti su više fokusirane, više vrijednosti raznovrsnije.
+Values range from 0.0 to 1.0. Lower values are more focused, higher values more diverse.
 
 ---
 
-### Dodatno
+### Additional
 
-Sve druge opcije koje navedete u konfiguraciji agenta će biti **direktno proslijeđene** dobavljaču kao opcije modela. Ovo vam omogućava da koristite karakteristike i parametre specifične za provajdera.
+Any other options you specify in your agent configuration will be **passed through directly** to the provider as model options. This allows you to use provider-specific features and parameters.
 
-Na primjer, sa OpenAI-jevim modelima rezonovanja, možete kontrolisati napor rasuđivanja:
+For example, with OpenAI's reasoning models, you can control the reasoning effort:
 
 ```json title="opencode.json" {6,7}
 {
@@ -653,55 +659,55 @@ Na primjer, sa OpenAI-jevim modelima rezonovanja, možete kontrolisati napor ras
 }
 ```
 
-Ove dodatne opcije su specifične za model i dobavljača. U dokumentaciji vašeg provajdera provjerite dostupne parametre.
+These additional options are model and provider-specific. Check your provider's documentation for available parameters.
 
 :::tip
-Pokrenite `opencode models` da vidite listu dostupnih modela.
+Run `cyxcode models` to see a list of the available models.
 :::
 
 ---
 
-## Kreiranje agenata
+## Create agents
 
-Možete kreirati nove agente koristeći sljedeću naredbu:
+You can create new agents using the following command:
 
 ```bash
-opencode agent create
+cyxcode agent create
 ```
 
-Ova interaktivna komanda će:
+This interactive command will:
 
-1. Pitajte gdje da sačuvate agenta; globalno ili specifično za projekat.
-2. Opis onoga što agent treba da uradi.
-3. Generirajte odgovarajući sistemski prompt i identifikator.
-4. Omogućite vam da odaberete kojim alatima agent može pristupiti.
-5. Konačno, kreirajte markdown datoteku s konfiguracijom agenta.
-
----
-
-## Primjeri upotrebe
-
-Evo nekoliko uobičajenih slučajeva upotrebe različitih agenata.
-
-- **Build agent**: Potpuni razvojni rad sa svim omogućenim alatima
-- **Plan agent**: Analiza i planiranje bez unošenja promjena
-- **Review agent**: Code review sa pristupom samo za čitanje plus alati za dokumentaciju
-- **Debug agent**: Fokusiran na istragu sa omogućenim bash i alatima za čitanje
-- **Docs agent**: Pisanje dokumentacije sa operacijama datoteka, ali bez sistemskih naredbi
+1. Ask where to save the agent; global or project-specific.
+2. Description of what the agent should do.
+3. Generate an appropriate system prompt and identifier.
+4. Let you select which tools the agent can access.
+5. Finally, create a markdown file with the agent configuration.
 
 ---
 
-## Primjeri
+## Use cases
 
-Evo nekoliko primjera agenata koji bi vam mogli biti korisni.
+Here are some common use cases for different agents.
+
+- **Build agent**: Full development work with all tools enabled
+- **Plan agent**: Analysis and planning without making changes
+- **Review agent**: Code review with read-only access plus documentation tools
+- **Debug agent**: Focused on investigation with bash and read tools enabled
+- **Docs agent**: Documentation writing with file operations but no system commands
+
+---
+
+## Examples
+
+Here are some example agents you might find useful.
 
 :::tip
-Imate li agenta kojeg biste željeli podijeliti? [Pošalji PR](https://github.com/anomalyco/opencode).
+Do you have an agent you'd like to share? [Submit a PR](https://github.com/code3hr/cyxcode).
 :::
 
 ---
 
-### Agent za dokumentaciju
+### Documentation agent
 
 ```markdown title="~/.config/opencode/agents/docs-writer.md"
 ---
@@ -723,7 +729,7 @@ Focus on:
 
 ---
 
-### Sigurnosni revizor
+### Security auditor
 
 ```markdown title="~/.config/opencode/agents/security-auditor.md"
 ---

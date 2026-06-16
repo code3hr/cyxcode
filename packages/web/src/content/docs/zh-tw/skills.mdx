@@ -1,62 +1,62 @@
 ---
-title: "代理技能"
-description: "透過 SKILL.md 定義可重複使用的行為"
+title: "Agent Skills"
+description: "Define reusable behavior via SKILL.md definitions"
 ---
 
-代理技能讓 OpenCode 能夠從你的儲存庫或主目錄中發現可重複使用的指令。
-技能透過原生的 `skill` 工具按需載入——代理可以查看可用技能，並在需要時載入完整內容。
-
----
-
-## 放置檔案
-
-為每個技能名稱建立一個資料夾，並在其中放入 `SKILL.md`。
-OpenCode 會搜尋以下位置：
-
-- 專案設定：`.opencode/skills/<name>/SKILL.md`
-- 全域設定：`~/.config/opencode/skills/<name>/SKILL.md`
-- 專案 Claude 相容：`.claude/skills/<name>/SKILL.md`
-- 全域 Claude 相容：`~/.claude/skills/<name>/SKILL.md`
-- 專案代理相容：`.agents/skills/<name>/SKILL.md`
-- 全域代理相容：`~/.agents/skills/<name>/SKILL.md`
+Agent skills let CyxCode discover reusable instructions from your repo or home directory.
+Skills are loaded on-demand via the native `skill` tool—agents see available skills and can load the full content when needed.
 
 ---
 
-## 了解發現機制
+## Place files
 
-對於專案本地路徑，OpenCode 會從當前工作目錄向上遍歷，直到到達 git 工作樹根目錄。
-在此過程中，它會載入 `.opencode/` 中所有匹配的 `skills/*/SKILL.md`，以及匹配的 `.claude/skills/*/SKILL.md` 或 `.agents/skills/*/SKILL.md`。
+Create one folder per skill name and put a `SKILL.md` inside it.
+cyxcode searches these locations:
 
-全域定義也會從 `~/.config/opencode/skills/*/SKILL.md`、`~/.claude/skills/*/SKILL.md` 和 `~/.agents/skills/*/SKILL.md` 中載入。
-
----
-
-## 撰寫 frontmatter
-
-每個 `SKILL.md` 必須以 YAML frontmatter 開頭。
-僅識別以下欄位：
-
-- `name`（必填）
-- `description`（必填）
-- `license`（選填）
-- `compatibility`（選填）
-- `metadata`（選填，字串到字串的映射）
-
-未知的 frontmatter 欄位會被忽略。
+- Project config: `.opencode/skills/<name>/SKILL.md`
+- Global config: `~/.config/opencode/skills/<name>/SKILL.md`
+- Project Claude-compatible: `.claude/skills/<name>/SKILL.md`
+- Global Claude-compatible: `~/.claude/skills/<name>/SKILL.md`
+- Project agent-compatible: `.agents/skills/<name>/SKILL.md`
+- Global agent-compatible: `~/.agents/skills/<name>/SKILL.md`
 
 ---
 
-## 驗證名稱
+## Understand discovery
 
-`name` 必須滿足：
+For project-local paths, CyxCode walks up from your current working directory until it reaches the git worktree.
+It loads any matching `skills/*/SKILL.md` in `.opencode/` and any matching `.claude/skills/*/SKILL.md` or `.agents/skills/*/SKILL.md` along the way.
 
-- 長度為 1–64 個字元
-- 僅包含小寫字母和數字，可用單個連字號分隔
-- 不以 `-` 開頭或結尾
-- 不包含連續的 `--`
-- 與包含 `SKILL.md` 的目錄名稱一致
+Global definitions are also loaded from `~/.config/opencode/skills/*/SKILL.md`, `~/.claude/skills/*/SKILL.md`, and `~/.agents/skills/*/SKILL.md`.
 
-等效的正規表示式：
+---
+
+## Write frontmatter
+
+Each `SKILL.md` must start with YAML frontmatter.
+Only these fields are recognized:
+
+- `name` (required)
+- `description` (required)
+- `license` (optional)
+- `compatibility` (optional)
+- `metadata` (optional, string-to-string map)
+
+Unknown frontmatter fields are ignored.
+
+---
+
+## Validate names
+
+`name` must:
+
+- Be 1–64 characters
+- Be lowercase alphanumeric with single hyphen separators
+- Not start or end with `-`
+- Not contain consecutive `--`
+- Match the directory name that contains `SKILL.md`
+
+Equivalent regex:
 
 ```text
 ^[a-z0-9]+(-[a-z0-9]+)*$
@@ -64,23 +64,23 @@ OpenCode 會搜尋以下位置：
 
 ---
 
-## 遵循長度規則
+## Follow length rules
 
-`description` 必須為 1-1024 個字元。
-請保持描述足夠具體，以便代理能夠正確選擇。
+`description` must be 1-1024 characters.
+Keep it specific enough for the agent to choose correctly.
 
 ---
 
-## 使用範例
+## Use an example
 
-建立 `.opencode/skills/git-release/SKILL.md`，內容如下：
+Create `.opencode/skills/git-release/SKILL.md` like this:
 
 ```markdown
 ---
 name: git-release
 description: Create consistent releases and changelogs
 license: MIT
-compatibility: opencode
+compatibility: CyxCode
 metadata:
   audience: maintainers
   workflow: github
@@ -100,10 +100,10 @@ Ask clarifying questions if the target versioning scheme is unclear.
 
 ---
 
-## 識別工具描述
+## Recognize tool description
 
-OpenCode 會在 `skill` 工具描述中列出可用技能。
-每個條目包含技能名稱和描述：
+cyxcode lists available skills in the `skill` tool description.
+Each entry includes the skill name and description:
 
 ```xml
 <available_skills>
@@ -114,7 +114,7 @@ OpenCode 會在 `skill` 工具描述中列出可用技能。
 </available_skills>
 ```
 
-代理透過呼叫工具來載入技能：
+The agent loads a skill by calling the tool:
 
 ```
 skill({ name: "git-release" })
@@ -122,9 +122,9 @@ skill({ name: "git-release" })
 
 ---
 
-## 設定權限
+## Configure permissions
 
-在 `opencode.json` 中使用基於模式的權限來控制代理可以存取哪些技能：
+Control which skills agents can access using pattern-based permissions in `opencode.json`:
 
 ```json
 {
@@ -139,21 +139,21 @@ skill({ name: "git-release" })
 }
 ```
 
-| 權限    | 行為                     |
-| ------- | ------------------------ |
-| `allow` | 技能立即載入             |
-| `deny`  | 對代理隱藏技能，拒絕存取 |
-| `ask`   | 載入前提示使用者確認     |
+| Permission | Behavior                                  |
+| ---------- | ----------------------------------------- |
+| `allow`    | Skill loads immediately                   |
+| `deny`     | Skill hidden from agent, access rejected  |
+| `ask`      | User prompted for approval before loading |
 
-模式支援萬用字元：`internal-*` 可匹配 `internal-docs`、`internal-tools` 等。
+Patterns support wildcards: `internal-*` matches `internal-docs`, `internal-tools`, etc.
 
 ---
 
-## 按代理覆蓋權限
+## Override per agent
 
-為特定代理授予與全域預設值不同的權限。
+Give specific agents different permissions than the global defaults.
 
-**自訂代理**（在代理 frontmatter 中）：
+**For custom agents** (in agent frontmatter):
 
 ```yaml
 ---
@@ -163,7 +163,7 @@ permission:
 ---
 ```
 
-**內建代理**（在 `opencode.json` 中）：
+**For built-in agents** (in `opencode.json`):
 
 ```json
 {
@@ -181,11 +181,11 @@ permission:
 
 ---
 
-## 停用技能工具
+## Disable the skill tool
 
-為不需要使用技能的代理完全停用技能功能：
+Completely disable skills for agents that shouldn't use them:
 
-**自訂代理**：
+**For custom agents**:
 
 ```yaml
 ---
@@ -194,7 +194,7 @@ tools:
 ---
 ```
 
-**內建代理**：
+**For built-in agents**:
 
 ```json
 {
@@ -208,15 +208,15 @@ tools:
 }
 ```
 
-停用後，`<available_skills>` 部分將被完全省略。
+When disabled, the `<available_skills>` section is omitted entirely.
 
 ---
 
-## 排查載入問題
+## Troubleshoot loading
 
-如果某個技能沒有顯示：
+If a skill does not show up:
 
-1. 確認 `SKILL.md` 檔案名稱全部為大寫字母
-2. 檢查 frontmatter 是否包含 `name` 和 `description`
-3. 確保技能名稱在所有位置中唯一
-4. 檢查權限設定——設為 `deny` 的技能會對代理隱藏
+1. Verify `SKILL.md` is spelled in all caps
+2. Check that frontmatter includes `name` and `description`
+3. Ensure skill names are unique across all locations
+4. Check permissions—skills with `deny` are hidden from agents

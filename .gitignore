@@ -23,6 +23,10 @@ target
 .scripts
 .direnv/
 .release-smoke/
+_bun_tmp/
+cve-lite-scan-*.json
+**/.wrangler/
+**/.cyxcode/
 
 # CyxCode state versioning (private per-machine)
 .opencode/history/
@@ -34,3 +38,19 @@ logs/
 tsconfig.tsbuildinfo
 CLAUDE.md
 .claude/
+
+# Local planning, audit, and cleanup notes
+/docs/local/
+/docs/BEFORE-AFTER.md
+/docs/COMPARISON.md
+/docs/SOCIAL_POST_TEMPLATE.md
+/docs/STATE-VERSIONING-ARCHITECTURE.md
+/docs/cyxwatch_implementation_plan.md
+/docs/cyxwatch_memory_firewall.md
+/docs/PHASE*.md
+/docs/BRANDING.md
+/docs/CLEANUP.md
+/docs/DEPENDENCY-VULNERABILITIES.md
+/docs/DOWNLOAD-STATS.md
+/docs/cve-lite-integration.md
+/docs/vulnscan-usage.md

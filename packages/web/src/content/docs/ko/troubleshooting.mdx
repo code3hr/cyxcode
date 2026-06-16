@@ -17,13 +17,13 @@ opencode와 문제를 디버그하려면 로그와 로컬 데이터를 확인하
 
 로그 파일은 타임스탬프 (예 : `2025-01-09T123456.log`)과 가장 최근 10 로그 파일이 보관됩니다.
 
-자세한 디버그 정보를 얻기 위해 `--log-level` 명령줄 옵션을 사용하여 로그 레벨을 설정할 수 있습니다. 예를 들면, `opencode --log-level DEBUG`.
+자세한 디버그 정보를 얻기 위해 `--log-level` 명령줄 옵션을 사용하여 로그 레벨을 설정할 수 있습니다. 예를 들면, `cyxcode --log-level DEBUG`.
 
 ---
 
 ## 저장소
 
-opencode 저장 세션 데이터 및 디스크에 다른 응용 데이터:
+cyxcode 저장 세션 데이터 및 디스크에 다른 응용 데이터:
 
 -**macOS/리눅스**: `~/.local/share/opencode/`
 
@@ -41,13 +41,13 @@ opencode 저장 세션 데이터 및 디스크에 다른 응용 데이터:
 
 ## 데스크톱 앱
 
-opencode 데스크톱은 배경에서 로컬 opencode 서버 (`opencode-cli` sidecar)를 실행합니다. 대부분의 문제는 misbehaving 플러그인, 손상된 캐시, 또는 나쁜 서버 설정에 의해 발생합니다.
+cyxcode 데스크톱은 배경에서 로컬 opencode 서버 (`opencode-cli` sidecar)를 실행합니다. 대부분의 문제는 misbehaving 플러그인, 손상된 캐시, 또는 나쁜 서버 설정에 의해 발생합니다.
 
 ## 빠른 확인
 
 - 완전히 종료하고 앱을 다시 시작.
 - 앱이 오류 화면을 보여 주면 ** Restart**를 클릭하고 오류 세부 정보를 복사합니다.
-- macOS만: `OpenCode` 메뉴 -> **웹뷰 **(UI가 공백/frozen인 경우).
+- macOS만: `CyxCode` 메뉴 -> **웹뷰 **(UI가 공백/frozen인 경우).
 
 ---
 
@@ -67,7 +67,7 @@ opencode 데스크톱은 배경에서 로컬 opencode 서버 (`opencode-cli` sid
 
 ```jsonc
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "plugin": [],
 }
 ```
@@ -103,7 +103,7 @@ opencode는 디스크에서 로컬 플러그인을로드 할 수 있습니다. T
 
 ## 서버 연결 문제 수정
 
-opencode 데스크톱은 자체 로컬 서버(기본)를 시작하거나 구성된 서버 URL에 연결할 수 있습니다.
+cyxcode 데스크톱은 자체 로컬 서버(기본)를 시작하거나 구성된 서버 URL에 연결할 수 있습니다.
 
 **"Connection Failed"** 대화 상자 (또는 앱이 스패시 화면을 지나지 않습니다), 사용자 정의 서버 URL을 확인합니다.
 
@@ -146,7 +146,7 @@ Windows에서 opencode 데스크톱은 Microsoft Edge ** WebView2 실행 시간 
 
 ## 알림이 표시되지 않음
 
-opencode 데스크톱은 시스템 알림을 보여줍니다 :
+cyxcode 데스크톱은 시스템 알림을 보여줍니다 :
 
 - OS 설정에서 opencode에 대한 알림이 활성화되고,
 - 앱 창이 집중되지 않습니다.
@@ -180,7 +180,7 @@ opencode와 문제가 발생하면:
 
 버그 또는 요청 기능을보고하는 가장 좋은 방법은 GitHub 저장소를 통해 다음과 같습니다.
 
-[**github.com/anomalyco/opencode/issues**](https://github.com/anomalyco/opencode/issues)
+[**github.com/code3hr/cyxcode/issues**](https://github.com/code3hr/cyxcode/issues)
 
 새로운 문제를 만들기 전에, 당신의 문제가 이미보고 된 경우 기존 문제를 검색.
 
@@ -188,7 +188,7 @@ opencode와 문제가 발생하면:
 
 실시간 도움말 및 커뮤니티 토론을 위해 Discord 서버에 가입하십시오.
 
-[**opencode.ai/discord**](https://opencode.ai/discord)
+[**cyxcode.ai/discord**](https://cyxcode.ai/discord)
 
 ---
 
@@ -202,7 +202,7 @@ opencode와 문제가 발생하면:
 
 1. 오류 메시지에 대한 로그 확인
 2. terminal에 있는 산출을 보기 위하여 `--print-logs`로 달리기를 시도하십시오
-3. 당신은 `opencode upgrade`를 가진 최신 버전이 있는 것을 지킵니다
+3. 당신은 `cyxcode upgrade`를 가진 최신 버전이 있는 것을 지킵니다
 
 ---
 
@@ -230,7 +230,7 @@ opencode와 문제가 발생하면:
 - `openrouter/google/gemini-2.5-flash`
 - `opencode/kimi-k2`
 
-당신이 액세스 할 수있는 모델을 파악하려면, `opencode models`를 실행
+당신이 액세스 할 수있는 모델을 파악하려면, `cyxcode models`를 실행
 
 ---
 

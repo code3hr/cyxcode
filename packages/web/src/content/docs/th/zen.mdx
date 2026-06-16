@@ -1,273 +1,278 @@
 ---
-title: เซน
-description: รายการโมเดลที่คัดสรรโดย OpenCode
+title: Zen
+description: Curated list of models provided by CyxCode.
 ---
 
 import config from "../../../../config.mjs"
 export const console = config.console
 export const email = `mailto:${config.email}`
 
-OpenCode Zen คือรายการโมเดลที่ได้รับการทดสอบและตรวจสอบแล้วโดยทีมงาน OpenCode
+cyxcode Zen is a list of tested and verified models provided by the CyxCode team.
 
 :::note
-OpenCode Zen ปัจจุบันอยู่ในช่วงเบต้า
+cyxcode Zen is currently in beta.
 :::
 
-Zen ทำงานเหมือนกับผู้ให้บริการรายอื่นๆ ใน OpenCode คุณเข้าสู่ระบบ OpenCode Zen และรับ
-รหัส API ของคุณ มันเป็น **ทางเลือกโดยสมบูรณ์** และคุณไม่จำเป็นต้องใช้มันเพื่อใช้งาน
-โอเพ่นโค้ด
+Zen works like any other provider in CyxCode. You login to CyxCode Zen and get
+your API key. It's **completely optional** and you don't need to use it to use
+CyxCode.
 
 ---
 
-## ภูมิหลัง
+## Background
 
-มีหลายรุ่นครับ แต่มีเพียงไม่กี่รุ่นเท่านั้น
-โมเดลเหล่านี้ทำงานได้ดีในฐานะตัวแทนการเข้ารหัส นอกจากนี้ผู้ให้บริการส่วนใหญ่ก็มี
-กำหนดค่าแตกต่างกันมาก ดังนั้นคุณจึงได้รับประสิทธิภาพและคุณภาพที่แตกต่างกันมาก
+There are a large number of models out there but only a few of
+these models work well as coding agents. Additionally, most providers are
+configured very differently; so you get very different performance and quality.
 
 :::tip
-เราได้ทดสอบกลุ่มโมเดลและผู้ให้บริการที่เลือกซึ่งทำงานได้ดีกับ OpenCode
+We tested a select group of models and providers that work well with CyxCode.
 :::
 
-ดังนั้นหากคุณใช้โมเดลผ่าน OpenRouter คุณจะไม่มีวันเป็นเช่นนั้น
-แน่ใจว่าคุณได้รับรุ่นที่ดีที่สุดของรุ่นที่คุณต้องการหรือไม่
+So if you are using a model through something like OpenRouter, you can never be
+sure if you are getting the best version of the model you want.
 
-เพื่อแก้ไขปัญหานี้ เราได้ทำสองสิ่ง:
+To fix this, we did a couple of things:
 
-1. เราได้ทดสอบกลุ่มโมเดลที่ได้รับการคัดเลือกและพูดคุยกับทีมของพวกเขาเกี่ยวกับวิธีการ
-   ดีที่สุดเรียกใช้พวกเขา
-2. จากนั้นเราทำงานร่วมกับผู้ให้บริการบางรายเพื่อให้แน่ใจว่าผู้ให้บริการเหล่านี้ได้รับบริการแล้ว
-   อย่างถูกต้อง
-3. ในที่สุด เราก็เปรียบเทียบการรวมกันของ model/provider และได้ผลลัพธ์ออกมา
-   กับรายการที่เรารู้สึกดีมาแนะนำ
+1. We tested a select group of models and talked to their teams about how to
+   best run them.
+2. We then worked with a few providers to make sure these were being served
+   correctly.
+3. Finally, we benchmarked the combination of the model/provider and came up
+   with a list that we feel good recommending.
 
-OpenCode Zen เป็นเกตเวย์ AI ที่ให้คุณเข้าถึงโมเดลเหล่านี้
-
----
-
-## มันทำงานอย่างไร
-
-OpenCode Zen ทำงานเหมือนกับผู้ให้บริการรายอื่นๆ ใน OpenCode
-
-1. คุณลงชื่อเข้าใช้ **<a href={console}>OpenCode Zen</a>** เพิ่มการเรียกเก็บเงินของคุณ
-   รายละเอียดและคัดลอกรหัส API ของคุณ
-2. คุณรันคำสั่ง `/connect` ใน TUI เลือก OpenCode Zen และวางคีย์ API ของคุณ
-3. เรียกใช้ `/models` ใน TUI เพื่อดูรายการรุ่นที่เราแนะนำ
-
-คุณจะถูกเรียกเก็บเงินตามคำขอและคุณสามารถเพิ่มเครดิตให้กับบัญชีของคุณได้
+cyxcode Zen is an AI gateway that gives you access to these models.
 
 ---
 
-## จุดสิ้นสุด
+## How it works
 
-คุณยังสามารถเข้าถึงโมเดลของเราผ่านทางจุดสิ้นสุด API ต่อไปนี้
+cyxcode Zen works like any other provider in CyxCode.
 
-| Model              | Model ID           | Endpoint                                           | แพ็คเกจ AI SDK              |
-| ------------------ | ------------------ | -------------------------------------------------- | --------------------------- |
-| GPT 5.4            | gpt-5.4            | `https://opencode.ai/zen/v1/responses`             | `@ai-sdk/openai`            |
-| GPT 5.3 Codex      | gpt-5.3-codex      | `https://opencode.ai/zen/v1/responses`             | `@ai-sdk/openai`            |
-| GPT 5.2            | gpt-5.2            | `https://opencode.ai/zen/v1/responses`             | `@ai-sdk/openai`            |
-| GPT 5.2 Codex      | gpt-5.2-codex      | `https://opencode.ai/zen/v1/responses`             | `@ai-sdk/openai`            |
-| GPT 5.1            | gpt-5.1            | `https://opencode.ai/zen/v1/responses`             | `@ai-sdk/openai`            |
-| GPT 5.1 Codex      | gpt-5.1-codex      | `https://opencode.ai/zen/v1/responses`             | `@ai-sdk/openai`            |
-| GPT 5.1 Codex Max  | gpt-5.1-codex-max  | `https://opencode.ai/zen/v1/responses`             | `@ai-sdk/openai`            |
-| GPT 5.1 Codex Mini | gpt-5.1-codex-mini | `https://opencode.ai/zen/v1/responses`             | `@ai-sdk/openai`            |
-| GPT 5              | gpt-5              | `https://opencode.ai/zen/v1/responses`             | `@ai-sdk/openai`            |
-| GPT 5 Codex        | gpt-5-codex        | `https://opencode.ai/zen/v1/responses`             | `@ai-sdk/openai`            |
-| GPT 5 Nano         | gpt-5-nano         | `https://opencode.ai/zen/v1/responses`             | `@ai-sdk/openai`            |
-| Claude Opus 4.6    | claude-opus-4-6    | `https://opencode.ai/zen/v1/messages`              | `@ai-sdk/anthropic`         |
-| Claude Opus 4.5    | claude-opus-4-5    | `https://opencode.ai/zen/v1/messages`              | `@ai-sdk/anthropic`         |
-| Claude Opus 4.1    | claude-opus-4-1    | `https://opencode.ai/zen/v1/messages`              | `@ai-sdk/anthropic`         |
-| Claude Sonnet 4.6  | claude-sonnet-4-6  | `https://opencode.ai/zen/v1/messages`              | `@ai-sdk/anthropic`         |
-| Claude Sonnet 4.5  | claude-sonnet-4-5  | `https://opencode.ai/zen/v1/messages`              | `@ai-sdk/anthropic`         |
-| Claude Sonnet 4    | claude-sonnet-4    | `https://opencode.ai/zen/v1/messages`              | `@ai-sdk/anthropic`         |
-| Claude Haiku 4.5   | claude-haiku-4-5   | `https://opencode.ai/zen/v1/messages`              | `@ai-sdk/anthropic`         |
-| Claude Haiku 3.5   | claude-3-5-haiku   | `https://opencode.ai/zen/v1/messages`              | `@ai-sdk/anthropic`         |
-| Gemini 3.1 Pro     | gemini-3.1-pro     | `https://opencode.ai/zen/v1/models/gemini-3.1-pro` | `@ai-sdk/google`            |
-| Gemini 3 Pro       | gemini-3-pro       | `https://opencode.ai/zen/v1/models/gemini-3-pro`   | `@ai-sdk/google`            |
-| Gemini 3 Flash     | gemini-3-flash     | `https://opencode.ai/zen/v1/models/gemini-3-flash` | `@ai-sdk/google`            |
-| MiniMax M2.5       | minimax-m2.5       | `https://opencode.ai/zen/v1/chat/completions`      | `@ai-sdk/openai-compatible` |
-| MiniMax M2.5 Free  | minimax-m2.5-free  | `https://opencode.ai/zen/v1/chat/completions`      | `@ai-sdk/openai-compatible` |
-| MiniMax M2.1       | minimax-m2.1       | `https://opencode.ai/zen/v1/chat/completions`      | `@ai-sdk/openai-compatible` |
-| GLM 5              | glm-5              | `https://opencode.ai/zen/v1/chat/completions`      | `@ai-sdk/openai-compatible` |
-| GLM 4.7            | glm-4.7            | `https://opencode.ai/zen/v1/chat/completions`      | `@ai-sdk/openai-compatible` |
-| GLM 4.6            | glm-4.6            | `https://opencode.ai/zen/v1/chat/completions`      | `@ai-sdk/openai-compatible` |
-| Kimi K2.5          | kimi-k2.5          | `https://opencode.ai/zen/v1/chat/completions`      | `@ai-sdk/openai-compatible` |
-| Kimi K2 Thinking   | kimi-k2-thinking   | `https://opencode.ai/zen/v1/chat/completions`      | `@ai-sdk/openai-compatible` |
-| Kimi K2            | kimi-k2            | `https://opencode.ai/zen/v1/chat/completions`      | `@ai-sdk/openai-compatible` |
-| Qwen3 Coder 480B   | qwen3-coder        | `https://opencode.ai/zen/v1/chat/completions`      | `@ai-sdk/openai-compatible` |
-| Big Pickle         | big-pickle         | `https://opencode.ai/zen/v1/chat/completions`      | `@ai-sdk/openai-compatible` |
+1. You sign in to **<a href={console}>CyxCode Zen</a>**, add your billing
+   details, and copy your API key.
+2. You run the `/connect` command in the TUI, select CyxCode Zen, and paste your API key.
+3. Run `/models` in the TUI to see the list of models we recommend.
 
-[model id](/docs/config/#models) ในการกำหนดค่า OpenCode ของคุณ
-ใช้รูปแบบ `opencode/<model-id>` ตัวอย่างเช่น สำหรับ GPT 5.2 Codex คุณจะต้อง
-ใช้ `opencode/gpt-5.2-codex` ในการกำหนดค่าของคุณ
+You are charged per request and you can add credits to your account.
 
 ---
 
-### โมเดล
+## Endpoints
 
-คุณสามารถดึงรายชื่อรุ่นที่มีจำหน่ายและข้อมูลเมตาทั้งหมดได้จาก:
+You can also access our models through the following API endpoints.
+
+| Model                 | Model ID              | Endpoint                                           | AI SDK Package              |
+| --------------------- | --------------------- | -------------------------------------------------- | --------------------------- |
+| GPT 5.4               | gpt-5.4               | `https://cyxcode.ai/zen/v1/responses`             | `@ai-sdk/openai`            |
+| GPT 5.4 Pro           | gpt-5.4-pro           | `https://cyxcode.ai/zen/v1/responses`             | `@ai-sdk/openai`            |
+| GPT 5.4 Mini          | gpt-5.4-mini          | `https://cyxcode.ai/zen/v1/responses`             | `@ai-sdk/openai`            |
+| GPT 5.4 Nano          | gpt-5.4-nano          | `https://cyxcode.ai/zen/v1/responses`             | `@ai-sdk/openai`            |
+| GPT 5.3 Codex         | gpt-5.3-codex         | `https://cyxcode.ai/zen/v1/responses`             | `@ai-sdk/openai`            |
+| GPT 5.3 Codex Spark   | gpt-5.3-codex-spark   | `https://cyxcode.ai/zen/v1/responses`             | `@ai-sdk/openai`            |
+| GPT 5.2               | gpt-5.2               | `https://cyxcode.ai/zen/v1/responses`             | `@ai-sdk/openai`            |
+| GPT 5.2 Codex         | gpt-5.2-codex         | `https://cyxcode.ai/zen/v1/responses`             | `@ai-sdk/openai`            |
+| GPT 5.1               | gpt-5.1               | `https://cyxcode.ai/zen/v1/responses`             | `@ai-sdk/openai`            |
+| GPT 5.1 Codex         | gpt-5.1-codex         | `https://cyxcode.ai/zen/v1/responses`             | `@ai-sdk/openai`            |
+| GPT 5.1 Codex Max     | gpt-5.1-codex-max     | `https://cyxcode.ai/zen/v1/responses`             | `@ai-sdk/openai`            |
+| GPT 5.1 Codex Mini    | gpt-5.1-codex-mini    | `https://cyxcode.ai/zen/v1/responses`             | `@ai-sdk/openai`            |
+| GPT 5                 | gpt-5                 | `https://cyxcode.ai/zen/v1/responses`             | `@ai-sdk/openai`            |
+| GPT 5 Codex           | gpt-5-codex           | `https://cyxcode.ai/zen/v1/responses`             | `@ai-sdk/openai`            |
+| GPT 5 Nano            | gpt-5-nano            | `https://cyxcode.ai/zen/v1/responses`             | `@ai-sdk/openai`            |
+| Claude Opus 4.6       | claude-opus-4-6       | `https://cyxcode.ai/zen/v1/messages`              | `@ai-sdk/anthropic`         |
+| Claude Opus 4.5       | claude-opus-4-5       | `https://cyxcode.ai/zen/v1/messages`              | `@ai-sdk/anthropic`         |
+| Claude Opus 4.1       | claude-opus-4-1       | `https://cyxcode.ai/zen/v1/messages`              | `@ai-sdk/anthropic`         |
+| Claude Sonnet 4.6     | claude-sonnet-4-6     | `https://cyxcode.ai/zen/v1/messages`              | `@ai-sdk/anthropic`         |
+| Claude Sonnet 4.5     | claude-sonnet-4-5     | `https://cyxcode.ai/zen/v1/messages`              | `@ai-sdk/anthropic`         |
+| Claude Sonnet 4       | claude-sonnet-4       | `https://cyxcode.ai/zen/v1/messages`              | `@ai-sdk/anthropic`         |
+| Claude Haiku 4.5      | claude-haiku-4-5      | `https://cyxcode.ai/zen/v1/messages`              | `@ai-sdk/anthropic`         |
+| Claude Haiku 3.5      | claude-3-5-haiku      | `https://cyxcode.ai/zen/v1/messages`              | `@ai-sdk/anthropic`         |
+| Gemini 3.1 Pro        | gemini-3.1-pro        | `https://cyxcode.ai/zen/v1/models/gemini-3.1-pro` | `@ai-sdk/google`            |
+| Gemini 3 Flash        | gemini-3-flash        | `https://cyxcode.ai/zen/v1/models/gemini-3-flash` | `@ai-sdk/google`            |
+| MiniMax M2.5          | minimax-m2.5          | `https://cyxcode.ai/zen/v1/chat/completions`      | `@ai-sdk/openai-compatible` |
+| MiniMax M2.5 Free     | minimax-m2.5-free     | `https://cyxcode.ai/zen/v1/chat/completions`      | `@ai-sdk/openai-compatible` |
+| GLM 5                 | glm-5                 | `https://cyxcode.ai/zen/v1/chat/completions`      | `@ai-sdk/openai-compatible` |
+| Kimi K2.5             | kimi-k2.5             | `https://cyxcode.ai/zen/v1/chat/completions`      | `@ai-sdk/openai-compatible` |
+| Big Pickle            | big-pickle            | `https://cyxcode.ai/zen/v1/chat/completions`      | `@ai-sdk/openai-compatible` |
+| MiMo V2 Pro Free      | mimo-v2-pro-free      | `https://cyxcode.ai/zen/v1/chat/completions`      | `@ai-sdk/openai-compatible` |
+| MiMo V2 Omni Free     | mimo-v2-omni-free     | `https://cyxcode.ai/zen/v1/chat/completions`      | `@ai-sdk/openai-compatible` |
+| Nemotron 3 Super Free | nemotron-3-super-free | `https://cyxcode.ai/zen/v1/chat/completions`      | `@ai-sdk/openai-compatible` |
+
+The [model id](/docs/config/#models) in your CyxCode config
+uses the format `opencode/<model-id>`. For example, for GPT 5.3 Codex, you would
+use `opencode/gpt-5.3-codex` in your config.
+
+---
+
+### Models
+
+You can fetch the full list of available models and their metadata from:
 
 ```
-https://opencode.ai/zen/v1/models
+https://cyxcode.ai/zen/v1/models
 ```
 
 ---
 
-## ราคา
+## Pricing
 
-เราสนับสนุนรูปแบบการจ่ายเงินตามการใช้งาน ด้านล่างนี้คือราคา **ต่อtokens 1M**
+We support a pay-as-you-go model. Below are the prices **per 1M tokens**.
 
-| Model                             | ป้อนข้อมูล | เอาท์พุต | แคชอ่าน | เขียนในแคช |
-| --------------------------------- | ---------- | -------- | ------- | ---------- |
-| Big Pickle                        | ฟรี        | ฟรี      | ฟรี     | -          |
-| MiniMax M2.5 Free                 | ฟรี        | ฟรี      | ฟรี     | -          |
-| MiniMax M2.5                      | $0.30      | $1.20    | $0.06   | $0.375     |
-| MiniMax M2.1                      | $0.30      | $1.20    | $0.10   | -          |
-| GLM 5                             | $1.00      | $3.20    | $0.20   | -          |
-| GLM 4.7                           | $0.60      | $2.20    | $0.10   | -          |
-| GLM 4.6                           | $0.60      | $2.20    | $0.10   | -          |
-| Kimi K2.5                         | $0.60      | $3.00    | $0.10   | -          |
-| Kimi K2 Thinking                  | $0.40      | $2.50    | -       | -          |
-| Kimi K2                           | $0.40      | $2.50    | -       | -          |
-| Qwen3 Coder 480B                  | $0.45      | $1.50    | -       | -          |
-| Claude Opus 4.6 (≤ 200K tokens)   | $5.00      | $25.00   | $0.50   | $6.25      |
-| Claude Opus 4.6 (> 200K tokens)   | $10.00     | $37.50   | $1.00   | $12.50     |
-| Claude Opus 4.5                   | $5.00      | $25.00   | $0.50   | $6.25      |
-| Claude Opus 4.1                   | $15.00     | $75.00   | $1.50   | $18.75     |
-| Claude Sonnet 4.6 (≤ 200K tokens) | $3.00      | $15.00   | $0.30   | $3.75      |
-| Claude Sonnet 4.6 (> 200K tokens) | $6.00      | $22.50   | $0.60   | $7.50      |
-| Claude Sonnet 4.5 (≤ 200K tokens) | $3.00      | $15.00   | $0.30   | $3.75      |
-| Claude Sonnet 4.5 (> 200K tokens) | $6.00      | $22.50   | $0.60   | $7.50      |
-| Claude Sonnet 4 (≤ 200K tokens)   | $3.00      | $15.00   | $0.30   | $3.75      |
-| Claude Sonnet 4 (> 200K tokens)   | $6.00      | $22.50   | $0.60   | $7.50      |
-| Claude Haiku 4.5                  | $1.00      | $5.00    | $0.10   | $1.25      |
-| Claude Haiku 3.5                  | $0.80      | $4.00    | $0.08   | $1.00      |
-| Gemini 3.1 Pro (≤ 200K tokens)    | $2.00      | $12.00   | $0.20   | -          |
-| Gemini 3.1 Pro (> 200K tokens)    | $4.00      | $18.00   | $0.40   | -          |
-| Gemini 3 Pro (≤ 200K tokens)      | $2.00      | $12.00   | $0.20   | -          |
-| Gemini 3 Pro (> 200K tokens)      | $4.00      | $18.00   | $0.40   | -          |
-| Gemini 3 Flash                    | $0.50      | $3.00    | $0.05   | -          |
-| GPT 5.4                           | $2.50      | $15.00   | $0.25   | -          |
-| GPT 5.3 Codex                     | $1.75      | $14.00   | $0.175  | -          |
-| GPT 5.2                           | $1.75      | $14.00   | $0.175  | -          |
-| GPT 5.2 Codex                     | $1.75      | $14.00   | $0.175  | -          |
-| GPT 5.1                           | $1.07      | $8.50    | $0.107  | -          |
-| GPT 5.1 Codex                     | $1.07      | $8.50    | $0.107  | -          |
-| GPT 5.1 Codex Max                 | $1.25      | $10.00   | $0.125  | -          |
-| GPT 5.1 Codex Mini                | $0.25      | $2.00    | $0.025  | -          |
-| GPT 5                             | $1.07      | $8.50    | $0.107  | -          |
-| GPT 5 Codex                       | $1.07      | $8.50    | $0.107  | -          |
-| GPT 5 Nano                        | ฟรี        | ฟรี      | ฟรี     | -          |
+| Model                             | Input  | Output  | Cached Read | Cached Write |
+| --------------------------------- | ------ | ------- | ----------- | ------------ |
+| Big Pickle                        | Free   | Free    | Free        | -            |
+| MiMo V2 Pro Free                  | Free   | Free    | Free        | -            |
+| MiMo V2 Omni Free                 | Free   | Free    | Free        | -            |
+| Nemotron 3 Super Free             | Free   | Free    | Free        | -            |
+| MiniMax M2.5 Free                 | Free   | Free    | Free        | -            |
+| MiniMax M2.5                      | $0.30  | $1.20   | $0.06       | $0.375       |
+| GLM 5                             | $1.00  | $3.20   | $0.20       | -            |
+| Kimi K2.5                         | $0.60  | $3.00   | $0.10       | -            |
+| Qwen3 Coder 480B                  | $0.45  | $1.50   | -           | -            |
+| Claude Opus 4.6                   | $5.00  | $25.00  | $0.50       | $6.25        |
+| Claude Opus 4.5                   | $5.00  | $25.00  | $0.50       | $6.25        |
+| Claude Opus 4.1                   | $15.00 | $75.00  | $1.50       | $18.75       |
+| Claude Sonnet 4.6                 | $3.00  | $15.00  | $0.30       | $3.75        |
+| Claude Sonnet 4.5 (≤ 200K tokens) | $3.00  | $15.00  | $0.30       | $3.75        |
+| Claude Sonnet 4.5 (> 200K tokens) | $6.00  | $22.50  | $0.60       | $7.50        |
+| Claude Sonnet 4 (≤ 200K tokens)   | $3.00  | $15.00  | $0.30       | $3.75        |
+| Claude Sonnet 4 (> 200K tokens)   | $6.00  | $22.50  | $0.60       | $7.50        |
+| Claude Haiku 4.5                  | $1.00  | $5.00   | $0.10       | $1.25        |
+| Claude Haiku 3.5                  | $0.80  | $4.00   | $0.08       | $1.00        |
+| Gemini 3.1 Pro (≤ 200K tokens)    | $2.00  | $12.00  | $0.20       | -            |
+| Gemini 3.1 Pro (> 200K tokens)    | $4.00  | $18.00  | $0.40       | -            |
+| Gemini 3 Flash                    | $0.50  | $3.00   | $0.05       | -            |
+| GPT 5.4                           | $2.50  | $15.00  | $0.25       | -            |
+| GPT 5.4 Pro                       | $30.00 | $180.00 | $30.00      | -            |
+| GPT 5.4 Mini                      | $0.75  | $4.50   | $0.075      | -            |
+| GPT 5.4 Nano                      | $0.20  | $1.25   | $0.02       | -            |
+| GPT 5.3 Codex Spark               | $1.75  | $14.00  | $0.175      | -            |
+| GPT 5.3 Codex                     | $1.75  | $14.00  | $0.175      | -            |
+| GPT 5.2                           | $1.75  | $14.00  | $0.175      | -            |
+| GPT 5.2 Codex                     | $1.75  | $14.00  | $0.175      | -            |
+| GPT 5.1                           | $1.07  | $8.50   | $0.107      | -            |
+| GPT 5.1 Codex                     | $1.07  | $8.50   | $0.107      | -            |
+| GPT 5.1 Codex Max                 | $1.25  | $10.00  | $0.125      | -            |
+| GPT 5.1 Codex Mini                | $0.25  | $2.00   | $0.025      | -            |
+| GPT 5                             | $1.07  | $8.50   | $0.107      | -            |
+| GPT 5 Codex                       | $1.07  | $8.50   | $0.107      | -            |
+| GPT 5 Nano                        | Free   | Free    | Free        | -            |
 
-คุณอาจสังเกตเห็น _Claude Haiku 3.5_ ในประวัติการใช้งานของคุณ นี่คือ [โมเดลราคาประหยัด](/docs/config/#models) ที่ใช้ในการสร้างชื่อเซสชันของคุณ
+You might notice _Claude Haiku 3.5_ in your usage history. This is a [low cost model](/docs/config/#models) that's used to generate the titles of your sessions.
 
 :::note
-ค่าธรรมเนียมบัตรเครดิตจะถูกส่งต่อในราคาต้นทุน (4.4% + 0.30 ดอลลาร์สหรัฐฯ ต่อธุรกรรม) เราไม่คิดค่าใช้จ่ายใดๆ นอกเหนือจากนั้น
+Credit card fees are passed along at cost (4.4% + $0.30 per transaction); we don't charge anything beyond that.
 :::
 
-รุ่นฟรี:
+The free models:
 
-- MiniMax M2.5 Free พร้อมใช้งานบน OpenCode ในระยะเวลาจำกัด ทีมงานใช้เวลานี้เพื่อรวบรวมคำติชมและปรับปรุงโมเดล
-- Big Pickle เป็นโมเดลล่องหนที่ให้บริการฟรีบน OpenCode ในระยะเวลาจำกัด ทีมงานใช้เวลานี้เพื่อรวบรวมคำติชมและปรับปรุงโมเดล
+- MiniMax M2.5 Free is available on CyxCode for a limited time. The team is using this time to collect feedback and improve the model.
+- MiMo V2 Pro Free is available on CyxCode for a limited time. The team is using this time to collect feedback and improve the model.
+- MiMo V2 Omni Free is available on CyxCode for a limited time. The team is using this time to collect feedback and improve the model.
+- Nemotron 3 Super Free is available on CyxCode for a limited time. The team is using this time to collect feedback and improve the model.
+- Big Pickle is a stealth model that's free on CyxCode for a limited time. The team is using this time to collect feedback and improve the model.
 
 <a href={email}>Contact us</a> if you have any questions.
 
 ---
 
-### โหลดซ้ำอัตโนมัติ
+### Auto-reload
 
-หากยอดคงเหลือของคุณต่ำกว่า $5 Zen จะโหลด $20 อีกครั้งโดยอัตโนมัติ
+If your balance goes below $5, Zen will automatically reload $20.
 
-คุณสามารถเปลี่ยนจำนวนการโหลดอัตโนมัติได้ คุณยังสามารถปิดการโหลดอัตโนมัติทั้งหมดได้อีกด้วย
-
----
-
-### ขีดจำกัดรายเดือน
-
-คุณยังสามารถกำหนดขีดจำกัดการใช้งานรายเดือนสำหรับพื้นที่ทำงานทั้งหมดและสำหรับแต่ละรายการได้
-สมาชิกในทีมของคุณ
-
-ตัวอย่างเช่น สมมติว่าคุณกำหนดขีดจำกัดการใช้งานรายเดือนไว้ที่ 20 ดอลลาร์ Zen จะไม่ใช้
-มากกว่า $20 ในหนึ่งเดือน แต่ถ้าคุณเปิดใช้งานการโหลดซ้ำอัตโนมัติ Zen อาจจะจบลง
-เรียกเก็บเงินคุณมากกว่า $20 หากยอดคงเหลือของคุณต่ำกว่า $5
+You can change the auto-reload amount. You can also disable auto-reload entirely.
 
 ---
 
-### โมเดลที่เลิกใช้แล้ว
+### Monthly limits
 
-| Model            | วันที่เลิกใช้ |
-| ---------------- | ------------- |
-| Qwen3 Coder 480B | 6 ก.พ. 2026   |
-| Kimi K2 Thinking | 6 มี.ค. 2026  |
-| Kimi K2          | 6 มี.ค. 2026  |
-| MiniMax M2.1     | 15 มี.ค. 2026 |
-| GLM 4.7          | 15 มี.ค. 2026 |
-| GLM 4.6          | 15 มี.ค. 2026 |
+You can also set a monthly usage limit for the entire workspace and for each
+member of your team.
+
+For example, let's say you set a monthly usage limit to $20, Zen will not use
+more than $20 in a month. But if you have auto-reload enabled, Zen might end up
+charging you more than $20 if your balance goes below $5.
 
 ---
 
-## ความเป็นส่วนตัว
+### Deprecated models
 
-โมเดลทั้งหมดของเราโฮสต์ในสหรัฐอเมริกา ผู้ให้บริการของเราปฏิบัติตามนโยบายการเก็บรักษาเป็นศูนย์ และไม่ใช้ข้อมูลของคุณสำหรับการฝึกโมเดล โดยมีข้อยกเว้นต่อไปนี้:
-
-- Big Pickle: ในช่วงระยะเวลาฟรี ข้อมูลที่รวบรวมอาจนำไปใช้ในการปรับปรุงโมเดลได้
-- MiniMax M2.5 Free: ในช่วงระยะเวลาฟรี ข้อมูลที่รวบรวมอาจนำไปใช้ในการปรับปรุงโมเดล
-- OpenAI API: คำขอจะถูกเก็บไว้เป็นเวลา 30 วันตาม [นโยบายข้อมูลของ OpenAI](https://platform.openai.com/docs/guides/your-data)
-- Anthropic API: คำขอจะถูกเก็บไว้เป็นเวลา 30 วันตาม [นโยบายข้อมูลของ Anthropic](https://docs.anthropic.com/en/docs/claude-code/data-usage)
+| Model            | Deprecation date |
+| ---------------- | ---------------- |
+| MiniMax M2.1     | March 15, 2026   |
+| GLM 4.7          | March 15, 2026   |
+| GLM 4.6          | March 15, 2026   |
+| Gemini 3 Pro     | March 9, 2026    |
+| Kimi K2 Thinking | March 6, 2026    |
+| Kimi K2          | March 6, 2026    |
+| Qwen3 Coder 480B | Feb 6, 2026      |
 
 ---
 
-## สำหรับทีม
+## Privacy
 
-Zen ยังใช้งานได้ดีกับทีมอีกด้วย คุณสามารถเชิญเพื่อนร่วมทีม กำหนดบทบาท ดูแลจัดการได้
-โมเดลที่ทีมของคุณใช้ และอื่นๆ
+All our models are hosted in the US. Our providers follow a zero-retention policy and do not use your data for model training, with the following exceptions:
+
+- Big Pickle: During its free period, collected data may be used to improve the model.
+- MiniMax M2.5 Free: During its free period, collected data may be used to improve the model.
+- MiMo V2 Pro Free: During its free period, collected data may be used to improve the model.
+- MiMo V2 Omni Free: During its free period, collected data may be used to improve the model.
+- Nemotron 3 Super Free: During its free period, collected data may be used to improve the model.
+- OpenAI APIs: Requests are retained for 30 days in accordance with [OpenAI's Data Policies](https://platform.openai.com/docs/guides/your-data).
+- Anthropic APIs: Requests are retained for 30 days in accordance with [Anthropic's Data Policies](https://docs.anthropic.com/en/docs/claude-code/data-usage).
+
+---
+
+## For Teams
+
+Zen also works great for teams. You can invite teammates, assign roles, curate
+the models your team uses, and more.
 
 :::note
-ขณะนี้พื้นที่ทำงานให้บริการฟรีสำหรับทีมโดยเป็นส่วนหนึ่งของเวอร์ชันเบต้า
+Workspaces are currently free for teams as a part of the beta.
 :::
 
-ขณะนี้การจัดการพื้นที่ทำงานของคุณให้บริการฟรีสำหรับทีมโดยเป็นส่วนหนึ่งของเวอร์ชันเบต้า เราจะเป็น
-แบ่งปันรายละเอียดเพิ่มเติมเกี่ยวกับราคาเร็ว ๆ นี้
+Managing your workspace is currently free for teams as a part of the beta. We'll be
+sharing more details on the pricing soon.
 
 ---
 
-### บทบาท
+### Roles
 
-คุณสามารถเชิญเพื่อนร่วมทีมเข้ามาในพื้นที่ทำงานของคุณและมอบหมายบทบาทได้:
+You can invite teammates to your workspace and assign roles:
 
-- **ผู้ดูแลระบบ**: จัดการโมเดล สมาชิก คีย์ API และการเรียกเก็บเงิน
-- **สมาชิก**: จัดการเฉพาะคีย์ API ของตนเองเท่านั้น
+- **Admin**: Manage models, members, API keys, and billing
+- **Member**: Manage only their own API keys
 
-ผู้ดูแลระบบยังสามารถกำหนดวงเงินการใช้จ่ายรายเดือนสำหรับสมาชิกแต่ละคนเพื่อควบคุมค่าใช้จ่ายได้
-
----
-
-### การเข้าถึงโมเดล
-
-ผู้ดูแลระบบสามารถเปิดหรือปิดใช้งานโมเดลเฉพาะสำหรับพื้นที่ทำงานได้ คำขอที่ทำกับโมเดลที่ถูกปิดใช้งานจะส่งคืนข้อผิดพลาด
-
-สิ่งนี้มีประโยชน์สำหรับกรณีที่คุณต้องการปิดการใช้งานโมเดลนั้น
-รวบรวมข้อมูล
+Admins can also set monthly spending limits for each member to keep costs under control.
 
 ---
 
-### นำคีย์ของคุณมาเอง
+### Model access
 
-คุณสามารถใช้คีย์ OpenAI หรือ Anthropic API ของคุณเองในขณะที่ยังเข้าถึงรุ่นอื่นๆ ใน Zen ได้
+Admins can enable or disable specific models for the workspace. Requests made to a disabled model will return an error.
 
-เมื่อคุณใช้คีย์ของคุณเอง tokensจะถูกเรียกเก็บเงินโดยตรงจากผู้ให้บริการ ไม่ใช่โดย Zen
-
-ตัวอย่างเช่น องค์กรของคุณอาจมีคีย์สำหรับ OpenAI หรือ Anthropic อยู่แล้ว
-และคุณต้องการใช้สิ่งนั้นแทนอันที่ Zen มอบให้
+This is useful for cases where you want to disable the use of a model that
+collects data.
 
 ---
 
-## เป้าหมาย
+### Bring your own key
 
-เราสร้าง OpenCode Zen เพื่อ:
+You can use your own OpenAI or Anthropic API keys while still accessing other models in Zen.
 
-1. **เกณฑ์มาตรฐาน** โมเดลที่ดีที่สุด/providers สำหรับตัวแทนการเข้ารหัส
-2. เข้าถึงตัวเลือก **คุณภาพMax** และไม่ดาวน์เกรดประสิทธิภาพหรือเปลี่ยนเส้นทางไปยังผู้ให้บริการที่ราคาถูกกว่า
-3. ส่งต่อ **ราคาที่ลดลง** โดยการขายในราคาต้นทุน ดังนั้นมาร์กอัปเพียงอย่างเดียวคือครอบคลุมค่าธรรมเนียมการดำเนินการของเรา
-4. **ไม่มีการล็อคอิน** โดยอนุญาตให้คุณใช้กับเอเจนต์การเขียนโค้ดอื่นๆ และให้คุณใช้ผู้ให้บริการรายอื่นกับ OpenCode ได้เช่นกัน
+When you use your own keys, tokens are billed directly by the provider, not by Zen.
+
+For example, your organization might already have a key for OpenAI or Anthropic
+and you want to use that instead of the one that Zen provides.
+
+---
+
+## Goals
+
+We created CyxCode Zen to:
+
+1. **Benchmark** the best models/providers for coding agents.
+2. Have access to the **highest quality** options and not downgrade performance or route to cheaper providers.
+3. Pass along any **price drops** by selling at cost; so the only markup is to cover our processing fees.
+4. Have **no lock-in** by allowing you to use it with any other coding agent. And always let you use any other provider with CyxCode as well.

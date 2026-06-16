@@ -7,7 +7,7 @@ const channel = (() => {
 })()
 
 const getBase = (): Configuration => ({
-  artifactName: "opencode-electron-${os}-${arch}.${ext}",
+  artifactName: "cyxcode-electron-${os}-${arch}.${ext}",
   directories: {
     output: "dist",
     buildResources: "resources",
@@ -39,7 +39,7 @@ const getBase = (): Configuration => ({
     sign: true,
   },
   protocols: {
-    name: "OpenCode",
+    name: "CyxCode",
     schemes: ["opencode"],
   },
   win: {
@@ -67,28 +67,28 @@ function getConfig() {
       return {
         ...base,
         appId: "ai.opencode.desktop.dev",
-        productName: "OpenCode Dev",
-        rpm: { packageName: "opencode-dev" },
+        productName: "CyxCode Dev",
+        rpm: { packageName: "cyxcode-dev" },
       }
     }
     case "beta": {
       return {
         ...base,
         appId: "ai.opencode.desktop.beta",
-        productName: "OpenCode Beta",
-        protocols: { name: "OpenCode Beta", schemes: ["opencode"] },
-        publish: { provider: "github", owner: "anomalyco", repo: "opencode-beta", channel: "latest" },
-        rpm: { packageName: "opencode-beta" },
+        productName: "CyxCode Beta",
+        protocols: { name: "CyxCode Beta", schemes: ["opencode"] },
+        publish: { provider: "github", owner: "code3hr", repo: "cyxcode-beta", channel: "latest" },
+        rpm: { packageName: "cyxcode-beta" },
       }
     }
     case "prod": {
       return {
         ...base,
         appId: "ai.opencode.desktop",
-        productName: "OpenCode",
-        protocols: { name: "OpenCode", schemes: ["opencode"] },
-        publish: { provider: "github", owner: "anomalyco", repo: "opencode", channel: "latest" },
-        rpm: { packageName: "opencode" },
+        productName: "CyxCode",
+        protocols: { name: "CyxCode", schemes: ["opencode"] },
+        publish: { provider: "github", owner: "code3hr", repo: "cyxcode", channel: "latest" },
+        rpm: { packageName: "cyxcode" },
       }
     }
   }

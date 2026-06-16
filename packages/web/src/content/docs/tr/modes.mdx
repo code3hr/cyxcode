@@ -8,7 +8,7 @@ Modlar artık opencode yapılandırmasındaki `agent` seçeneği aracılığıyl
 `mode` seçeneği artık kullanımdan kaldırıldı. [Daha fazla bilgi](/docs/agents).
 :::
 
-opencode'daki modlar, farklı kullanım durumları için davranışı, araçları ve istemleri özelleştirmenize olanak tanır.
+cyxcode'daki modlar, farklı kullanım durumları için davranışı, araçları ve istemleri özelleştirmenize olanak tanır.
 
 İki yerleşik modla birlikte gelir: **build** ve **plan**. Kişiselleştirebilirsiniz
 bunları veya opencode yapılandırması aracılığıyla kendinizinkini yapılandırın.
@@ -19,7 +19,7 @@ Bir oturum sırasında modlar arasında geçiş yapabilir veya bunları yapılan
 
 ## Yerleşik
 
-opencode iki yerleşik modla birlikte gelir.
+cyxcode iki yerleşik modla birlikte gelir.
 
 ---
 
@@ -60,7 +60,7 @@ Yerleşik modları özelleştirebilir veya yapılandırma aracılığıyla kendi
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "mode": {
     "build": {
       "model": "anthropic/claude-sonnet-4-20250514",
@@ -249,7 +249,7 @@ Yapılandırmaya ekleyerek kendi özel modlarınızı oluşturabilirsiniz. Her i
 
 ```json title="opencode.json" {4-14}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "mode": {
     "docs": {
       "prompt": "{file:./prompts/documentation.txt}",

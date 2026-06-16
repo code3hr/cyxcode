@@ -1,19 +1,19 @@
 ---
 title: Config
-description: Using the OpenCode JSON config.
+description: Using the CyxCode JSON config.
 ---
 
-You can configure OpenCode using a JSON config file.
+You can configure CyxCode using a JSON config file.
 
 ---
 
 ## Format
 
-OpenCode supports both **JSON** and **JSONC** (JSON with Comments) formats.
+CyxCode supports both **JSON** and **JSONC** (JSON with Comments) formats.
 
 ```jsonc title="opencode.jsonc"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "model": "anthropic/claude-sonnet-4-5",
   "autoupdate": true,
   "server": {
@@ -43,7 +43,7 @@ For example, if your global config sets `autoupdate: true` and your project conf
 
 Config sources are loaded in this order (later sources override earlier ones):
 
-1. **Remote config** (from `.well-known/opencode`) - organizational defaults
+1. **Remote config** (from `.well-known/CyxCode`) - organizational defaults
 2. **Global config** (`~/.config/opencode/opencode.json`) - user preferences
 3. **Custom config** (`OPENCODE_CONFIG` env var) - custom overrides
 4. **Project config** (`opencode.json` in project) - project-specific settings
@@ -60,13 +60,13 @@ The `.opencode` and `~/.config/opencode` directories use **plural names** for su
 
 ### Remote
 
-Organizations can provide default configuration via the `.well-known/opencode` endpoint. This is fetched automatically when you authenticate with a provider that supports it.
+Organizations can provide default configuration via the `.well-known/CyxCode` endpoint. This is fetched automatically when you authenticate with a provider that supports it.
 
 Remote config is loaded first, serving as the base layer. All other config sources (global, project) can override these defaults.
 
 For example, if your organization provides MCP servers that are disabled by default:
 
-```json title="Remote config from .well-known/opencode"
+```json title="Remote config from .well-known/CyxCode"
 {
   "mcp": {
     "jira": {
@@ -96,7 +96,7 @@ You can enable specific servers in your local config:
 
 ### Global
 
-Place your global OpenCode config in `~/.config/opencode/opencode.json`. Use global config for user-wide server/runtime preferences like providers, models, and permissions.
+Place your global CyxCode config in `~/.config/opencode/opencode.json`. Use global config for user-wide server/runtime preferences like providers, models, and permissions.
 
 For TUI-specific settings, use `~/.config/opencode/tui.json`.
 
@@ -114,7 +114,7 @@ For project-specific TUI settings, add `tui.json` alongside it.
 Place project specific config in the root of your project.
 :::
 
-When OpenCode starts up, it looks for a config file in the current directory or traverse up to the nearest Git directory.
+When CyxCode starts up, it looks for a config file in the current directory or traverse up to the nearest Git directory.
 
 This is also safe to be checked into Git and uses the same schema as the global one.
 
@@ -126,7 +126,7 @@ Specify a custom config file path using the `OPENCODE_CONFIG` environment variab
 
 ```bash
 export OPENCODE_CONFIG=/path/to/my/custom-config.json
-opencode run "Hello world"
+cyxcode run "Hello world"
 ```
 
 Custom config is loaded between global and project configs in the precedence order.
@@ -142,7 +142,7 @@ follow the same structure.
 
 ```bash
 export OPENCODE_CONFIG_DIR=/path/to/my/config-directory
-opencode run "Hello world"
+cyxcode run "Hello world"
 ```
 
 The custom directory is loaded after the global config and `.opencode` directories, so it **can override** their settings.
@@ -151,9 +151,9 @@ The custom directory is loaded after the global config and `.opencode` directori
 
 ## Schema
 
-The server/runtime config schema is defined in [**`opencode.ai/config.json`**](https://opencode.ai/config.json).
+The server/runtime config schema is defined in [**`cyxcode.ai/config.json`**](https://cyxcode.ai/config.json).
 
-TUI config uses [**`opencode.ai/tui.json`**](https://opencode.ai/tui.json).
+TUI config uses [**`cyxcode.ai/tui.json`**](https://cyxcode.ai/tui.json).
 
 Your editor should be able to validate and autocomplete based on the schema.
 
@@ -165,7 +165,7 @@ Use a dedicated `tui.json` (or `tui.jsonc`) file for TUI-specific settings.
 
 ```json title="tui.json"
 {
-  "$schema": "https://opencode.ai/tui.json",
+  "$schema": "https://cyxcode.ai/tui.json",
   "scroll_speed": 3,
   "scroll_acceleration": {
     "enabled": true
@@ -184,11 +184,11 @@ Legacy `theme`, `keybinds`, and `tui` keys in `opencode.json` are deprecated and
 
 ### Server
 
-You can configure server settings for the `opencode serve` and `opencode web` commands through the `server` option.
+You can configure server settings for the `cyxcode serve` and `cyxcode web` commands through the `server` option.
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "server": {
     "port": 4096,
     "hostname": "0.0.0.0",
@@ -203,7 +203,7 @@ Available options:
 
 - `port` - Port to listen on.
 - `hostname` - Hostname to listen on. When `mdns` is enabled and no hostname is set, defaults to `0.0.0.0`.
-- `mdns` - Enable mDNS service discovery. This allows other devices on the network to discover your OpenCode server.
+- `mdns` - Enable mDNS service discovery. This allows other devices on the network to discover your CyxCode server.
 - `mdnsDomain` - Custom domain name for mDNS service. Defaults to `opencode.local`. Useful for running multiple instances on the same network.
 - `cors` - Additional origins to allow for CORS when using the HTTP server from a browser-based client. Values must be full origins (scheme + host + optional port), eg `https://app.example.com`.
 
@@ -217,7 +217,7 @@ You can manage the tools an LLM can use through the `tools` option.
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "tools": {
     "write": false,
     "bash": false
@@ -231,24 +231,24 @@ You can manage the tools an LLM can use through the `tools` option.
 
 ### Models
 
-You can configure the providers and models you want to use in your OpenCode config through the `provider`, `model` and `small_model` options.
+You can configure the providers and models you want to use in your CyxCode config through the `provider`, `model` and `small_model` options.
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "provider": {},
   "model": "anthropic/claude-sonnet-4-5",
   "small_model": "anthropic/claude-haiku-4-5"
 }
 ```
 
-The `small_model` option configures a separate model for lightweight tasks like title generation. By default, OpenCode tries to use a cheaper model if one is available from your provider, otherwise it falls back to your main model.
+The `small_model` option configures a separate model for lightweight tasks like title generation. By default, CyxCode tries to use a cheaper model if one is available from your provider, otherwise it falls back to your main model.
 
 Provider options can include `timeout`, `chunkTimeout`, and `setCacheKey`:
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "provider": {
     "anthropic": {
       "options": {
@@ -279,7 +279,7 @@ Amazon Bedrock supports AWS-specific configuration:
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "provider": {
     "amazon-bedrock": {
       "options": {
@@ -310,7 +310,7 @@ Set your UI theme in `tui.json`.
 
 ```json title="tui.json"
 {
-  "$schema": "https://opencode.ai/tui.json",
+  "$schema": "https://cyxcode.ai/tui.json",
   "theme": "tokyonight"
 }
 ```
@@ -325,7 +325,7 @@ You can configure specialized agents for specific tasks through the `agent` opti
 
 ```jsonc title="opencode.jsonc"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "agent": {
     "code-reviewer": {
       "description": "Reviews code for best practices and potential issues",
@@ -351,14 +351,14 @@ You can set the default agent using the `default_agent` option. This determines 
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "default_agent": "plan"
 }
 ```
 
-The default agent must be a primary agent (not a subagent). This can be a built-in agent like `"build"` or `"plan"`, or a [custom agent](/docs/agents) you've defined. If the specified agent doesn't exist or is a subagent, OpenCode will fall back to `"build"` with a warning.
+The default agent must be a primary agent (not a subagent). This can be a built-in agent like `"build"` or `"plan"`, or a [custom agent](/docs/agents) you've defined. If the specified agent doesn't exist or is a subagent, CyxCode will fall back to `"build"` with a warning.
 
-This setting applies across all interfaces: TUI, CLI (`opencode run`), desktop app, and GitHub Action.
+This setting applies across all interfaces: TUI, CLI (`cyxcode run`), desktop app, and GitHub Action.
 
 ---
 
@@ -368,7 +368,7 @@ You can configure the [share](/docs/share) feature through the `share` option.
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "share": "manual"
 }
 ```
@@ -389,7 +389,7 @@ You can configure custom commands for repetitive tasks through the `command` opt
 
 ```jsonc title="opencode.jsonc"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "command": {
     "test": {
       "template": "Run the full test suite with coverage report and show any failures.\nFocus on the failing tests and suggest fixes.",
@@ -415,7 +415,7 @@ Customize keybinds in `tui.json`.
 
 ```json title="tui.json"
 {
-  "$schema": "https://opencode.ai/tui.json",
+  "$schema": "https://cyxcode.ai/tui.json",
   "keybinds": {}
 }
 ```
@@ -426,13 +426,13 @@ Customize keybinds in `tui.json`.
 
 ### Snapshot
 
-OpenCode uses snapshots to track file changes during agent operations, enabling you to undo and revert changes within a session. Snapshots are enabled by default.
+CyxCode uses snapshots to track file changes during agent operations, enabling you to undo and revert changes within a session. Snapshots are enabled by default.
 
 For large repositories or projects with many submodules, the snapshot system can cause slow indexing and significant disk usage as it tracks all changes using an internal git repository. You can disable snapshots using the `snapshot` option.
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "snapshot": false
 }
 ```
@@ -443,11 +443,11 @@ Note that disabling snapshots means changes made by the agent cannot be rolled b
 
 ### Autoupdate
 
-OpenCode will automatically download any new updates when it starts up. You can disable this with the `autoupdate` option.
+CyxCode will automatically download any new updates when it starts up. You can disable this with the `autoupdate` option.
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "autoupdate": false
 }
 ```
@@ -463,7 +463,7 @@ You can configure code formatters through the `formatter` option.
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "formatter": {
     "prettier": {
       "disabled": true
@@ -485,13 +485,13 @@ You can configure code formatters through the `formatter` option.
 
 ### Permissions
 
-By default, opencode **allows all operations** without requiring explicit approval. You can change this using the `permission` option.
+By default, CyxCode **allows all operations** without requiring explicit approval. You can change this using the `permission` option.
 
 For example, to ensure that the `edit` and `bash` tools require user approval:
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "permission": {
     "edit": "ask",
     "bash": "ask"
@@ -509,7 +509,7 @@ You can control context compaction behavior through the `compaction` option.
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "compaction": {
     "auto": true,
     "prune": true,
@@ -530,7 +530,7 @@ You can configure file watcher ignore patterns through the `watcher` option.
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "watcher": {
     "ignore": ["node_modules/**", "dist/**", ".git/**"]
   }
@@ -547,7 +547,7 @@ You can configure MCP servers you want to use through the `mcp` option.
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "mcp": {}
 }
 ```
@@ -558,13 +558,13 @@ You can configure MCP servers you want to use through the `mcp` option.
 
 ### Plugins
 
-[Plugins](/docs/plugins) extend OpenCode with custom tools, hooks, and integrations.
+[Plugins](/docs/plugins) extend CyxCode with custom tools, hooks, and integrations.
 
 Place plugin files in `.opencode/plugins/` or `~/.config/opencode/plugins/`. You can also load plugins from npm through the `plugin` option.
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "plugin": ["opencode-helicone-session", "@my-org/custom-plugin"]
 }
 ```
@@ -579,7 +579,7 @@ You can configure the instructions for the model you're using through the `instr
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "instructions": ["CONTRIBUTING.md", "docs/guidelines.md", ".cursor/rules/*.md"]
 }
 ```
@@ -595,7 +595,7 @@ You can disable providers that are loaded automatically through the `disabled_pr
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "disabled_providers": ["openai", "gemini"]
 }
 ```
@@ -618,12 +618,12 @@ You can specify an allowlist of providers through the `enabled_providers` option
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "enabled_providers": ["anthropic", "openai"]
 }
 ```
 
-This is useful when you want to restrict OpenCode to only use specific providers rather than disabling them one by one.
+This is useful when you want to restrict CyxCode to only use specific providers rather than disabling them one by one.
 
 :::note
 The `disabled_providers` takes priority over `enabled_providers`.
@@ -639,7 +639,7 @@ The `experimental` key contains options that are under active development.
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "experimental": {}
 }
 ```
@@ -662,7 +662,7 @@ Use `{env:VARIABLE_NAME}` to substitute environment variables:
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "model": "{env:OPENCODE_MODEL}",
   "provider": {
     "anthropic": {
@@ -685,7 +685,7 @@ Use `{file:path/to/file}` to substitute the contents of a file:
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "instructions": ["./custom-instructions.md"],
   "provider": {
     "openai": {

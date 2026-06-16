@@ -1,10 +1,10 @@
 # CyxWatch Security Layer
 
-CyxWatch is the runtime observability and security layer proposed by `New TODO.txt`.
+CyxWatch is the runtime observability and security layer for CyxCode.
 It is not an antivirus product and not a separate agent framework.
 It is a set of hooks, policies, and reports that make AI-driven behavior visible, auditable, and enforceable.
 
-Related memory/privacy design: [CyxWatch Memory Firewall](./cyxwatch_memory_firewall.md).
+Memory and privacy rules should stay explicit in the implementation docs and code comments that own those checks.
 
 ## Goal
 
@@ -382,7 +382,7 @@ In the consolidated UI, this lives in the main app on port `3000`.
 
 ## Implementation Order
 
-Detailed build sequencing lives in `docs/cyxwatch_implementation_plan.md`.
+Detailed build sequencing is local planning material. Keep the public documentation focused on the maintained behavior and current integration points.
 
 ### Phase 1
 

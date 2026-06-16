@@ -1,23 +1,23 @@
 ---
-title: Modeller
-description: Konfiguration af en LLM udbyder og model.
+title: Models
+description: Configuring an LLM provider and model.
 ---
 
-OpenCode bruger [AI SDK](https://ai-sdk.dev/) og [Models.dev](https://models.dev) til at understøtte **75+ LLM udbydere** og det understøtter at køre lokale modeller.
-
----
-
-## Udbydere
-
-De fleste populære udbydere er forudindlæst som standard. Hvis du har tilføjet legitimationsoplysningerne for en udbyder gennem kommandoen `/connect`, vil de være tilgængelige, når du starter OpenCode.
-
-Få mere at vide om [providers](/docs/providers).
+CyxCode uses the [AI SDK](https://ai-sdk.dev/) and [Models.dev](https://models.dev) to support **75+ LLM providers** and it supports running local models.
 
 ---
 
-## Vælg en model
+## Providers
 
-Når du har konfigureret din udbyder, kan du vælge den ønskede model ved at indtaste:
+Most popular providers are preloaded by default. If you've added the credentials for a provider through the `/connect` command, they'll be available when you start CyxCode.
+
+Learn more about [providers](/docs/providers).
+
+---
+
+## Select a model
+
+Once you've configured your provider you can select the model you want by typing in:
 
 ```bash frame="none"
 /models
@@ -25,52 +25,52 @@ Når du har konfigureret din udbyder, kan du vælge den ønskede model ved at in
 
 ---
 
-## Anbefalede modeller
+## Recommended models
 
-Der er mange modeller derude, og der kommer nye modeller hver uge.
+There are a lot of models out there, with new models coming out every week.
 
 :::tip
-Overvej at bruge en af ​​de modeller, vi anbefaler.
+Consider using one of the models we recommend.
 :::
 
-Der er dog kun få af dem, der er gode til både at generere kode og værktøjsopkald.
+However, there are only a few of them that are good at both generating code and tool calling.
 
-Her er flere modeller, der fungerer godt med OpenCode, uden bestemt rækkefølge. (Dette er ikke en udtømmende liste og er heller ikke nødvendigvis opdateret):
+Here are several models that work well with CyxCode, in no particular order. (This is not an exhaustive list nor is it necessarily up to date):
 
 - GPT 5.2
 - GPT 5.1 Codex
-- Claude Opus 4,5
-- Claude Sonnet 4,5
+- Claude Opus 4.5
+- Claude Sonnet 4.5
 - Minimax M2.1
 - Gemini 3 Pro
 
 ---
 
-## Indstil en standard
+## Set a default
 
-For at indstille en af ​​disse som standardmodellen kan du indstille `model`-nøglen i din
-OpenCode konfig.
+To set one of these as the default model, you can set the `model` key in your
+CyxCode config.
 
 ```json title="opencode.json" {3}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "model": "lmstudio/google/gemma-3n-e4b"
 }
 ```
 
-Her er det fulde ID `provider_id/model_id`. For eksempel, hvis du bruger [OpenCode Zen](/docs/zen), vil du bruge `opencode/gpt-5.1-codex` til GPT 5.1 Codex.
+Here the full ID is `provider_id/model_id`. For example, if you're using [CyxCode Zen](/docs/zen), you would use `opencode/gpt-5.1-codex` for GPT 5.1 Codex.
 
-Hvis du har konfigureret en [custom provider](/docs/providers#custom), er `provider_id` nøglen fra `provider` delen af ​​din konfiguration, og `model_id` er nøglen fra `provider.models`.
+If you've configured a [custom provider](/docs/providers#custom), the `provider_id` is key from the `provider` part of your config, and the `model_id` is the key from `provider.models`.
 
 ---
 
-## Konfiguration af modeller
+## Configure models
 
-Du kan konfigurere en models muligheder globalt gennem konfigurationen.
+You can globally configure a model's options through the config.
 
 ```jsonc title="opencode.jsonc" {7-12,19-24}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "provider": {
     "openai": {
       "models": {
@@ -100,18 +100,18 @@ Du kan konfigurere en models muligheder globalt gennem konfigurationen.
 }
 ```
 
-Her konfigurerer vi globale indstillinger for to indbyggede modeller: `gpt-5` når de tilgås via `openai` udbyderen og `claude-sonnet-4-20250514` når de tilgås via `anthropic` udbyderen.
-Den indbyggede udbyder og modelnavne kan findes på [Models.dev](https://models.dev).
+Here we're configuring global settings for two built-in models: `gpt-5` when accessed via the `openai` provider, and `claude-sonnet-4-20250514` when accessed via the `anthropic` provider.
+The built-in provider and model names can be found on [Models.dev](https://models.dev).
 
-Du kan også konfigurere disse indstillinger for alle agenter, du bruger. Agentkonfigurationen tilsidesætter alle globale muligheder her. [Learn more](/docs/agents/#additional).
+You can also configure these options for any agents that you are using. The agent config overrides any global options here. [Learn more](/docs/agents/#additional).
 
-Du kan også definere brugerdefinerede varianter, der udvider de indbyggede. Varianter giver dig mulighed for at konfigurere forskellige indstillinger for den samme model uden at oprette duplikerede poster:
+You can also define custom variants that extend built-in ones. Variants let you configure different settings for the same model without creating duplicate entries:
 
 ```jsonc title="opencode.jsonc" {6-21}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "provider": {
-    "opencode": {
+    "CyxCode": {
       "models": {
         "gpt-5": {
           "variants": {
@@ -135,46 +135,46 @@ Du kan også definere brugerdefinerede varianter, der udvider de indbyggede. Var
 
 ---
 
-## Varianter
+## Variants
 
-Mange modeller understøtter flere varianter med forskellige konfigurationer. OpenCode leveres med indbyggede standardvarianter til populære udbydere.
+Many models support multiple variants with different configurations. CyxCode ships with built-in default variants for popular providers.
 
-### Indbyggede varianter
+### Built-in variants
 
-OpenCode leveres med standardvarianter for mange udbydere:
+cyxcode ships with default variants for many providers:
 
 **Anthropic**:
 
-- `high` - Højt tænkende budget (standard)
-- `max` - Maksimalt tænkebudget
+- `high` - High thinking budget (default)
+- `max` - Maximum thinking budget
 
 **OpenAI**:
 
-Varierer efter model, men nogenlunde:
+Varies by model but roughly:
 
-- `none` - Ingen begrundelse
-- `minimal` - Minimal ræsonnement indsats
-- `low` - Lav ræsonnement indsats
-- `medium` - Middel ræsonnement indsats
-- `high` - Høj ræsonnement indsats
-- `xhigh` - Ekstra høj ræsonnement indsats
+- `none` - No reasoning
+- `minimal` - Minimal reasoning effort
+- `low` - Low reasoning effort
+- `medium` - Medium reasoning effort
+- `high` - High reasoning effort
+- `xhigh` - Extra high reasoning effort
 
 **Google**:
 
-- `low` - Lavere effort/token budget
-- `high` - Højere effort/token budget
+- `low` - Lower effort/token budget
+- `high` - Higher effort/token budget
 
 :::tip
-Denne liste er ikke udtømmende. Mange andre udbydere har også indbyggede standardindstillinger.
+This list is not comprehensive. Many other providers have built-in defaults too.
 :::
 
-### Brugerdefinerede varianter
+### Custom variants
 
-Du kan tilsidesætte eksisterende varianter eller tilføje dine egne:
+You can override existing variants or add your own:
 
 ```jsonc title="opencode.jsonc" {7-18}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "provider": {
     "openai": {
       "models": {
@@ -195,29 +195,29 @@ Du kan tilsidesætte eksisterende varianter eller tilføje dine egne:
 }
 ```
 
-### Skift varianter
+### Cycle variants
 
-Brug tastebindingen `variant_cycle` til hurtigt at skifte mellem varianter. [Learn more](/docs/keybinds).
+Use the keybind `variant_cycle` to quickly switch between variants. [Learn more](/docs/keybinds).
 
 ---
 
-## Indlæsning af modeller
+## Loading models
 
-Når OpenCode starter op, søger den efter modeller i følgende prioriterede rækkefølge:
+When CyxCode starts up, it checks for models in the following priority order:
 
-1. Kommandolinjeflaget `--model` eller `-m`. Formatet er det samme som i konfigurationsfilen: `provider_id/model_id`.
+1. The `--model` or `-m` command line flag. The format is the same as in the config file: `provider_id/model_id`.
 
-2. Modellisten i OpenCode-konfigurationen.
+2. The model list in the CyxCode config.
 
    ```json title="opencode.json"
    {
-     "$schema": "https://opencode.ai/config.json",
+     "$schema": "https://cyxcode.ai/config.json",
      "model": "anthropic/claude-sonnet-4-20250514"
    }
    ```
 
-   Formatet her er `provider/model`.
+   The format here is `provider/model`.
 
-3. Den sidst brugte model.
+3. The last used model.
 
-4. Den første model med en intern prioritet.
+4. The first model using an internal priority.

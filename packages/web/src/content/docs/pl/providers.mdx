@@ -6,7 +6,7 @@ description: Korzystanie z dowolnego dostawcy LLM w opencode.
 import config from "../../../../config.mjs"
 export const console = config.console
 
-opencode używa [AI SDK](https://ai-sdk.dev/) i [Models.dev](https://models.dev) do obsługi **ponad 75 dostawców LLM** i obsługuje uruchamianie modeli lokalnych.
+cyxcode używa [AI SDK](https://ai-sdk.dev/) i [Models.dev](https://models.dev) do obsługi **ponad 75 dostawców LLM** i obsługuje uruchamianie modeli lokalnych.
 
 Aby dodać dostawcę należy:
 
@@ -35,7 +35,7 @@ Możesz dostosować podstawowy adres URL dla dowolnego dostawcy, ustawiając opc
 
 ```json title="opencode.json" {6}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "provider": {
     "anthropic": {
       "options": {
@@ -48,16 +48,16 @@ Możesz dostosować podstawowy adres URL dla dowolnego dostawcy, ustawiając opc
 
 ---
 
-## OpenCode Zen
+## CyxCode Zen
 
-OpenCode Zen to lista modeli dostarczonych przez zespół opencode, które zostały
+CyxCode Zen to lista modeli dostarczonych przez zespół opencode, które zostały
 przetestowane i zweryfikowane, aby dobrze współpracować z opencode. [Dowiedz się więcej](/docs/zen).
 
 :::tip
-Jeśli jesteś nowy, zalecamy rozpoczęcie od OpenCode Zen.
+Jeśli jesteś nowy, zalecamy rozpoczęcie od CyxCode Zen.
 :::
 
-1. Uruchom polecenie `/connect` w TUI, wybierz `OpenCode Zen` i przejdź do [opencode.ai/auth](https://opencode.ai/zen).
+1. Uruchom polecenie `/connect` w TUI, wybierz `CyxCode Zen` i przejdź do [cyxcode.ai/auth](https://cyxcode.ai/zen).
 
    ```txt
    /connect
@@ -84,11 +84,11 @@ Działa jak każdy inny dostawca w opencode i jest całkowicie opcjonalny w uży
 
 ---
 
-## OpenCode Go
+## CyxCode Go
 
-OpenCode Go to tani plan subskrypcji, który zapewnia niezawodny dostęp do popularnych modeli open coding dostarczanych przez zespół opencode, które zostały przetestowane i zweryfikowane pod kątem dobrej współpracy z opencode.
+CyxCode Go to tani plan subskrypcji, który zapewnia niezawodny dostęp do popularnych modeli open coding dostarczanych przez zespół opencode, które zostały przetestowane i zweryfikowane pod kątem dobrej współpracy z opencode.
 
-1. Uruchom polecenie `/connect` w TUI, wybierz `OpenCode Go` i przejdź do [opencode.ai/auth](https://opencode.ai/zen).
+1. Uruchom polecenie `/connect` w TUI, wybierz `CyxCode Go` i przejdź do [cyxcode.ai/auth](https://cyxcode.ai/zen).
 
    ```txt
    /connect
@@ -172,13 +172,13 @@ Aby używać Amazon Bedrock z opencode:
 
    ```bash
    # Option 1: Using AWS access keys
-   AWS_ACCESS_KEY_ID=XXX AWS_SECRET_ACCESS_KEY=YYY opencode
+   AWS_ACCESS_KEY_ID=XXX AWS_SECRET_ACCESS_KEY=YYY cyxcode
 
    # Option 2: Using named AWS profile
    AWS_PROFILE=my-profile opencode
 
    # Option 3: Using Bedrock bearer token
-   AWS_BEARER_TOKEN_BEDROCK=XXX opencode
+   AWS_BEARER_TOKEN_BEDROCK=XXX cyxcode
    ```
 
    Lub dodaj je do swojego profilu bash:
@@ -194,7 +194,7 @@ Aby używać Amazon Bedrock z opencode:
 
    ```json title="opencode.json"
    {
-     "$schema": "https://opencode.ai/config.json",
+     "$schema": "https://cyxcode.ai/config.json",
      "provider": {
        "amazon-bedrock": {
          "options": {
@@ -221,7 +221,7 @@ Aby używać Amazon Bedrock z opencode:
 
    ```json title="opencode.json"
    {
-     "$schema": "https://opencode.ai/config.json",
+     "$schema": "https://cyxcode.ai/config.json",
      "provider": {
        "amazon-bedrock": {
          "options": {
@@ -265,7 +265,7 @@ W przypadku niestandardowych profili wnioskowania użyj nazwy modelu i dostawcy 
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "provider": {
     "amazon-bedrock": {
       // ...
@@ -355,7 +355,7 @@ Jeśli napotkasz błędy „Przykro mi, ale nie mogę pomóc w tej prośbie”, 
 5. Ustaw nazwę zasobu jako zmienną środowiskową:
 
    ```bash
-   AZURE_RESOURCE_NAME=XXX opencode
+   AZURE_RESOURCE_NAME=XXX cyxcode
    ```
 
    Lub dodaj go do swojego profilu bash:
@@ -402,7 +402,7 @@ Jeśli napotkasz błędy „Przykro mi, ale nie mogę pomóc w tej prośbie”, 
 5. Ustaw nazwę zasobu jako zmienną środowiskową:
 
    ```bash
-   AZURE_COGNITIVE_SERVICES_RESOURCE_NAME=XXX opencode
+   AZURE_COGNITIVE_SERVICES_RESOURCE_NAME=XXX cyxcode
    ```
 
    Lub dodaj go do swojego profilu bash:
@@ -517,7 +517,7 @@ Cloudflare AI Gateway umożliwia dostęp do modeli z OpenAI, Anthropic, Workers 
 
    ```json title="opencode.json"
    {
-     "$schema": "https://opencode.ai/config.json",
+     "$schema": "https://cyxcode.ai/config.json",
      "provider": {
        "cloudflare-ai-gateway": {
          "models": {
@@ -693,7 +693,7 @@ GitLab Duo zapewnia czat agentowy oparty na sztucznej inteligencji z natywnymi m
    #### Użycie osobistego tokenu dostępu
    1. Przejdź do [Ustawienia użytkownika GitLab > Tokeny dostępu](https://gitlab.com/-/user_settings/personal_access_tokens)
    2. Click **Add new token**
-   3. Name: `OpenCode`, Scopes: `api`
+   3. Name: `CyxCode`, Scopes: `api`
    4. Skopiuj token (zaczyna się od `glpat-`)
    5. Wpisz go w terminalu
 
@@ -710,20 +710,20 @@ GitLab Duo zapewnia czat agentowy oparty na sztucznej inteligencji z natywnymi m
 
 :::note
 Jeśli nie chcesz, możesz także określić zmienną środowiskową „GITLAB_TOKEN”.
-to store token in opencode auth storage.
+to store token in `cyxcode auth storage.
 :::
 
 ##### Self-Hosted GitLab
 
 :::note[compliance note]
-opencode używa małego modelu do niektórych zadań AI, takich jak generowanie tytułu sesji.
+cyxcode używa małego modelu do niektórych zadań AI, takich jak generowanie tytułu sesji.
 Domyślnie jest skonfigurowany do używania gpt-5-nano, hostowanego przez Zen. Aby zablokować opencode
 aby używać tylko własnej instancji hostowanej przez GitLab, dodaj następujące elementy do pliku
 `opencode.json` plik. Zalecane jest również wyłączenie udostępniania sesji.
 
 ```json
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "small_model": "gitlab/duo-chat-haiku-4-5",
   "share": "disabled"
 }
@@ -785,7 +785,7 @@ Customize through `opencode.json`:
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "provider": {
     "gitlab": {
       "options": {
@@ -802,7 +802,7 @@ To access GitLab tools (merge requests, issues, pipelines, CI/CD, etc.):
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "plugin": ["opencode-gitlab-plugin"]
 }
 ```
@@ -984,7 +984,7 @@ Oto [Katalog modeli Helicone](https://helicone.ai/models), będziesz go potrzebo
 
 ```jsonc title="~/.config/opencode/opencode.jsonc"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "provider": {
     "helicone": {
       "npm": "@ai-sdk/openai-compatible",
@@ -1012,7 +1012,7 @@ Helicone obsługuje niestandardowe nagłówki dla funkcji takich jak buforowanie
 
 ```jsonc title="~/.config/opencode/opencode.jsonc"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "provider": {
     "helicone": {
       "npm": "@ai-sdk/openai-compatible",
@@ -1066,7 +1066,7 @@ Możesz skonfigurować opencode tak, aby korzystał z modeli lokalnych, za pomoc
 
 ```json title="opencode.json" "llama.cpp" {5, 6, 8, 10-15}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "provider": {
     "llama.cpp": {
       "npm": "@ai-sdk/openai-compatible",
@@ -1133,7 +1133,7 @@ Możesz skonfigurować opencode tak, aby korzystał z modeli lokalnych poprzez L
 
 ```json title="opencode.json" "lmstudio" {5, 6, 8, 10-14}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "provider": {
     "lmstudio": {
       "npm": "@ai-sdk/openai-compatible",
@@ -1254,7 +1254,7 @@ Ollama może automatycznie skonfigurować się pod kątem opencode. Aby uzyskać
 
 ```json title="opencode.json" "ollama" {5, 6, 8, 10-14}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "provider": {
     "ollama": {
       "npm": "@ai-sdk/openai-compatible",
@@ -1358,13 +1358,13 @@ Jeśli posiadasz już klucz API, możesz wybrać opcję **Wprowadź klucz API r�
 
 ---
 
-### OpenCode Zen
+### CyxCode Zen
 
-OpenCode Zen to lista przetestowanych i zweryfikowanych modeli udostępniona przez zespół opencode. [Dowiedz się więcej](/docs/zen).
+CyxCode Zen to lista przetestowanych i zweryfikowanych modeli udostępniona przez zespół opencode. [Dowiedz się więcej](/docs/zen).
 
-1. Zaloguj się do **<a href={console}>OpenCode Zen</a>** i kliknij **Utwórz klucz API**.
+1. Zaloguj się do **<a href={console}>CyxCode Zen</a>** i kliknij **Utwórz klucz API**.
 
-2. Uruchom polecenie `/connect` i wyszukaj **OpenCode Zen**.
+2. Uruchom polecenie `/connect` i wyszukaj **CyxCode Zen**.
 
    ```txt
    /connect
@@ -1416,7 +1416,7 @@ OpenCode Zen to lista przetestowanych i zweryfikowanych modeli udostępniona prz
 
    ```json title="opencode.json" {6}
    {
-     "$schema": "https://opencode.ai/config.json",
+     "$schema": "https://cyxcode.ai/config.json",
      "provider": {
        "openrouter": {
          "models": {
@@ -1431,7 +1431,7 @@ OpenCode Zen to lista przetestowanych i zweryfikowanych modeli udostępniona prz
 
    ```json title="opencode.json"
    {
-     "$schema": "https://opencode.ai/config.json",
+     "$schema": "https://cyxcode.ai/config.json",
      "provider": {
        "openrouter": {
          "models": {
@@ -1680,7 +1680,7 @@ Możesz także dostosować modele za pomocą konfiguracji opencode. Oto przykła
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "provider": {
     "vercel": {
       "models": {
@@ -1790,7 +1790,7 @@ Przydatne opcje routingu:
 
    ```json title="opencode.json" {6}
    {
-     "$schema": "https://opencode.ai/config.json",
+     "$schema": "https://cyxcode.ai/config.json",
      "provider": {
        "zenmux": {
          "models": {
@@ -1858,7 +1858,7 @@ Możesz użyć dowolnego dostawcy kompatybilnego z OpenAI z opencode. Większoś
 
    ```json title="opencode.json" ""myprovider"" {5-15}
    {
-     "$schema": "https://opencode.ai/config.json",
+     "$schema": "https://cyxcode.ai/config.json",
      "provider": {
        "myprovider": {
          "npm": "@ai-sdk/openai-compatible",
@@ -1896,7 +1896,7 @@ Oto przykład ustawienia opcji `apiKey`, `headers` i modelu `limit`.
 
 ```json title="opencode.json" {9,11,17-20}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "provider": {
     "myprovider": {
       "npm": "@ai-sdk/openai-compatible",
@@ -1937,7 +1937,7 @@ Pola `limit` pozwalają opencode zrozumieć, ile kontekstu pozostało. Standardo
 
 Jeśli masz problemy z konfiguracją dostawcy, sprawdź następujące elementy:
 
-1. **Sprawdź konfigurację uwierzytelniania**: Uruchom `opencode auth list`, aby sprawdzić, czy poświadczenia
+1. **Sprawdź konfigurację uwierzytelniania**: Uruchom `cyxcode auth list`, aby sprawdzić, czy poświadczenia
    dla dostawcy są dodawane do Twojej konfiguracji.
 
    Nie dotyczy to dostawców takich jak Amazon Bedrock, którzy w procesie uwierzytelniania opierają się na zmiennych środowiskowych.

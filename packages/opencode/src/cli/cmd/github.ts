@@ -136,9 +136,9 @@ type IssueQueryResponse = {
   }
 }
 
-const AGENT_USERNAME = "opencode-agent[bot]"
+const AGENT_USERNAME = "cyxcode-agent[bot]"
 const AGENT_REACTION = "eyes"
-const WORKFLOW_FILE = ".github/workflows/opencode.yml"
+const WORKFLOW_FILE = ".github/workflows/cyxcode.yml"
 
 // Event categories for routing
 // USER_EVENTS: triggered by user actions, have actor/issueId, support reactions/comments
@@ -243,7 +243,7 @@ export const GithubInstallCommand = cmd({
                 `    1. Commit the \`${WORKFLOW_FILE}\` file and push`,
                 step2,
                 "",
-                "    3. Go to a GitHub issue and comment `/oc summarize` to see the agent in action",
+                "    3. Go to a GitHub issue and comment `/cyxcode summarize` to see the agent in action",
                 "",
                 "   Learn more about the GitHub agent - https://cyxcode.ai/docs/github/#usage-examples",
               ].join("\n"),
@@ -327,7 +327,7 @@ export const GithubInstallCommand = cmd({
             if (installation) return s.stop("GitHub app already installed")
 
             // Open browser
-            const url = "https://github.com/apps/opencode-agent"
+            const url = "https://github.com/apps/cyxcode-agent"
             const command =
               process.platform === "darwin"
                 ? `open "${url}"`
@@ -377,7 +377,7 @@ export const GithubInstallCommand = cmd({
 
             await Filesystem.write(
               path.join(app.root, WORKFLOW_FILE),
-              `name: opencode
+              `name: cyxcode
 
 on:
   issue_comment:
@@ -386,8 +386,10 @@ on:
     types: [created]
 
 jobs:
-  opencode:
+  cyxcode:
     if: |
+      contains(github.event.comment.body, ' /cyxcode') ||
+      startsWith(github.event.comment.body, '/cyxcode') ||
       contains(github.event.comment.body, ' /oc') ||
       startsWith(github.event.comment.body, '/oc') ||
       contains(github.event.comment.body, ' /opencode') ||
@@ -404,7 +406,7 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: Run opencode
+      - name: Run CyxCode
         uses: code3hr/cyxcode/github@latest${envStr}
         with:
           model: ${provider}/${model}`,
@@ -543,7 +545,7 @@ export const GithubRunCommand = cmd({
           await addReaction(commentType)
         }
 
-        // Setup opencode session
+        // Setup CyxCode session
         const repoData = await fetchRepo()
         session = await Session.create({
           permission: [
@@ -561,7 +563,7 @@ export const GithubRunCommand = cmd({
           await Session.share(session.id)
           return session.id.slice(-8)
         })()
-        console.log("opencode session", session.id)
+        console.log("CyxCode session", session.id)
 
         // Handle event types:
         // REPO_EVENTS (schedule, workflow_dispatch): no issue/PR context, output to logs/PR only
@@ -783,7 +785,7 @@ export const GithubRunCommand = cmd({
         }
 
         const reviewContext = getReviewCommentContext()
-        const mentions = (process.env["MENTIONS"] || "/opencode,/oc")
+        const mentions = (process.env["MENTIONS"] || "/cyxcode,/oc,/opencode")
           .split(",")
           .map((m) => m.trim().toLowerCase())
           .filter(Boolean)
@@ -1404,7 +1406,7 @@ export const GithubRunCommand = cmd({
 
           return `<a href="${shareBaseUrl}/s/${shareId}"><img width="200" alt="${titleAlt}" src="https://social-cards.sst.dev/opencode-share/${title64}.png?model=${providerID}/${modelID}&version=${session.version}&id=${shareId}" /></a>\n`
         })()
-        const shareUrl = shareId ? `[opencode session](${shareBaseUrl}/s/${shareId})&nbsp;&nbsp;|&nbsp;&nbsp;` : ""
+        const shareUrl = shareId ? `[CyxCode session](${shareBaseUrl}/s/${shareId})&nbsp;&nbsp;|&nbsp;&nbsp;` : ""
         return `\n\n${image}${shareUrl}[github run](${runUrl})`
       }
 

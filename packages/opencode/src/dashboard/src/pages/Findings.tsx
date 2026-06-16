@@ -19,6 +19,7 @@ const Findings: Component = () => {
   const [severityFilter, setSeverityFilter] = createSignal(searchParams.severity || "")
   const [statusFilter, setStatusFilter] = createSignal(searchParams.status || "")
   const [targetFilter, setTargetFilter] = createSignal(searchParams.target || "")
+  const [kind, setKind] = createSignal(searchParams.service || "")
 
   const fetchFindings = async () => {
     setLoading(true)
@@ -28,6 +29,7 @@ const Findings: Component = () => {
     if (severityFilter()) filters.severity = severityFilter()
     if (statusFilter()) filters.status = statusFilter()
     if (targetFilter()) filters.target = targetFilter()
+    if (kind()) filters.service = kind()
 
     const result = await findingsApi.list(filters)
 
@@ -108,6 +110,7 @@ const Findings: Component = () => {
     if (severityFilter()) params.severity = severityFilter()
     if (statusFilter()) params.status = statusFilter()
     if (targetFilter()) params.target = targetFilter()
+    if (kind()) params.service = kind()
     setSearchParams(params)
     fetchFindings()
   }
@@ -116,6 +119,7 @@ const Findings: Component = () => {
     setSeverityFilter("")
     setStatusFilter("")
     setTargetFilter("")
+    setKind("")
     setSearchParams({})
     fetchFindings()
   }
@@ -133,7 +137,7 @@ const Findings: Component = () => {
       render: (f) => (
         <div>
           <div class="font-medium text-gray-100">{f.title}</div>
-          <div class="text-xs text-gray-500 mt-1">{f.target}{f.port ? `:${f.port}` : ""}</div>
+          <div class="text-xs text-gray-500 mt-1">{detail(f) || `${f.target}${f.port ? `:${f.port}` : ""}`}</div>
         </div>
       ),
     },
@@ -147,7 +151,7 @@ const Findings: Component = () => {
       key: "service",
       header: "Service",
       width: "100px",
-      render: (f) => <span class="text-gray-400">{f.service || "-"}</span>,
+      render: (f) => <span class="text-gray-400">{label(f.service)}</span>,
     },
     {
       key: "createdAt",
@@ -219,6 +223,21 @@ const Findings: Component = () => {
             />
           </div>
 
+          <div>
+            <label class="block text-sm text-gray-400 mb-1">Type</label>
+            <select
+              class="select"
+              value={kind()}
+              onChange={(e) => setKind(e.currentTarget.value)}
+            >
+              <option value="">All</option>
+              <option value="dependency">Dependency</option>
+              <option value="code-pattern">Code Pattern</option>
+              <option value="web">Web</option>
+              <option value="custom">Custom</option>
+            </select>
+          </div>
+
           <div class="flex gap-2">
             <button onClick={applyFilters} class="btn btn-primary">Apply</button>
             <button onClick={clearFilters} class="btn btn-secondary">Clear</button>
@@ -282,9 +301,34 @@ const Findings: Component = () => {
                 <div class="text-gray-100">
                   {selectedFinding()!.target}
                   {selectedFinding()!.port && `:${selectedFinding()!.port}`}
-                  {selectedFinding()!.service && ` (${selectedFinding()!.service})`}
+                  {selectedFinding()!.service && ` (${label(selectedFinding()!.service)})`}
                 </div>
               </div>
+
+              <Show when={selectedFinding()!.scanID}>
+                <div>
+                  <div class="text-sm text-gray-400">Scan</div>
+                  <A href={`/scans/${selectedFinding()!.scanID}`} class="text-blue-400 hover:text-blue-300 text-sm">
+                    {selectedFinding()!.scanID}
+                  </A>
+                </div>
+              </Show>
+
+              <Show when={vuln(selectedFinding()!)}>
+                <div>
+                  <div class="text-sm text-gray-400 mb-2">Vulnerability Metadata</div>
+                  <div class="bg-gray-900 p-3 rounded text-sm space-y-2">
+                    <For each={rows(selectedFinding()!)}>
+                      {(row) => (
+                        <div>
+                          <div class="text-xs text-gray-500">{row.label}</div>
+                          <div class="text-gray-300 break-words">{row.value}</div>
+                        </div>
+                      )}
+                    </For>
+                  </div>
+                </div>
+              </Show>
 
               <div>
                 <div class="text-sm text-gray-400">Description</div>
@@ -369,6 +413,57 @@ const Findings: Component = () => {
       </div>
     </div>
   )
+}
+
+function label(service?: string) {
+  const labels: Record<string, string> = {
+    dependency: "Dependency",
+    "code-pattern": "Code Pattern",
+    web: "Web",
+    custom: "Custom",
+  }
+  return service ? labels[service] || service : "-"
+}
+
+function meta(finding: Finding) {
+  return (finding.evidence || "")
+    .split(/\r?\n/)
+    .reduce<Record<string, string>>((sum, line) => {
+      const idx = line.indexOf("=")
+      if (idx < 1) return sum
+      return { ...sum, [line.slice(0, idx)]: line.slice(idx + 1) }
+    }, {})
+}
+
+function vuln(finding: Finding) {
+  return finding.service === "dependency" || finding.service === "code-pattern"
+}
+
+function detail(finding: Finding) {
+  const data = meta(finding)
+  if (finding.service === "dependency") return [data.package, data.version].filter(Boolean).join("@")
+  if (finding.service === "code-pattern") return [data.file, data.line].filter(Boolean).join(":")
+  return ""
+}
+
+function rows(finding: Finding) {
+  const data = meta(finding)
+  const list =
+    finding.service === "dependency"
+      ? [
+          { label: "Package", value: data.package },
+          { label: "Version", value: data.version },
+          { label: "Relationship", value: data.relationship },
+          { label: "Fixed", value: data.fixed },
+          { label: "Fix Command", value: data.fixCommand },
+        ]
+      : [
+          { label: "File", value: data.file },
+          { label: "Line", value: data.line },
+          { label: "Confidence", value: data.confidence },
+          { label: "Match", value: data.match },
+        ]
+  return list.filter((item) => item.value && item.value !== "n/a")
 }
 
 export default Findings

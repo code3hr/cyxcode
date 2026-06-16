@@ -1,19 +1,19 @@
 ---
 title: Zen
-description: Lista curata di modelli fornita da OpenCode.
+description: Lista curata di modelli fornita da CyxCode.
 ---
 
 import config from "../../../../config.mjs"
 export const console = config.console
 export const email = `mailto:${config.email}`
 
-OpenCode Zen è una lista di modelli testati e verificati dal team di OpenCode.
+CyxCode Zen è una lista di modelli testati e verificati dal team di CyxCode.
 
 :::note
-OpenCode Zen è attualmente in beta.
+CyxCode Zen è attualmente in beta.
 :::
 
-Zen funziona come qualunque altro provider in OpenCode. Accedi a OpenCode Zen e ottieni la tua chiave API. È **completamente opzionale** e non devi usarlo per usare OpenCode.
+Zen funziona come qualunque altro provider in CyxCode. Accedi a CyxCode Zen e ottieni la tua chiave API. È **completamente opzionale** e non devi usarlo per usare CyxCode.
 
 ---
 
@@ -22,7 +22,7 @@ Zen funziona come qualunque altro provider in OpenCode. Accedi a OpenCode Zen e 
 Ci sono moltissimi modelli, ma solo pochi funzionano bene come agenti di coding. Inoltre, la maggior parte dei provider è configurata in modo molto diverso, quindi prestazioni e qualità possono variare parecchio.
 
 :::tip
-Abbiamo testato un gruppo selezionato di modelli e provider che funzionano bene con OpenCode.
+Abbiamo testato un gruppo selezionato di modelli e provider che funzionano bene con CyxCode.
 :::
 
 Quindi, se usi un modello tramite qualcosa come OpenRouter, non puoi mai essere sicuro di ottenere la migliore versione del modello che vuoi.
@@ -33,16 +33,16 @@ Per risolvere, abbiamo fatto alcune cose:
 2. Poi abbiamo lavorato con alcuni provider per assicurarci che venissero serviti correttamente.
 3. Infine, abbiamo fatto benchmark delle combinazioni modello/provider e creato una lista che ci sentiamo di raccomandare.
 
-OpenCode Zen è un gateway AI che ti dà accesso a questi modelli.
+CyxCode Zen è un gateway AI che ti dà accesso a questi modelli.
 
 ---
 
 ## Come funziona
 
-OpenCode Zen funziona come qualunque altro provider in OpenCode.
+CyxCode Zen funziona come qualunque altro provider in CyxCode.
 
-1. Accedi a **<a href={console}>OpenCode Zen</a>**, aggiungi i dettagli di fatturazione e copia la chiave API.
-2. Esegui il comando `/connect` nella TUI, seleziona OpenCode Zen e incolla la chiave API.
+1. Accedi a **<a href={console}>CyxCode Zen</a>**, aggiungi i dettagli di fatturazione e copia la chiave API.
+2. Esegui il comando `/connect` nella TUI, seleziona CyxCode Zen e incolla la chiave API.
 3. Esegui `/models` nella TUI per vedere la lista dei modelli che consigliamo.
 
 Paghi per richiesta e puoi aggiungere credito al tuo account.
@@ -55,40 +55,40 @@ Puoi anche accedere ai nostri modelli tramite i seguenti endpoint API.
 
 | Modello               | ID modello            | Endpoint                                           | Pacchetto AI SDK            |
 | --------------------- | --------------------- | -------------------------------------------------- | --------------------------- |
-| GPT 5.4               | gpt-5.4               | `https://opencode.ai/zen/v1/responses`             | `@ai-sdk/openai`            |
-| GPT 5.4 Pro           | gpt-5.4-pro           | `https://opencode.ai/zen/v1/responses`             | `@ai-sdk/openai`            |
-| GPT 5.4 Mini          | gpt-5.4-mini          | `https://opencode.ai/zen/v1/responses`             | `@ai-sdk/openai`            |
-| GPT 5.4 Nano          | gpt-5.4-nano          | `https://opencode.ai/zen/v1/responses`             | `@ai-sdk/openai`            |
-| GPT 5.3 Codex         | gpt-5.3-codex         | `https://opencode.ai/zen/v1/responses`             | `@ai-sdk/openai`            |
-| GPT 5.3 Codex Spark   | gpt-5.3-codex-spark   | `https://opencode.ai/zen/v1/responses`             | `@ai-sdk/openai`            |
-| GPT 5.2               | gpt-5.2               | `https://opencode.ai/zen/v1/responses`             | `@ai-sdk/openai`            |
-| GPT 5.2 Codex         | gpt-5.2-codex         | `https://opencode.ai/zen/v1/responses`             | `@ai-sdk/openai`            |
-| GPT 5.1               | gpt-5.1               | `https://opencode.ai/zen/v1/responses`             | `@ai-sdk/openai`            |
-| GPT 5.1 Codex         | gpt-5.1-codex         | `https://opencode.ai/zen/v1/responses`             | `@ai-sdk/openai`            |
-| GPT 5.1 Codex Max     | gpt-5.1-codex-max     | `https://opencode.ai/zen/v1/responses`             | `@ai-sdk/openai`            |
-| GPT 5.1 Codex Mini    | gpt-5.1-codex-mini    | `https://opencode.ai/zen/v1/responses`             | `@ai-sdk/openai`            |
-| GPT 5                 | gpt-5                 | `https://opencode.ai/zen/v1/responses`             | `@ai-sdk/openai`            |
-| GPT 5 Codex           | gpt-5-codex           | `https://opencode.ai/zen/v1/responses`             | `@ai-sdk/openai`            |
-| GPT 5 Nano            | gpt-5-nano            | `https://opencode.ai/zen/v1/responses`             | `@ai-sdk/openai`            |
-| Claude Opus 4.6       | claude-opus-4-6       | `https://opencode.ai/zen/v1/messages`              | `@ai-sdk/anthropic`         |
-| Claude Opus 4.5       | claude-opus-4-5       | `https://opencode.ai/zen/v1/messages`              | `@ai-sdk/anthropic`         |
-| Claude Opus 4.1       | claude-opus-4-1       | `https://opencode.ai/zen/v1/messages`              | `@ai-sdk/anthropic`         |
-| Claude Sonnet 4.6     | claude-sonnet-4-6     | `https://opencode.ai/zen/v1/messages`              | `@ai-sdk/anthropic`         |
-| Claude Sonnet 4.5     | claude-sonnet-4-5     | `https://opencode.ai/zen/v1/messages`              | `@ai-sdk/anthropic`         |
-| Claude Sonnet 4       | claude-sonnet-4       | `https://opencode.ai/zen/v1/messages`              | `@ai-sdk/anthropic`         |
-| Claude Haiku 4.5      | claude-haiku-4-5      | `https://opencode.ai/zen/v1/messages`              | `@ai-sdk/anthropic`         |
-| Claude Haiku 3.5      | claude-3-5-haiku      | `https://opencode.ai/zen/v1/messages`              | `@ai-sdk/anthropic`         |
-| Gemini 3.1 Pro        | gemini-3.1-pro        | `https://opencode.ai/zen/v1/models/gemini-3.1-pro` | `@ai-sdk/google`            |
-| Gemini 3 Flash        | gemini-3-flash        | `https://opencode.ai/zen/v1/models/gemini-3-flash` | `@ai-sdk/google`            |
-| MiniMax M2.5          | minimax-m2.5          | `https://opencode.ai/zen/v1/chat/completions`      | `@ai-sdk/openai-compatible` |
-| MiniMax M2.5 Free     | minimax-m2.5-free     | `https://opencode.ai/zen/v1/chat/completions`      | `@ai-sdk/openai-compatible` |
-| GLM 5                 | glm-5                 | `https://opencode.ai/zen/v1/chat/completions`      | `@ai-sdk/openai-compatible` |
-| Kimi K2.5             | kimi-k2.5             | `https://opencode.ai/zen/v1/chat/completions`      | `@ai-sdk/openai-compatible` |
-| Big Pickle            | big-pickle            | `https://opencode.ai/zen/v1/chat/completions`      | `@ai-sdk/openai-compatible` |
-| MiMo V2 Flash Free    | mimo-v2-flash-free    | `https://opencode.ai/zen/v1/chat/completions`      | `@ai-sdk/openai-compatible` |
-| Nemotron 3 Super Free | nemotron-3-super-free | `https://opencode.ai/zen/v1/chat/completions`      | `@ai-sdk/openai-compatible` |
+| GPT 5.4               | gpt-5.4               | `https://cyxcode.ai/zen/v1/responses`             | `@ai-sdk/openai`            |
+| GPT 5.4 Pro           | gpt-5.4-pro           | `https://cyxcode.ai/zen/v1/responses`             | `@ai-sdk/openai`            |
+| GPT 5.4 Mini          | gpt-5.4-mini          | `https://cyxcode.ai/zen/v1/responses`             | `@ai-sdk/openai`            |
+| GPT 5.4 Nano          | gpt-5.4-nano          | `https://cyxcode.ai/zen/v1/responses`             | `@ai-sdk/openai`            |
+| GPT 5.3 Codex         | gpt-5.3-codex         | `https://cyxcode.ai/zen/v1/responses`             | `@ai-sdk/openai`            |
+| GPT 5.3 Codex Spark   | gpt-5.3-codex-spark   | `https://cyxcode.ai/zen/v1/responses`             | `@ai-sdk/openai`            |
+| GPT 5.2               | gpt-5.2               | `https://cyxcode.ai/zen/v1/responses`             | `@ai-sdk/openai`            |
+| GPT 5.2 Codex         | gpt-5.2-codex         | `https://cyxcode.ai/zen/v1/responses`             | `@ai-sdk/openai`            |
+| GPT 5.1               | gpt-5.1               | `https://cyxcode.ai/zen/v1/responses`             | `@ai-sdk/openai`            |
+| GPT 5.1 Codex         | gpt-5.1-codex         | `https://cyxcode.ai/zen/v1/responses`             | `@ai-sdk/openai`            |
+| GPT 5.1 Codex Max     | gpt-5.1-codex-max     | `https://cyxcode.ai/zen/v1/responses`             | `@ai-sdk/openai`            |
+| GPT 5.1 Codex Mini    | gpt-5.1-codex-mini    | `https://cyxcode.ai/zen/v1/responses`             | `@ai-sdk/openai`            |
+| GPT 5                 | gpt-5                 | `https://cyxcode.ai/zen/v1/responses`             | `@ai-sdk/openai`            |
+| GPT 5 Codex           | gpt-5-codex           | `https://cyxcode.ai/zen/v1/responses`             | `@ai-sdk/openai`            |
+| GPT 5 Nano            | gpt-5-nano            | `https://cyxcode.ai/zen/v1/responses`             | `@ai-sdk/openai`            |
+| Claude Opus 4.6       | claude-opus-4-6       | `https://cyxcode.ai/zen/v1/messages`              | `@ai-sdk/anthropic`         |
+| Claude Opus 4.5       | claude-opus-4-5       | `https://cyxcode.ai/zen/v1/messages`              | `@ai-sdk/anthropic`         |
+| Claude Opus 4.1       | claude-opus-4-1       | `https://cyxcode.ai/zen/v1/messages`              | `@ai-sdk/anthropic`         |
+| Claude Sonnet 4.6     | claude-sonnet-4-6     | `https://cyxcode.ai/zen/v1/messages`              | `@ai-sdk/anthropic`         |
+| Claude Sonnet 4.5     | claude-sonnet-4-5     | `https://cyxcode.ai/zen/v1/messages`              | `@ai-sdk/anthropic`         |
+| Claude Sonnet 4       | claude-sonnet-4       | `https://cyxcode.ai/zen/v1/messages`              | `@ai-sdk/anthropic`         |
+| Claude Haiku 4.5      | claude-haiku-4-5      | `https://cyxcode.ai/zen/v1/messages`              | `@ai-sdk/anthropic`         |
+| Claude Haiku 3.5      | claude-3-5-haiku      | `https://cyxcode.ai/zen/v1/messages`              | `@ai-sdk/anthropic`         |
+| Gemini 3.1 Pro        | gemini-3.1-pro        | `https://cyxcode.ai/zen/v1/models/gemini-3.1-pro` | `@ai-sdk/google`            |
+| Gemini 3 Flash        | gemini-3-flash        | `https://cyxcode.ai/zen/v1/models/gemini-3-flash` | `@ai-sdk/google`            |
+| MiniMax M2.5          | minimax-m2.5          | `https://cyxcode.ai/zen/v1/chat/completions`      | `@ai-sdk/openai-compatible` |
+| MiniMax M2.5 Free     | minimax-m2.5-free     | `https://cyxcode.ai/zen/v1/chat/completions`      | `@ai-sdk/openai-compatible` |
+| GLM 5                 | glm-5                 | `https://cyxcode.ai/zen/v1/chat/completions`      | `@ai-sdk/openai-compatible` |
+| Kimi K2.5             | kimi-k2.5             | `https://cyxcode.ai/zen/v1/chat/completions`      | `@ai-sdk/openai-compatible` |
+| Big Pickle            | big-pickle            | `https://cyxcode.ai/zen/v1/chat/completions`      | `@ai-sdk/openai-compatible` |
+| MiMo V2 Flash Free    | mimo-v2-flash-free    | `https://cyxcode.ai/zen/v1/chat/completions`      | `@ai-sdk/openai-compatible` |
+| Nemotron 3 Super Free | nemotron-3-super-free | `https://cyxcode.ai/zen/v1/chat/completions`      | `@ai-sdk/openai-compatible` |
 
-Il [model id](/docs/config/#models) nella config di OpenCode usa il formato `opencode/<model-id>`. Per esempio, per GPT 5.3 Codex, useresti `opencode/gpt-5.3-codex` nella config.
+Il [model id](/docs/config/#models) nella config di CyxCode usa il formato `opencode/<model-id>`. Per esempio, per GPT 5.3 Codex, useresti `opencode/gpt-5.3-codex` nella config.
 
 ---
 
@@ -97,7 +97,7 @@ Il [model id](/docs/config/#models) nella config di OpenCode usa il formato `ope
 Puoi recuperare la lista completa dei modelli disponibili e i relativi metadati da:
 
 ```
-https://opencode.ai/zen/v1/models
+https://cyxcode.ai/zen/v1/models
 ```
 
 ---
@@ -153,10 +153,10 @@ Le commissioni della carta di credito vengono ribaltate al costo (4.4% + $0.30 p
 
 I modelli gratuiti:
 
-- MiniMax M2.5 Free è disponibile su OpenCode per un periodo limitato. Il team usa questo tempo per raccogliere feedback e migliorare il modello.
-- MiMo V2 Flash Free è disponibile su OpenCode per un periodo limitato. Il team usa questo tempo per raccogliere feedback e migliorare il modello.
-- Nemotron 3 Super Free è disponibile su OpenCode per un periodo limitato. Il team usa questo tempo per raccogliere feedback e migliorare il modello.
-- Big Pickle è un modello stealth gratuito su OpenCode per un periodo limitato. Il team usa questo tempo per raccogliere feedback e migliorare il modello.
+- MiniMax M2.5 Free è disponibile su CyxCode per un periodo limitato. Il team usa questo tempo per raccogliere feedback e migliorare il modello.
+- MiMo V2 Flash Free è disponibile su CyxCode per un periodo limitato. Il team usa questo tempo per raccogliere feedback e migliorare il modello.
+- Nemotron 3 Super Free è disponibile su CyxCode per un periodo limitato. Il team usa questo tempo per raccogliere feedback e migliorare il modello.
+- Big Pickle è un modello stealth gratuito su CyxCode per un periodo limitato. Il team usa questo tempo per raccogliere feedback e migliorare il modello.
 
 <a href={email}>Contattaci</a> se hai domande.
 
@@ -248,9 +248,9 @@ Per esempio, la tua organizzazione potrebbe avere già una chiave per OpenAI o A
 
 ## Obiettivi
 
-Abbiamo creato OpenCode Zen per:
+Abbiamo creato CyxCode Zen per:
 
 1. Fare **benchmark** dei migliori modelli/provider per agenti di coding.
 2. Dare accesso alle opzioni di **massima qualità** senza ridurre le prestazioni o instradare verso provider più economici.
 3. Trasferire eventuali **riduzioni di prezzo** vendendo al costo; l'unico markup copre le commissioni di elaborazione.
-4. Evitare **lock-in** permettendoti di usarlo con qualunque altro agente di coding e lasciandoti sempre usare anche altri provider con OpenCode.
+4. Evitare **lock-in** permettendoti di usarlo con qualunque altro agente di coding e lasciandoti sempre usare anche altri provider con CyxCode.

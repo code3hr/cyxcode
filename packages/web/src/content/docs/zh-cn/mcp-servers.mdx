@@ -1,33 +1,33 @@
 ---
-title: MCP 服务器
-description: 添加本地和远程 MCP 工具。
+title: MCP servers
+description: Add local and remote MCP tools.
 ---
 
-你可以通过 _Model Context Protocol_（MCP）为 OpenCode 添加外部工具。OpenCode 同时支持本地和远程服务器。
+You can add external tools to CyxCode using the _Model Context Protocol_, or MCP. CyxCode supports both local and remote servers.
 
-添加后，MCP 工具会自动与内置工具一起提供给 LLM 使用。
+Once added, MCP tools are automatically available to the LLM alongside built-in tools.
 
 ---
 
-#### 注意事项
+#### Caveats
 
-使用 MCP 服务器时，它会占用上下文空间。如果你启用了大量工具，上下文消耗会迅速增加。因此，我们建议谨慎选择要使用的 MCP 服务器。
+When you use an MCP server, it adds to the context. This can quickly add up if you have a lot of tools. So we recommend being careful with which MCP servers you use.
 
 :::tip
-MCP 服务器会占用你的上下文空间，所以请谨慎选择启用哪些服务器。
+MCP servers add to your context, so you want to be careful with which ones you enable.
 :::
 
-某些 MCP 服务器（例如 GitHub MCP 服务器）往往会消耗大量 Token，很容易超出上下文限制。
+Certain MCP servers, like the GitHub MCP server, tend to add a lot of tokens and can easily exceed the context limit.
 
 ---
 
-## 启用
+## Enable
 
-你可以在 [OpenCode 配置](https://opencode.ai/docs/config/)的 `mcp` 字段下定义 MCP 服务器。为每个 MCP 指定一个唯一的名称，在提示词中可以通过该名称来引用对应的 MCP。
+You can define MCP servers in your [CyxCode Config](https://cyxcode.ai/docs/config/) under `mcp`. Add each MCP with a unique name. You can refer to that MCP by name when prompting the LLM.
 
 ```jsonc title="opencode.jsonc" {6}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "mcp": {
     "name-of-mcp-server": {
       // ...
@@ -40,19 +40,19 @@ MCP 服务器会占用你的上下文空间，所以请谨慎选择启用哪些�
 }
 ```
 
-你也可以将 `enabled` 设置为 `false` 来禁用某个服务器。当你想临时禁用某个服务器而不将其从配置中移除时，这个选项非常有用。
+You can also disable a server by setting `enabled` to `false`. This is useful if you want to temporarily disable a server without removing it from your config.
 
 ---
 
-### 覆盖远程默认值
+### Overriding remote defaults
 
-组织可以通过其 `.well-known/opencode` 端点提供默认的 MCP 服务器。这些服务器可能默认处于禁用状态，允许用户按需启用。
+Organizations can provide default MCP servers via their `.well-known/CyxCode` endpoint. These servers may be disabled by default, allowing users to opt-in to the ones they need.
 
-要启用组织远程配置中的某个服务器，请在本地配置中添加该服务器并设置 `enabled: true`：
+To enable a specific server from your organization's remote config, add it to your local config with `enabled: true`:
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "mcp": {
     "jira": {
       "type": "remote",
@@ -63,17 +63,17 @@ MCP 服务器会占用你的上下文空间，所以请谨慎选择启用哪些�
 }
 ```
 
-本地配置值会覆盖远程默认值。详情请参阅[配置优先级](/docs/config#precedence-order)。
+Your local config values override the remote defaults. See [config precedence](/docs/config#precedence-order) for more details.
 
 ---
 
-## 本地
+## Local
 
-通过在 MCP 对象中将 `type` 设置为 `"local"` 来添加本地 MCP 服务器。
+Add local MCP servers using `type` to `"local"` within the MCP object.
 
 ```jsonc title="opencode.jsonc" {15}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "mcp": {
     "my-local-mcp-server": {
       "type": "local",
@@ -88,13 +88,13 @@ MCP 服务器会占用你的上下文空间，所以请谨慎选择启用哪些�
 }
 ```
 
-`command` 用于指定本地 MCP 服务器的启动命令。你还可以传入一组环境变量。
+The command is how the local MCP server is started. You can also pass in a list of environment variables as well.
 
-例如，以下是添加测试用的 [`@modelcontextprotocol/server-everything`](https://www.npmjs.com/package/@modelcontextprotocol/server-everything) MCP 服务器的方法。
+For example, here's how you can add the test [`@modelcontextprotocol/server-everything`](https://www.npmjs.com/package/@modelcontextprotocol/server-everything) MCP server.
 
 ```jsonc title="opencode.jsonc"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "mcp": {
     "mcp_everything": {
       "type": "local",
@@ -104,7 +104,7 @@ MCP 服务器会占用你的上下文空间，所以请谨慎选择启用哪些�
 }
 ```
 
-要使用它，可以在提示词中添加 `use the mcp_everything tool`。
+And to use it I can add `use the mcp_everything tool` to my prompts.
 
 ```txt "mcp_everything"
 use the mcp_everything tool to add the number 3 and 4
@@ -112,27 +112,27 @@ use the mcp_everything tool to add the number 3 and 4
 
 ---
 
-#### 选项
+#### Options
 
-以下是配置本地 MCP 服务器的所有选项。
+Here are all the options for configuring a local MCP server.
 
-| 选项          | 类型   | 必填 | 描述                                                              |
-| ------------- | ------ | ---- | ----------------------------------------------------------------- |
-| `type`        | 字符串 | 是   | MCP 服务器连接类型，必须为 `"local"`。                            |
-| `command`     | 数组   | 是   | 运行 MCP 服务器的命令及参数。                                     |
-| `environment` | 对象   |      | 运行服务器时设置的环境变量。                                      |
-| `enabled`     | 布尔值 |      | 启动时启用或禁用该 MCP 服务器。                                   |
-| `timeout`     | 数字   |      | 从 MCP 服务器获取工具的超时时间（毫秒）。默认为 5000（即 5 秒）。 |
+| Option        | Type    | Required | Description                                                                         |
+| ------------- | ------- | -------- | ----------------------------------------------------------------------------------- |
+| `type`        | String  | Y        | Type of MCP server connection, must be `"local"`.                                   |
+| `command`     | Array   | Y        | Command and arguments to run the MCP server.                                        |
+| `environment` | Object  |          | Environment variables to set when running the server.                               |
+| `enabled`     | Boolean |          | Enable or disable the MCP server on startup.                                        |
+| `timeout`     | Number  |          | Timeout in ms for fetching tools from the MCP server. Defaults to 5000 (5 seconds). |
 
 ---
 
-## 远程
+## Remote
 
-通过将 `type` 设置为 `"remote"` 来添加远程 MCP 服务器。
+Add remote MCP servers by setting `type` to `"remote"`.
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "mcp": {
     "my-remote-mcp": {
       "type": "remote",
@@ -146,40 +146,40 @@ use the mcp_everything tool to add the number 3 and 4
 }
 ```
 
-`url` 是远程 MCP 服务器的地址，通过 `headers` 选项可以传入一组请求头。
+The `url` is the URL of the remote MCP server and with the `headers` option you can pass in a list of headers.
 
 ---
 
-#### 选项
+#### Options
 
-| 选项      | 类型   | 必填 | 描述                                                              |
-| --------- | ------ | ---- | ----------------------------------------------------------------- |
-| `type`    | 字符串 | 是   | MCP 服务器连接类型，必须为 `"remote"`。                           |
-| `url`     | 字符串 | 是   | 远程 MCP 服务器的 URL。                                           |
-| `enabled` | 布尔值 |      | 启动时启用或禁用该 MCP 服务器。                                   |
-| `headers` | 对象   |      | 随请求发送的请求头。                                              |
-| `oauth`   | 对象   |      | OAuth 身份验证配置。详见下方 [OAuth](#oauth) 部分。               |
-| `timeout` | 数字   |      | 从 MCP 服务器获取工具的超时时间（毫秒）。默认为 5000（即 5 秒）。 |
+| Option    | Type    | Required | Description                                                                         |
+| --------- | ------- | -------- | ----------------------------------------------------------------------------------- |
+| `type`    | String  | Y        | Type of MCP server connection, must be `"remote"`.                                  |
+| `url`     | String  | Y        | URL of the remote MCP server.                                                       |
+| `enabled` | Boolean |          | Enable or disable the MCP server on startup.                                        |
+| `headers` | Object  |          | Headers to send with the request.                                                   |
+| `oauth`   | Object  |          | OAuth authentication configuration. See [OAuth](#oauth) section below.              |
+| `timeout` | Number  |          | Timeout in ms for fetching tools from the MCP server. Defaults to 5000 (5 seconds). |
 
 ---
 
 ## OAuth
 
-OpenCode 会自动处理远程 MCP 服务器的 OAuth 身份验证。当服务器需要身份验证时，OpenCode 将：
+CyxCode automatically handles OAuth authentication for remote MCP servers. When a server requires authentication, CyxCode will:
 
-1. 检测 401 响应并启动 OAuth 流程
-2. 在服务器支持的情况下使用**动态客户端注册（RFC 7591）**
-3. 安全地存储 Token 以供后续请求使用
+1. Detect the 401 response and initiate the OAuth flow
+2. Use **Dynamic Client Registration (RFC 7591)** if supported by the server
+3. Store tokens securely for future requests
 
 ---
 
-### 自动认证
+### Automatic
 
-对于大多数支持 OAuth 的 MCP 服务器，无需特殊配置。只需配置远程服务器即可：
+For most OAuth-enabled MCP servers, no special configuration is needed. Just configure the remote server:
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "mcp": {
     "my-oauth-server": {
       "type": "remote",
@@ -189,17 +189,17 @@ OpenCode 会自动处理远程 MCP 服务器的 OAuth 身份验证。当服务�
 }
 ```
 
-如果服务器需要身份验证，OpenCode 会在你首次使用时提示你进行认证。你也可以使用 `opencode mcp auth <server-name>` [手动触发认证流程](#authenticating)。
+If the server requires authentication, CyxCode will prompt you to authenticate when you first try to use it. If not, you can [manually trigger the flow](#authenticating) with `cyxcode mcp auth <server-name>`.
 
 ---
 
-### 预注册
+### Pre-registered
 
-如果你已经从 MCP 服务器提供商处获得了客户端凭据，可以直接配置：
+If you have client credentials from the MCP server provider, you can configure them:
 
 ```json title="opencode.json" {7-11}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "mcp": {
     "my-oauth-server": {
       "type": "remote",
@@ -216,39 +216,39 @@ OpenCode 会自动处理远程 MCP 服务器的 OAuth 身份验证。当服务�
 
 ---
 
-### 身份验证
+### Authenticating
 
-你可以手动触发身份验证或管理凭据。
+You can manually trigger authentication or manage credentials.
 
-对特定 MCP 服务器进行身份验证：
-
-```bash
-opencode mcp auth my-oauth-server
-```
-
-列出所有 MCP 服务器及其认证状态：
+Authenticate with a specific MCP server:
 
 ```bash
-opencode mcp list
+cyxcode mcp auth my-oauth-server
 ```
 
-删除已存储的凭据：
+List all MCP servers and their auth status:
 
 ```bash
-opencode mcp logout my-oauth-server
+cyxcode mcp list
 ```
 
-`mcp auth` 命令会打开浏览器进行授权。授权完成后，OpenCode 会将 Token 安全地存储在 `~/.local/share/opencode/mcp-auth.json` 中。
+Remove stored credentials:
+
+```bash
+cyxcode mcp logout my-oauth-server
+```
+
+The `mcp auth` command will open your browser for authorization. After you authorize, CyxCode will store the tokens securely in `~/.local/share/opencode/mcp-auth.json`.
 
 ---
 
-#### 禁用 OAuth
+#### Disabling OAuth
 
-如果你想为某个服务器禁用自动 OAuth（例如，该服务器使用 API 密钥而非 OAuth），可以将 `oauth` 设置为 `false`：
+If you want to disable automatic OAuth for a server (e.g., for servers that use API keys instead), set `oauth` to `false`:
 
 ```json title="opencode.json" {7}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "mcp": {
     "my-api-key-server": {
       "type": "remote",
@@ -264,44 +264,44 @@ opencode mcp logout my-oauth-server
 
 ---
 
-#### OAuth 选项
+#### OAuth Options
 
-| 选项           | 类型            | 描述                                                   |
-| -------------- | --------------- | ------------------------------------------------------ |
-| `oauth`        | 对象 \| `false` | OAuth 配置对象，或设为 `false` 以禁用 OAuth 自动检测。 |
-| `clientId`     | 字符串          | OAuth 客户端 ID。如果未提供，将尝试动态客户端注册。    |
-| `clientSecret` | 字符串          | OAuth 客户端密钥（如果授权服务器要求提供）。           |
-| `scope`        | 字符串          | 授权时请求的 OAuth 作用域。                            |
+| Option         | Type            | Description                                                                      |
+| -------------- | --------------- | -------------------------------------------------------------------------------- |
+| `oauth`        | Object \| false | OAuth config object, or `false` to disable OAuth auto-detection.                 |
+| `clientId`     | String          | OAuth client ID. If not provided, dynamic client registration will be attempted. |
+| `clientSecret` | String          | OAuth client secret, if required by the authorization server.                    |
+| `scope`        | String          | OAuth scopes to request during authorization.                                    |
 
-#### 调试
+#### Debugging
 
-如果远程 MCP 服务器身份验证失败，你可以通过以下方式诊断问题：
+If a remote MCP server is failing to authenticate, you can diagnose issues with:
 
 ```bash
-# 查看所有支持 OAuth 的服务器的认证状态
-opencode mcp auth list
+# View auth status for all OAuth-capable servers
+cyxcode mcp auth list
 
-# 调试特定服务器的连接和 OAuth 流程
-opencode mcp debug my-oauth-server
+# Debug connection and OAuth flow for a specific server
+cyxcode mcp debug my-oauth-server
 ```
 
-`mcp debug` 命令会显示当前认证状态、测试 HTTP 连接，并尝试执行 OAuth 发现流程。
+The `mcp debug` command shows the current auth status, tests HTTP connectivity, and attempts the OAuth discovery flow.
 
 ---
 
-## 管理
+## Manage
 
-你的 MCP 在 OpenCode 中作为工具使用，与内置工具并列。因此，你可以像管理其他工具一样，通过 OpenCode 配置来管理它们。
+Your MCPs are available as tools in CyxCode, alongside built-in tools. So you can manage them through the CyxCode config like any other tool.
 
 ---
 
-### 全局
+### Global
 
-你可以全局启用或禁用 MCP 工具。
+This means that you can enable or disable them globally.
 
 ```json title="opencode.json" {14}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "mcp": {
     "my-mcp-foo": {
       "type": "local",
@@ -318,11 +318,11 @@ opencode mcp debug my-oauth-server
 }
 ```
 
-也可以使用 glob 模式来禁用所有匹配的 MCP。
+We can also use a glob pattern to disable all matching MCPs.
 
 ```json title="opencode.json" {14}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "mcp": {
     "my-mcp-foo": {
       "type": "local",
@@ -339,20 +339,20 @@ opencode mcp debug my-oauth-server
 }
 ```
 
-这里使用 glob 模式 `my-mcp*` 来禁用所有 MCP。
+Here we are using the glob pattern `my-mcp*` to disable all MCPs.
 
 ---
 
-### 按代理配置
+### Per agent
 
-如果你有大量 MCP 服务器，可以选择全局禁用它们，然后仅在特定代理中启用。具体做法：
+If you have a large number of MCP servers you may want to only enable them per agent and disable them globally. To do this:
 
-1. 全局禁用该工具。
-2. 在[代理配置](/docs/agents#tools)中，将 MCP 服务器作为工具启用。
+1. Disable it as a tool globally.
+2. In your [agent config](/docs/agents#tools), enable the MCP server as a tool.
 
 ```json title="opencode.json" {11, 14-18}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "mcp": {
     "my-mcp": {
       "type": "local",
@@ -375,16 +375,16 @@ opencode mcp debug my-oauth-server
 
 ---
 
-#### Glob 模式
+#### Glob patterns
 
-glob 模式使用简单的正则通配符规则：
+The glob pattern uses simple regex globbing patterns:
 
-- `*` 匹配零个或多个任意字符（例如，`"my-mcp*"` 匹配 `my-mcp_search`、`my-mcp_list` 等）
-- `?` 匹配恰好一个字符
-- 其他字符按字面值匹配
+- `*` matches zero or more of any character (e.g., `"my-mcp*"` matches `my-mcp_search`, `my-mcp_list`, etc.)
+- `?` matches exactly one character
+- All other characters match literally
 
 :::note
-MCP 服务器工具在注册时以服务器名称作为前缀，因此要禁用某个服务器的所有工具，只需使用：
+MCP server tools are registered with server name as prefix, so to disable all tools for a server simply use:
 
 ```
 "mymcpservername_*": false
@@ -394,19 +394,19 @@ MCP 服务器工具在注册时以服务器名称作为前缀，因此要禁用�
 
 ---
 
-## 示例
+## Examples
 
-以下是一些常见 MCP 服务器的配置示例。如果你想记录其他服务器的用法，欢迎提交 PR。
+Below are examples of some common MCP servers. You can submit a PR if you want to document other servers.
 
 ---
 
 ### Sentry
 
-添加 [Sentry MCP 服务器](https://mcp.sentry.dev) 以与你的 Sentry 项目和问题进行交互。
+Add the [Sentry MCP server](https://mcp.sentry.dev) to interact with your Sentry projects and issues.
 
 ```json title="opencode.json" {4-8}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "mcp": {
     "sentry": {
       "type": "remote",
@@ -417,15 +417,15 @@ MCP 服务器工具在注册时以服务器名称作为前缀，因此要禁用�
 }
 ```
 
-添加配置后，使用 Sentry 进行身份验证：
+After adding the configuration, authenticate with Sentry:
 
 ```bash
-opencode mcp auth sentry
+cyxcode mcp auth sentry
 ```
 
-这会打开浏览器窗口完成 OAuth 流程，将 OpenCode 连接到你的 Sentry 账户。
+This will open a browser window to complete the OAuth flow and connect CyxCode to your Sentry account.
 
-认证完成后，你可以在提示词中使用 Sentry 工具来查询问题、项目和错误数据。
+Once authenticated, you can use Sentry tools in your prompts to query issues, projects, and error data.
 
 ```txt "use sentry"
 Show me the latest unresolved issues in my project. use sentry
@@ -435,11 +435,11 @@ Show me the latest unresolved issues in my project. use sentry
 
 ### Context7
 
-添加 [Context7 MCP 服务器](https://github.com/upstash/context7) 以搜索文档。
+Add the [Context7 MCP server](https://github.com/upstash/context7) to search through docs.
 
 ```json title="opencode.json" {4-7}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "mcp": {
     "context7": {
       "type": "remote",
@@ -449,11 +449,11 @@ Show me the latest unresolved issues in my project. use sentry
 }
 ```
 
-如果你注册了免费账户，可以使用 API 密钥来获得更高的速率限制。
+If you have signed up for a free account, you can use your API key and get higher rate-limits.
 
 ```json title="opencode.json" {7-9}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "mcp": {
     "context7": {
       "type": "remote",
@@ -466,15 +466,15 @@ Show me the latest unresolved issues in my project. use sentry
 }
 ```
 
-这里假设你已经设置了 `CONTEXT7_API_KEY` 环境变量。
+Here we are assuming that you have the `CONTEXT7_API_KEY` environment variable set.
 
-在提示词中添加 `use context7` 即可使用 Context7 MCP 服务器。
+Add `use context7` to your prompts to use Context7 MCP server.
 
 ```txt "use context7"
 Configure a Cloudflare Worker script to cache JSON API responses for five minutes. use context7
 ```
 
-你也可以在 [AGENTS.md](/docs/rules/) 中添加类似的规则。
+Alternatively, you can add something like this to your [AGENTS.md](/docs/rules/).
 
 ```md title="AGENTS.md"
 When you need to search docs, use `context7` tools.
@@ -484,11 +484,11 @@ When you need to search docs, use `context7` tools.
 
 ### Grep by Vercel
 
-添加 [Grep by Vercel](https://grep.app) MCP 服务器以搜索 GitHub 上的代码片段。
+Add the [Grep by Vercel](https://grep.app) MCP server to search through code snippets on GitHub.
 
 ```json title="opencode.json" {4-7}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "mcp": {
     "gh_grep": {
       "type": "remote",
@@ -498,13 +498,13 @@ When you need to search docs, use `context7` tools.
 }
 ```
 
-由于我们将 MCP 服务器命名为 `gh_grep`，你可以在提示词中添加 `use the gh_grep tool` 来让代理使用它。
+Since we named our MCP server `gh_grep`, you can add `use the gh_grep tool` to your prompts to get the agent to use it.
 
 ```txt "use the gh_grep tool"
 What's the right way to set a custom domain in an SST Astro component? use the gh_grep tool
 ```
 
-你也可以在 [AGENTS.md](/docs/rules/) 中添加类似的规则。
+Alternatively, you can add something like this to your [AGENTS.md](/docs/rules/).
 
 ```md title="AGENTS.md"
 If you are unsure how to do something, use `gh_grep` to search code examples from GitHub.

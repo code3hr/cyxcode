@@ -1,78 +1,79 @@
 ---
-title: エコシステム
-description: OpenCode で構築されたプロジェクトと統合。
+title: Ecosystem
+description: Projects and integrations built with CyxCode.
 ---
 
-OpenCode に基づいて構築されたコミュニティプロジェクトのコレクション。
+A collection of community projects built on CyxCode.
 
 :::note
-OpenCode 関連プロジェクトをこのリストに追加したいですか? PR を送信してください。
+Want to add your CyxCode related project to this list? Submit a PR.
 :::
 
-[awesome-opencode](https://github.com/awesome-opencode/awesome-opencode) および [opencode.cafe](https://opencode.cafe) もチェックしてください。
+You can also check out [awesome-opencode](https://github.com/awesome-opencode/awesome-opencode) and [opencode.cafe](https://opencode.cafe), a community that aggregates the ecosystem and community.
 
 ---
 
-## プラグイン
+## Plugins
 
-| 名前                                                                                               | 説明                                                                                                                 |
-| -------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
-| [opencode-daytona](https://github.com/daytonaio/daytona/tree/main/libs/opencode-plugin)            | git sync とライブプレビューを使用して、隔離された Daytona サンドボックスで OpenCode セッションを自動的に実行します。 |
-| [opencode-helicone-session](https://github.com/H2Shami/opencode-helicone-session)                  | リクエストのグループ化のために Helicone セッションヘッダーを自動的に挿入する                                         |
-| [opencode-type-inject](https://github.com/nick-vi/opencode-type-inject)                            | ルックアップツールを使用して TypeScript/Svelte 型をファイル読み取りに自動挿入する                                    |
-| [opencode-openai-codex-auth](https://github.com/numman-ali/opencode-openai-codex-auth)             | API クレジットの代わりに ChatGPT Plus/Pro サブスクリプションを使用する                                               |
-| [opencode-gemini-auth](https://github.com/jenslys/opencode-gemini-auth)                            | API 課金の代わりに既存の Gemini プランを使用する                                                                     |
-| [opencode-antigravity-auth](https://github.com/NoeFabris/opencode-antigravity-auth)                | API 課金の代わりに Antigravity の無料モデルを使用する                                                                |
-| [opencode-devcontainers](https://github.com/athal7/opencode-devcontainers)                         | 浅いクローンと自動割り当てポートを使用したマルチブランチ devcontainer の分離                                         |
-| [opencode-google-antigravity-auth](https://github.com/shekohex/opencode-google-antigravity-auth)   | Google Antigravity OAuth プラグイン、Google 検索のサポート、およびより堅牢な API 処理                                |
-| [opencode-dynamic-context-pruning](https://github.com/Tarquinen/opencode-dynamic-context-pruning)  | 古いツールの出力を削除してトークンの使用を最適化する                                                                 |
-| [opencode-vibeguard](https://github.com/inkdust2021/opencode-vibeguard)                            | LLM 呼び出しの前にシークレット/PII を VibeGuard スタイルのプレースホルダーに編集し、ローカルで復元する               |
-| [opencode-websearch-cited](https://github.com/ghoulr/opencode-websearch-cited.git)                 | Google ベースのスタイルでサポートされているプロバイダーにネイティブ Web 検索サポートを追加                           |
-| [opencode-pty](https://github.com/shekohex/opencode-pty.git)                                       | AI エージェントが PTY でバックグラウンドプロセスを実行し、インタラクティブな入力を送信できるようにします。           |
-| [opencode-shell-strategy](https://github.com/JRedeker/opencode-shell-strategy)                     | 非対話型シェルコマンドの手順 - TTY に依存する操作によるハングの防止                                                  |
-| [opencode-wakatime](https://github.com/angristan/opencode-wakatime)                                | wakatime で OpenCode の使用状況を追跡する                                                                            |
-| [opencode-md-table-formatter](https://github.com/franlol/opencode-md-table-formatter/tree/main)    | LLM によって生成された Markdown テーブルをクリーンアップする                                                         |
-| [opencode-morph-plugin](https://github.com/morphllm/opencode-morph-plugin)                         | Morph による Fast Apply 編集、WarpGrep コードベース検索、コンテキスト圧縮                                            |
-| [oh-my-opencode](https://github.com/code-yeongyu/oh-my-opencode)                                   | バックグラウンドエージェント、事前構築された LSP/AST/MCP ツール、厳選されたエージェント、Claude Code 互換            |
-| [opencode-notificator](https://github.com/panta82/opencode-notificator)                            | OpenCode セッションのデスクトップ通知とサウンドアラート                                                              |
-| [opencode-notifier](https://github.com/mohak34/opencode-notifier)                                  | 許可、完了、エラーイベントのデスクトップ通知とサウンドアラート                                                       |
-| [opencode-zellij-namer](https://github.com/24601/opencode-zellij-namer)                            | OpenCode コンテキストに基づいた AI による自動 Zellij セッション命名                                                  |
-| [opencode-skillful](https://github.com/zenobi-us/opencode-skillful)                                | OpenCode エージェントがスキルの検出と挿入を使用してオンデマンドでプロンプトを遅延ロードできるようにする              |
-| [opencode-supermemory](https://github.com/supermemoryai/opencode-supermemory)                      | スーパーメモリを使用したセッション間での永続メモリ                                                                   |
-| [@plannotator/opencode](https://github.com/backnotprop/plannotator/tree/main/apps/opencode-plugin) | 視覚的な注釈とプライベート/オフライン共有による対話型の計画レビュー                                                  |
-| [@openspoon/subtask2](https://github.com/spoons-and-mirrors/subtask2)                              | OpenCode/コマンドをきめ細かいフロー制御を備えた強力なオーケストレーションシステムに拡張                              |
-| [opencode-scheduler](https://github.com/different-ai/opencode-scheduler)                           | launchd (Mac) または systemd (Linux) を cron 構文で使用して、定期的なジョブをスケジュールする                        |
-| [micode](https://github.com/vtemian/micode)                                                        | 構造化されたブレインストーミング → 計画 → セッション継続性のあるワークフローの実装                                   |
-| [octto](https://github.com/vtemian/octto)                                                          | 複数の質問フォームを使用した AI ブレインストーミング用のインタラクティブなブラウザ UI                                |
-| [opencode-background-agents](https://github.com/kdcokenny/opencode-background-agents)              | 非同期委任とコンテキスト永続性を備えた Claude Code スタイルのバックグラウンドエージェント                            |
-| [opencode-notify](https://github.com/kdcokenny/opencode-notify)                                    | OpenCode のネイティブ OS 通知 – タスクがいつ完了したかを知る                                                         |
-| [opencode-workspace](https://github.com/kdcokenny/opencode-workspace)                              | バンドルされたマルチエージェントオーケストレーションハーネス – 16 コンポーネント、1 回のインストール                 |
-| [opencode-worktree](https://github.com/kdcokenny/opencode-worktree)                                | OpenCode 用のゼロフリクション Git ワークツリー                                                                       |
-| [opencode-sentry-monitor](https://github.com/stolinski/opencode-sentry-monitor)                    | Sentry AI Monitoring を使用して AI エージェントをトレースおよびデバッグする                                          |
-
----
-
-## プロジェクト
-
-| 名前                                                                                       | 説明                                                                             |
-| ------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------- |
-| [kimaki](https://github.com/remorses/kimaki)                                               | SDK 上に構築された OpenCode セッションを制御する Discord ボット                  |
-| [opencode.nvim](https://github.com/NickvanDyke/opencode.nvim)                              | API に基づいて構築された、エディター対応プロンプト用の Neovim プラグイン         |
-| [portal](https://github.com/hosenur/portal)                                                | Tailscale/VPN 上の OpenCode 向けモバイルファースト Web UI                        |
-| [opencode plugin template](https://github.com/zenobi-us/opencode-plugin-template/)         | OpenCode プラグインを構築するためのテンプレート                                  |
-| [opencode.nvim](https://github.com/sudo-tee/opencode.nvim)                                 | Neovim OpenCode用フロントエンド - ターミナルベースの AI コーディングエージェント |
-| [ai-sdk-provider-opencode-sdk](https://github.com/ben-vargas/ai-sdk-provider-opencode-sdk) | @opencode-ai/sdk 経由で OpenCode を使用するための Vercel AI SDK プロバイダー     |
-| [OpenChamber](https://github.com/btriapitsyn/openchamber)                                  | OpenCode 用の Web/デスクトップアプリと VS Code 拡張機能                          |
-| [OpenCode-Obsidian](https://github.com/mtymek/opencode-obsidian)                           | Obsidian の UI に OpenCode を埋め込む Obsidian プラグイン                        |
-| [OpenWork](https://github.com/different-ai/openwork)                                       | OpenCode を利用した、Claude Cowork に代わるオープンソース                        |
-| [ocx](https://github.com/kdcokenny/ocx)                                                    | 移植可能な独立したプロファイルを備えた OpenCode 拡張機能マネージャー。           |
-| [CodeNomad](https://github.com/NeuralNomadsAI/CodeNomad)                                   | OpenCode 用のデスクトップ、Web、モバイル、およびリモートクライアントアプリ       |
+| Name                                                                                               | Description                                                                                       |
+| -------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------- |
+| [opencode-daytona](https://github.com/daytonaio/daytona/tree/main/libs/opencode-plugin)            | Automatically run CyxCode sessions in isolated Daytona sandboxes with git sync and live previews |
+| [opencode-helicone-session](https://github.com/H2Shami/opencode-helicone-session)                  | Automatically inject Helicone session headers for request grouping                                |
+| [opencode-type-inject](https://github.com/nick-vi/opencode-type-inject)                            | Auto-inject TypeScript/Svelte types into file reads with lookup tools                             |
+| [opencode-openai-codex-auth](https://github.com/numman-ali/opencode-openai-codex-auth)             | Use your ChatGPT Plus/Pro subscription instead of API credits                                     |
+| [opencode-gemini-auth](https://github.com/jenslys/opencode-gemini-auth)                            | Use your existing Gemini plan instead of API billing                                              |
+| [opencode-antigravity-auth](https://github.com/NoeFabris/opencode-antigravity-auth)                | Use Antigravity's free models instead of API billing                                              |
+| [opencode-devcontainers](https://github.com/athal7/opencode-devcontainers)                         | Multi-branch devcontainer isolation with shallow clones and auto-assigned ports                   |
+| [opencode-google-antigravity-auth](https://github.com/shekohex/opencode-google-antigravity-auth)   | Google Antigravity OAuth Plugin, with support for Google Search, and more robust API handling     |
+| [opencode-dynamic-context-pruning](https://github.com/Tarquinen/opencode-dynamic-context-pruning)  | Optimize token usage by pruning obsolete tool outputs                                             |
+| [opencode-vibeguard](https://github.com/inkdust2021/opencode-vibeguard)                            | Redact secrets/PII into VibeGuard-style placeholders before LLM calls; restore locally            |
+| [opencode-websearch-cited](https://github.com/ghoulr/opencode-websearch-cited.git)                 | Add native websearch support for supported providers with Google grounded style                   |
+| [opencode-pty](https://github.com/shekohex/opencode-pty.git)                                       | Enables AI agents to run background processes in a PTY, send interactive input to them.           |
+| [opencode-shell-strategy](https://github.com/JRedeker/opencode-shell-strategy)                     | Instructions for non-interactive shell commands - prevents hangs from TTY-dependent operations    |
+| [opencode-wakatime](https://github.com/angristan/opencode-wakatime)                                | Track CyxCode usage with Wakatime                                                                |
+| [opencode-md-table-formatter](https://github.com/franlol/opencode-md-table-formatter/tree/main)    | Clean up markdown tables produced by LLMs                                                         |
+| [opencode-morph-plugin](https://github.com/morphllm/opencode-morph-plugin)                         | Fast Apply editing, WarpGrep codebase search, and context compaction via Morph                    |
+| [oh-my-CyxCode](https://github.com/code-yeongyu/oh-my-CyxCode)                                   | Background agents, pre-built LSP/AST/MCP tools, curated agents, Claude Code compatible            |
+| [opencode-notificator](https://github.com/panta82/opencode-notificator)                            | Desktop notifications and sound alerts for CyxCode sessions                                      |
+| [opencode-notifier](https://github.com/mohak34/opencode-notifier)                                  | Desktop notifications and sound alerts for permission, completion, and error events               |
+| [opencode-zellij-namer](https://github.com/24601/opencode-zellij-namer)                            | AI-powered automatic Zellij session naming based on CyxCode context                              |
+| [opencode-skillful](https://github.com/zenobi-us/opencode-skillful)                                | Allow CyxCode agents to lazy load prompts on demand with skill discovery and injection           |
+| [opencode-supermemory](https://github.com/supermemoryai/opencode-supermemory)                      | Persistent memory across sessions using Supermemory                                               |
+| [@plannotator/CyxCode](https://github.com/backnotprop/plannotator/tree/main/apps/opencode-plugin) | Interactive plan review with visual annotation and private/offline sharing                        |
+| [@openspoon/subtask2](https://github.com/spoons-and-mirrors/subtask2)                              | Extend CyxCode /commands into a powerful orchestration system with granular flow control         |
+| [opencode-scheduler](https://github.com/different-ai/opencode-scheduler)                           | Schedule recurring jobs using launchd (Mac) or systemd (Linux) with cron syntax                   |
+| [micode](https://github.com/vtemian/micode)                                                        | Structured Brainstorm → Plan → Implement workflow with session continuity                         |
+| [octto](https://github.com/vtemian/octto)                                                          | Interactive browser UI for AI brainstorming with multi-question forms                             |
+| [opencode-background-agents](https://github.com/kdcokenny/opencode-background-agents)              | Claude Code-style background agents with async delegation and context persistence                 |
+| [opencode-notify](https://github.com/kdcokenny/opencode-notify)                                    | Native OS notifications for CyxCode – know when tasks complete                                   |
+| [opencode-workspace](https://github.com/kdcokenny/opencode-workspace)                              | Bundled multi-agent orchestration harness – 16 components, one install                            |
+| [opencode-worktree](https://github.com/kdcokenny/opencode-worktree)                                | Zero-friction git worktrees for CyxCode                                                          |
+| [opencode-sentry-monitor](https://github.com/stolinski/opencode-sentry-monitor)                    | Trace and debug your AI agents with Sentry AI Monitoring                                          |
+| [opencode-firecrawl](https://github.com/firecrawl/opencode-firecrawl)                              | Web scraping, crawling, and search via the Firecrawl CLI                                          |
 
 ---
 
-## エージェント
+## Projects
 
-| 名前                                                              | 説明                                                                           |
-| ----------------------------------------------------------------- | ------------------------------------------------------------------------------ |
-| [Agentic](https://github.com/Cluster444/agentic)                  | 構造化開発のためのモジュール型 AI エージェントとコマンド                       |
-| [opencode-agents](https://github.com/darrenhinde/opencode-agents) | 強化されたワークフローのための構成、プロンプト、エージェント、およびプラグイン |
+| Name                                                                                       | Description                                                      |
+| ------------------------------------------------------------------------------------------ | ---------------------------------------------------------------- |
+| [kimaki](https://github.com/remorses/kimaki)                                               | Discord bot to control CyxCode sessions, built on the SDK       |
+| [CyxCode.nvim](https://github.com/NickvanDyke/CyxCode.nvim)                              | Neovim plugin for editor-aware prompts, built on the API         |
+| [portal](https://github.com/hosenur/portal)                                                | Mobile-first web UI for CyxCode over Tailscale/VPN              |
+| [CyxCode plugin template](https://github.com/zenobi-us/opencode-plugin-template/)         | Template for building CyxCode plugins                           |
+| [CyxCode.nvim](https://github.com/sudo-tee/CyxCode.nvim)                                 | Neovim frontend for CyxCode - a terminal-based AI coding agent  |
+| [ai-sdk-provider-CyxCode-sdk](https://github.com/ben-vargas/ai-sdk-provider-CyxCode-sdk) | Vercel AI SDK provider for using CyxCode via @CyxCode-ai/sdk   |
+| [OpenChamber](https://github.com/btriapitsyn/openchamber)                                  | Web / Desktop App and VS Code Extension for CyxCode             |
+| [opencode-Obsidian](https://github.com/mtymek/opencode-obsidian)                           | Obsidian plugin that embeds CyxCode in Obsidian's UI            |
+| [OpenWork](https://github.com/different-ai/openwork)                                       | An open-source alternative to Claude Cowork, powered by CyxCode |
+| [ocx](https://github.com/kdcokenny/ocx)                                                    | CyxCode extension manager with portable, isolated profiles.     |
+| [CodeNomad](https://github.com/NeuralNomadsAI/CodeNomad)                                   | Desktop, Web, Mobile and Remote Client App for CyxCode          |
+
+---
+
+## Agents
+
+| Name                                                              | Description                                                  |
+| ----------------------------------------------------------------- | ------------------------------------------------------------ |
+| [Agentic](https://github.com/Cluster444/agentic)                  | Modular AI agents and commands for structured development    |
+| [opencode-agents](https://github.com/darrenhinde/opencode-agents) | Configs, prompts, agents, and plugins for enhanced workflows |

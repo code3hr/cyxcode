@@ -1,25 +1,25 @@
 ---
 title: TUI
-description: Bruke opencode-terminalbrukergrensesnittet.
+description: Using the CyxCode terminal user interface.
 ---
 
 import { Tabs, TabItem } from "@astrojs/starlight/components"
 
-OpenCode gir et interaktivt terminalgrensesnitt (TUI) for å jobbe med prosjektene dine med en LLM.
+CyxCode provides an interactive terminal interface or TUI for working on your projects with an LLM.
 
-Å kjøre OpenCode starter TUI for gjeldende katalog.
-
-```bash
-opencode
-```
-
-Eller du kan starte den for en spesifikk arbeidskatalog.
+Running CyxCode starts the TUI for the current directory.
 
 ```bash
-opencode /path/to/project
+cyxcode
 ```
 
-Når du er i TUI, kan du stille den spørsmål med en prompt.
+Or you can start it for a specific working directory.
+
+```bash
+cyxcode /path/to/project
+```
+
+Once you're in the TUI, you can prompt it with a message.
 
 ```text
 Give me a quick summary of the codebase.
@@ -27,51 +27,51 @@ Give me a quick summary of the codebase.
 
 ---
 
-## Filreferanser
+## File references
 
-Du kan referere til filer i meldingene dine ved å bruke `@`. Dette gjør et fuzzy-filsøk i gjeldende arbeidskatalog.
+You can reference files in your messages using `@`. This does a fuzzy file search in the current working directory.
 
 :::tip
-Du kan også bruke `@` til å referere til filer i meldingene dine.
+You can also use `@` to reference files in your messages.
 :::
 
 ```text "@packages/functions/src/api/index.ts"
 How is auth handled in @packages/functions/src/api/index.ts?
 ```
 
-Innholdet i filen legges automatisk til samtalen.
+The content of the file is added to the conversation automatically.
 
 ---
 
-## Bash-kommandoer
+## Bash commands
 
-Start en melding med `!` for å kjøre en skallkommando.
+Start a message with `!` to run a shell command.
 
 ```bash frame="none"
 !ls -la
 ```
 
-Utdataene fra kommandoen legges til samtalen som et verktøyresultat.
+The output of the command is added to the conversation as a tool result.
 
 ---
 
-## Kommandoer
+## Commands
 
-Når du bruker OpenCode TUI, kan du skrive `/` etterfulgt av et kommandonavn for raskt å utføre handlinger. For eksempel:
+When using the CyxCode TUI, you can type `/` followed by a command name to quickly execute actions. For example:
 
 ```bash frame="none"
 /help
 ```
 
-De fleste kommandoer har også tastebinding som bruker `ctrl+x` som leader-tast, der `ctrl+x` er standard leader-tast. [Finn ut mer](/docs/keybinds).
+Most commands also have keybind using `ctrl+x` as the leader key, where `ctrl+x` is the default leader key. [Learn more](/docs/keybinds).
 
-Her er alle tilgjengelige slash-kommandoer:
+Here are all available slash commands:
 
 ---
 
 ### connect
 
-Legg til en leverandør til OpenCode. Lar deg velge fra tilgjengelige leverandører og legge til deres API-nøkler.
+Add a provider to CyxCode. Allows you to select from available providers and add their API keys.
 
 ```bash frame="none"
 /connect
@@ -81,173 +81,173 @@ Legg til en leverandør til OpenCode. Lar deg velge fra tilgjengelige leverandø
 
 ### compact
 
-Komprimer gjeldende økt. _Alias_: `/summarize`
+Compact the current session. _Alias_: `/summarize`
 
 ```bash frame="none"
 /compact
 ```
 
-**Nøkkelbinding:** `ctrl+x c`
+**Keybind:** `ctrl+x c`
 
 ---
 
 ### details
 
-Veksle visning av verktøydetaljer.
+Toggle tool execution details.
 
 ```bash frame="none"
 /details
 ```
 
-**Nøkkelbinding:** `ctrl+x d`
+**Keybind:** `ctrl+x d`
 
 ---
 
 ### editor
 
-Åpne eksternt tekstredigeringsprogram for å skrive meldinger. Bruker redigeringssettet i miljøvariabelen `EDITOR`. [Finn ut mer](#editor-setup).
+Open external editor for composing messages. Uses the editor set in your `EDITOR` environment variable. [Learn more](#editor-setup).
 
 ```bash frame="none"
 /editor
 ```
 
-**Nøkkelbinding:** `ctrl+x e`
+**Keybind:** `ctrl+x e`
 
 ---
 
 ### exit
 
-Avslutt OpenCode. _Aliaser_: `/quit`, `/q`
+Exit CyxCode. _Aliases_: `/quit`, `/q`
 
 ```bash frame="none"
 /exit
 ```
 
-**Nøkkelbinding:** `ctrl+x q`
+**Keybind:** `ctrl+x q`
 
 ---
 
 ### export
 
-Eksporter gjeldende samtale til Markdown og åpne i standardredigeringsprogrammet. Bruker redigeringssettet i miljøvariabelen `EDITOR`. [Finn ut mer](#editor-setup).
+Export current conversation to Markdown and open in your default editor. Uses the editor set in your `EDITOR` environment variable. [Learn more](#editor-setup).
 
 ```bash frame="none"
 /export
 ```
 
-**Nøkkelbinding:** `ctrl+x x`
+**Keybind:** `ctrl+x x`
 
 ---
 
 ### help
 
-Vis hjelpedialogen.
+Show the help dialog.
 
 ```bash frame="none"
 /help
 ```
 
-**Nøkkelbinding:** `ctrl+x h`
+**Keybind:** `ctrl+x h`
 
 ---
 
 ### init
 
-Opprett eller oppdater `AGENTS.md`-fil. [Finn ut mer](/docs/rules).
+Create or update `AGENTS.md` file. [Learn more](/docs/rules).
 
 ```bash frame="none"
 /init
 ```
 
-**Nøkkelbinding:** `ctrl+x i`
+**Keybind:** `ctrl+x i`
 
 ---
 
 ### models
 
-Liste over tilgjengelige modeller.
+List available models.
 
 ```bash frame="none"
 /models
 ```
 
-**Nøkkelbinding:** `ctrl+x m`
+**Keybind:** `ctrl+x m`
 
 ---
 
 ### new
 
-Start en ny økt. _Alias_: `/clear`
+Start a new session. _Alias_: `/clear`
 
 ```bash frame="none"
 /new
 ```
 
-**Nøkkelbinding:** `ctrl+x n`
+**Keybind:** `ctrl+x n`
 
 ---
 
 ### redo
 
-Gjenta en tidligere angret melding. Kun tilgjengelig etter bruk av `/undo`.
+Redo a previously undone message. Only available after using `/undo`.
 
 :::tip
-Eventuelle filendringer vil også bli gjenopprettet.
+Any file changes will also be restored.
 :::
 
-Internt bruker dette Git til å administrere filendringene. Så ditt prosjekt **må
-være et Git-repo**.
+Internally, this uses Git to manage the file changes. So your project **needs to
+be a Git repository**.
 
 ```bash frame="none"
 /redo
 ```
 
-**Nøkkelbinding:** `ctrl+x r`
+**Keybind:** `ctrl+x r`
 
 ---
 
 ### sessions
 
-List opp og bytt mellom økter. _Aliaser_: `/resume`, `/continue`
+List and switch between sessions. _Aliases_: `/resume`, `/continue`
 
 ```bash frame="none"
 /sessions
 ```
 
-**Nøkkelbinding:** `ctrl+x l`
+**Keybind:** `ctrl+x l`
 
 ---
 
 ### share
 
-Del gjeldende økt. [Finn ut mer](/docs/share).
+Share current session. [Learn more](/docs/share).
 
 ```bash frame="none"
 /share
 ```
 
-**Nøkkelbinding:** `ctrl+x s`
+**Keybind:** `ctrl+x s`
 
 ---
 
 ### themes
 
-Liste over tilgjengelige temaer.
+List available themes.
 
 ```bash frame="none"
 /themes
 ```
 
-**Nøkkelbinding:** `ctrl+x t`
+**Keybind:** `ctrl+x t`
 
 ---
 
 ### thinking
 
-Veksle mellom synligheten av tenke-/resonneringsblokker i samtalen. Når den er aktivert, kan du se modellens resonneringsprosess for modeller som støtter utvidet tenkning.
+Toggle the visibility of thinking/reasoning blocks in the conversation. When enabled, you can see the model's reasoning process for models that support extended thinking.
 
 :::note
-Denne kommandoen kontrollerer bare om tenkeblokker **vises** - den aktiverer eller deaktiverer ikke modellens resonneringsmuligheter. For å veksle mellom faktiske resonneringsmuligheter, bruk `ctrl+t` for å bla gjennom modellvarianter.
+This command only controls whether thinking blocks are **displayed** - it does not enable or disable the model's reasoning capabilities. To toggle actual reasoning capabilities, use `ctrl+t` to cycle through model variants.
 :::
 
 ```bash frame="none"
@@ -258,26 +258,26 @@ Denne kommandoen kontrollerer bare om tenkeblokker **vises** - den aktiverer ell
 
 ### undo
 
-Angre siste melding i samtalen. Fjerner den siste brukermeldingen, alle påfølgende svar og eventuelle filendringer.
+Undo last message in the conversation. Removes the most recent user message, all subsequent responses, and any file changes.
 
 :::tip
-Eventuelle filendringer vil også bli tilbakestilt.
+Any file changes made will also be reverted.
 :::
 
-Internt bruker dette Git til å administrere filendringene. Så ditt prosjekt **må
-være et Git-repo**.
+Internally, this uses Git to manage the file changes. So your project **needs to
+be a Git repository**.
 
 ```bash frame="none"
 /undo
 ```
 
-**Nøkkelbinding:** `ctrl+x u`
+**Keybind:** `ctrl+x u`
 
 ---
 
 ### unshare
 
-Opphev deling av gjeldende økt. [Finn ut mer](/docs/share#un-sharing).
+Unshare current session. [Learn more](/docs/share#un-sharing).
 
 ```bash frame="none"
 /unshare
@@ -285,9 +285,9 @@ Opphev deling av gjeldende økt. [Finn ut mer](/docs/share#un-sharing).
 
 ---
 
-## Oppsett av editor
+## Editor setup
 
-Både kommandoene `/editor` og `/export` bruker editoren som er spesifisert i miljøvariabelen `EDITOR`.
+Both the `/editor` and `/export` commands use the editor specified in your `EDITOR` environment variable.
 
 <Tabs>
   <TabItem label="Linux/macOS">
@@ -301,8 +301,8 @@ Både kommandoene `/editor` og `/export` bruker editoren som er spesifisert i mi
     export EDITOR="code --wait"
     ```
 
-    For å gjøre det permanent, legg dette til i shell-profilen din;
-    `~/.bashrc`, `~/.zshrc` osv.
+    To make it permanent, add this to your shell profile;
+    `~/.bashrc`, `~/.zshrc`, etc.
 
   </TabItem>
 
@@ -315,8 +315,8 @@ Både kommandoene `/editor` og `/export` bruker editoren som er spesifisert i mi
     set EDITOR=code --wait
     ```
 
-    For å gjøre det permanent, bruk **Systemegenskaper** > **Miljø
-    Variabler**.
+    To make it permanent, use **System Properties** > **Environment
+    Variables**.
 
   </TabItem>
 
@@ -329,38 +329,38 @@ Både kommandoene `/editor` og `/export` bruker editoren som er spesifisert i mi
     $env:EDITOR = "code --wait"
     ```
 
-    For å gjøre det permanent, legg dette til i PowerShell-profilen din.
+    To make it permanent, add this to your PowerShell profile.
 
   </TabItem>
 </Tabs>
 
-Populære editor-alternativer inkluderer:
+Popular editor options include:
 
 - `code` - Visual Studio Code
 - `cursor` - Cursor
 - `windsurf` - Windsurf
-- `nvim` - Neovim-editor
+- `nvim` - Neovim editor
 - `vim` - Vim editor
-- `nano` - Nano-editor
-- `notepad` - Windows Notisblokk
+- `nano` - Nano editor
+- `notepad` - Windows Notepad
 - `subl` - Sublime Text
 
 :::note
-Noen editorer som VS Code må startes med flagget `--wait`.
+Some editors like VS Code need to be started with the `--wait` flag.
 :::
 
-Noen editorer trenger kommandolinjeargumenter for å kjøre i blokkeringsmodus. `--wait`-flagget gjør at editor-prosessen blokkeres til den lukkes.
+Some editors need command-line arguments to run in blocking mode. The `--wait` flag makes the editor process block until closed.
 
 ---
 
-## Konfigurasjon
+## Configure
 
-Du kan tilpasse TUI-oppførselen gjennom `tui.json` (eller `tui.jsonc`).
+You can customize TUI behavior through `tui.json` (or `tui.jsonc`).
 
 ```json title="tui.json"
 {
-  "$schema": "https://opencode.ai/tui.json",
-  "theme": "opencode",
+  "$schema": "https://cyxcode.ai/tui.json",
+  "theme": "CyxCode",
   "keybinds": {
     "leader": "ctrl+x"
   },
@@ -372,29 +372,29 @@ Du kan tilpasse TUI-oppførselen gjennom `tui.json` (eller `tui.jsonc`).
 }
 ```
 
-Dette er atskilt fra `opencode.json`, som konfigurerer server-/kjøretidsoppførsel.
+This is separate from `opencode.json`, which configures server/runtime behavior.
 
-### Alternativer
+### Options
 
-- `theme` - Angir UI-temaet ditt. [Finn ut mer](/docs/themes).
-- `keybinds` - Tilpasser hurtigtaster. [Finn ut mer](/docs/keybinds).
-- `scroll_acceleration.enabled` - Aktiver rulleakselerasjon i macOS-stil for jevn, naturlig rulling. Når aktivert, øker rullehastigheten med raske rullebevegelser og forblir presis for langsommere bevegelser. **Denne innstillingen har forrang over `scroll_speed` og overstyrer den når den er aktivert.**
-- `scroll_speed` - Styrer hvor raskt TUI ruller når du bruker rullekommandoer (minimum: `0.001`, støtter desimalverdier). Standard er `3`. **Merk: Dette ignoreres hvis `scroll_acceleration.enabled` er satt til `true`.**
-- `diff_style` - Kontrollerer diff-gjengivelse. `"auto"` tilpasser seg terminalbredden, `"stacked"` viser alltid en enkeltkolonneoppsett.
+- `theme` - Sets your UI theme. [Learn more](/docs/themes).
+- `keybinds` - Customizes keyboard shortcuts. [Learn more](/docs/keybinds).
+- `scroll_acceleration.enabled` - Enable macOS-style scroll acceleration for smooth, natural scrolling. When enabled, scroll speed increases with rapid scrolling gestures and stays precise for slower movements. **This setting takes precedence over `scroll_speed` and overrides it when enabled.**
+- `scroll_speed` - Controls how fast the TUI scrolls when using scroll commands (minimum: `0.001`, supports decimal values). Defaults to `3`. **Note: This is ignored if `scroll_acceleration.enabled` is set to `true`.**
+- `diff_style` - Controls diff rendering. `"auto"` adapts to terminal width, `"stacked"` always shows a single-column layout.
 
-Bruk `OPENCODE_TUI_CONFIG` for å laste en egendefinert TUI-konfigurasjonsbane.
-
----
-
-## Tilpasning
-
-Du kan tilpasse ulike aspekter av TUI-visningen ved å bruke kommandopaletten (`ctrl+x h` eller `/help`). Disse innstillingene vedvarer ved omstarter.
+Use `OPENCODE_TUI_CONFIG` to load a custom TUI config path.
 
 ---
 
-#### Visning av brukernavn
+## Customization
 
-Veksle om brukernavnet ditt vises i chat-meldinger. Få tilgang til dette gjennom:
+You can customize various aspects of the TUI view using the command palette (`ctrl+x h` or `/help`). These settings persist across restarts.
 
-- Kommandopalett: Søk etter "brukernavn" eller "skjul brukernavn"
-- Innstillingen vedvarer automatisk og vil bli husket over TUI økter
+---
+
+#### Username display
+
+Toggle whether your username appears in chat messages. Access this through:
+
+- Command palette: Search for "username" or "hide username"
+- The setting persists automatically and will be remembered across TUI sessions

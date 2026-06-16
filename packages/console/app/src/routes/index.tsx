@@ -128,7 +128,7 @@ export default function Home() {
                     <button data-copy data-slot="command" onClick={handleCopyClick}>
                       <span>
                         <span data-slot="protocol">npm i -g </span>
-                        <span data-slot="highlight">opencode-ai</span>
+                        <span data-slot="highlight">cyxcode</span>
                       </span>
                       <CopyStatus />
                     </button>
@@ -137,7 +137,7 @@ export default function Home() {
                     <button data-copy data-slot="command" onClick={handleCopyClick}>
                       <span>
                         <span data-slot="protocol">bun add -g </span>
-                        <span data-slot="highlight">opencode-ai</span>
+                        <span data-slot="highlight">cyxcode</span>
                       </span>
                       <CopyStatus />
                     </button>
@@ -146,7 +146,7 @@ export default function Home() {
                     <button data-copy data-slot="command" onClick={handleCopyClick}>
                       <span>
                         <span data-slot="protocol">brew install </span>
-                        <span data-slot="highlight">anomalyco/tap/opencode</span>
+                        <span data-slot="highlight">code3hr/tap/cyxcode</span>
                       </span>
                       <CopyStatus />
                     </button>
@@ -155,7 +155,7 @@ export default function Home() {
                     <button data-copy data-slot="command" onClick={handleCopyClick}>
                       <span>
                         <span data-slot="protocol">paru -S </span>
-                        <span data-slot="highlight">opencode</span>
+                        <span data-slot="highlight">cyxcode</span>
                       </span>
                       <CopyStatus />
                     </button>

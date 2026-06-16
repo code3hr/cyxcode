@@ -1,31 +1,31 @@
 ---
-title: Tillatelser
-description: Kontroller hvilke handlinger som krever godkjenning for å kjøre.
+title: Permissions
+description: Control which actions require approval to run.
 ---
 
-OpenCode bruker `permission`-konfigurasjonen for å bestemme om en gitt handling skal kjøres automatisk, spørre deg eller blokkeres.
+CyxCode uses the `permission` config to decide whether a given action should run automatically, prompt you, or be blocked.
 
-Fra og med `v1.1.1` er den eldre `tools` boolske konfigurasjonen avviklet og har blitt slått sammen til `permission`. Den gamle `tools`-konfigurasjonen støttes fortsatt for bakoverkompatibilitet.
-
----
-
-## Handlinger
-
-Hver tillatelsesregel løses til en av:
-
-- `"allow"` — kjør uten godkjenning
-- `"ask"` — be om godkjenning
-- `"deny"` — blokker handlingen
+As of `v1.1.1`, the legacy `tools` boolean config is deprecated and has been merged into `permission`. The old `tools` config is still supported for backwards compatibility.
 
 ---
 
-## Konfigurasjon
+## Actions
 
-Du kan angi tillatelser globalt (med `*`), og overstyre spesifikke verktøy.
+Each permission rule resolves to one of:
+
+- `"allow"` — run without approval
+- `"ask"` — prompt for approval
+- `"deny"` — block the action
+
+---
+
+## Configuration
+
+You can set permissions globally (with `*`), and override specific tools.
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "permission": {
     "*": "ask",
     "bash": "allow",
@@ -34,24 +34,24 @@ Du kan angi tillatelser globalt (med `*`), og overstyre spesifikke verktøy.
 }
 ```
 
-Du kan også angi alle tillatelser samtidig:
+You can also set all permissions at once:
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "permission": "allow"
 }
 ```
 
 ---
 
-## Granulære regler (objektsyntaks)
+## Granular Rules (Object Syntax)
 
-For de fleste tillatelser kan du bruke et objekt til å bruke forskjellige handlinger basert på verktøyinndata.
+For most permissions, you can use an object to apply different actions based on the tool input.
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "permission": {
     "bash": {
       "*": "ask",
@@ -68,35 +68,35 @@ For de fleste tillatelser kan du bruke et objekt til å bruke forskjellige handl
 }
 ```
 
-Regler evalueres etter mønstermatch, med **siste samsvarende regel som vinner**. Et vanlig mønster er å sette oppsamlingsregelen `"*"` først, og mer spesifikke regler etter den.
+Rules are evaluated by pattern match, with the **last matching rule winning**. A common pattern is to put the catch-all `"*"` rule first, and more specific rules after it.
 
-### Jokertegn
+### Wildcards
 
-Tillatelsesmønstre bruker enkel jokertegnsamsvar:
+Permission patterns use simple wildcard matching:
 
-- `*` samsvarer med null eller flere av alle tegn
-- `?` samsvarer med nøyaktig ett tegn
-- Alle andre karakterer samsvarer bokstavelig talt
+- `*` matches zero or more of any character
+- `?` matches exactly one character
+- All other characters match literally
 
-### Utvidelse av hjemmekatalog
+### Home Directory Expansion
 
-Du kan bruke `~` eller `$HOME` i starten av et mønster for å referere til hjemmekatalogen din. Dette er spesielt nyttig for [`external_directory`](#external-directories) regler.
+You can use `~` or `$HOME` at the start of a pattern to reference your home directory. This is particularly useful for [`external_directory`](#external-directories) rules.
 
 - `~/projects/*` -> `/Users/username/projects/*`
 - `$HOME/projects/*` -> `/Users/username/projects/*`
 - `~` -> `/Users/username`
 
-### Eksterne kataloger
+### External Directories
 
-Bruk `external_directory` for å tillate verktøyanrop som berører stier utenfor arbeidskatalogen der OpenCode ble startet. Dette gjelder alle verktøy som tar en bane som input (for eksempel `read`, `edit`, `list`, `glob`, `grep` og mange `bash`-kommandoer).
+Use `external_directory` to allow tool calls that touch paths outside the working directory where CyxCode was started. This applies to any tool that takes a path as input (for example `read`, `edit`, `list`, `glob`, `grep`, and many `bash` commands).
 
-Hjemmeutvidelse (som `~/...`) påvirker bare hvordan et mønster skrives. Den gjør ikke en ekstern bane til en del av det gjeldende arbeidsområdet, så stier utenfor arbeidskatalogen må fortsatt tillates via `external_directory`.
+Home expansion (like `~/...`) only affects how a pattern is written. It does not make an external path part of the current workspace, so paths outside the working directory must still be allowed via `external_directory`.
 
-For eksempel gir dette tilgang til alt under `~/projects/personal/`:
+For example, this allows access to everything under `~/projects/personal/`:
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "permission": {
     "external_directory": {
       "~/projects/personal/**": "allow"
@@ -105,11 +105,11 @@ For eksempel gir dette tilgang til alt under `~/projects/personal/`:
 }
 ```
 
-Enhver katalog som er tillatt her, arver de samme standardinnstillingene som gjeldende arbeidsområde. Siden [`read` er standard til `allow`](#defaults), er lesing også tillatt for oppføringer under `external_directory` med mindre overstyrt. Legg til eksplisitte regler når et verktøy skal begrenses i disse banene, for eksempel blokkering av redigeringer mens du beholder lesninger:
+Any directory allowed here inherits the same defaults as the current workspace. Since [`read` defaults to `allow`](#defaults), reads are also allowed for entries under `external_directory` unless overridden. Add explicit rules when a tool should be restricted in these paths, such as blocking edits while keeping reads:
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "permission": {
     "external_directory": {
       "~/projects/personal/**": "allow"
@@ -121,38 +121,39 @@ Enhver katalog som er tillatt her, arver de samme standardinnstillingene som gje
 }
 ```
 
-Hold listen fokusert på klarerte baner, og lag ekstra tillat eller avslå regler etter behov for andre verktøy (for eksempel `bash`).
+Keep the list focused on trusted paths, and layer extra allow or deny rules as needed for other tools (for example `bash`).
 
 ---
 
-## Tilgjengelige tillatelser
+## Available Permissions
 
-OpenCode-tillatelser tastes inn etter verktøynavn, pluss et par sikkerhetsvakter:
+cyxcode permissions are keyed by tool name, plus a couple of safety guards:
 
-- `read` — lesing av en fil (tilsvarer filbanen)
-- `edit` — alle filendringer (dekker `edit`, `write`, `patch`, `multiedit`)
-- `glob` — fil-globing (tilsvarer glob-mønsteret)
-- `grep` — innholdssøk (samsvarer med regex-mønsteret)
-- `list` — viser filer i en katalog (tilsvarer katalogbanen)
-- `bash` — kjører skallkommandoer (matcher analyserte kommandoer som `git status --porcelain`)
-- `task` — start av subagenter (tilsvarer subagenttypen)
-- `skill` — laster en ferdighet (tilsvarer navnet på ferdigheten)
-- `lsp` — kjører LSP-spørringer (for øyeblikket ikke-granulære)
-- `todoread`, `todowrite` — lesing/oppdatering av gjøremålslisten
-- `webfetch` — henter en URL (tilsvarer URL)
-- `websearch`, `codesearch` - nett-/kodesøk (samsvarer med søket)
-- `external_directory` - utløses når et verktøy berører stier utenfor prosjektets arbeidskatalog
-- `doom_loop` — utløses når det samme verktøykallet gjentas 3 ganger med identisk inndata
+- `read` — reading a file (matches the file path)
+- `edit` — all file modifications (covers `edit`, `write`, `patch`, `multiedit`)
+- `glob` — file globbing (matches the glob pattern)
+- `grep` — content search (matches the regex pattern)
+- `list` — listing files in a directory (matches the directory path)
+- `bash` — running shell commands (matches parsed commands like `git status --porcelain`)
+- `task` — launching subagents (matches the subagent type)
+- `skill` — loading a skill (matches the skill name)
+- `lsp` — running LSP queries (currently non-granular)
+- `todoread`, `todowrite` — reading/updating the todo list
+- `wikiread`, `wikiwrite` — reading/updating project wiki notes
+- `webfetch` — fetching a URL (matches the URL)
+- `websearch`, `codesearch` — web/code search (matches the query)
+- `external_directory` — triggered when a tool touches paths outside the project working directory
+- `doom_loop` — triggered when the same tool call repeats 3 times with identical input
 
 ---
 
-## Standarder
+## Defaults
 
-Hvis du ikke spesifiserer noe, starter OpenCode fra tillatte standardinnstillinger:
+If you don’t specify anything, CyxCode starts from permissive defaults:
 
-- De fleste tillatelser er satt til `"allow"` som standard.
-- `doom_loop` og `external_directory` er standard til `"ask"`.
-- `read` er `"allow"`, men `.env` filer nektes som standard:
+- Most permissions default to `"allow"`.
+- `doom_loop` and `external_directory` default to `"ask"`.
+- `read` is `"allow"`, but `.env` files are denied by default:
 
 ```json title="opencode.json"
 {
@@ -169,29 +170,29 @@ Hvis du ikke spesifiserer noe, starter OpenCode fra tillatte standardinnstilling
 
 ---
 
-## Hva "ask" gjør
+## What “Ask” Does
 
-Når OpenCode ber om godkjenning, gir brukergrensesnittet tre alternativer:
+When CyxCode prompts for approval, the UI offers three outcomes:
 
-- `once` — godkjenne nettopp denne forespørselen
-- `always` — godkjenn fremtidige forespørsler som samsvarer med de foreslåtte mønstrene (for resten av den nåværende OpenCode-økten)
-- `reject` — avslå forespørselen
+- `once` — approve just this request
+- `always` — approve future requests matching the suggested patterns (for the rest of the current CyxCode session)
+- `reject` — deny the request
 
-Settet med mønstre som `always` vil godkjenne, leveres av verktøyet (for eksempel, bash-godkjenninger hvitlister vanligvis et trygt kommandoprefiks som `git status*`).
+The set of patterns that `always` would approve is provided by the tool (for example, bash approvals typically whitelist a safe command prefix like `git status*`).
 
 ---
 
-## Agenter
+## Agents
 
-Du kan overstyre tillatelser per agent. Agenttillatelser slås sammen med den globale konfigurasjonen, og agentregler har forrang. [Finn ut mer](/docs/agents#permissions) om agenttillatelser.
+You can override permissions per agent. Agent permissions are merged with the global config, and agent rules take precedence. [Learn more](/docs/agents#permissions) about agent permissions.
 
 :::note
-Se avsnittet [Granular Rules (Object Syntax)](#granular-rules-object-syntax) ovenfor for mer detaljerte eksempler på mønstertilpasning.
+Refer to the [Granular Rules (Object Syntax)](#granular-rules-object-syntax) section above for more detailed pattern matching examples.
 :::
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "permission": {
     "bash": {
       "*": "ask",
@@ -217,7 +218,7 @@ Se avsnittet [Granular Rules (Object Syntax)](#granular-rules-object-syntax) ove
 }
 ```
 
-Du kan også konfigurere agenttillatelser i Markdown:
+You can also configure agent permissions in Markdown:
 
 ```markdown title="~/.config/opencode/agents/review.md"
 ---
@@ -233,5 +234,5 @@ Only analyze code and suggest changes.
 ```
 
 :::tip
-Bruk mønstertilpasning for kommandoer med argumenter. `"grep *"` tillater `grep pattern file.txt`, mens `"grep"` alene ville blokkert den. Kommandoer som `git status` fungerer for standard oppførsel, men krever eksplisitt tillatelse (som `"git status *"`) når argumenter sendes.
+Use pattern matching for commands with arguments. `"grep *"` allows `grep pattern file.txt`, while `"grep"` alone would block it. Commands like `git status` work for default behavior but require explicit permission (like `"git status *"`) when arguments are passed.
 :::

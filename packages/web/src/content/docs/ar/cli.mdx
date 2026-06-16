@@ -1,30 +1,30 @@
 ---
 title: CLI
-description: أوامر وخيارات CLI في OpenCode.
+description: أوامر وخيارات CLI في CyxCode.
 ---
 
 import { Tabs, TabItem } from "@astrojs/starlight/components"
 
-يبدأ CLI الخاص بـ OpenCode افتراضيا واجهة [TUI](/docs/tui) عند تشغيله بدون أي معاملات.
+يبدأ CLI الخاص بـ CyxCode افتراضيا واجهة [TUI](/docs/tui) عند تشغيله بدون أي معاملات.
 
 ```bash
-opencode
+cyxcode
 ```
 
-كما يدعم أيضا أوامر موثقة في هذه الصفحة، ما يتيح لك التفاعل مع OpenCode برمجيا.
+كما يدعم أيضا أوامر موثقة في هذه الصفحة، ما يتيح لك التفاعل مع CyxCode برمجيا.
 
 ```bash
-opencode run "Explain how closures work in JavaScript"
+cyxcode run "Explain how closures work in JavaScript"
 ```
 
 ---
 
 ### tui
 
-بدء واجهة المستخدم terminal (TUI) الخاصة بـ OpenCode.
+بدء واجهة المستخدم terminal (TUI) الخاصة بـ CyxCode.
 
 ```bash
-opencode [project]
+cyxcode [project]
 ```
 
 #### الخيارات
@@ -44,36 +44,36 @@ opencode [project]
 
 ## الأوامر
 
-يتضمن CLI الخاص بـ OpenCode أيضا الأوامر التالية.
+يتضمن CLI الخاص بـ CyxCode أيضا الأوامر التالية.
 
 ---
 
 ### agent
 
-إدارة وكلاء OpenCode.
+إدارة وكلاء CyxCode.
 
 ```bash
-opencode agent [command]
+cyxcode agent [command]
 ```
 
 ---
 
 ### attach
 
-إرفاق terminal بخادم الواجهة الخلفية لـ OpenCode قيد التشغيل بالفعل، والذي تم تشغيله عبر الأمرين `serve` أو `web`.
+إرفاق terminal بخادم الواجهة الخلفية لـ CyxCode قيد التشغيل بالفعل، والذي تم تشغيله عبر الأمرين `serve` أو `web`.
 
 ```bash
-opencode attach [url]
+cyxcode attach [url]
 ```
 
-يتيح ذلك استخدام واجهة TUI مع واجهة خلفية لـ OpenCode تعمل عن بعد. على سبيل المثال:
+يتيح ذلك استخدام واجهة TUI مع واجهة خلفية لـ CyxCode تعمل عن بعد. على سبيل المثال:
 
 ```bash
 # ابدأ خادم الواجهة الخلفية للوصول عبر الويب/الجوال
-opencode web --port 4096 --hostname 0.0.0.0
+cyxcode web --port 4096 --hostname 0.0.0.0
 
 # في محطة طرفية (terminal) أخرى، اربط TUI بالواجهة الخلفية قيد التشغيل
-opencode attach http://10.20.30.40:4096
+cyxcode attach http://10.20.30.40:4096
 ```
 
 #### الرايات
@@ -90,7 +90,7 @@ opencode attach http://10.20.30.40:4096
 إنشاء وكيل جديد بإعدادات مخصصة.
 
 ```bash
-opencode agent create
+cyxcode agent create
 ```
 
 سيرشدك هذا الأمر خلال إنشاء وكيل جديد مع موجه نظام مخصص وإعدادات الأدوات.
@@ -102,7 +102,7 @@ opencode agent create
 عرض جميع الوكلاء المتاحين.
 
 ```bash
-opencode agent list
+cyxcode agent list
 ```
 
 ---
@@ -112,20 +112,20 @@ opencode agent list
 أمر لإدارة بيانات الاعتماد وتسجيل الدخول لمزودي الخدمة.
 
 ```bash
-opencode auth [command]
+cyxcode auth [command]
 ```
 
 ---
 
 #### login
 
-يعتمد OpenCode على قائمة المزودين في [Models.dev](https://models.dev)، لذا يمكنك استخدام `opencode auth login` لتهيئة مفاتيح API لأي مزود ترغب باستخدامه. يتم حفظ ذلك في `~/.local/share/opencode/auth.json`.
+يعتمد CyxCode على قائمة المزودين في [Models.dev](https://models.dev)، لذا يمكنك استخدام `cyxcode auth login` لتهيئة مفاتيح API لأي مزود ترغب باستخدامه. يتم حفظ ذلك في `~/.local/share/opencode/auth.json`.
 
 ```bash
-opencode auth login
+cyxcode auth login
 ```
 
-عند تشغيل OpenCode يقوم بتحميل المزودين من ملف بيانات الاعتماد، وكذلك أي مفاتيح معرّفة في متغيرات البيئة لديك أو في ملف `.env` ضمن مشروعك.
+عند تشغيل CyxCode يقوم بتحميل المزودين من ملف بيانات الاعتماد، وكذلك أي مفاتيح معرّفة في متغيرات البيئة لديك أو في ملف `.env` ضمن مشروعك.
 
 ---
 
@@ -134,13 +134,13 @@ opencode auth login
 يسرد جميع المزودين الذين تم توثيقهم كما هم محفوظون في ملف بيانات الاعتماد.
 
 ```bash
-opencode auth list
+cyxcode auth list
 ```
 
 أو النسخة المختصرة.
 
 ```bash
-opencode auth ls
+cyxcode auth ls
 ```
 
 ---
@@ -150,7 +150,7 @@ opencode auth ls
 يسجلك خارج مزود عبر حذفه من ملف بيانات الاعتماد.
 
 ```bash
-opencode auth logout
+cyxcode auth logout
 ```
 
 ---
@@ -160,7 +160,7 @@ opencode auth logout
 إدارة وكيل GitHub لأتمتة المستودع.
 
 ```bash
-opencode github [command]
+cyxcode github [command]
 ```
 
 ---
@@ -170,7 +170,7 @@ opencode github [command]
 تثبيت وكيل GitHub في مستودعك.
 
 ```bash
-opencode github install
+cyxcode github install
 ```
 
 يقوم ذلك بإعداد سير عمل GitHub Actions اللازم ويرشدك خلال عملية التهيئة. [اعرف المزيد](/docs/github).
@@ -182,7 +182,7 @@ opencode github install
 تشغيل وكيل GitHub. يُستخدم هذا عادة ضمن GitHub Actions.
 
 ```bash
-opencode github run
+cyxcode github run
 ```
 
 ##### الرايات
@@ -199,7 +199,7 @@ opencode github run
 إدارة خوادم Model Context Protocol.
 
 ```bash
-opencode mcp [command]
+cyxcode mcp [command]
 ```
 
 ---
@@ -209,7 +209,7 @@ opencode mcp [command]
 إضافة خادم MCP إلى تهيئتك.
 
 ```bash
-opencode mcp add
+cyxcode mcp add
 ```
 
 سيرشدك هذا الأمر خلال إضافة خادم MCP محلي أو بعيد.
@@ -221,13 +221,13 @@ opencode mcp add
 عرض جميع خوادم MCP المُهيأة وحالة اتصالها.
 
 ```bash
-opencode mcp list
+cyxcode mcp list
 ```
 
 أو استخدم النسخة المختصرة.
 
 ```bash
-opencode mcp ls
+cyxcode mcp ls
 ```
 
 ---
@@ -237,7 +237,7 @@ opencode mcp ls
 إجراء المصادقة مع خادم MCP يدعم OAuth.
 
 ```bash
-opencode mcp auth [name]
+cyxcode mcp auth [name]
 ```
 
 إذا لم تُحدِّد اسم خادم، فسيُطلب منك الاختيار من الخوادم المتاحة الداعمة لـ OAuth.
@@ -245,13 +245,13 @@ opencode mcp auth [name]
 يمكنك أيضا عرض الخوادم الداعمة لـ OAuth وحالة المصادقة الخاصة بها.
 
 ```bash
-opencode mcp auth list
+cyxcode mcp auth list
 ```
 
 أو استخدم النسخة المختصرة.
 
 ```bash
-opencode mcp auth ls
+cyxcode mcp auth ls
 ```
 
 ---
@@ -261,7 +261,7 @@ opencode mcp auth ls
 إزالة بيانات اعتماد OAuth لخادم MCP.
 
 ```bash
-opencode mcp logout [name]
+cyxcode mcp logout [name]
 ```
 
 ---
@@ -271,7 +271,7 @@ opencode mcp logout [name]
 تشخيص مشاكل اتصال OAuth لخادم MCP.
 
 ```bash
-opencode mcp debug <name>
+cyxcode mcp debug <name>
 ```
 
 ---
@@ -281,7 +281,7 @@ opencode mcp debug <name>
 عرض جميع النماذج المتاحة من المزودين المُهيأين.
 
 ```bash
-opencode models [provider]
+cyxcode models [provider]
 ```
 
 يعرض هذا الأمر جميع النماذج المتاحة عبر المزودين المُهيأين لديك بصيغة `provider/model`.
@@ -291,7 +291,7 @@ opencode models [provider]
 يمكنك اختياريا تمرير معرّف مزود لتصفية النماذج حسب ذلك المزود.
 
 ```bash
-opencode models anthropic
+cyxcode models anthropic
 ```
 
 #### الرايات
@@ -301,10 +301,10 @@ opencode models anthropic
 | `--refresh` | تحديث ذاكرة التخزين المؤقت للنماذج من models.dev              |
 | `--verbose` | استخدام مخرجات أكثر تفصيلا للنماذج (تشمل بيانات مثل التكاليف) |
 
-استخدم الراية `--refresh` لتحديث قائمة النماذج المخزنة مؤقتا. يفيد ذلك عند إضافة نماذج جديدة إلى مزود وتريد رؤيتها في OpenCode.
+استخدم الراية `--refresh` لتحديث قائمة النماذج المخزنة مؤقتا. يفيد ذلك عند إضافة نماذج جديدة إلى مزود وتريد رؤيتها في CyxCode.
 
 ```bash
-opencode models --refresh
+cyxcode models --refresh
 ```
 
 ---
@@ -314,23 +314,23 @@ opencode models --refresh
 تشغيل opencode في وضع غير تفاعلي عبر تمرير موجه مباشرة.
 
 ```bash
-opencode run [message..]
+cyxcode run [message..]
 ```
 
 هذا مفيد للبرمجة النصية والأتمتة، أو عندما تريد إجابة سريعة دون تشغيل واجهة TUI كاملة. على سبيل المثال.
 
-```bash "opencode run"
-opencode run Explain the use of context in Go
+```bash "cyxcode run"
+cyxcode run Explain the use of context in Go
 ```
 
-يمكنك أيضا الإرفاق بمثيل `opencode serve` قيد التشغيل لتجنّب زمن الإقلاع البارد لخوادم MCP في كل تشغيل:
+يمكنك أيضا الإرفاق بمثيل `cyxcode serve` قيد التشغيل لتجنّب زمن الإقلاع البارد لخوادم MCP في كل تشغيل:
 
 ```bash
 # ابدأ خادمًا بلا واجهة في محطة طرفية واحدة
-opencode serve
+cyxcode serve
 
 # في محطة طرفية أخرى، شغّل الأوامر التي ترتبط به
-opencode run --attach http://localhost:4096 "Explain async/await in JavaScript"
+cyxcode run --attach http://localhost:4096 "Explain async/await in JavaScript"
 ```
 
 #### الرايات
@@ -354,10 +354,10 @@ opencode run --attach http://localhost:4096 "Explain async/await in JavaScript"
 
 ### serve
 
-بدء خادم OpenCode بدون واجهة للوصول عبر API. راجع [توثيق الخادم](/docs/server) لواجهة HTTP الكاملة.
+بدء خادم CyxCode بدون واجهة للوصول عبر API. راجع [توثيق الخادم](/docs/server) لواجهة HTTP الكاملة.
 
 ```bash
-opencode serve
+cyxcode serve
 ```
 
 يشغّل هذا خادم HTTP يوفّر وصولا عبر API لوظائف opencode دون واجهة TUI. اضبط `OPENCODE_SERVER_PASSWORD` لتفعيل مصادقة HTTP الأساسية (اسم المستخدم الافتراضي `opencode`).
@@ -375,20 +375,20 @@ opencode serve
 
 ### session
 
-إدارة جلسات OpenCode.
+إدارة جلسات CyxCode.
 
 ```bash
-opencode session [command]
+cyxcode session [command]
 ```
 
 ---
 
 #### list
 
-عرض جميع جلسات OpenCode.
+عرض جميع جلسات CyxCode.
 
 ```bash
-opencode session list
+cyxcode session list
 ```
 
 ##### الرايات
@@ -402,10 +402,10 @@ opencode session list
 
 ### stats
 
-عرض إحصاءات استخدام الرموز والتكلفة لجلسات OpenCode لديك.
+عرض إحصاءات استخدام الرموز والتكلفة لجلسات CyxCode لديك.
 
 ```bash
-opencode stats
+cyxcode stats
 ```
 
 #### الرايات
@@ -424,7 +424,7 @@ opencode stats
 تصدير بيانات الجلسة بصيغة JSON.
 
 ```bash
-opencode export [sessionID]
+cyxcode export [sessionID]
 ```
 
 إذا لم تُقدّم معرّف جلسة، فسيُطلب منك الاختيار من الجلسات المتاحة.
@@ -433,30 +433,30 @@ opencode export [sessionID]
 
 ### import
 
-استيراد بيانات الجلسة من ملف JSON أو رابط مشاركة OpenCode.
+استيراد بيانات الجلسة من ملف JSON أو رابط مشاركة CyxCode.
 
 ```bash
-opencode import <file>
+cyxcode import <file>
 ```
 
-يمكنك الاستيراد من ملف محلي أو من رابط مشاركة OpenCode.
+يمكنك الاستيراد من ملف محلي أو من رابط مشاركة CyxCode.
 
 ```bash
-opencode import session.json
-opencode import https://opncd.ai/s/abc123
+cyxcode import session.json
+cyxcode import https://opncd.ai/s/abc123
 ```
 
 ---
 
 ### web
 
-بدء خادم OpenCode بدون واجهة مع واجهة ويب.
+بدء خادم CyxCode بدون واجهة مع واجهة ويب.
 
 ```bash
-opencode web
+cyxcode web
 ```
 
-يشغّل هذا خادم HTTP ويفتح متصفح ويب للوصول إلى OpenCode عبر واجهة ويب. اضبط `OPENCODE_SERVER_PASSWORD` لتفعيل مصادقة HTTP الأساسية (اسم المستخدم الافتراضي `opencode`).
+يشغّل هذا خادم HTTP ويفتح متصفح ويب للوصول إلى CyxCode عبر واجهة ويب. اضبط `OPENCODE_SERVER_PASSWORD` لتفعيل مصادقة HTTP الأساسية (اسم المستخدم الافتراضي `opencode`).
 
 #### الرايات
 
@@ -474,7 +474,7 @@ opencode web
 بدء خادم ACP (Agent Client Protocol).
 
 ```bash
-opencode acp
+cyxcode acp
 ```
 
 يشغّل هذا الأمر خادم ACP يتواصل عبر stdin/stdout باستخدام nd-JSON.
@@ -491,10 +491,10 @@ opencode acp
 
 ### uninstall
 
-إلغاء تثبيت OpenCode وإزالة جميع الملفات ذات الصلة.
+إلغاء تثبيت CyxCode وإزالة جميع الملفات ذات الصلة.
 
 ```bash
-opencode uninstall
+cyxcode uninstall
 ```
 
 #### الرايات
@@ -513,19 +513,19 @@ opencode uninstall
 تحديث opencode إلى أحدث إصدار أو إلى إصدار محدد.
 
 ```bash
-opencode upgrade [target]
+cyxcode upgrade [target]
 ```
 
 للترقية إلى أحدث إصدار.
 
 ```bash
-opencode upgrade
+cyxcode upgrade
 ```
 
 للترقية إلى إصدار محدد.
 
 ```bash
-opencode upgrade v0.1.48
+cyxcode upgrade v0.1.48
 ```
 
 #### الرايات
@@ -551,7 +551,7 @@ opencode upgrade v0.1.48
 
 ## متغيرات البيئة
 
-يمكن تهيئة OpenCode باستخدام متغيرات البيئة.
+يمكن تهيئة CyxCode باستخدام متغيرات البيئة.
 
 | المتغير                               | النوع   | الوصف                                                     |
 | ------------------------------------- | ------- | --------------------------------------------------------- |

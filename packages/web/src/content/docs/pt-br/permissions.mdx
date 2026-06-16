@@ -1,31 +1,31 @@
 ---
-title: Permissões
-description: Controle quais ações requerem aprovação para serem executadas.
+title: Permissions
+description: Control which actions require approval to run.
 ---
 
-O opencode usa a configuração `permission` para decidir se uma determinada ação deve ser executada automaticamente, solicitar sua aprovação ou ser bloqueada.
+CyxCode uses the `permission` config to decide whether a given action should run automatically, prompt you, or be blocked.
 
-A partir da versão `v1.1.1`, a configuração booleana legada `tools` foi descontinuada e mesclada na `permission`. A antiga configuração `tools` ainda é suportada para compatibilidade retroativa.
-
----
-
-## Ações
-
-Cada regra de permissão se resolve em uma das seguintes opções:
-
-- `"allow"` — executar sem aprovação
-- `"ask"` — solicitar aprovação
-- `"deny"` — bloquear a ação
+As of `v1.1.1`, the legacy `tools` boolean config is deprecated and has been merged into `permission`. The old `tools` config is still supported for backwards compatibility.
 
 ---
 
-## Configuração
+## Actions
 
-Você pode definir permissões globalmente (com `*`), e substituir ferramentas específicas.
+Each permission rule resolves to one of:
+
+- `"allow"` — run without approval
+- `"ask"` — prompt for approval
+- `"deny"` — block the action
+
+---
+
+## Configuration
+
+You can set permissions globally (with `*`), and override specific tools.
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "permission": {
     "*": "ask",
     "bash": "allow",
@@ -34,24 +34,24 @@ Você pode definir permissões globalmente (com `*`), e substituir ferramentas e
 }
 ```
 
-Você também pode definir todas as permissões de uma vez:
+You can also set all permissions at once:
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "permission": "allow"
 }
 ```
 
 ---
 
-## Regras Granulares (Sintaxe de Objeto)
+## Granular Rules (Object Syntax)
 
-Para a maioria das permissões, você pode usar um objeto para aplicar diferentes ações com base na entrada da ferramenta.
+For most permissions, you can use an object to apply different actions based on the tool input.
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "permission": {
     "bash": {
       "*": "ask",
@@ -68,35 +68,35 @@ Para a maioria das permissões, você pode usar um objeto para aplicar diferente
 }
 ```
 
-As regras são avaliadas por correspondência de padrão, com a **última regra correspondente vencendo**. Um padrão comum é colocar a regra de captura `"*"` primeiro, e regras mais específicas depois.
+Rules are evaluated by pattern match, with the **last matching rule winning**. A common pattern is to put the catch-all `"*"` rule first, and more specific rules after it.
 
-### Coringas
+### Wildcards
 
-Os padrões de permissão usam correspondência simples de coringas:
+Permission patterns use simple wildcard matching:
 
-- `*` corresponde a zero ou mais de qualquer caractere
-- `?` corresponde exatamente a um caractere
-- Todos os outros caracteres correspondem literalmente
+- `*` matches zero or more of any character
+- `?` matches exactly one character
+- All other characters match literally
 
-### Expansão do Diretório Home
+### Home Directory Expansion
 
-Você pode usar `~` ou `$HOME` no início de um padrão para referenciar seu diretório home. Isso é particularmente útil para regras de [`external_directory`](#external-directories).
+You can use `~` or `$HOME` at the start of a pattern to reference your home directory. This is particularly useful for [`external_directory`](#external-directories) rules.
 
 - `~/projects/*` -> `/Users/username/projects/*`
 - `$HOME/projects/*` -> `/Users/username/projects/*`
 - `~` -> `/Users/username`
 
-### Diretórios Externos
+### External Directories
 
-Use `external_directory` para permitir chamadas de ferramentas que tocam em caminhos fora do diretório de trabalho onde o opencode foi iniciado. Isso se aplica a qualquer ferramenta que aceite um caminho como entrada (por exemplo, `read`, `edit`, `list`, `glob`, `grep` e muitos comandos `bash`).
+Use `external_directory` to allow tool calls that touch paths outside the working directory where CyxCode was started. This applies to any tool that takes a path as input (for example `read`, `edit`, `list`, `glob`, `grep`, and many `bash` commands).
 
-A expansão do home (como `~/...`) afeta apenas como um padrão é escrito. Não torna um caminho externo parte do espaço de trabalho atual, então caminhos fora do diretório de trabalho ainda devem ser permitidos via `external_directory`.
+Home expansion (like `~/...`) only affects how a pattern is written. It does not make an external path part of the current workspace, so paths outside the working directory must still be allowed via `external_directory`.
 
-Por exemplo, isso permite acesso a tudo sob `~/projects/personal/`:
+For example, this allows access to everything under `~/projects/personal/`:
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "permission": {
     "external_directory": {
       "~/projects/personal/**": "allow"
@@ -105,11 +105,11 @@ Por exemplo, isso permite acesso a tudo sob `~/projects/personal/`:
 }
 ```
 
-Qualquer diretório permitido aqui herda os mesmos padrões do espaço de trabalho atual. Como [`read` padrão é `allow`](#defaults), leituras também são permitidas para entradas sob `external_directory`, a menos que sejam substituídas. Adicione regras explícitas quando uma ferramenta deve ser restrita nesses caminhos, como bloquear edições enquanto mantém leituras:
+Any directory allowed here inherits the same defaults as the current workspace. Since [`read` defaults to `allow`](#defaults), reads are also allowed for entries under `external_directory` unless overridden. Add explicit rules when a tool should be restricted in these paths, such as blocking edits while keeping reads:
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "permission": {
     "external_directory": {
       "~/projects/personal/**": "allow"
@@ -121,38 +121,39 @@ Qualquer diretório permitido aqui herda os mesmos padrões do espaço de trabal
 }
 ```
 
-Mantenha a lista focada em caminhos confiáveis e adicione regras adicionais de permissão ou negação conforme necessário para outras ferramentas (por exemplo, `bash`).
+Keep the list focused on trusted paths, and layer extra allow or deny rules as needed for other tools (for example `bash`).
 
 ---
 
-## Permissões Disponíveis
+## Available Permissions
 
-As permissões do opencode são indexadas pelo nome da ferramenta, além de alguns guardas de segurança:
+cyxcode permissions are keyed by tool name, plus a couple of safety guards:
 
-- `read` — leitura de um arquivo (corresponde ao caminho do arquivo)
-- `edit` — todas as modificações de arquivo (cobre `edit`, `write`, `patch`, `multiedit`)
-- `glob` — globbing de arquivos (corresponde ao padrão glob)
-- `grep` — busca de conteúdo (corresponde ao padrão regex)
-- `list` — listagem de arquivos em um diretório (corresponde ao caminho do diretório)
-- `bash` — execução de comandos de shell (corresponde a comandos analisados como `git status --porcelain`)
-- `task` — lançamento de subagentes (corresponde ao tipo de subagente)
-- `skill` — carregamento de uma habilidade (corresponde ao nome da habilidade)
-- `lsp` — execução de consultas LSP (atualmente não granular)
-- `todoread`, `todowrite` — leitura/atualização da lista de tarefas
-- `webfetch` — busca de uma URL (corresponde à URL)
-- `websearch`, `codesearch` — busca na web/código (corresponde à consulta)
-- `external_directory` — acionado quando uma ferramenta toca em caminhos fora do diretório de trabalho do projeto
-- `doom_loop` — acionado quando a mesma chamada de ferramenta se repete 3 vezes com entrada idêntica
+- `read` — reading a file (matches the file path)
+- `edit` — all file modifications (covers `edit`, `write`, `patch`, `multiedit`)
+- `glob` — file globbing (matches the glob pattern)
+- `grep` — content search (matches the regex pattern)
+- `list` — listing files in a directory (matches the directory path)
+- `bash` — running shell commands (matches parsed commands like `git status --porcelain`)
+- `task` — launching subagents (matches the subagent type)
+- `skill` — loading a skill (matches the skill name)
+- `lsp` — running LSP queries (currently non-granular)
+- `todoread`, `todowrite` — reading/updating the todo list
+- `wikiread`, `wikiwrite` — reading/updating project wiki notes
+- `webfetch` — fetching a URL (matches the URL)
+- `websearch`, `codesearch` — web/code search (matches the query)
+- `external_directory` — triggered when a tool touches paths outside the project working directory
+- `doom_loop` — triggered when the same tool call repeats 3 times with identical input
 
 ---
 
-## Padrões
+## Defaults
 
-Se você não especificar nada, o opencode começa com padrões permissivos:
+If you don’t specify anything, CyxCode starts from permissive defaults:
 
-- A maioria das permissões padrão é `"allow"`.
-- `doom_loop` e `external_directory` padrão é `"ask"`.
-- `read` é `"allow"`, mas arquivos `.env` são negados por padrão:
+- Most permissions default to `"allow"`.
+- `doom_loop` and `external_directory` default to `"ask"`.
+- `read` is `"allow"`, but `.env` files are denied by default:
 
 ```json title="opencode.json"
 {
@@ -169,29 +170,29 @@ Se você não especificar nada, o opencode começa com padrões permissivos:
 
 ---
 
-## O que “Ask” Faz
+## What “Ask” Does
 
-Quando o opencode solicita aprovação, a interface oferece três resultados:
+When CyxCode prompts for approval, the UI offers three outcomes:
 
-- `once` — aprovar apenas esta solicitação
-- `always` — aprovar futuras solicitações que correspondam aos padrões sugeridos (para o restante da sessão atual do opencode)
-- `reject` — negar a solicitação
+- `once` — approve just this request
+- `always` — approve future requests matching the suggested patterns (for the rest of the current CyxCode session)
+- `reject` — deny the request
 
-O conjunto de padrões que `always` aprovaria é fornecido pela ferramenta (por exemplo, aprovações de bash normalmente incluem um prefixo de comando seguro como `git status*`).
+The set of patterns that `always` would approve is provided by the tool (for example, bash approvals typically whitelist a safe command prefix like `git status*`).
 
 ---
 
-## Agentes
+## Agents
 
-Você pode substituir permissões por agente. As permissões do agente são mescladas com a configuração global, e as regras do agente têm precedência. [Saiba mais](/docs/agents#permissions) sobre permissões de agentes.
+You can override permissions per agent. Agent permissions are merged with the global config, and agent rules take precedence. [Learn more](/docs/agents#permissions) about agent permissions.
 
 :::note
-Consulte a seção [Regras Granulares (Sintaxe de Objeto)](#granular-rules-object-syntax) acima para exemplos mais detalhados de correspondência de padrões.
+Refer to the [Granular Rules (Object Syntax)](#granular-rules-object-syntax) section above for more detailed pattern matching examples.
 :::
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "permission": {
     "bash": {
       "*": "ask",
@@ -217,7 +218,7 @@ Consulte a seção [Regras Granulares (Sintaxe de Objeto)](#granular-rules-objec
 }
 ```
 
-Você também pode configurar permissões de agentes em Markdown:
+You can also configure agent permissions in Markdown:
 
 ```markdown title="~/.config/opencode/agents/review.md"
 ---
@@ -233,5 +234,5 @@ Only analyze code and suggest changes.
 ```
 
 :::tip
-Use correspondência de padrões para comandos com argumentos. `"grep *"` permite `grep pattern file.txt`, enquanto `"grep"` sozinho o bloquearia. Comandos como `git status` funcionam para o comportamento padrão, mas requerem permissão explícita (como `"git status *"`) quando argumentos são passados.
+Use pattern matching for commands with arguments. `"grep *"` allows `grep pattern file.txt`, while `"grep"` alone would block it. Commands like `git status` work for default behavior but require explicit permission (like `"git status *"`) when arguments are passed.
 :::

@@ -1,78 +1,79 @@
 ---
-title: Økosystem
-description: Projekter og integrationer bygget med OpenCode.
+title: Ecosystem
+description: Projects and integrations built with CyxCode.
 ---
 
-En samling af samfundsprojekter bygget på OpenCode.
+A collection of community projects built on CyxCode.
 
 :::note
-Vil du tilføje dit OpenCode-relaterede projekt til denne liste? Send en PR.
+Want to add your CyxCode related project to this list? Submit a PR.
 :::
 
-Du kan også tjekke [awesome-opencode](https://github.com/awesome-opencode/awesome-opencode) og [opencode.cafe](https://opencode.cafe), et fællesskab, der samler økosystemet og fællesskabet.
+You can also check out [awesome-opencode](https://github.com/awesome-opencode/awesome-opencode) and [opencode.cafe](https://opencode.cafe), a community that aggregates the ecosystem and community.
 
 ---
 
 ## Plugins
 
-| Navn                                                                                               | Beskrivelse                                                                                                       |
-| -------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------- |
-| [opencode-daytona](https://github.com/daytonaio/daytona/tree/main/libs/opencode-plugin)            | Kør automatisk OpenCode-sessioner i isolerede Daytona-sandkasser med git-synkronisering og live forhåndsvisninger |
-| [opencode-helicone-session](https://github.com/H2Shami/opencode-helicone-session)                  | Injicer automatisk Helicone-sessionsoverskrifter til anmodningsgruppering                                         |
-| [opencode-type-inject](https://github.com/nick-vi/opencode-type-inject)                            | Autoinjicer TypeScript/Svelte-typer i fillæsninger med opslagsværktøjer                                           |
-| [opencode-openai-codex-auth](https://github.com/numman-ali/opencode-openai-codex-auth)             | Brug dit ChatGPT Plus/Pro abonnement i stedet for API kreditter                                                   |
-| [opencode-gemini-auth](https://github.com/jenslys/opencode-gemini-auth)                            | Brug din eksisterende Gemini-plan i stedet for API fakturering                                                    |
-| [opencode-antigravity-auth](https://github.com/NoeFabris/opencode-antigravity-auth)                | Brug Antigravitys gratis modeller i stedet for API fakturering                                                    |
-| [opencode-devcontainers](https://github.com/athal7/opencode-devcontainers)                         | Multi-branch devcontainer isolation med lavvandede kloner og automatisk tildelte porte                            |
-| [opencode-google-antigravity-auth](https://github.com/shekohex/opencode-google-antigravity-auth)   | Google Antigravity OAuth Plugin, med understøttelse af Google søgning og mere robust API håndtering               |
-| [opencode-dynamic-context-pruning](https://github.com/Tarquinen/opencode-dynamic-context-pruning)  | Optimer tokenbrug ved at beskære forældede værktøjsoutput                                                         |
-| [opencode-vibeguard](https://github.com/inkdust2021/opencode-vibeguard)                            | Masker hemmeligheder/PII til pladsholdere i VibeGuard-stil før LLM-kald; gendan lokalt                            |
-| [opencode-websearch-cited](https://github.com/ghoulr/opencode-websearch-cited.git)                 | Tilføj native websearch-understøttelse for understøttede udbydere med Google jordet stil                          |
-| [opencode-pty](https://github.com/shekohex/opencode-pty.git)                                       | Gør det muligt for AI-agenter at køre baggrundsprocesser i en PTY, send interaktive input til dem.                |
-| [opencode-shell-strategy](https://github.com/JRedeker/opencode-shell-strategy)                     | Instruktioner til ikke-interaktive shell-kommandoer - forhindrer hænger fra TTY-afhængige operationer             |
-| [opencode-wakatime](https://github.com/angristan/opencode-wakatime)                                | Spor OpenCode brug med Wakatime                                                                                   |
-| [opencode-md-table-formatter](https://github.com/franlol/opencode-md-table-formatter/tree/main)    | Ryd op afmærkningstabeller produceret af LLMs                                                                     |
-| [opencode-morph-plugin](https://github.com/morphllm/opencode-morph-plugin)                         | Fast Apply-redigering, WarpGrep-kodesøgning og kontekstkomprimering via Morph                                     |
-| [oh-my-opencode](https://github.com/code-yeongyu/oh-my-opencode)                                   | Baggrundsagenter, præbyggede LSP/AST/MCP værktøjer, kuraterede agenter, Claude Kodekompatibel                     |
-| [opencode-notificator](https://github.com/panta82/opencode-notificator)                            | Skrivebordsmeddelelser og lydadvarsler for OpenCode-sessioner                                                     |
-| [opencode-notifier](https://github.com/mohak34/opencode-notifier)                                  | Skrivebordsmeddelelser og lydadvarsler for tilladelser, fuldførelse og fejlhændelser                              |
-| [opencode-zellij-namer](https://github.com/24601/opencode-zellij-namer)                            | AI-drevet automatisk Zellij-sessionsnavngivning baseret på OpenCode-kontekst                                      |
-| [opencode-skillful](https://github.com/zenobi-us/opencode-skillful)                                | Tillad OpenCode-agenter til dovne load-prompter på efterspørgsel med færdighedsopdagelse og -injektion            |
-| [opencode-supermemory](https://github.com/supermemoryai/opencode-supermemory)                      | Vedvarende hukommelse på tværs af sessioner ved hjælp af Supermemory                                              |
-| [@plannotator/opencode](https://github.com/backnotprop/plannotator/tree/main/apps/opencode-plugin) | Interaktiv plangennemgang med visuel annotering og private/offline deling                                         |
-| [@openspoon/subtask2](https://github.com/spoons-and-mirrors/subtask2)                              | Udvid opencode /commands til et kraftfuldt orkestreringssystem med granulær flowkontrol                           |
-| [opencode-scheduler](https://github.com/different-ai/opencode-scheduler)                           | Planlæg tilbagevendende job ved hjælp af launchd (Mac) eller systemd (Linux) med cron-syntaks                     |
-| [micode](https://github.com/vtemian/micode)                                                        | Struktureret brainstorm → Plan → Implementer workflow med session kontinuitet                                     |
-| [octto](https://github.com/vtemian/octto)                                                          | Interaktiv browser-UI til AI-brainstorming med formularer med flere spørgsmål                                     |
-| [opencode-background-agents](https://github.com/kdcokenny/opencode-background-agents)              | Claude Baggrundsagenter i kodestil med asynkron-delegering og kontekstvedholdenhed                                |
-| [opencode-notify](https://github.com/kdcokenny/opencode-notify)                                    | Native OS-meddelelser for OpenCode – ved, hvornår opgaver er fuldført                                             |
-| [opencode-workspace](https://github.com/kdcokenny/opencode-workspace)                              | Bundled multi-agent orkestreringssele – 16 komponenter, én installation                                           |
-| [opencode-worktree](https://github.com/kdcokenny/opencode-worktree)                                | Nulfriktions git-arbejdstræer for OpenCode                                                                        |
-| [opencode-sentry-monitor](https://github.com/stolinski/opencode-sentry-monitor)                    | Spor og fejlfind dine AI-agenter med Sentry AI Monitoring                                                         |
+| Name                                                                                               | Description                                                                                       |
+| -------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------- |
+| [opencode-daytona](https://github.com/daytonaio/daytona/tree/main/libs/opencode-plugin)            | Automatically run CyxCode sessions in isolated Daytona sandboxes with git sync and live previews |
+| [opencode-helicone-session](https://github.com/H2Shami/opencode-helicone-session)                  | Automatically inject Helicone session headers for request grouping                                |
+| [opencode-type-inject](https://github.com/nick-vi/opencode-type-inject)                            | Auto-inject TypeScript/Svelte types into file reads with lookup tools                             |
+| [opencode-openai-codex-auth](https://github.com/numman-ali/opencode-openai-codex-auth)             | Use your ChatGPT Plus/Pro subscription instead of API credits                                     |
+| [opencode-gemini-auth](https://github.com/jenslys/opencode-gemini-auth)                            | Use your existing Gemini plan instead of API billing                                              |
+| [opencode-antigravity-auth](https://github.com/NoeFabris/opencode-antigravity-auth)                | Use Antigravity's free models instead of API billing                                              |
+| [opencode-devcontainers](https://github.com/athal7/opencode-devcontainers)                         | Multi-branch devcontainer isolation with shallow clones and auto-assigned ports                   |
+| [opencode-google-antigravity-auth](https://github.com/shekohex/opencode-google-antigravity-auth)   | Google Antigravity OAuth Plugin, with support for Google Search, and more robust API handling     |
+| [opencode-dynamic-context-pruning](https://github.com/Tarquinen/opencode-dynamic-context-pruning)  | Optimize token usage by pruning obsolete tool outputs                                             |
+| [opencode-vibeguard](https://github.com/inkdust2021/opencode-vibeguard)                            | Redact secrets/PII into VibeGuard-style placeholders before LLM calls; restore locally            |
+| [opencode-websearch-cited](https://github.com/ghoulr/opencode-websearch-cited.git)                 | Add native websearch support for supported providers with Google grounded style                   |
+| [opencode-pty](https://github.com/shekohex/opencode-pty.git)                                       | Enables AI agents to run background processes in a PTY, send interactive input to them.           |
+| [opencode-shell-strategy](https://github.com/JRedeker/opencode-shell-strategy)                     | Instructions for non-interactive shell commands - prevents hangs from TTY-dependent operations    |
+| [opencode-wakatime](https://github.com/angristan/opencode-wakatime)                                | Track CyxCode usage with Wakatime                                                                |
+| [opencode-md-table-formatter](https://github.com/franlol/opencode-md-table-formatter/tree/main)    | Clean up markdown tables produced by LLMs                                                         |
+| [opencode-morph-plugin](https://github.com/morphllm/opencode-morph-plugin)                         | Fast Apply editing, WarpGrep codebase search, and context compaction via Morph                    |
+| [oh-my-CyxCode](https://github.com/code-yeongyu/oh-my-CyxCode)                                   | Background agents, pre-built LSP/AST/MCP tools, curated agents, Claude Code compatible            |
+| [opencode-notificator](https://github.com/panta82/opencode-notificator)                            | Desktop notifications and sound alerts for CyxCode sessions                                      |
+| [opencode-notifier](https://github.com/mohak34/opencode-notifier)                                  | Desktop notifications and sound alerts for permission, completion, and error events               |
+| [opencode-zellij-namer](https://github.com/24601/opencode-zellij-namer)                            | AI-powered automatic Zellij session naming based on CyxCode context                              |
+| [opencode-skillful](https://github.com/zenobi-us/opencode-skillful)                                | Allow CyxCode agents to lazy load prompts on demand with skill discovery and injection           |
+| [opencode-supermemory](https://github.com/supermemoryai/opencode-supermemory)                      | Persistent memory across sessions using Supermemory                                               |
+| [@plannotator/CyxCode](https://github.com/backnotprop/plannotator/tree/main/apps/opencode-plugin) | Interactive plan review with visual annotation and private/offline sharing                        |
+| [@openspoon/subtask2](https://github.com/spoons-and-mirrors/subtask2)                              | Extend CyxCode /commands into a powerful orchestration system with granular flow control         |
+| [opencode-scheduler](https://github.com/different-ai/opencode-scheduler)                           | Schedule recurring jobs using launchd (Mac) or systemd (Linux) with cron syntax                   |
+| [micode](https://github.com/vtemian/micode)                                                        | Structured Brainstorm → Plan → Implement workflow with session continuity                         |
+| [octto](https://github.com/vtemian/octto)                                                          | Interactive browser UI for AI brainstorming with multi-question forms                             |
+| [opencode-background-agents](https://github.com/kdcokenny/opencode-background-agents)              | Claude Code-style background agents with async delegation and context persistence                 |
+| [opencode-notify](https://github.com/kdcokenny/opencode-notify)                                    | Native OS notifications for CyxCode – know when tasks complete                                   |
+| [opencode-workspace](https://github.com/kdcokenny/opencode-workspace)                              | Bundled multi-agent orchestration harness – 16 components, one install                            |
+| [opencode-worktree](https://github.com/kdcokenny/opencode-worktree)                                | Zero-friction git worktrees for CyxCode                                                          |
+| [opencode-sentry-monitor](https://github.com/stolinski/opencode-sentry-monitor)                    | Trace and debug your AI agents with Sentry AI Monitoring                                          |
+| [opencode-firecrawl](https://github.com/firecrawl/opencode-firecrawl)                              | Web scraping, crawling, and search via the Firecrawl CLI                                          |
 
 ---
 
-## Projekter
+## Projects
 
-| Navn                                                                                       | Beskrivelse                                                            |
-| ------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------- |
-| [kimaki](https://github.com/remorses/kimaki)                                               | Discord-bot til at styre OpenCode-sessioner, bygget på SDK             |
-| [opencode.nvim](https://github.com/NickvanDyke/opencode.nvim)                              | Neovim-plugin til redaktør-bevidste prompter, bygget på API            |
-| [portal](https://github.com/hosenur/portal)                                                | Mobile-first web UI til OpenCode over Tailscale/VPN                    |
-| [opencode plugin template](https://github.com/zenobi-us/opencode-plugin-template/)         | Skabelon til at bygge OpenCode plugins                                 |
-| [opencode.nvim](https://github.com/sudo-tee/opencode.nvim)                                 | Neovim-frontend til opencode - en terminalbaseret AI-kodningsagent     |
-| [ai-sdk-provider-opencode-sdk](https://github.com/ben-vargas/ai-sdk-provider-opencode-sdk) | Vercel AI SDK udbyder til brug af OpenCode via @opencode-ai/sdk        |
-| [OpenChamber](https://github.com/btriapitsyn/openchamber)                                  | Web / Desktop App og VS Code udvidelse til OpenCode                    |
-| [OpenCode-Obsidian](https://github.com/mtymek/opencode-obsidian)                           | Obsidian plugin, der integrerer OpenCode i Obsidians brugergrænseflade |
-| [OpenWork](https://github.com/different-ai/openwork)                                       | Et open source-alternativ til Claude Cowork, drevet af OpenCode        |
-| [ocx](https://github.com/kdcokenny/ocx)                                                    | OpenCode udvidelsesmanager med bærbare, isolerede profiler.            |
-| [CodeNomad](https://github.com/NeuralNomadsAI/CodeNomad)                                   | Desktop-, web-, mobil- og fjernklientapp til OpenCode                  |
+| Name                                                                                       | Description                                                      |
+| ------------------------------------------------------------------------------------------ | ---------------------------------------------------------------- |
+| [kimaki](https://github.com/remorses/kimaki)                                               | Discord bot to control CyxCode sessions, built on the SDK       |
+| [CyxCode.nvim](https://github.com/NickvanDyke/CyxCode.nvim)                              | Neovim plugin for editor-aware prompts, built on the API         |
+| [portal](https://github.com/hosenur/portal)                                                | Mobile-first web UI for CyxCode over Tailscale/VPN              |
+| [CyxCode plugin template](https://github.com/zenobi-us/opencode-plugin-template/)         | Template for building CyxCode plugins                           |
+| [CyxCode.nvim](https://github.com/sudo-tee/CyxCode.nvim)                                 | Neovim frontend for CyxCode - a terminal-based AI coding agent  |
+| [ai-sdk-provider-CyxCode-sdk](https://github.com/ben-vargas/ai-sdk-provider-CyxCode-sdk) | Vercel AI SDK provider for using CyxCode via @CyxCode-ai/sdk   |
+| [OpenChamber](https://github.com/btriapitsyn/openchamber)                                  | Web / Desktop App and VS Code Extension for CyxCode             |
+| [opencode-Obsidian](https://github.com/mtymek/opencode-obsidian)                           | Obsidian plugin that embeds CyxCode in Obsidian's UI            |
+| [OpenWork](https://github.com/different-ai/openwork)                                       | An open-source alternative to Claude Cowork, powered by CyxCode |
+| [ocx](https://github.com/kdcokenny/ocx)                                                    | CyxCode extension manager with portable, isolated profiles.     |
+| [CodeNomad](https://github.com/NeuralNomadsAI/CodeNomad)                                   | Desktop, Web, Mobile and Remote Client App for CyxCode          |
 
 ---
 
-## Agenter
+## Agents
 
-| Navn                                                              | Beskrivelse                                                               |
-| ----------------------------------------------------------------- | ------------------------------------------------------------------------- |
-| [Agentic](https://github.com/Cluster444/agentic)                  | Modulære AI-agenter og -kommandoer til struktureret udvikling             |
-| [opencode-agents](https://github.com/darrenhinde/opencode-agents) | Konfigurationer, prompter, agenter og plugins til forbedrede arbejdsgange |
+| Name                                                              | Description                                                  |
+| ----------------------------------------------------------------- | ------------------------------------------------------------ |
+| [Agentic](https://github.com/Cluster444/agentic)                  | Modular AI agents and commands for structured development    |
+| [opencode-agents](https://github.com/darrenhinde/opencode-agents) | Configs, prompts, agents, and plugins for enhanced workflows |

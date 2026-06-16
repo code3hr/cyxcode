@@ -8,15 +8,19 @@
  */
 
 import { Hono } from "hono"
+import path from "path"
 import z from "zod"
 import { Findings } from "../pentest/findings"
 import { PentestTypes } from "../pentest/types"
+import { VulnScanArtifacts } from "../pentest/vulnscan/artifacts"
+import { VulnScanService } from "../pentest/vulnscan/service"
 import { MonitorStorage } from "../pentest/monitoring/storage"
 import { Scheduler } from "../pentest/monitoring/scheduler"
 import { ComplianceMapper } from "../pentest/compliance/mapper"
 import { ComplianceScorer } from "../pentest/compliance/scorer"
 import { ComplianceFrameworks } from "../pentest/compliance/frameworks"
 import type { ComplianceTypes } from "../pentest/compliance/types"
+import { Instance } from "../project/instance"
 import { Storage } from "../storage/storage"
 import { Log } from "../util/log"
 
@@ -25,7 +29,7 @@ const log = Log.create({ service: "dashboard" })
 /**
  * Create the dashboard API router.
  */
-export function createDashboardRoutes(): Hono {
+export function createDashboardRoutes(opts: Findings.StorageConfig = {}): Hono {
   const app = new Hono()
 
   // ============================================================================
@@ -44,6 +48,7 @@ export function createDashboardRoutes(): Hono {
       severity?: PentestTypes.Severity
       status?: PentestTypes.FindingStatus
       target?: string
+      service?: string
       limit?: number
     } = {}
 
@@ -56,9 +61,10 @@ export function createDashboardRoutes(): Hono {
       filters.status = query.status as PentestTypes.FindingStatus
     }
     if (query.target) filters.target = query.target
+    if (query.service) filters.service = query.service
     if (query.limit) filters.limit = parseInt(query.limit, 10)
 
-    const findings = await Findings.list({}, filters)
+    const findings = await Findings.list(opts, filters)
     return c.json({ findings, total: findings.length })
   })
 
@@ -67,7 +73,7 @@ export function createDashboardRoutes(): Hono {
    */
   app.get("/pentest/findings/:id", async (c) => {
     const id = c.req.param("id")
-    const finding = await Findings.get(id)
+    const finding = await Findings.get(id, opts)
 
     if (!finding) {
       return c.json({ error: "Finding not found" }, 404)
@@ -94,7 +100,7 @@ export function createDashboardRoutes(): Hono {
       return c.json({ error: "Invalid update data", details: parsed.error.issues }, 400)
     }
 
-    const updated = await Findings.update(id, parsed.data)
+    const updated = await Findings.update(id, parsed.data, opts)
     if (!updated) {
       return c.json({ error: "Finding not found" }, 404)
     }
@@ -107,7 +113,7 @@ export function createDashboardRoutes(): Hono {
    */
   app.delete("/pentest/findings/:id", async (c) => {
     const id = c.req.param("id")
-    const deleted = await Findings.remove(id)
+    const deleted = await Findings.remove(id, opts)
 
     if (!deleted) {
       return c.json({ error: "Finding not found" }, 404)
@@ -140,7 +146,7 @@ export function createDashboardRoutes(): Hono {
     }
     if (query.limit) filters.limit = parseInt(query.limit, 10)
 
-    const scans = await Findings.listScans({}, filters)
+    const scans = await Findings.listScans(opts, filters)
     return c.json({ scans, total: scans.length })
   })
 
@@ -149,13 +155,85 @@ export function createDashboardRoutes(): Hono {
    */
   app.get("/pentest/scans/:id", async (c) => {
     const id = c.req.param("id")
-    const scan = await Findings.getScan(id)
+    const scan = await Findings.getScan(id, opts)
 
     if (!scan) {
       return c.json({ error: "Scan not found" }, 404)
     }
 
     return c.json({ scan })
+  })
+
+  /**
+   * GET /pentest/scans/:id/artifacts - List scan artifacts
+   */
+  app.get("/pentest/scans/:id/artifacts", async (c) => {
+    const id = c.req.param("id")
+    const scan = await Findings.getScan(id, opts)
+
+    if (!scan) {
+      return c.json({ error: "Scan not found" }, 404)
+    }
+
+    return c.json({ artifacts: await VulnScanArtifacts.list(id, opts.storage) })
+  })
+
+  /**
+   * GET /pentest/vulnscan/artifacts/:id - Get stored vulnerability scan artifact
+   */
+  app.get("/pentest/vulnscan/artifacts/:id", async (c) => {
+    const id = c.req.param("id")
+    const artifact = await VulnScanArtifacts.get(id, opts.storage)
+
+    if (!artifact) {
+      return c.json({ error: "Artifact not found" }, 404)
+    }
+
+    return c.json({ artifact })
+  })
+
+  /**
+   * POST /pentest/vulnscan - Run project vulnerability scan
+   */
+  app.post("/pentest/vulnscan", async (c) => {
+    const body = await c.req.json().catch(() => ({}))
+    const Schema = z.object({
+      target: z.string().optional(),
+      minSeverity: z.enum(["critical", "high", "medium", "low"]).optional().default("high"),
+      failOnSeverity: z.enum(["critical", "high", "medium", "low"]).optional().default("high"),
+      createFindings: z.boolean().optional().default(true),
+      timeout: z.number().optional(),
+    })
+
+    const parsed = Schema.safeParse(body)
+    if (!parsed.success) {
+      return c.json({ error: "Invalid vulnscan request", details: parsed.error.issues }, 400)
+    }
+
+    const root = path.resolve(parsed.data.target ?? Instance.directory)
+    if (!Instance.containsPath(root)) {
+      return c.json({ error: "Target must be inside the active project" }, 403)
+    }
+
+    const result = await VulnScanService.run({
+      root,
+      sessionID: "dashboard",
+      min: parsed.data.minSeverity,
+      failOn: parsed.data.failOnSeverity,
+      create: parsed.data.createFindings,
+      timeout: parsed.data.timeout,
+      storage: opts.storage,
+    })
+
+    return c.json({
+      scan: result.scan,
+      discovery: result.discovery,
+      artifact: result.artifacts[0],
+      artifacts: result.artifacts,
+      findings: result.findings,
+      severity: result.severity,
+      gate: result.gate,
+    })
   })
 
   // ============================================================================

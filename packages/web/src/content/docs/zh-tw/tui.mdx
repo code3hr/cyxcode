@@ -1,25 +1,25 @@
 ---
 title: TUI
-description: 使用 OpenCode 終端機使用者介面。
+description: Using the CyxCode terminal user interface.
 ---
 
 import { Tabs, TabItem } from "@astrojs/starlight/components"
 
-OpenCode 提供了一個互動式終端機介面（TUI），用於配合 LLM 處理您的專案。
+CyxCode provides an interactive terminal interface or TUI for working on your projects with an LLM.
 
-執行 OpenCode 即可啟動當前目錄的 TUI。
-
-```bash
-opencode
-```
-
-或者您可以為指定的工作目錄啟動它。
+Running CyxCode starts the TUI for the current directory.
 
 ```bash
-opencode /path/to/project
+cyxcode
 ```
 
-進入 TUI 後，您可以輸入訊息進行提示。
+Or you can start it for a specific working directory.
+
+```bash
+cyxcode /path/to/project
+```
+
+Once you're in the TUI, you can prompt it with a message.
 
 ```text
 Give me a quick summary of the codebase.
@@ -27,51 +27,51 @@ Give me a quick summary of the codebase.
 
 ---
 
-## 檔案參考
+## File references
 
-您可以使用 `@` 在訊息中參考檔案。這會在當前工作目錄中進行模糊檔案搜尋。
+You can reference files in your messages using `@`. This does a fuzzy file search in the current working directory.
 
 :::tip
-您還可以使用 `@` 來參考訊息中的檔案。
+You can also use `@` to reference files in your messages.
 :::
 
 ```text "@packages/functions/src/api/index.ts"
 How is auth handled in @packages/functions/src/api/index.ts?
 ```
 
-檔案的內容會自動新增到對話中。
+The content of the file is added to the conversation automatically.
 
 ---
 
-## Bash 指令
+## Bash commands
 
-以 `!` 開頭的訊息會作為 shell 指令執行。
+Start a message with `!` to run a shell command.
 
 ```bash frame="none"
 !ls -la
 ```
 
-指令的輸出會作為工具結果新增到對話中。
+The output of the command is added to the conversation as a tool result.
 
 ---
 
-## 指令
+## Commands
 
-使用 OpenCode TUI 時，您可以輸入 `/` 後跟指令名稱來快速執行操作。例如：
+When using the CyxCode TUI, you can type `/` followed by a command name to quickly execute actions. For example:
 
 ```bash frame="none"
 /help
 ```
 
-大多數指令還支援以 `ctrl+x` 作為前導鍵的快速鍵，其中 `ctrl+x` 是預設前導鍵。[了解更多](/docs/keybinds)。
+Most commands also have keybind using `ctrl+x` as the leader key, where `ctrl+x` is the default leader key. [Learn more](/docs/keybinds).
 
-以下是所有可用的斜線指令：
+Here are all available slash commands:
 
 ---
 
 ### connect
 
-將供應商新增到 OpenCode。允許您從可用的供應商中選擇並新增其 API 金鑰。
+Add a provider to CyxCode. Allows you to select from available providers and add their API keys.
 
 ```bash frame="none"
 /connect
@@ -81,172 +81,173 @@ How is auth handled in @packages/functions/src/api/index.ts?
 
 ### compact
 
-壓縮當前工作階段。_別名_：`/summarize`
+Compact the current session. _Alias_: `/summarize`
 
 ```bash frame="none"
 /compact
 ```
 
-**快速鍵：** `ctrl+x c`
+**Keybind:** `ctrl+x c`
 
 ---
 
 ### details
 
-切換工具執行詳情的顯示。
+Toggle tool execution details.
 
 ```bash frame="none"
 /details
 ```
 
-**快速鍵：** `ctrl+x d`
+**Keybind:** `ctrl+x d`
 
 ---
 
 ### editor
 
-開啟外部編輯器來撰寫訊息。使用 `EDITOR` 環境變數中設定的編輯器。[了解更多](#editor-setup)。
+Open external editor for composing messages. Uses the editor set in your `EDITOR` environment variable. [Learn more](#editor-setup).
 
 ```bash frame="none"
 /editor
 ```
 
-**快速鍵：** `ctrl+x e`
+**Keybind:** `ctrl+x e`
 
 ---
 
 ### exit
 
-退出 OpenCode。_別名_：`/quit`、`/q`
+Exit CyxCode. _Aliases_: `/quit`, `/q`
 
 ```bash frame="none"
 /exit
 ```
 
-**快速鍵：** `ctrl+x q`
+**Keybind:** `ctrl+x q`
 
 ---
 
 ### export
 
-將當前對話匯出為 Markdown 並在預設編輯器中開啟。使用 `EDITOR` 環境變數中設定的編輯器。[了解更多](#editor-setup)。
+Export current conversation to Markdown and open in your default editor. Uses the editor set in your `EDITOR` environment variable. [Learn more](#editor-setup).
 
 ```bash frame="none"
 /export
 ```
 
-**快速鍵：** `ctrl+x x`
+**Keybind:** `ctrl+x x`
 
 ---
 
 ### help
 
-顯示說明對話框。
+Show the help dialog.
 
 ```bash frame="none"
 /help
 ```
 
-**快速鍵：** `ctrl+x h`
+**Keybind:** `ctrl+x h`
 
 ---
 
 ### init
 
-建立或更新 `AGENTS.md` 檔案。[了解更多](/docs/rules)。
+Create or update `AGENTS.md` file. [Learn more](/docs/rules).
 
 ```bash frame="none"
 /init
 ```
 
-**快速鍵：** `ctrl+x i`
+**Keybind:** `ctrl+x i`
 
 ---
 
 ### models
 
-列出可用模型。
+List available models.
 
 ```bash frame="none"
 /models
 ```
 
-**快速鍵：** `ctrl+x m`
+**Keybind:** `ctrl+x m`
 
 ---
 
 ### new
 
-開始新的工作階段。_別名_：`/clear`
+Start a new session. _Alias_: `/clear`
 
 ```bash frame="none"
 /new
 ```
 
-**快速鍵：** `ctrl+x n`
+**Keybind:** `ctrl+x n`
 
 ---
 
 ### redo
 
-重做之前復原的訊息。僅在使用 `/undo` 後可用。
+Redo a previously undone message. Only available after using `/undo`.
 
 :::tip
-所有檔案變更也會被恢復。
+Any file changes will also be restored.
 :::
 
-在內部，這使用 Git 來管理檔案變更。因此您的專案**需要是一個 Git 儲存庫**。
+Internally, this uses Git to manage the file changes. So your project **needs to
+be a Git repository**.
 
 ```bash frame="none"
 /redo
 ```
 
-**快速鍵：** `ctrl+x r`
+**Keybind:** `ctrl+x r`
 
 ---
 
 ### sessions
 
-列出工作階段並在工作階段之間切換。_別名_：`/resume`、`/continue`
+List and switch between sessions. _Aliases_: `/resume`, `/continue`
 
 ```bash frame="none"
 /sessions
 ```
 
-**快速鍵：** `ctrl+x l`
+**Keybind:** `ctrl+x l`
 
 ---
 
 ### share
 
-分享當前工作階段。[了解更多](/docs/share)。
+Share current session. [Learn more](/docs/share).
 
 ```bash frame="none"
 /share
 ```
 
-**快速鍵：** `ctrl+x s`
+**Keybind:** `ctrl+x s`
 
 ---
 
 ### themes
 
-列出可用主題。
+List available themes.
 
 ```bash frame="none"
-/theme
+/themes
 ```
 
-**快速鍵：** `ctrl+x t`
+**Keybind:** `ctrl+x t`
 
 ---
 
 ### thinking
 
-切換對話中思考/推理區塊的可見性。啟用後，您可以看到支援擴充思考的模型的推理過程。
+Toggle the visibility of thinking/reasoning blocks in the conversation. When enabled, you can see the model's reasoning process for models that support extended thinking.
 
 :::note
-此指令僅控制思考區塊是否**顯示** — 它不會啟用或停用模型的推理能力。要切換實際的推理能力，請使用 `ctrl+t` 循環切換模型變體。
+This command only controls whether thinking blocks are **displayed** - it does not enable or disable the model's reasoning capabilities. To toggle actual reasoning capabilities, use `ctrl+t` to cycle through model variants.
 :::
 
 ```bash frame="none"
@@ -257,25 +258,26 @@ How is auth handled in @packages/functions/src/api/index.ts?
 
 ### undo
 
-復原對話中的最後一條訊息。移除最近的使用者訊息、所有後續回應以及所有檔案變更。
+Undo last message in the conversation. Removes the most recent user message, all subsequent responses, and any file changes.
 
 :::tip
-所做的任何檔案變更也會被還原。
+Any file changes made will also be reverted.
 :::
 
-在內部，這使用 Git 來管理檔案變更。因此您的專案**需要是一個 Git 儲存庫**。
+Internally, this uses Git to manage the file changes. So your project **needs to
+be a Git repository**.
 
 ```bash frame="none"
 /undo
 ```
 
-**快速鍵：** `ctrl+x u`
+**Keybind:** `ctrl+x u`
 
 ---
 
 ### unshare
 
-取消分享當前工作階段。[了解更多](/docs/share#un-sharing)。
+Unshare current session. [Learn more](/docs/share#un-sharing).
 
 ```bash frame="none"
 /unshare
@@ -283,9 +285,9 @@ How is auth handled in @packages/functions/src/api/index.ts?
 
 ---
 
-## 編輯器設定
+## Editor setup
 
-`/editor` 和 `/export` 指令都使用 `EDITOR` 環境變數中指定的編輯器。
+Both the `/editor` and `/export` commands use the editor specified in your `EDITOR` environment variable.
 
 <Tabs>
   <TabItem label="Linux/macOS">
@@ -299,8 +301,8 @@ How is auth handled in @packages/functions/src/api/index.ts?
     export EDITOR="code --wait"
     ```
 
-    要使其永久生效，請將其新增到您的 shell 設定檔中；
-    `~/.bashrc`、`~/.zshrc` 等。
+    To make it permanent, add this to your shell profile;
+    `~/.bashrc`, `~/.zshrc`, etc.
 
   </TabItem>
 
@@ -313,7 +315,8 @@ How is auth handled in @packages/functions/src/api/index.ts?
     set EDITOR=code --wait
     ```
 
-    要使其永久生效，請使用**系統內容** > **環境變數**。
+    To make it permanent, use **System Properties** > **Environment
+    Variables**.
 
   </TabItem>
 
@@ -326,38 +329,38 @@ How is auth handled in @packages/functions/src/api/index.ts?
     $env:EDITOR = "code --wait"
     ```
 
-    要使其永久生效，請將其新增到您的 PowerShell 設定檔中。
+    To make it permanent, add this to your PowerShell profile.
 
   </TabItem>
 </Tabs>
 
-常用的編輯器選項包括：
+Popular editor options include:
 
 - `code` - Visual Studio Code
 - `cursor` - Cursor
 - `windsurf` - Windsurf
-- `nvim` - Neovim 編輯器
-- `vim` - Vim 編輯器
-- `nano` - Nano 編輯器
-- `notepad` - Notepad（Windows 記事本）
+- `nvim` - Neovim editor
+- `vim` - Vim editor
+- `nano` - Nano editor
+- `notepad` - Windows Notepad
 - `subl` - Sublime Text
 
 :::note
-某些編輯器（如 VS Code）需要以 `--wait` 旗標啟動。
+Some editors like VS Code need to be started with the `--wait` flag.
 :::
 
-某些編輯器需要命令列參數才能以阻塞模式執行。`--wait` 旗標使編輯器程序阻塞直到關閉。
+Some editors need command-line arguments to run in blocking mode. The `--wait` flag makes the editor process block until closed.
 
 ---
 
-## 設定
+## Configure
 
-您可以透過 `tui.json`（或 `tui.jsonc`）自訂 TUI 行為。
+You can customize TUI behavior through `tui.json` (or `tui.jsonc`).
 
 ```json title="tui.json"
 {
-  "$schema": "https://opencode.ai/tui.json",
-  "theme": "opencode",
+  "$schema": "https://cyxcode.ai/tui.json",
+  "theme": "CyxCode",
   "keybinds": {
     "leader": "ctrl+x"
   },
@@ -369,29 +372,29 @@ How is auth handled in @packages/functions/src/api/index.ts?
 }
 ```
 
-這與設定伺服器/執行時行為的 `opencode.json` 是分開的。
+This is separate from `opencode.json`, which configures server/runtime behavior.
 
-### 選項
+### Options
 
-- `theme` - 設定您的 UI 主題。[了解更多](/docs/themes)。
-- `keybinds` - 自訂鍵盤快速鍵。[了解更多](/docs/keybinds)。
-- `scroll_acceleration.enabled` - 啟用 macOS 風格的捲動加速，實現平滑、自然的捲動體驗。啟用後，快速捲動時速度會增加，慢速移動時保持精確。**此設定優先於 `scroll_speed`，啟用時會覆蓋它。**
-- `scroll_speed` - 控制使用捲動指令時 TUI 的捲動速度（最小值：`0.001`，支援小數值）。預設為 `3`。**注意：如果 `scroll_acceleration.enabled` 設定為 `true`，則此設定會被忽略。**
-- `diff_style` - 控制差異呈現方式。`"auto"` 根據終端機寬度自適應，`"stacked"` 始終顯示單列。
+- `theme` - Sets your UI theme. [Learn more](/docs/themes).
+- `keybinds` - Customizes keyboard shortcuts. [Learn more](/docs/keybinds).
+- `scroll_acceleration.enabled` - Enable macOS-style scroll acceleration for smooth, natural scrolling. When enabled, scroll speed increases with rapid scrolling gestures and stays precise for slower movements. **This setting takes precedence over `scroll_speed` and overrides it when enabled.**
+- `scroll_speed` - Controls how fast the TUI scrolls when using scroll commands (minimum: `0.001`, supports decimal values). Defaults to `3`. **Note: This is ignored if `scroll_acceleration.enabled` is set to `true`.**
+- `diff_style` - Controls diff rendering. `"auto"` adapts to terminal width, `"stacked"` always shows a single-column layout.
 
-使用 `OPENCODE_TUI_CONFIG` 載入自訂 TUI 設定路徑。
-
----
-
-## 自訂
-
-您可以使用指令面板（`ctrl+x h` 或 `/help`）自訂 TUI 檢視的各個方面。這些設定在重新啟動後仍會保留。
+Use `OPENCODE_TUI_CONFIG` to load a custom TUI config path.
 
 ---
 
-#### 使用者名稱顯示
+## Customization
 
-切換您的使用者名稱是否顯示在聊天訊息中。透過以下方式存取：
+You can customize various aspects of the TUI view using the command palette (`ctrl+x h` or `/help`). These settings persist across restarts.
 
-- 指令面板：搜尋「username」或「hide username」
-- 該設定會自動儲存，並在各個 TUI 工作階段中保持記憶
+---
+
+#### Username display
+
+Toggle whether your username appears in chat messages. Access this through:
+
+- Command palette: Search for "username" or "hide username"
+- The setting persists automatically and will be remembered across TUI sessions

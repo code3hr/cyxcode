@@ -1,23 +1,23 @@
 ---
-title: モデル
-description: LLM プロバイダーとモデルを構成します。
+title: Models
+description: Configuring an LLM provider and model.
 ---
 
-OpenCode は [AI SDK](https://ai-sdk.dev/) および [Models.dev](https://models.dev) を使用して **75 以上の LLM プロバイダー** をサポートし、ローカルモデルの実行をサポートします。
-
----
-
-## プロバイダー
-
-最も一般的なプロバイダーはデフォルトでプリロードされています。 `/connect` コマンドを使用してプロバイダーの資格情報を追加した場合は、OpenCode を開始するときにそれらの資格情報を使用できるようになります。
-
-[プロバイダー](/docs/providers).
+CyxCode uses the [AI SDK](https://ai-sdk.dev/) and [Models.dev](https://models.dev) to support **75+ LLM providers** and it supports running local models.
 
 ---
 
-## モデルの選択
+## Providers
 
-プロバイダーを構成したら、次のように入力して必要なモデルを選択できます。
+Most popular providers are preloaded by default. If you've added the credentials for a provider through the `/connect` command, they'll be available when you start CyxCode.
+
+Learn more about [providers](/docs/providers).
+
+---
+
+## Select a model
+
+Once you've configured your provider you can select the model you want by typing in:
 
 ```bash frame="none"
 /models
@@ -25,50 +25,52 @@ OpenCode は [AI SDK](https://ai-sdk.dev/) および [Models.dev](https://models
 
 ---
 
-## 推奨モデル
+## Recommended models
 
-たくさんのモデルがあり、毎週のように新しいモデルが登場します。
+There are a lot of models out there, with new models coming out every week.
 
 :::tip
-当社が推奨するモデルのいずれかの使用を検討してください。
+Consider using one of the models we recommend.
 :::
-しかし、コード生成とツール呼び出しの両方に優れたものはほんのわずかしかありません。
 
-ここでは、OpenCode で適切に動作するいくつかのモデルを順不同で示します。 (これは完全なリストではなく、必ずしも最新であるとは限りません):
+However, there are only a few of them that are good at both generating code and tool calling.
 
-- GPT5.2
+Here are several models that work well with CyxCode, in no particular order. (This is not an exhaustive list nor is it necessarily up to date):
+
+- GPT 5.2
 - GPT 5.1 Codex
 - Claude Opus 4.5
 - Claude Sonnet 4.5
-- MiniMax M2.1
+- Minimax M2.1
 - Gemini 3 Pro
 
 ---
 
-## デフォルトの設定
+## Set a default
 
-これらのいずれかをデフォルトのモデルとして設定するには、`model` キーを OpenCode の設定に追加します。
+To set one of these as the default model, you can set the `model` key in your
+CyxCode config.
 
 ```json title="opencode.json" {3}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "model": "lmstudio/google/gemma-3n-e4b"
 }
 ```
 
-ここでの完全な ID は `provider_id/model_id` です。たとえば、[OpenCode Zen](/docs/zen) を使用している場合、GPT 5.1 Codex には `opencode/gpt-5.1-codex` を使用します。
+Here the full ID is `provider_id/model_id`. For example, if you're using [CyxCode Zen](/docs/zen), you would use `opencode/gpt-5.1-codex` for GPT 5.1 Codex.
 
-[カスタムプロバイダー](/docs/providers#custom) を構成している場合、`provider_id` は構成の `provider` 部分のキーであり、`model_id` は `provider.models` のキーです。
+If you've configured a [custom provider](/docs/providers#custom), the `provider_id` is key from the `provider` part of your config, and the `model_id` is the key from `provider.models`.
 
 ---
 
-## モデルの設定
+## Configure models
 
-config を通じてモデルのオプションをグローバルに設定できます。
+You can globally configure a model's options through the config.
 
 ```jsonc title="opencode.jsonc" {7-12,19-24}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "provider": {
     "openai": {
       "models": {
@@ -98,18 +100,18 @@ config を通じてモデルのオプションをグローバルに設定でき�
 }
 ```
 
-ここでは、2 つの組み込みモデル (`gpt-5` プロバイダー経由でアクセスする場合は `openai`、`claude-sonnet-4-20250514` プロバイダー経由でアクセスする場合は `anthropic`) のグローバル設定を構成しています。
-組み込みプロバイダーとモデル名は、[Models.dev](https://models.dev) で確認できます。
+Here we're configuring global settings for two built-in models: `gpt-5` when accessed via the `openai` provider, and `claude-sonnet-4-20250514` when accessed via the `anthropic` provider.
+The built-in provider and model names can be found on [Models.dev](https://models.dev).
 
-使用しているエージェントに対してこれらのオプションを構成することもできます。ここでエージェント設定はグローバルオプションをオーバーライドします。 [詳細はこちら](/docs/agents/#additional)。
+You can also configure these options for any agents that you are using. The agent config overrides any global options here. [Learn more](/docs/agents/#additional).
 
-組み込みバリアントを拡張するカスタムバリアントを定義することもできます。バリアントを使用すると、重複したエントリを作成せずに、同じモデルに対して異なる設定を構成できます。
+You can also define custom variants that extend built-in ones. Variants let you configure different settings for the same model without creating duplicate entries:
 
 ```jsonc title="opencode.jsonc" {6-21}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "provider": {
-    "opencode": {
+    "CyxCode": {
       "models": {
         "gpt-5": {
           "variants": {
@@ -133,46 +135,46 @@ config を通じてモデルのオプションをグローバルに設定でき�
 
 ---
 
-## バリアント
+## Variants
 
-多くのモデルは、異なる構成の複数のバリアントをサポートしています。 OpenCode には、一般的なプロバイダーのデフォルトのバリアントが組み込まれています。
+Many models support multiple variants with different configurations. CyxCode ships with built-in default variants for popular providers.
 
-### 組み込みバリアント
+### Built-in variants
 
-OpenCode には、多くのプロバイダーのデフォルトのバリアントが付属しています。
+cyxcode ships with default variants for many providers:
 
 **Anthropic**:
 
-- `high` - 高度な思考予算 (デフォルト)
-- `max` - 最大の思考予算
+- `high` - High thinking budget (default)
+- `max` - Maximum thinking budget
 
 **OpenAI**:
 
-モデルによって異なりますが、おおよそ次のとおりです。
+Varies by model but roughly:
 
-- `none` - 理由はありません
-- `minimal` - 最小限の推論努力
-- `low` - 推論の労力が少ない
-- `medium` - 中程度の推論努力
-- `high` - 高い推論努力
-- `xhigh` - 非常に高い推論努力
+- `none` - No reasoning
+- `minimal` - Minimal reasoning effort
+- `low` - Low reasoning effort
+- `medium` - Medium reasoning effort
+- `high` - High reasoning effort
+- `xhigh` - Extra high reasoning effort
 
 **Google**:
 
-- `low` - 労力/トークン予算の削減
-- `high` - より高い労力/トークン予算
+- `low` - Lower effort/token budget
+- `high` - Higher effort/token budget
 
 :::tip
-このリストは包括的なものではありません。他の多くのプロバイダーにもデフォルトが組み込まれています。
+This list is not comprehensive. Many other providers have built-in defaults too.
 :::
 
-### カスタムバリアント
+### Custom variants
 
-既存のバリアントをオーバーライドすることも、独自のバリアントを追加することもできます。
+You can override existing variants or add your own:
 
 ```jsonc title="opencode.jsonc" {7-18}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "provider": {
     "openai": {
       "models": {
@@ -193,29 +195,29 @@ OpenCode には、多くのプロバイダーのデフォルトのバリアン�
 }
 ```
 
-### バリアントの切り替え
+### Cycle variants
 
-キーバインド `variant_cycle` を使用すると、バリアントをすばやく切り替えることができます。 [詳細はこちら](/docs/keybinds)。
+Use the keybind `variant_cycle` to quickly switch between variants. [Learn more](/docs/keybinds).
 
 ---
 
-## モデルのロード
+## Loading models
 
-OpenCode が起動すると、次の優先順位でモデルがチェックされます。
+When CyxCode starts up, it checks for models in the following priority order:
 
-1. `--model` または `-m` コマンドラインフラグ。形式は構成ファイルと同じです: `provider_id/model_id`。
+1. The `--model` or `-m` command line flag. The format is the same as in the config file: `provider_id/model_id`.
 
-2. OpenCode 構成内のモデルのリスト。
+2. The model list in the CyxCode config.
 
    ```json title="opencode.json"
    {
-     "$schema": "https://opencode.ai/config.json",
+     "$schema": "https://cyxcode.ai/config.json",
      "model": "anthropic/claude-sonnet-4-20250514"
    }
    ```
 
-ここでの形式は `provider/model` です。
+   The format here is `provider/model`.
 
-3. 最後に使用されたモデル。
+3. The last used model.
 
-4. 内部優先順位に基づく最初のモデル。
+4. The first model using an internal priority.

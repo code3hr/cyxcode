@@ -1,299 +1,105 @@
-# Distribution Channels: Kali Linux & Parrot OS
+# Distribution Channels
 
-This document outlines the strategy for distributing CyxCode through the official Kali Linux and Parrot OS repositories.
+This document tracks CyxCode distribution work for Debian-based security distributions and direct package delivery.
 
----
+## Targets
 
-## Overview
+- Kali Linux official repositories
+- Parrot OS official repositories
+- GitHub release `.deb` downloads
+- Future APT repository
+- Future Homebrew tap
 
-Both Kali Linux and Parrot OS use Debian-based packaging (.deb). To get CyxCode included in their official repositories, we need to:
+## Kali Linux
 
-1. Create a proper Debian package
-2. Meet their tool criteria
-3. Submit through their official channels
+Official references:
 
----
-
-## Kali Linux Distribution
-
-### Official Documentation
 - [Submitting Tools to Kali](https://www.kali.org/docs/tools/submitting-tools/)
 - [Intro to Packaging](https://www.kali.org/docs/development/intro-to-packaging-example/)
-- [Bug Tracker](https://bugs.kali.org/)
+- [Kali bug tracker](https://bugs.kali.org/)
 
-### Requirements Checklist
+Status:
 
 | Requirement | Status | Notes |
-|-------------|--------|-------|
-| `debian/` directory | DONE | Complete packaging created |
-| Tagged release | DONE | v1.1.0 released |
-| Clear license | DONE | MIT License |
-| Homepage | DONE | GitHub repo |
-| Documentation | DONE | README, docs/ |
-| Dependencies listed | DONE | In debian/control |
-| Installation instructions | DONE | In README |
-| Usage examples | DONE | In README |
-| Active development | DONE | Regular commits |
-| Not duplicate of existing tool | DONE | Unique AI orchestration approach |
-| Man page | DONE | debian/cyxcode.1 |
+| --- | --- | --- |
+| `debian/` directory | Done | Packaging exists in repo |
+| Tagged release | Done | Use the current tagged release when submitting |
+| License | Done | MIT |
+| Homepage | Done | `https://github.com/code3hr/cyxcode` |
+| Documentation | Done | README and docs |
+| Dependencies | Done | Listed in `debian/control` |
+| Man page | Done | `debian/cyxcode.1` |
+| Clean Kali VM install test | Pending | Run before resubmission |
+| Reviewer feedback | Pending | Track in the Kali issue |
 
-### Submission Information
+Submission summary:
 
-When submitting to Kali's bug tracker, we need:
-
-```
+```text
 Category: New Tool Requests
 Severity: Minor
 Priority: Normal
 
 Name: cyxcode
-Version: 1.0.0 (use tagged release)
-Homepage: https://github.com/code3hr/opencode
+Homepage: https://github.com/code3hr/cyxcode
 Author: code3hr
 License: MIT
-
-Description:
-AI-powered security operations platform. Orchestrates 30+ security tools
-through natural language. Features governance engine, scope enforcement,
-audit logging, and structured findings management.
-
-Dependencies:
-- bun (JavaScript runtime)
-- nmap, nikto, nuclei, etc. (security tools - already in Kali)
-
-Similar Tools:
-- None directly comparable (unique AI orchestration approach)
-- Partially overlaps with: metasploit (automation), faraday (findings)
-
-Installation:
-bun install && bun run build
-
-Usage:
-$ cyxcode
-> scan 192.168.1.0/24 for vulnerabilities
+Description: AI-powered security operations platform for orchestrating security tools with governance, scope enforcement, audit logging, and structured findings.
 ```
 
-### Kali Metapackage Target
+## Parrot OS
 
-CyxCode should be included in:
-- `kali-tools-top10` - Core tools
-- `kali-tools-automation` - Automation category
+Official references:
 
----
-
-## Parrot OS Distribution
-
-### Official Documentation
 - [Community Contributions](https://parrotsec.org/docs/introduction/community-contributions/)
-- [GitLab Repository](https://gitlab.com/parrotsec)
-- Contact: team@parrotsec.org
+- [Parrot GitLab](https://gitlab.com/parrotsec)
 
-### Requirements Checklist
+Status:
 
 | Requirement | Status | Notes |
-|-------------|--------|-------|
-| GitLab account | TODO | Create account |
-| Debian packaging | DONE | debian/ directory created |
-| Debian standards compliance | DONE | Follows Debian policy |
-| Email submission | DONE | Sent to team@parrotsec.org |
-| Fork on personal repo | PENDING | Awaiting team response |
-| Merge request | PENDING | Awaiting team response |
+| --- | --- | --- |
+| GitLab account | Pending | Required for merge request |
+| Debian packaging | Done | `debian/` directory exists |
+| Debian standards compliance | Done | Follows Debian policy |
+| Email submission | Done | Sent to `team@parrotsec.org` in January 2026 |
+| Fork on personal repo | Pending | Awaiting team response |
+| Merge request | Pending | Awaiting team response |
 
-### Submission Process
+## Debian Package Layout
 
-1. **Email team@parrotsec.org** with:
-   - Project name: CyxCode
-   - Description: AI-powered security operations platform
-   - Sub-project: Security tools
-   - Contribution type: New tool package
-
-2. **Create GitLab fork** and prepare Debian package
-
-3. **Submit merge request** for review
-
----
-
-## Debian Packaging Requirements
-
-Both distributions require proper Debian packaging. Here's what we need:
-
-### Directory Structure (Implemented)
-
-```
+```text
 cyxcode/
-├── debian/
-│   ├── changelog          # Version history (1.0.0-1)
-│   ├── compat             # Debhelper compatibility (13)
-│   ├── control            # Package metadata
-│   ├── copyright          # MIT license information
-│   ├── rules              # Build instructions
-│   ├── install            # File installation paths
-│   ├── postinst           # Post-install script (Bun setup)
-│   ├── prerm              # Pre-removal script
-│   ├── postrm             # Post-removal script
-│   ├── cyxcode.1           # Man page
-│   └── source/
-│       └── format         # Source format (3.0 native)
-├── packages/
-└── ...
+|-- debian/
+|   |-- changelog
+|   |-- compat
+|   |-- control
+|   |-- copyright
+|   |-- rules
+|   |-- install
+|   |-- postinst
+|   |-- prerm
+|   |-- postrm
+|   |-- cyxcode.1
+|   `-- source/
+|       `-- format
+|-- packages/
+`-- ...
 ```
 
-### debian/control
+## Direct Release Package
 
+Manual install path for GitHub release artifacts:
+
+```bash
+wget https://github.com/code3hr/cyxcode/releases/download/v1.1.0/cyxcode_1.1.0-1_all.deb
+sudo dpkg -i cyxcode_1.1.0-1_all.deb
+sudo apt-get install -f
 ```
-Source: cyxcode
-Section: utils
-Priority: optional
-Maintainer: code3hr <code3hr@users.noreply.github.com>
-Build-Depends: debhelper (>= 11)
-Standards-Version: 4.5.0
-Homepage: https://github.com/code3hr/opencode
-
-Package: cyxcode
-Architecture: all
-Depends: ${misc:Depends}, bun
-Recommends: nmap, nikto, nuclei, gobuster, ffuf, sqlmap,
-            smbclient, ldap-utils, snmp, dnsutils
-Description: AI-powered security operations platform
- CyxCode is an AI-powered operations platform for security professionals.
- It orchestrates 30+ security tools through natural language commands,
- with governance, scope enforcement, and audit logging.
- .
- Features:
-  - Natural language tool orchestration
-  - Governance engine with policy-based approval
-  - Scope enforcement for authorized targets
-  - Comprehensive audit logging
-  - Structured findings management
-  - Professional report generation
-```
-
-### debian/rules
-
-```makefile
-#!/usr/bin/make -f
-
-%:
-	dh $@
-
-override_dh_auto_build:
-	bun install
-	bun run build
-
-override_dh_auto_install:
-	mkdir -p debian/cyxcode/usr/lib/cyxcode
-	cp -r dist/* debian/cyxcode/usr/lib/cyxcode/
-	mkdir -p debian/cyxcode/usr/bin
-	ln -s /usr/lib/cyxcode/cyxcode debian/cyxcode/usr/bin/cyxcode
-```
-
----
 
 ## Action Items
 
-### Phase 1: Prepare Package (Priority: High)
-
-- [x] Create `debian/` directory with all required files
-- [x] Write man page for cyxcode
-- [x] Create tagged release (v1.1.0)
-- [x] Test package build locally
-- [ ] Test installation on clean Kali VM
-- [ ] Test installation on clean Parrot VM
-
-### Phase 2: Submit to Kali (Priority: High)
-
-- [x] Create account on bugs.kali.org
-- [x] Submit new tool request (January 2026)
-- [ ] Respond to reviewer feedback
-- [ ] Iterate on packaging if needed
-
-### Phase 3: Submit to Parrot (Priority: High)
-
-- [ ] Create GitLab account
-- [x] Email team@parrotsec.org (January 2026)
-- [ ] Fork and prepare package
-- [ ] Submit merge request
-- [ ] Respond to reviewer feedback
-
-### Phase 4: Ongoing Maintenance
-
-- [ ] Monitor for security updates
-- [ ] Update packages with new releases
-- [ ] Respond to user issues
-- [ ] Engage with community
-
----
-
-## Alternative Distribution Methods
-
-While working on official inclusion, we can also distribute via:
-
-### 1. Direct .deb Download
-
-Host .deb packages on GitHub releases for manual installation:
-
-```bash
-wget https://github.com/code3hr/opencode/releases/download/v1.1.0/cyxcode_1.1.0-1_all.deb
-sudo dpkg -i cyxcode_1.1.0-1_all.deb
-sudo apt-get install -f  # Install dependencies
-```
-
-### 2. APT Repository
-
-Host our own APT repository:
-
-```bash
-# Add repository
-echo "deb https://apt.cyxcode.dev stable main" | sudo tee /etc/apt/sources.list.d/cyxcode.list
-wget -qO - https://apt.cyxcode.dev/key.gpg | sudo apt-key add -
-
-# Install
-sudo apt update
-sudo apt install cyxcode
-```
-
-### 3. Installation Script
-
-One-liner installation (current method):
-
-```bash
-curl -fsSL https://cyxcode.dev/install.sh | bash
-```
-
-### 4. Homebrew (for macOS users)
-
-```bash
-brew tap code3hr/cyxcode
-brew install cyxcode
-```
-
----
-
-## Timeline Estimate
-
-| Phase | Status |
-|-------|--------|
-| Debian packaging | COMPLETE |
-| Kali submission | SUBMITTED (Jan 2026) |
-| Kali review process | PENDING (2-4 weeks) |
-| Parrot submission | SUBMITTED (Jan 2026) |
-| Parrot review | PENDING (2-4 weeks) |
-| Official inclusion | 1-3 months total |
-
----
-
-## Resources
-
-- [Debian Policy Manual](https://www.debian.org/doc/debian-policy/)
-- [Debian New Maintainers' Guide](https://www.debian.org/doc/manuals/maint-guide/)
-- [Kali Public Packaging](https://www.kali.org/docs/development/public-packaging/)
-- [Lintian - Debian Package Checker](https://lintian.debian.org/)
-
----
-
-## Sources
-
-- [Kali Linux - Submitting Tools](https://www.kali.org/docs/tools/submitting-tools/)
-- [Parrot OS - Community Contributions](https://parrotsec.org/docs/introduction/community-contributions/)
-- [Kali Linux Bug Tracker](https://bugs.kali.org/)
-- [Parrot GitLab](https://gitlab.com/parrotsec)
+- Test package installation on a clean Kali VM.
+- Test package installation on a clean Parrot VM.
+- Respond to Kali reviewer feedback.
+- Create or confirm GitLab account for Parrot submission.
+- Prepare Parrot fork and merge request after response.
+- Keep Debian package metadata in sync with each release.

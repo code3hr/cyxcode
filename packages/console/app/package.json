@@ -11,15 +11,15 @@
     "start": "vite start"
   },
   "dependencies": {
-    "@cloudflare/vite-plugin": "1.15.2",
-    "@ibm/plex": "6.4.1",
-    "@jsx-email/render": "1.1.1",
-    "@kobalte/core": "catalog:",
-    "@openauthjs/openauth": "catalog:",
+    "@cloudflare/vite-plugin": "1.40.0",
     "@cyxcode/console-core": "workspace:*",
     "@cyxcode/console-mail": "workspace:*",
     "@cyxcode/console-resource": "workspace:*",
     "@cyxcode/ui": "workspace:*",
+    "@ibm/plex": "6.4.1",
+    "@jsx-email/render": "1.1.1",
+    "@kobalte/core": "catalog:",
+    "@openauthjs/openauth": "catalog:",
     "@smithy/eventstream-codec": "4.2.7",
     "@smithy/util-utf8": "4.2.0",
     "@solidjs/meta": "catalog:",
@@ -27,7 +27,7 @@
     "@solidjs/start": "catalog:",
     "@stripe/stripe-js": "8.6.1",
     "chart.js": "4.5.1",
-    "nitro": "3.0.1-alpha.1",
+    "nitro": "3.0.260610-beta",
     "solid-js": "catalog:",
     "solid-list": "0.3.0",
     "solid-stripe": "0.8.1",
@@ -38,7 +38,7 @@
     "@typescript/native-preview": "catalog:",
     "@webgpu/types": "0.1.54",
     "typescript": "catalog:",
-    "wrangler": "4.50.0"
+    "wrangler": "4.59.1"
   },
   "engines": {
     "node": ">=22"

@@ -1,19 +1,19 @@
 ---
 title: Sunucu
-description: opencode sunucusuyla HTTP uzerinden etkilesin.
+description: CyxCode sunucusuyla HTTP uzerinden etkilesin.
 ---
 
 import config from "../../../../config.mjs"
 export const typesUrl = `${config.github}/blob/dev/packages/sdk/js/src/gen/types.gen.ts`
 
-`opencode serve` komutu, opencode istemcisinin kullanabileceği bir OpenAPI endpoint'i açan headless bir HTTP sunucusu çalıştırır.
+`cyxcode serve` komutu, opencode istemcisinin kullanabileceği bir OpenAPI endpoint'i açan headless bir HTTP sunucusu çalıştırır.
 
 ---
 
 ### Kullanım
 
 ```bash
-opencode serve [--port <number>] [--hostname <string>] [--cors <origin>]
+cyxcode serve [--port <number>] [--hostname <string>] [--cors <origin>]
 ```
 
 #### Seçenekler
@@ -29,17 +29,17 @@ opencode serve [--port <number>] [--hostname <string>] [--cors <origin>]
 `--cors` birden fazla kez geçilebilir:
 
 ```bash
-opencode serve --cors http://localhost:5173 --cors https://app.example.com
+cyxcode serve --cors http://localhost:5173 --cors https://app.example.com
 ```
 
 ---
 
 ### Kimlik Doğrulama
 
-Sunucuyu HTTP temel kimlik doğrulama (basic auth) ile korumak için `OPENCODE_SERVER_PASSWORD` ayarlayın. Kullanıcı adı varsayılan olarak `opencode` değeridir; değiştirmek isterseniz `OPENCODE_SERVER_USERNAME` ayarlayabilirsiniz. Bu ayar hem `opencode serve` hem de `opencode web` için geçerlidir.
+Sunucuyu HTTP temel kimlik doğrulama (basic auth) ile korumak için `OPENCODE_SERVER_PASSWORD` ayarlayın. Kullanıcı adı varsayılan olarak `opencode` değeridir; değiştirmek isterseniz `OPENCODE_SERVER_USERNAME` ayarlayabilirsiniz. Bu ayar hem `cyxcode serve` hem de `cyxcode web` için geçerlidir.
 
 ```bash
-OPENCODE_SERVER_PASSWORD=your-password opencode serve
+OPENCODE_SERVER_PASSWORD=your-password cyxcode serve
 ```
 
 ---
@@ -50,12 +50,12 @@ OPENCODE_SERVER_PASSWORD=your-password opencode serve
 Sunucu bir OpenAPI 3.1 spesifikasyon uç noktası açar. Bu uç nokta [SDK](/docs/sdk) üretiminde de kullanılır.
 
 :::tip
-opencode ile programatik etkileşim için opencode sunucusunu kullanın.
+cyxcode ile programatik etkileşim için opencode sunucusunu kullanın.
 :::
 
 Bu mimari, opencode'un birden fazla istemciyi desteklemesini ve programatik kullanımları mümkün kılmasını sağlar.
 
-`opencode serve` ile bağımsız bir sunucu başlatabilirsiniz. opencode TUI açıksa, `opencode serve` yeni bir sunucu başlatır.
+`cyxcode serve` ile bağımsız bir sunucu başlatabilirsiniz. CyxCode TUI açıksa, `cyxcode serve` yeni bir sunucu başlatır.
 
 ---
 
@@ -81,7 +81,7 @@ http://<hostname>:<port>/doc
 
 ## API'ler
 
-opencode sunucusu aşağıdaki API'leri sunar.
+cyxcode sunucusu aşağıdaki API'leri sunar.
 
 ---
 

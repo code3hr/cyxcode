@@ -3,7 +3,7 @@ title: Sorun giderme
 description: Yaygin sorunlar ve cozum adimlari.
 ---
 
-opencode ile ilgili bir sorunu ayiklamak icin once loglari ve diskte tuttugu yerel verileri kontrol edin.
+cyxcode ile ilgili bir sorunu ayiklamak icin once loglari ve diskte tuttugu yerel verileri kontrol edin.
 
 ---
 
@@ -16,13 +16,13 @@ Log dosyalari su konuma yazilir:
 
 Log dosyalari zaman damgasiyla adlandirilir (ornegin `2025-01-09T123456.log`) ve en yeni 10 log dosyasi tutulur.
 
-Daha ayrintili ayiklama bilgisi icin `--log-level` komut satiri secenegini kullanabilirsiniz. Ornek: `opencode --log-level DEBUG`.
+Daha ayrintili ayiklama bilgisi icin `--log-level` komut satiri secenegini kullanabilirsiniz. Ornek: `cyxcode --log-level DEBUG`.
 
 ---
 
 ## Depolama
 
-opencode, oturum verilerini ve diger uygulama verilerini diskte su konumda saklar:
+cyxcode, oturum verilerini ve diger uygulama verilerini diskte su konumda saklar:
 
 - **macOS/Linux**: `~/.local/share/opencode/`
 - **Windows**: `WIN+R` tuslayip `%USERPROFILE%\.local\share\opencode` yapistirin
@@ -39,7 +39,7 @@ Bu dizin sunlari icerir:
 
 ## Masaüstü uygulaması
 
-opencode Desktop arka planda yerel bir opencode sunucusu (`opencode-cli` sidecar) calistirir. Sorunlarin cogu bozuk bir plugin, hasarli cache veya hatali sunucu ayarindan kaynaklanir.
+cyxcode Desktop arka planda yerel bir opencode sunucusu (`opencode-cli` sidecar) calistirir. Sorunlarin cogu bozuk bir plugin, hasarli cache veya hatali sunucu ayarindan kaynaklanir.
 
 ### Hızlı kontroller
 
@@ -65,14 +65,14 @@ Plugin tanimliysa anahtari kaldirarak veya bos bir diziye cekerek gecici olarak 
 
 ```jsonc
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "plugin": [],
 }
 ```
 
 #### Eklenti dizinlerini kontrol edin
 
-opencode diskten yerel plugin de yukleyebilir. Bu dizinleri gecici olarak tasiyin (veya klasoru yeniden adlandirin) ve uygulamayi yeniden baslatin:
+cyxcode diskten yerel plugin de yukleyebilir. Bu dizinleri gecici olarak tasiyin (veya klasoru yeniden adlandirin) ve uygulamayi yeniden baslatin:
 
 - **Global plugins**
   - **macOS/Linux**: `~/.config/opencode/plugins/`
@@ -101,7 +101,7 @@ Pluginleri kapatmak ise yaramazsa (veya plugin kurulumu takili kaldiysa), openco
 
 ### Sunucu bağlantı sorunlarını düzeltin
 
-opencode Desktop ya kendi yerel sunucusunu baslatir (varsayilan) ya da sizin tanimladiginiz bir sunucu URL'sine baglanir.
+cyxcode Desktop ya kendi yerel sunucusunu baslatir (varsayilan) ya da sizin tanimladiginiz bir sunucu URL'sine baglanir.
 
 **"Connection Failed"** penceresi goruyorsaniz (veya uygulama acilis ekranini gecemiyorsa), ozel bir sunucu URL'si olup olmadigini kontrol edin.
 
@@ -144,7 +144,7 @@ Windows'ta yavaslik, dosya erisim sorunlari veya terminal problemleri yasiyorsan
 
 ### Bildirimler görünmüyor
 
-opencode Desktop sistem bildirimlerini yalnizca su durumlarda gosterir:
+cyxcode Desktop sistem bildirimlerini yalnizca su durumlarda gosterir:
 
 - Isletim sistemi ayarlarinizda opencode icin bildirimler etkinse
 - Uygulama penceresi odakta degilse
@@ -171,13 +171,13 @@ Dizini hizlica bulmak icin:
 
 ## Yardım alın
 
-opencode ile ilgili bir sorun yasiyorsaniz:
+cyxcode ile ilgili bir sorun yasiyorsaniz:
 
 1. **GitHub'da issue acin**
 
    Hata bildirmek veya ozellik talep etmek icin en iyi yol GitHub depomuzdur:
 
-   [**github.com/anomalyco/opencode/issues**](https://github.com/anomalyco/opencode/issues)
+   [**github.com/code3hr/cyxcode/issues**](https://github.com/code3hr/cyxcode/issues)
 
    Yeni issue acmadan once sorununuzun daha once raporlanip raporlanmadigini kontrol edin.
 
@@ -185,7 +185,7 @@ opencode ile ilgili bir sorun yasiyorsaniz:
 
    Gercek zamanli yardim ve topluluk sohbeti icin Discord sunucumuza katilin:
 
-   [**opencode.ai/discord**](https://opencode.ai/discord)
+   [**cyxcode.ai/discord**](https://cyxcode.ai/discord)
 
 ---
 
@@ -199,7 +199,7 @@ Asagida yaygin sorunlar ve cozumleri yer aliyor.
 
 1. Hata mesaji icin loglari kontrol edin
 2. Terminalde cikti gormek icin `--print-logs` ile calistirin
-3. `opencode upgrade` ile en guncel surumu kullandiginizdan emin olun
+3. `cyxcode upgrade` ile en guncel surumu kullandiginizdan emin olun
 
 ---
 
@@ -226,7 +226,7 @@ Ornekler:
 - `openrouter/google/gemini-2.5-flash`
 - `opencode/kimi-k2`
 
-Erisiminiz olan modelleri gormek icin `opencode models` calistirin.
+Erisiminiz olan modelleri gormek icin `cyxcode models` calistirin.
 
 ---
 
@@ -296,4 +296,4 @@ Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &
 export DISPLAY=:99.0
 ```
 
-opencode, Wayland kullandiginizi algilarsa `wl-clipboard` tercihi yapar. Aksi halde sirayla `xclip` ve `xsel` araclarini arar.
+cyxcode, Wayland kullandiginizi algilarsa `wl-clipboard` tercihi yapar. Aksi halde sirayla `xclip` ve `xsel` araclarini arar.

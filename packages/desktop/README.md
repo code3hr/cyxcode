@@ -1,6 +1,6 @@
-# OpenCode Desktop
+# CyxCode Desktop
 
-Native OpenCode desktop app, built with Tauri v2.
+Native CyxCode desktop app, built with Tauri v2.
 
 ## Prerequisites
 

@@ -685,6 +685,242 @@ export type EventSessionCompacted = {
   }
 }
 
+export type EventGovernanceChecked = {
+  type: "governance.checked"
+  properties: {
+    entry: {
+      /**
+       * Unique audit entry ID
+       */
+      id: string
+      /**
+       * Unix timestamp in milliseconds
+       */
+      timestamp: number
+      /**
+       * Session that executed the tool
+       */
+      sessionID: string
+      /**
+       * Unique tool call ID
+       */
+      callID: string
+      /**
+       * Tool name that was executed
+       */
+      tool: string
+      /**
+       * Targets extracted from tool arguments
+       */
+      targets: Array<{
+        /**
+         * Original string that was classified
+         */
+        raw: string
+        /**
+         * Detected target type
+         */
+        type: "ip" | "cidr" | "domain" | "url" | "unknown"
+        /**
+         * Normalized form (e.g., hostname from URL, lowercase domain)
+         */
+        normalized: string
+      }>
+      /**
+       * Result of governance check
+       */
+      outcome: "allowed" | "denied" | "pending-approval" | "error"
+      /**
+       * Name of matched policy
+       */
+      policy?: string
+      /**
+       * Human-readable explanation
+       */
+      reason?: string
+      /**
+       * Tool arguments (if audit.include_args is true)
+       */
+      args?: {
+        [key: string]: unknown
+      }
+      /**
+       * Time taken for governance check in ms
+       */
+      duration?: number
+    }
+  }
+}
+
+export type EventGovernancePolicyViolation = {
+  type: "governance.policy_violation"
+  properties: {
+    entry: {
+      /**
+       * Unique audit entry ID
+       */
+      id: string
+      /**
+       * Unix timestamp in milliseconds
+       */
+      timestamp: number
+      /**
+       * Session that executed the tool
+       */
+      sessionID: string
+      /**
+       * Unique tool call ID
+       */
+      callID: string
+      /**
+       * Tool name that was executed
+       */
+      tool: string
+      /**
+       * Targets extracted from tool arguments
+       */
+      targets: Array<{
+        /**
+         * Original string that was classified
+         */
+        raw: string
+        /**
+         * Detected target type
+         */
+        type: "ip" | "cidr" | "domain" | "url" | "unknown"
+        /**
+         * Normalized form (e.g., hostname from URL, lowercase domain)
+         */
+        normalized: string
+      }>
+      /**
+       * Result of governance check
+       */
+      outcome: "allowed" | "denied" | "pending-approval" | "error"
+      /**
+       * Name of matched policy
+       */
+      policy?: string
+      /**
+       * Human-readable explanation
+       */
+      reason?: string
+      /**
+       * Tool arguments (if audit.include_args is true)
+       */
+      args?: {
+        [key: string]: unknown
+      }
+      /**
+       * Time taken for governance check in ms
+       */
+      duration?: number
+    }
+    policy: string
+  }
+}
+
+export type EventCyxcodePatternMatch = {
+  type: "cyxcode.pattern.match"
+  properties: {
+    patternId: string
+    skill: string
+    tokensSaved: number
+  }
+}
+
+export type EventCyxcodePatternMiss = {
+  type: "cyxcode.pattern.miss"
+  properties: {
+    tokensUsed: number
+    errorLength: number
+  }
+}
+
+export type EventCyxcodePatternLearned = {
+  type: "cyxcode.pattern.learned"
+  properties: {
+    patternId: string
+    source: string
+  }
+}
+
+export type EventCyxcodeCorrectionAdded = {
+  type: "cyxcode.correction.added"
+  properties: {
+    correctionId: string
+    rule: string
+    strength: number
+  }
+}
+
+export type EventCyxcodeCorrectionReinforced = {
+  type: "cyxcode.correction.reinforced"
+  properties: {
+    correctionId: string
+    rule: string
+    strength: number
+  }
+}
+
+export type EventCyxcodeCorrectionPromoted = {
+  type: "cyxcode.correction.promoted"
+  properties: {
+    correctionId: string
+    rule: string
+  }
+}
+
+export type EventCyxcodeDriftDetected = {
+  type: "cyxcode.drift.detected"
+  properties: {
+    correctionId: string
+    rule: string
+    violation: string
+  }
+}
+
+export type EventCyxcodeDriftReminded = {
+  type: "cyxcode.drift.reminded"
+  properties: {
+    correctionId: string
+    rule: string
+  }
+}
+
+export type EventCyxcodeMemoryLoaded = {
+  type: "cyxcode.memory.loaded"
+  properties: {
+    memoryId: string
+    tags: Array<string>
+    chars: number
+  }
+}
+
+export type EventCyxcodeCommitCreated = {
+  type: "cyxcode.commit.created"
+  properties: {
+    hash: string
+    trigger: string
+  }
+}
+
+export type EventCyxcodeSessionStart = {
+  type: "cyxcode.session.start"
+  properties: {
+    sessionId: string
+  }
+}
+
+export type EventCyxcodeSessionEnd = {
+  type: "cyxcode.session.end"
+  properties: {
+    sessionId: string
+    tokensSaved: number
+    tokensUsed: number
+  }
+}
+
 export type EventFileWatcherUpdated = {
   type: "file.watcher.updated"
   properties: {
@@ -713,6 +949,113 @@ export type EventTodoUpdated = {
   properties: {
     sessionID: string
     todos: Array<Todo>
+  }
+}
+
+export type EventPentestScanStarted = {
+  type: "pentest.scan_started"
+  properties: {
+    scanID: string
+    tool?: string
+    target: string
+    command: string
+  }
+}
+
+export type EventPentestScanCompleted = {
+  type: "pentest.scan_completed"
+  properties: {
+    scan: {
+      id: string
+      sessionID: string
+      scanType: "port" | "service" | "vuln" | "web" | "custom"
+      target: string
+      command: string
+      startTime: number
+      endTime?: number
+      hosts: Array<{
+        address: string
+        addressType?: "ipv4" | "ipv6" | "mac"
+        hostname?: string
+        status: "up" | "down" | "unknown"
+        ports: Array<{
+          protocol: "tcp" | "udp" | "sctp"
+          portid: number
+          state: "open" | "closed" | "filtered" | "unfiltered" | "open|filtered" | "closed|filtered"
+          reason?: string
+          service?: {
+            name: string
+            product?: string
+            version?: string
+            extrainfo?: string
+            ostype?: string
+            method?: string
+            conf?: number
+          }
+        }>
+        os?: Array<{
+          name: string
+          accuracy: number
+          family?: string
+          vendor?: string
+        }>
+        startTime?: number
+        endTime?: number
+      }>
+      rawOutput?: string
+      xmlOutput?: string
+      summary?: string
+    }
+  }
+}
+
+export type EventPentestFindingCreated = {
+  type: "pentest.finding_created"
+  properties: {
+    finding: {
+      id: string
+      sessionID: string
+      scanID?: string
+      title: string
+      description: string
+      severity: "critical" | "high" | "medium" | "low" | "info"
+      status: "open" | "confirmed" | "mitigated" | "false_positive"
+      target: string
+      port?: number
+      protocol?: "tcp" | "udp" | "sctp"
+      service?: string
+      evidence?: string
+      remediation?: string
+      references?: Array<string>
+      cve?: Array<string>
+      createdAt: number
+      updatedAt?: number
+    }
+  }
+}
+
+export type EventPentestFindingUpdated = {
+  type: "pentest.finding_updated"
+  properties: {
+    finding: {
+      id: string
+      sessionID: string
+      scanID?: string
+      title: string
+      description: string
+      severity: "critical" | "high" | "medium" | "low" | "info"
+      status: "open" | "confirmed" | "mitigated" | "false_positive"
+      target: string
+      port?: number
+      protocol?: "tcp" | "udp" | "sctp"
+      service?: string
+      evidence?: string
+      remediation?: string
+      references?: Array<string>
+      cve?: Array<string>
+      createdAt: number
+      updatedAt?: number
+    }
   }
 }
 
@@ -980,8 +1323,26 @@ export type Event =
   | EventQuestionReplied
   | EventQuestionRejected
   | EventSessionCompacted
+  | EventGovernanceChecked
+  | EventGovernancePolicyViolation
+  | EventCyxcodePatternMatch
+  | EventCyxcodePatternMiss
+  | EventCyxcodePatternLearned
+  | EventCyxcodeCorrectionAdded
+  | EventCyxcodeCorrectionReinforced
+  | EventCyxcodeCorrectionPromoted
+  | EventCyxcodeDriftDetected
+  | EventCyxcodeDriftReminded
+  | EventCyxcodeMemoryLoaded
+  | EventCyxcodeCommitCreated
+  | EventCyxcodeSessionStart
+  | EventCyxcodeSessionEnd
   | EventFileWatcherUpdated
   | EventTodoUpdated
+  | EventPentestScanStarted
+  | EventPentestScanCompleted
+  | EventPentestFindingCreated
+  | EventPentestFindingUpdated
   | EventTuiPromptAppend
   | EventTuiCommandExecute
   | EventTuiToastShow
@@ -1061,6 +1422,8 @@ export type PermissionConfig =
       external_directory?: PermissionRuleConfig
       todowrite?: PermissionActionConfig
       todoread?: PermissionActionConfig
+      wikiwrite?: PermissionActionConfig
+      wikiread?: PermissionActionConfig
       question?: PermissionActionConfig
       webfetch?: PermissionActionConfig
       websearch?: PermissionActionConfig
@@ -1480,6 +1843,90 @@ export type Config = {
      * Token buffer for compaction. Leaves enough window to avoid overflow during compaction.
      */
     reserved?: number
+  }
+  /**
+   * Governance engine for scope enforcement, policy rules, and audit logging
+   */
+  governance?: {
+    /**
+     * Enable governance engine for scope and policy enforcement
+     */
+    enabled?: boolean
+    /**
+     * Scope restrictions for network targets
+     */
+    scope?: {
+      ip?: {
+        /**
+         * Allowed IP addresses or CIDR ranges
+         */
+        allow?: Array<string>
+        /**
+         * Blocked IP addresses or CIDR ranges
+         */
+        deny?: Array<string>
+      }
+      domain?: {
+        /**
+         * Allowed domain patterns (glob-style, e.g., '*.example.com')
+         */
+        allow?: Array<string>
+        /**
+         * Blocked domain patterns
+         */
+        deny?: Array<string>
+      }
+    }
+    /**
+     * Policy rules evaluated in order, first match wins
+     */
+    policies?: Array<{
+      /**
+       * Policy action
+       */
+      action: "auto-approve" | "require-approval" | "blocked"
+      /**
+       * Tool patterns (e.g., 'bash', 'webfetch', 'mcp:*')
+       */
+      tools?: Array<string>
+      /**
+       * Command patterns for bash tool (e.g., 'curl *', 'ssh *')
+       */
+      commands?: Array<string>
+      /**
+       * Target patterns (domains/IPs)
+       */
+      targets?: Array<string>
+      /**
+       * Human-readable policy description
+       */
+      description?: string
+    }>
+    /**
+     * Default action when no policy matches
+     */
+    default_action?: "auto-approve" | "require-approval" | "blocked"
+    /**
+     * Audit logging configuration
+     */
+    audit?: {
+      /**
+       * Enable audit logging
+       */
+      enabled?: boolean
+      /**
+       * Audit log storage backend
+       */
+      storage?: "file" | "memory"
+      /**
+       * Days to retain audit logs
+       */
+      retention?: number
+      /**
+       * Include tool arguments in audit log
+       */
+      include_args?: boolean
+    }
   }
   experimental?: {
     disable_paste_summary?: boolean
@@ -2619,6 +3066,720 @@ export type ExperimentalWorkspaceRemoveResponses = {
 
 export type ExperimentalWorkspaceRemoveResponse =
   ExperimentalWorkspaceRemoveResponses[keyof ExperimentalWorkspaceRemoveResponses]
+
+export type WikiListData = {
+  body?: never
+  path?: never
+  query?: {
+    directory?: string
+    workspace?: string
+    search?: string
+    limit?: number
+  }
+  url: "/experimental/wiki"
+}
+
+export type WikiListResponses = {
+  /**
+   * Wiki pages
+   */
+  200: {
+    pages: Array<{
+      id: string
+      path: string
+      kind: "doc" | "wiki"
+      title: string
+      summary: string
+      tags: Array<string>
+      links: Array<string>
+      backlinks: Array<string>
+      hash: string
+      created: number
+      modified: number
+      accessed: number
+      accessCount: number
+    }>
+    total: number
+  }
+}
+
+export type WikiListResponse = WikiListResponses[keyof WikiListResponses]
+
+export type WikiGraphData = {
+  body?: never
+  path?: never
+  query?: {
+    directory?: string
+    workspace?: string
+  }
+  url: "/experimental/wiki/graph"
+}
+
+export type WikiGraphResponses = {
+  /**
+   * Wiki graph
+   */
+  200: {
+    nodes: Array<{
+      id: string
+      path: string
+      kind: "doc" | "wiki"
+      title: string
+    }>
+    edges: Array<{
+      from: string
+      to: string
+      type: "wikilink"
+    }>
+  }
+}
+
+export type WikiGraphResponse = WikiGraphResponses[keyof WikiGraphResponses]
+
+export type WikiDeleteData = {
+  body?: never
+  path?: never
+  query: {
+    directory?: string
+    workspace?: string
+    id: string
+  }
+  url: "/experimental/wiki/page"
+}
+
+export type WikiDeleteErrors = {
+  /**
+   * Not found
+   */
+  404: NotFoundError
+}
+
+export type WikiDeleteError = WikiDeleteErrors[keyof WikiDeleteErrors]
+
+export type WikiDeleteResponses = {
+  /**
+   * Deletion result
+   */
+  200: {
+    success: boolean
+  }
+}
+
+export type WikiDeleteResponse = WikiDeleteResponses[keyof WikiDeleteResponses]
+
+export type WikiGetData = {
+  body?: never
+  path?: never
+  query: {
+    directory?: string
+    workspace?: string
+    id: string
+  }
+  url: "/experimental/wiki/page"
+}
+
+export type WikiGetErrors = {
+  /**
+   * Not found
+   */
+  404: NotFoundError
+}
+
+export type WikiGetError = WikiGetErrors[keyof WikiGetErrors]
+
+export type WikiGetResponses = {
+  /**
+   * Wiki page
+   */
+  200: {
+    page: {
+      id: string
+      path: string
+      kind: "doc" | "wiki"
+      title: string
+      summary: string
+      tags: Array<string>
+      links: Array<string>
+      backlinks: Array<string>
+      hash: string
+      created: number
+      modified: number
+      accessed: number
+      accessCount: number
+    }
+    content: string
+  }
+}
+
+export type WikiGetResponse = WikiGetResponses[keyof WikiGetResponses]
+
+export type WikiUpdateData = {
+  body?: {
+    title: string
+    body?: string
+    tags?: Array<string>
+  }
+  path?: never
+  query: {
+    directory?: string
+    workspace?: string
+    id: string
+  }
+  url: "/experimental/wiki/page"
+}
+
+export type WikiUpdateErrors = {
+  /**
+   * Not found
+   */
+  404: NotFoundError
+}
+
+export type WikiUpdateError = WikiUpdateErrors[keyof WikiUpdateErrors]
+
+export type WikiUpdateResponses = {
+  /**
+   * Wiki page
+   */
+  200: {
+    page: {
+      id: string
+      path: string
+      kind: "doc" | "wiki"
+      title: string
+      summary: string
+      tags: Array<string>
+      links: Array<string>
+      backlinks: Array<string>
+      hash: string
+      created: number
+      modified: number
+      accessed: number
+      accessCount: number
+    }
+  }
+}
+
+export type WikiUpdateResponse = WikiUpdateResponses[keyof WikiUpdateResponses]
+
+export type WikiCreateData = {
+  body?: {
+    title: string
+    body?: string
+    tags?: Array<string>
+  }
+  path?: never
+  query?: {
+    directory?: string
+    workspace?: string
+  }
+  url: "/experimental/wiki/page"
+}
+
+export type WikiCreateResponses = {
+  /**
+   * Wiki page
+   */
+  200: {
+    page: {
+      id: string
+      path: string
+      kind: "doc" | "wiki"
+      title: string
+      summary: string
+      tags: Array<string>
+      links: Array<string>
+      backlinks: Array<string>
+      hash: string
+      created: number
+      modified: number
+      accessed: number
+      accessCount: number
+    }
+  }
+}
+
+export type WikiCreateResponse = WikiCreateResponses[keyof WikiCreateResponses]
+
+export type WikiRebuildData = {
+  body?: {
+    force?: boolean
+  }
+  path?: never
+  query?: {
+    directory?: string
+    workspace?: string
+  }
+  url: "/experimental/wiki/rebuild"
+}
+
+export type WikiRebuildResponses = {
+  /**
+   * Rebuild stats
+   */
+  200: {
+    pages: number
+    indexed: number
+    links: number
+    errors: number
+  }
+}
+
+export type WikiRebuildResponse = WikiRebuildResponses[keyof WikiRebuildResponses]
+
+export type CodegraphListData = {
+  body?: never
+  path?: never
+  query?: {
+    directory?: string
+    workspace?: string
+    search?: string
+    limit?: number
+  }
+  url: "/experimental/codegraph"
+}
+
+export type CodegraphListResponses = {
+  /**
+   * Codegraph files
+   */
+  200: {
+    files: Array<{
+      id: string
+      path: string
+      kind: "file"
+      title: string
+      hash: string
+      imports: Array<string>
+      uses: Array<string>
+      exports: Array<string>
+      symbols: Array<string>
+      modified: number
+    }>
+    total: number
+  }
+}
+
+export type CodegraphListResponse = CodegraphListResponses[keyof CodegraphListResponses]
+
+export type CodegraphGraphData = {
+  body?: never
+  path?: never
+  query?: {
+    directory?: string
+    workspace?: string
+  }
+  url: "/experimental/codegraph/graph"
+}
+
+export type CodegraphGraphResponses = {
+  /**
+   * Code graph
+   */
+  200: {
+    nodes: Array<{
+      id: string
+      path: string
+      kind: "file" | "symbol"
+      title: string
+    }>
+    edges: Array<{
+      from: string
+      to: string
+      type: "import" | "declares" | "uses"
+    }>
+  }
+}
+
+export type CodegraphGraphResponse = CodegraphGraphResponses[keyof CodegraphGraphResponses]
+
+export type CodegraphGetData = {
+  body?: never
+  path?: never
+  query: {
+    directory?: string
+    workspace?: string
+    id: string
+  }
+  url: "/experimental/codegraph/page"
+}
+
+export type CodegraphGetErrors = {
+  /**
+   * Not found
+   */
+  404: NotFoundError
+}
+
+export type CodegraphGetError = CodegraphGetErrors[keyof CodegraphGetErrors]
+
+export type CodegraphGetResponses = {
+  /**
+   * Code file
+   */
+  200: {
+    file: {
+      id: string
+      path: string
+      kind: "file"
+      title: string
+      hash: string
+      imports: Array<string>
+      uses: Array<string>
+      exports: Array<string>
+      symbols: Array<string>
+      modified: number
+    }
+    content: string
+  }
+}
+
+export type CodegraphGetResponse = CodegraphGetResponses[keyof CodegraphGetResponses]
+
+export type CodegraphRebuildData = {
+  body?: never
+  path?: never
+  query?: {
+    directory?: string
+    workspace?: string
+  }
+  url: "/experimental/codegraph/rebuild"
+}
+
+export type CodegraphRebuildResponses = {
+  /**
+   * Rebuild stats
+   */
+  200: {
+    files: number
+    symbols: number
+    imports: number
+    edges: number
+    errors: number
+  }
+}
+
+export type CodegraphRebuildResponse = CodegraphRebuildResponses[keyof CodegraphRebuildResponses]
+
+export type MemoryListData = {
+  body?: never
+  path?: never
+  query?: {
+    directory?: string
+    workspace?: string
+    search?: string
+    limit?: number
+  }
+  url: "/experimental/memory"
+}
+
+export type MemoryListResponses = {
+  /**
+   * Memory entries
+   */
+  200: {
+    entries: Array<{
+      id: string
+      file: string
+      tags: Array<string>
+      summary: string
+      created: string
+      accessed: string
+      accessCount: number
+      privacy?: "public" | "private" | "sensitive" | "never_send"
+    }>
+    total: number
+  }
+}
+
+export type MemoryListResponse = MemoryListResponses[keyof MemoryListResponses]
+
+export type MemoryPresetsData = {
+  body?: never
+  path?: never
+  query?: {
+    directory?: string
+    workspace?: string
+  }
+  url: "/experimental/memory/presets"
+}
+
+export type MemoryPresetsResponses = {
+  /**
+   * Memory policy presets
+   */
+  200: {
+    presets: Array<{
+      id: "balanced" | "strict" | "public"
+      name: string
+      description: string
+    }>
+  }
+}
+
+export type MemoryPresetsResponse = MemoryPresetsResponses[keyof MemoryPresetsResponses]
+
+export type MemoryApplyPresetData = {
+  body?: {
+    id: "balanced" | "strict" | "public"
+  }
+  path?: never
+  query?: {
+    directory?: string
+    workspace?: string
+  }
+  url: "/experimental/memory/preset"
+}
+
+export type MemoryApplyPresetErrors = {
+  /**
+   * Not found
+   */
+  404: NotFoundError
+}
+
+export type MemoryApplyPresetError = MemoryApplyPresetErrors[keyof MemoryApplyPresetErrors]
+
+export type MemoryApplyPresetResponses = {
+  /**
+   * Memory policy preset result
+   */
+  200: {
+    preset: {
+      id: "balanced" | "strict" | "public"
+      name: string
+      description: string
+    }
+    updated: number
+    entries: Array<{
+      id: string
+      file: string
+      tags: Array<string>
+      summary: string
+      created: string
+      accessed: string
+      accessCount: number
+      privacy?: "public" | "private" | "sensitive" | "never_send"
+    }>
+  }
+}
+
+export type MemoryApplyPresetResponse = MemoryApplyPresetResponses[keyof MemoryApplyPresetResponses]
+
+export type MemoryDeleteData = {
+  body?: never
+  path?: never
+  query: {
+    directory?: string
+    workspace?: string
+    id: string
+  }
+  url: "/experimental/memory/page"
+}
+
+export type MemoryDeleteErrors = {
+  /**
+   * Not found
+   */
+  404: NotFoundError
+}
+
+export type MemoryDeleteError = MemoryDeleteErrors[keyof MemoryDeleteErrors]
+
+export type MemoryDeleteResponses = {
+  /**
+   * Deletion result
+   */
+  200: {
+    success: boolean
+  }
+}
+
+export type MemoryDeleteResponse = MemoryDeleteResponses[keyof MemoryDeleteResponses]
+
+export type MemoryGetData = {
+  body?: never
+  path?: never
+  query: {
+    directory?: string
+    workspace?: string
+    id: string
+  }
+  url: "/experimental/memory/page"
+}
+
+export type MemoryGetErrors = {
+  /**
+   * Not found
+   */
+  404: NotFoundError
+}
+
+export type MemoryGetError = MemoryGetErrors[keyof MemoryGetErrors]
+
+export type MemoryGetResponses = {
+  /**
+   * Memory entry
+   */
+  200: {
+    entry: {
+      id: string
+      file: string
+      tags: Array<string>
+      summary: string
+      created: string
+      accessed: string
+      accessCount: number
+      privacy?: "public" | "private" | "sensitive" | "never_send"
+    }
+    content: string
+  }
+}
+
+export type MemoryGetResponse = MemoryGetResponses[keyof MemoryGetResponses]
+
+export type MemoryUpdateData = {
+  body?: {
+    privacy?: "public" | "private" | "sensitive" | "never_send"
+    tags?: Array<string>
+    summary?: string
+  }
+  path?: never
+  query: {
+    directory?: string
+    workspace?: string
+    id: string
+  }
+  url: "/experimental/memory/page"
+}
+
+export type MemoryUpdateErrors = {
+  /**
+   * Not found
+   */
+  404: NotFoundError
+}
+
+export type MemoryUpdateError = MemoryUpdateErrors[keyof MemoryUpdateErrors]
+
+export type MemoryUpdateResponses = {
+  /**
+   * Updated memory entry
+   */
+  200: {
+    entry: {
+      id: string
+      file: string
+      tags: Array<string>
+      summary: string
+      created: string
+      accessed: string
+      accessCount: number
+      privacy?: "public" | "private" | "sensitive" | "never_send"
+    }
+  }
+}
+
+export type MemoryUpdateResponse = MemoryUpdateResponses[keyof MemoryUpdateResponses]
+
+export type MemoryExportData = {
+  body?: never
+  path?: never
+  query: {
+    directory?: string
+    workspace?: string
+    id: string
+  }
+  url: "/experimental/memory/export"
+}
+
+export type MemoryExportErrors = {
+  /**
+   * Not found
+   */
+  404: NotFoundError
+}
+
+export type MemoryExportError = MemoryExportErrors[keyof MemoryExportErrors]
+
+export type MemoryExportResponses = {
+  /**
+   * Memory export
+   */
+  200: {
+    entry: {
+      id: string
+      file: string
+      tags: Array<string>
+      summary: string
+      created: string
+      accessed: string
+      accessCount: number
+      privacy?: "public" | "private" | "sensitive" | "never_send"
+    }
+    content: string
+  }
+}
+
+export type MemoryExportResponse = MemoryExportResponses[keyof MemoryExportResponses]
+
+export type GraphGetData = {
+  body?: never
+  path?: never
+  query?: {
+    directory?: string
+    workspace?: string
+    id?: string
+    q?: string
+    hop?: number
+    limit?: number
+    symbols?: "true" | "false"
+  }
+  url: "/experimental/graph"
+}
+
+export type GraphGetErrors = {
+  /**
+   * Bad request
+   */
+  400: BadRequestError
+}
+
+export type GraphGetError = GraphGetErrors[keyof GraphGetErrors]
+
+export type GraphGetResponses = {
+  /**
+   * Knowledge graph
+   */
+  200: {
+    nodes: Array<{
+      id: string
+      kind: "wiki" | "code" | "symbol" | "memory" | "learned" | "concept" | "cyxwatch"
+      title: string
+      path?: string
+      summary?: string
+      tags?: Array<string>
+      meta?: {
+        [key: string]: unknown
+      }
+    }>
+    edges: Array<{
+      from: string
+      to: string
+      type: string
+    }>
+    stats: {
+      wiki: number
+      code: number
+      memory: number
+      learned: number
+      facts: number
+      cyxwatch: number
+    }
+  }
+}
+
+export type GraphGetResponse = GraphGetResponses[keyof GraphGetResponses]
 
 export type WorktreeRemoveData = {
   body?: WorktreeRemoveInput

@@ -13,6 +13,11 @@ import type {
   AuthRemoveResponses,
   AuthSetErrors,
   AuthSetResponses,
+  CodegraphGetErrors,
+  CodegraphGetResponses,
+  CodegraphGraphResponses,
+  CodegraphListResponses,
+  CodegraphRebuildResponses,
   CommandListResponses,
   Config as Config3,
   ConfigGetResponses,
@@ -48,6 +53,8 @@ import type {
   GlobalHealthResponses,
   GlobalUpgradeErrors,
   GlobalUpgradeResponses,
+  GraphGetErrors,
+  GraphGetResponses,
   InstanceDisposeResponses,
   LspStatusResponses,
   McpAddErrors,
@@ -65,6 +72,18 @@ import type {
   McpLocalConfig,
   McpRemoteConfig,
   McpStatusResponses,
+  MemoryApplyPresetErrors,
+  MemoryApplyPresetResponses,
+  MemoryDeleteErrors,
+  MemoryDeleteResponses,
+  MemoryExportErrors,
+  MemoryExportResponses,
+  MemoryGetErrors,
+  MemoryGetResponses,
+  MemoryListResponses,
+  MemoryPresetsResponses,
+  MemoryUpdateErrors,
+  MemoryUpdateResponses,
   OutputFormat,
   Part as Part2,
   PartDeleteErrors,
@@ -175,6 +194,16 @@ import type {
   TuiShowToastResponses,
   TuiSubmitPromptResponses,
   VcsGetResponses,
+  WikiCreateResponses,
+  WikiDeleteErrors,
+  WikiDeleteResponses,
+  WikiGetErrors,
+  WikiGetResponses,
+  WikiGraphResponses,
+  WikiListResponses,
+  WikiRebuildResponses,
+  WikiUpdateErrors,
+  WikiUpdateResponses,
   WorktreeCreateErrors,
   WorktreeCreateInput,
   WorktreeCreateResponses,
@@ -234,7 +263,7 @@ export class Config extends HeyApiClient {
   /**
    * Get global configuration
    *
-   * Retrieve the current global OpenCode configuration settings and preferences.
+   * Retrieve the current global CyxCode configuration settings and preferences.
    */
   public get<ThrowOnError extends boolean = false>(options?: Options<never, ThrowOnError>) {
     return (options?.client ?? this.client).get<GlobalConfigGetResponses, unknown, ThrowOnError>({
@@ -246,7 +275,7 @@ export class Config extends HeyApiClient {
   /**
    * Update global configuration
    *
-   * Update global OpenCode configuration settings and preferences.
+   * Update global CyxCode configuration settings and preferences.
    */
   public update<ThrowOnError extends boolean = false>(
     parameters?: {
@@ -272,7 +301,7 @@ export class Global extends HeyApiClient {
   /**
    * Get health
    *
-   * Get health information about the OpenCode server.
+   * Get health information about the CyxCode server.
    */
   public health<ThrowOnError extends boolean = false>(options?: Options<never, ThrowOnError>) {
     return (options?.client ?? this.client).get<GlobalHealthResponses, unknown, ThrowOnError>({
@@ -284,7 +313,7 @@ export class Global extends HeyApiClient {
   /**
    * Get global events
    *
-   * Subscribe to global events from the OpenCode system using server-sent events.
+   * Subscribe to global events from the CyxCode system using server-sent events.
    */
   public event<ThrowOnError extends boolean = false>(options?: Options<never, ThrowOnError>) {
     return (options?.client ?? this.client).sse.get<GlobalEventResponses, unknown, ThrowOnError>({
@@ -296,7 +325,7 @@ export class Global extends HeyApiClient {
   /**
    * Dispose instance
    *
-   * Clean up and dispose all OpenCode instances, releasing all resources.
+   * Clean up and dispose all CyxCode instances, releasing all resources.
    */
   public dispose<ThrowOnError extends boolean = false>(options?: Options<never, ThrowOnError>) {
     return (options?.client ?? this.client).post<GlobalDisposeResponses, unknown, ThrowOnError>({
@@ -306,9 +335,9 @@ export class Global extends HeyApiClient {
   }
 
   /**
-   * Upgrade opencode
+   * Upgrade CyxCode
    *
-   * Upgrade opencode to the specified version or latest if not specified.
+   * Upgrade CyxCode to the specified version or latest if not specified.
    */
   public upgrade<ThrowOnError extends boolean = false>(
     parameters?: {
@@ -395,7 +424,7 @@ export class Project extends HeyApiClient {
   /**
    * List all projects
    *
-   * Get a list of projects that have been opened with OpenCode.
+   * Get a list of projects that have been opened with CyxCode.
    */
   public list<ThrowOnError extends boolean = false>(
     parameters?: {
@@ -425,7 +454,7 @@ export class Project extends HeyApiClient {
   /**
    * Get current project
    *
-   * Retrieve the currently active project that OpenCode is working with.
+   * Retrieve the currently active project that CyxCode is working with.
    */
   public current<ThrowOnError extends boolean = false>(
     parameters?: {
@@ -539,7 +568,7 @@ export class Pty extends HeyApiClient {
   /**
    * List PTY sessions
    *
-   * Get a list of all active pseudo-terminal (PTY) sessions managed by OpenCode.
+   * Get a list of all active pseudo-terminal (PTY) sessions managed by CyxCode.
    */
   public list<ThrowOnError extends boolean = false>(
     parameters?: {
@@ -758,7 +787,7 @@ export class Config2 extends HeyApiClient {
   /**
    * Get configuration
    *
-   * Retrieve the current OpenCode configuration settings and preferences.
+   * Retrieve the current CyxCode configuration settings and preferences.
    */
   public get<ThrowOnError extends boolean = false>(
     parameters?: {
@@ -788,7 +817,7 @@ export class Config2 extends HeyApiClient {
   /**
    * Update configuration
    *
-   * Update OpenCode configuration settings and preferences.
+   * Update CyxCode configuration settings and preferences.
    */
   public update<ThrowOnError extends boolean = false>(
     parameters?: {
@@ -1038,7 +1067,7 @@ export class Session extends HeyApiClient {
   /**
    * List sessions
    *
-   * Get a list of all OpenCode sessions across projects, sorted by most recently updated. Archived sessions are excluded by default.
+   * Get a list of all CyxCode sessions across projects, sorted by most recently updated. Archived sessions are excluded by default.
    */
   public list<ThrowOnError extends boolean = false>(
     parameters?: {
@@ -1124,6 +1153,669 @@ export class Experimental extends HeyApiClient {
   private _resource?: Resource
   get resource(): Resource {
     return (this._resource ??= new Resource({ client: this.client }))
+  }
+}
+
+export class Wiki extends HeyApiClient {
+  /**
+   * List wiki pages
+   *
+   * List wiki and markdown pages in the current project knowledge index.
+   */
+  public list<ThrowOnError extends boolean = false>(
+    parameters?: {
+      directory?: string
+      workspace?: string
+      search?: string
+      limit?: number
+    },
+    options?: Options<never, ThrowOnError>,
+  ) {
+    const params = buildClientParams(
+      [parameters],
+      [
+        {
+          args: [
+            { in: "query", key: "directory" },
+            { in: "query", key: "workspace" },
+            { in: "query", key: "search" },
+            { in: "query", key: "limit" },
+          ],
+        },
+      ],
+    )
+    return (options?.client ?? this.client).get<WikiListResponses, unknown, ThrowOnError>({
+      url: "/experimental/wiki",
+      ...options,
+      ...params,
+    })
+  }
+
+  /**
+   * Get wiki graph
+   *
+   * Return nodes and edges for the current wiki graph.
+   */
+  public graph<ThrowOnError extends boolean = false>(
+    parameters?: {
+      directory?: string
+      workspace?: string
+    },
+    options?: Options<never, ThrowOnError>,
+  ) {
+    const params = buildClientParams(
+      [parameters],
+      [
+        {
+          args: [
+            { in: "query", key: "directory" },
+            { in: "query", key: "workspace" },
+          ],
+        },
+      ],
+    )
+    return (options?.client ?? this.client).get<WikiGraphResponses, unknown, ThrowOnError>({
+      url: "/experimental/wiki/graph",
+      ...options,
+      ...params,
+    })
+  }
+
+  /**
+   * Delete wiki page
+   *
+   * Delete a wiki note from the project wiki directory.
+   */
+  public delete<ThrowOnError extends boolean = false>(
+    parameters: {
+      directory?: string
+      workspace?: string
+      id: string
+    },
+    options?: Options<never, ThrowOnError>,
+  ) {
+    const params = buildClientParams(
+      [parameters],
+      [
+        {
+          args: [
+            { in: "query", key: "directory" },
+            { in: "query", key: "workspace" },
+            { in: "query", key: "id" },
+          ],
+        },
+      ],
+    )
+    return (options?.client ?? this.client).delete<WikiDeleteResponses, WikiDeleteErrors, ThrowOnError>({
+      url: "/experimental/wiki/page",
+      ...options,
+      ...params,
+    })
+  }
+
+  /**
+   * Get wiki page
+   *
+   * Return a wiki page and its content.
+   */
+  public get<ThrowOnError extends boolean = false>(
+    parameters: {
+      directory?: string
+      workspace?: string
+      id: string
+    },
+    options?: Options<never, ThrowOnError>,
+  ) {
+    const params = buildClientParams(
+      [parameters],
+      [
+        {
+          args: [
+            { in: "query", key: "directory" },
+            { in: "query", key: "workspace" },
+            { in: "query", key: "id" },
+          ],
+        },
+      ],
+    )
+    return (options?.client ?? this.client).get<WikiGetResponses, WikiGetErrors, ThrowOnError>({
+      url: "/experimental/wiki/page",
+      ...options,
+      ...params,
+    })
+  }
+
+  /**
+   * Update wiki page
+   *
+   * Update an existing wiki page.
+   */
+  public update<ThrowOnError extends boolean = false>(
+    parameters: {
+      directory?: string
+      workspace?: string
+      id: string
+      title?: string
+      body?: string
+      tags?: Array<string>
+    },
+    options?: Options<never, ThrowOnError>,
+  ) {
+    const params = buildClientParams(
+      [parameters],
+      [
+        {
+          args: [
+            { in: "query", key: "directory" },
+            { in: "query", key: "workspace" },
+            { in: "query", key: "id" },
+            { in: "body", key: "title" },
+            { in: "body", key: "body" },
+            { in: "body", key: "tags" },
+          ],
+        },
+      ],
+    )
+    return (options?.client ?? this.client).patch<WikiUpdateResponses, WikiUpdateErrors, ThrowOnError>({
+      url: "/experimental/wiki/page",
+      ...options,
+      ...params,
+      headers: {
+        "Content-Type": "application/json",
+        ...options?.headers,
+        ...params.headers,
+      },
+    })
+  }
+
+  /**
+   * Create wiki page
+   *
+   * Create a new wiki page in the project wiki directory.
+   */
+  public create<ThrowOnError extends boolean = false>(
+    parameters?: {
+      directory?: string
+      workspace?: string
+      title?: string
+      body?: string
+      tags?: Array<string>
+    },
+    options?: Options<never, ThrowOnError>,
+  ) {
+    const params = buildClientParams(
+      [parameters],
+      [
+        {
+          args: [
+            { in: "query", key: "directory" },
+            { in: "query", key: "workspace" },
+            { in: "body", key: "title" },
+            { in: "body", key: "body" },
+            { in: "body", key: "tags" },
+          ],
+        },
+      ],
+    )
+    return (options?.client ?? this.client).post<WikiCreateResponses, unknown, ThrowOnError>({
+      url: "/experimental/wiki/page",
+      ...options,
+      ...params,
+      headers: {
+        "Content-Type": "application/json",
+        ...options?.headers,
+        ...params.headers,
+      },
+    })
+  }
+
+  /**
+   * Rebuild wiki index
+   *
+   * Rescan markdown files and refresh backlinks and recall vectors.
+   */
+  public rebuild<ThrowOnError extends boolean = false>(
+    parameters?: {
+      directory?: string
+      workspace?: string
+      force?: boolean
+    },
+    options?: Options<never, ThrowOnError>,
+  ) {
+    const params = buildClientParams(
+      [parameters],
+      [
+        {
+          args: [
+            { in: "query", key: "directory" },
+            { in: "query", key: "workspace" },
+            { in: "body", key: "force" },
+          ],
+        },
+      ],
+    )
+    return (options?.client ?? this.client).post<WikiRebuildResponses, unknown, ThrowOnError>({
+      url: "/experimental/wiki/rebuild",
+      ...options,
+      ...params,
+      headers: {
+        "Content-Type": "application/json",
+        ...options?.headers,
+        ...params.headers,
+      },
+    })
+  }
+}
+
+export class Codegraph extends HeyApiClient {
+  /**
+   * List codegraph files
+   *
+   * List scanned code files in the current project code graph.
+   */
+  public list<ThrowOnError extends boolean = false>(
+    parameters?: {
+      directory?: string
+      workspace?: string
+      search?: string
+      limit?: number
+    },
+    options?: Options<never, ThrowOnError>,
+  ) {
+    const params = buildClientParams(
+      [parameters],
+      [
+        {
+          args: [
+            { in: "query", key: "directory" },
+            { in: "query", key: "workspace" },
+            { in: "query", key: "search" },
+            { in: "query", key: "limit" },
+          ],
+        },
+      ],
+    )
+    return (options?.client ?? this.client).get<CodegraphListResponses, unknown, ThrowOnError>({
+      url: "/experimental/codegraph",
+      ...options,
+      ...params,
+    })
+  }
+
+  /**
+   * Get codegraph
+   *
+   * Return nodes and edges for the current code graph.
+   */
+  public graph<ThrowOnError extends boolean = false>(
+    parameters?: {
+      directory?: string
+      workspace?: string
+    },
+    options?: Options<never, ThrowOnError>,
+  ) {
+    const params = buildClientParams(
+      [parameters],
+      [
+        {
+          args: [
+            { in: "query", key: "directory" },
+            { in: "query", key: "workspace" },
+          ],
+        },
+      ],
+    )
+    return (options?.client ?? this.client).get<CodegraphGraphResponses, unknown, ThrowOnError>({
+      url: "/experimental/codegraph/graph",
+      ...options,
+      ...params,
+    })
+  }
+
+  /**
+   * Get code file
+   *
+   * Return a scanned code file and its content.
+   */
+  public get<ThrowOnError extends boolean = false>(
+    parameters: {
+      directory?: string
+      workspace?: string
+      id: string
+    },
+    options?: Options<never, ThrowOnError>,
+  ) {
+    const params = buildClientParams(
+      [parameters],
+      [
+        {
+          args: [
+            { in: "query", key: "directory" },
+            { in: "query", key: "workspace" },
+            { in: "query", key: "id" },
+          ],
+        },
+      ],
+    )
+    return (options?.client ?? this.client).get<CodegraphGetResponses, CodegraphGetErrors, ThrowOnError>({
+      url: "/experimental/codegraph/page",
+      ...options,
+      ...params,
+    })
+  }
+
+  /**
+   * Rebuild code graph
+   *
+   * Rescan code files and refresh imports and symbol relationships.
+   */
+  public rebuild<ThrowOnError extends boolean = false>(
+    parameters?: {
+      directory?: string
+      workspace?: string
+    },
+    options?: Options<never, ThrowOnError>,
+  ) {
+    const params = buildClientParams(
+      [parameters],
+      [
+        {
+          args: [
+            { in: "query", key: "directory" },
+            { in: "query", key: "workspace" },
+          ],
+        },
+      ],
+    )
+    return (options?.client ?? this.client).post<CodegraphRebuildResponses, unknown, ThrowOnError>({
+      url: "/experimental/codegraph/rebuild",
+      ...options,
+      ...params,
+    })
+  }
+}
+
+export class Memory extends HeyApiClient {
+  /**
+   * List memories
+   *
+   * List indexed project memory entries.
+   */
+  public list<ThrowOnError extends boolean = false>(
+    parameters?: {
+      directory?: string
+      workspace?: string
+      search?: string
+      limit?: number
+    },
+    options?: Options<never, ThrowOnError>,
+  ) {
+    const params = buildClientParams(
+      [parameters],
+      [
+        {
+          args: [
+            { in: "query", key: "directory" },
+            { in: "query", key: "workspace" },
+            { in: "query", key: "search" },
+            { in: "query", key: "limit" },
+          ],
+        },
+      ],
+    )
+    return (options?.client ?? this.client).get<MemoryListResponses, unknown, ThrowOnError>({
+      url: "/experimental/memory",
+      ...options,
+      ...params,
+    })
+  }
+
+  /**
+   * List memory policy presets
+   *
+   * List built-in Memory Firewall privacy presets.
+   */
+  public presets<ThrowOnError extends boolean = false>(
+    parameters?: {
+      directory?: string
+      workspace?: string
+    },
+    options?: Options<never, ThrowOnError>,
+  ) {
+    const params = buildClientParams(
+      [parameters],
+      [
+        {
+          args: [
+            { in: "query", key: "directory" },
+            { in: "query", key: "workspace" },
+          ],
+        },
+      ],
+    )
+    return (options?.client ?? this.client).get<MemoryPresetsResponses, unknown, ThrowOnError>({
+      url: "/experimental/memory/presets",
+      ...options,
+      ...params,
+    })
+  }
+
+  /**
+   * Apply memory policy preset
+   *
+   * Apply a built-in Memory Firewall privacy preset to project memory entries.
+   */
+  public applyPreset<ThrowOnError extends boolean = false>(
+    parameters?: {
+      directory?: string
+      workspace?: string
+      id?: "balanced" | "strict" | "public"
+    },
+    options?: Options<never, ThrowOnError>,
+  ) {
+    const params = buildClientParams(
+      [parameters],
+      [
+        {
+          args: [
+            { in: "query", key: "directory" },
+            { in: "query", key: "workspace" },
+            { in: "body", key: "id" },
+          ],
+        },
+      ],
+    )
+    return (options?.client ?? this.client).post<MemoryApplyPresetResponses, MemoryApplyPresetErrors, ThrowOnError>({
+      url: "/experimental/memory/preset",
+      ...options,
+      ...params,
+      headers: {
+        "Content-Type": "application/json",
+        ...options?.headers,
+        ...params.headers,
+      },
+    })
+  }
+
+  /**
+   * Delete memory entry
+   *
+   * Delete a memory entry and its backing file.
+   */
+  public delete<ThrowOnError extends boolean = false>(
+    parameters: {
+      directory?: string
+      workspace?: string
+      id: string
+    },
+    options?: Options<never, ThrowOnError>,
+  ) {
+    const params = buildClientParams(
+      [parameters],
+      [
+        {
+          args: [
+            { in: "query", key: "directory" },
+            { in: "query", key: "workspace" },
+            { in: "query", key: "id" },
+          ],
+        },
+      ],
+    )
+    return (options?.client ?? this.client).delete<MemoryDeleteResponses, MemoryDeleteErrors, ThrowOnError>({
+      url: "/experimental/memory/page",
+      ...options,
+      ...params,
+    })
+  }
+
+  /**
+   * Get memory entry
+   *
+   * Return a memory entry and its content.
+   */
+  public get<ThrowOnError extends boolean = false>(
+    parameters: {
+      directory?: string
+      workspace?: string
+      id: string
+    },
+    options?: Options<never, ThrowOnError>,
+  ) {
+    const params = buildClientParams(
+      [parameters],
+      [
+        {
+          args: [
+            { in: "query", key: "directory" },
+            { in: "query", key: "workspace" },
+            { in: "query", key: "id" },
+          ],
+        },
+      ],
+    )
+    return (options?.client ?? this.client).get<MemoryGetResponses, MemoryGetErrors, ThrowOnError>({
+      url: "/experimental/memory/page",
+      ...options,
+      ...params,
+    })
+  }
+
+  /**
+   * Update memory entry metadata
+   *
+   * Update memory tags, summary, or privacy class.
+   */
+  public update<ThrowOnError extends boolean = false>(
+    parameters: {
+      directory?: string
+      workspace?: string
+      id: string
+      privacy?: "public" | "private" | "sensitive" | "never_send"
+      tags?: Array<string>
+      summary?: string
+    },
+    options?: Options<never, ThrowOnError>,
+  ) {
+    const params = buildClientParams(
+      [parameters],
+      [
+        {
+          args: [
+            { in: "query", key: "directory" },
+            { in: "query", key: "workspace" },
+            { in: "query", key: "id" },
+            { in: "body", key: "privacy" },
+            { in: "body", key: "tags" },
+            { in: "body", key: "summary" },
+          ],
+        },
+      ],
+    )
+    return (options?.client ?? this.client).patch<MemoryUpdateResponses, MemoryUpdateErrors, ThrowOnError>({
+      url: "/experimental/memory/page",
+      ...options,
+      ...params,
+      headers: {
+        "Content-Type": "application/json",
+        ...options?.headers,
+        ...params.headers,
+      },
+    })
+  }
+
+  /**
+   * Export memory entry
+   *
+   * Return a memory entry and raw content for export.
+   */
+  public export<ThrowOnError extends boolean = false>(
+    parameters: {
+      directory?: string
+      workspace?: string
+      id: string
+    },
+    options?: Options<never, ThrowOnError>,
+  ) {
+    const params = buildClientParams(
+      [parameters],
+      [
+        {
+          args: [
+            { in: "query", key: "directory" },
+            { in: "query", key: "workspace" },
+            { in: "query", key: "id" },
+          ],
+        },
+      ],
+    )
+    return (options?.client ?? this.client).get<MemoryExportResponses, MemoryExportErrors, ThrowOnError>({
+      url: "/experimental/memory/export",
+      ...options,
+      ...params,
+    })
+  }
+}
+
+export class Graph extends HeyApiClient {
+  /**
+   * Get knowledge graph
+   *
+   * Return the unified knowledge graph across wiki pages, code files, memories, learned patterns, and semantic facts.
+   */
+  public get<ThrowOnError extends boolean = false>(
+    parameters?: {
+      directory?: string
+      workspace?: string
+      id?: string
+      q?: string
+      hop?: number
+      limit?: number
+      symbols?: "true" | "false"
+    },
+    options?: Options<never, ThrowOnError>,
+  ) {
+    const params = buildClientParams(
+      [parameters],
+      [
+        {
+          args: [
+            { in: "query", key: "directory" },
+            { in: "query", key: "workspace" },
+            { in: "query", key: "id" },
+            { in: "query", key: "q" },
+            { in: "query", key: "hop" },
+            { in: "query", key: "limit" },
+            { in: "query", key: "symbols" },
+          ],
+        },
+      ],
+    )
+    return (options?.client ?? this.client).get<GraphGetResponses, GraphGetErrors, ThrowOnError>({
+      url: "/experimental/graph",
+      ...options,
+      ...params,
+    })
   }
 }
 
@@ -1274,7 +1966,7 @@ export class Session2 extends HeyApiClient {
   /**
    * List sessions
    *
-   * Get a list of all OpenCode sessions, sorted by most recently updated.
+   * Get a list of all CyxCode sessions, sorted by most recently updated.
    */
   public list<ThrowOnError extends boolean = false>(
     parameters?: {
@@ -1312,7 +2004,7 @@ export class Session2 extends HeyApiClient {
   /**
    * Create session
    *
-   * Create a new OpenCode session for interacting with AI assistants and managing conversations.
+   * Create a new CyxCode session for interacting with AI assistants and managing conversations.
    */
   public create<ThrowOnError extends boolean = false>(
     parameters?: {
@@ -1417,7 +2109,7 @@ export class Session2 extends HeyApiClient {
   /**
    * Get session
    *
-   * Retrieve detailed information about a specific OpenCode session.
+   * Retrieve detailed information about a specific CyxCode session.
    */
   public get<ThrowOnError extends boolean = false>(
     parameters: {
@@ -3629,7 +4321,7 @@ export class Instance extends HeyApiClient {
   /**
    * Dispose instance
    *
-   * Clean up and dispose the current OpenCode instance, releasing all resources.
+   * Clean up and dispose the current CyxCode instance, releasing all resources.
    */
   public dispose<ThrowOnError extends boolean = false>(
     parameters?: {
@@ -3661,7 +4353,7 @@ export class Path extends HeyApiClient {
   /**
    * Get paths
    *
-   * Retrieve the current working directory and related path information for the OpenCode instance.
+   * Retrieve the current working directory and related path information for the CyxCode instance.
    */
   public get<ThrowOnError extends boolean = false>(
     parameters?: {
@@ -3725,7 +4417,7 @@ export class Command extends HeyApiClient {
   /**
    * List commands
    *
-   * Get a list of all available commands in the OpenCode system.
+   * Get a list of all available commands in the CyxCode system.
    */
   public list<ThrowOnError extends boolean = false>(
     parameters?: {
@@ -3802,7 +4494,7 @@ export class App extends HeyApiClient {
   /**
    * List agents
    *
-   * Get a list of all available AI agents in the OpenCode system.
+   * Get a list of all available AI agents in the CyxCode system.
    */
   public agents<ThrowOnError extends boolean = false>(
     parameters?: {
@@ -3832,7 +4524,7 @@ export class App extends HeyApiClient {
   /**
    * List skills
    *
-   * Get a list of all available skills in the OpenCode system.
+   * Get a list of all available skills in the CyxCode system.
    */
   public skills<ThrowOnError extends boolean = false>(
     parameters?: {
@@ -3965,6 +4657,26 @@ export class OpencodeClient extends HeyApiClient {
   private _experimental?: Experimental
   get experimental(): Experimental {
     return (this._experimental ??= new Experimental({ client: this.client }))
+  }
+
+  private _wiki?: Wiki
+  get wiki(): Wiki {
+    return (this._wiki ??= new Wiki({ client: this.client }))
+  }
+
+  private _codegraph?: Codegraph
+  get codegraph(): Codegraph {
+    return (this._codegraph ??= new Codegraph({ client: this.client }))
+  }
+
+  private _memory?: Memory
+  get memory(): Memory {
+    return (this._memory ??= new Memory({ client: this.client }))
+  }
+
+  private _graph?: Graph
+  get graph(): Graph {
+    return (this._graph ??= new Graph({ client: this.client }))
   }
 
   private _worktree?: Worktree

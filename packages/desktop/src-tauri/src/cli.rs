@@ -41,7 +41,7 @@ impl CommandWrapper for WinCreationFlags {
 }
 
 const CLI_INSTALL_DIR: &str = ".opencode/bin";
-const CLI_BINARY_NAME: &str = "opencode";
+const CLI_BINARY_NAME: &str = "cyxcode";
 const SHELL_ENV_TIMEOUT: Duration = Duration::from_secs(5);
 
 #[derive(serde::Deserialize, Debug)]
@@ -400,10 +400,10 @@ pub fn spawn_command(
             let version = app.package_info().version.to_string();
             let mut script = vec![
                 "set -e".to_string(),
-                "BIN=\"$HOME/.opencode/bin/opencode\"".to_string(),
+                "BIN=\"$HOME/.opencode/bin/cyxcode\"".to_string(),
                 "if [ ! -x \"$BIN\" ]; then".to_string(),
                 format!(
-                    "  curl -fsSL https://opencode.ai/install | bash -s -- --version {} --no-modify-path",
+                    "  curl -fsSL https://cyxcode.ai/install | bash -s -- --version {} --no-modify-path",
                     shell_escape(&version)
                 ),
                 "fi".to_string(),
@@ -569,7 +569,7 @@ pub fn serve(
         format!("--print-logs --log-level WARN serve --hostname {hostname} --port {port}").as_str(),
         &envs,
     )
-    .expect("Failed to spawn opencode");
+    .expect("Failed to spawn cyxcode");
 
     let mut exit_tx = Some(exit_tx);
     tokio::spawn(

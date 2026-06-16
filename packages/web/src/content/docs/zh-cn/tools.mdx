@@ -1,21 +1,21 @@
 ---
-title: 工具
-description: 管理 LLM 可以使用的工具。
+title: Tools
+description: Manage the tools an LLM can use.
 ---
 
-工具允许 LLM 在您的代码库中执行操作。OpenCode 自带一组内置工具，您也可以通过[自定义工具](/docs/custom-tools)或 [MCP 服务器](/docs/mcp-servers)来扩展它。
+Tools allow the LLM to perform actions in your codebase. CyxCode comes with a set of built-in tools, but you can extend it with [custom tools](/docs/custom-tools) or [MCP servers](/docs/mcp-servers).
 
-默认情况下，所有工具都是**启用**的，且无需权限即可运行。您可以通过[权限](/docs/permissions)来控制工具的行为。
+By default, all tools are **enabled** and don't need permission to run. You can control tool behavior through [permissions](/docs/permissions).
 
 ---
 
-## 配置
+## Configure
 
-使用 `permission` 字段来控制工具行为。您可以对每个工具设置允许、拒绝或需要审批。
+Use the `permission` field to control tool behavior. You can allow, deny, or require approval for each tool.
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "permission": {
     "edit": "deny",
     "bash": "ask",
@@ -24,201 +24,201 @@ description: 管理 LLM 可以使用的工具。
 }
 ```
 
-您还可以使用通配符同时控制多个工具。例如，要求某个 MCP 服务器的所有工具都需要审批：
+You can also use wildcards to control multiple tools at once. For example, to require approval for all tools from an MCP server:
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "permission": {
     "mymcp_*": "ask"
   }
 }
 ```
 
-[了解更多](/docs/permissions)关于配置权限的内容。
+[Learn more](/docs/permissions) about configuring permissions.
 
 ---
 
-## 内置工具
+## Built-in
 
-以下是 OpenCode 中所有可用的内置工具。
+Here are all the built-in tools available in CyxCode.
 
 ---
 
 ### bash
 
-在项目环境中执行 shell 命令。
+Execute shell commands in your project environment.
 
 ```json title="opencode.json" {4}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "permission": {
     "bash": "allow"
   }
 }
 ```
 
-该工具允许 LLM 运行终端命令，例如 `npm install`、`git status` 或其他任何 shell 命令。
+This tool allows the LLM to run terminal commands like `npm install`, `git status`, or any other shell command.
 
 ---
 
 ### edit
 
-通过精确的字符串替换来修改现有文件。
+Modify existing files using exact string replacements.
 
 ```json title="opencode.json" {4}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "permission": {
     "edit": "allow"
   }
 }
 ```
 
-该工具通过替换精确匹配的文本来对文件进行编辑。这是 LLM 修改代码的主要方式。
+This tool performs precise edits to files by replacing exact text matches. It's the primary way the LLM modifies code.
 
 ---
 
 ### write
 
-创建新文件或覆盖现有文件。
+Create new files or overwrite existing ones.
 
 ```json title="opencode.json" {4}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "permission": {
     "edit": "allow"
   }
 }
 ```
 
-使用此工具允许 LLM 创建新文件。如果文件已存在，则会覆盖现有文件。
+Use this to allow the LLM to create new files. It will overwrite existing files if they already exist.
 
 :::note
-`write` 工具由 `edit` 权限控制，该权限涵盖所有文件修改操作（`edit`、`write`、`patch`、`multiedit`）。
+The `write` tool is controlled by the `edit` permission, which covers all file modifications (`edit`, `write`, `patch`, `multiedit`).
 :::
 
 ---
 
 ### read
 
-读取代码库中的文件内容。
+Read file contents from your codebase.
 
 ```json title="opencode.json" {4}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "permission": {
     "read": "allow"
   }
 }
 ```
 
-该工具读取文件并返回其内容。它支持对大文件读取指定行范围。
+This tool reads files and returns their contents. It supports reading specific line ranges for large files.
 
 ---
 
 ### grep
 
-使用正则表达式搜索文件内容。
+Search file contents using regular expressions.
 
 ```json title="opencode.json" {4}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "permission": {
     "grep": "allow"
   }
 }
 ```
 
-在代码库中快速搜索内容。支持完整的正则表达式语法和文件模式过滤。
+Fast content search across your codebase. Supports full regex syntax and file pattern filtering.
 
 ---
 
 ### glob
 
-通过模式匹配查找文件。
+Find files by pattern matching.
 
 ```json title="opencode.json" {4}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "permission": {
     "glob": "allow"
   }
 }
 ```
 
-使用 `**/*.js` 或 `src/**/*.ts` 等 glob 模式搜索文件。返回按修改时间排序的匹配文件路径。
+Search for files using glob patterns like `**/*.js` or `src/**/*.ts`. Returns matching file paths sorted by modification time.
 
 ---
 
 ### list
 
-列出指定路径下的文件和目录。
+List files and directories in a given path.
 
 ```json title="opencode.json" {4}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "permission": {
     "list": "allow"
   }
 }
 ```
 
-该工具用于列出目录内容。它接受 glob 模式来过滤结果。
+This tool lists directory contents. It accepts glob patterns to filter results.
 
 ---
 
-### lsp（实验性）
+### lsp (experimental)
 
-与已配置的 LSP 服务器交互，获取代码智能功能，如定义跳转、引用查找、悬停信息和调用层次结构。
+Interact with your configured LSP servers to get code intelligence features like definitions, references, hover info, and call hierarchy.
 
 :::note
-该工具仅在设置 `OPENCODE_EXPERIMENTAL_LSP_TOOL=true`（或 `OPENCODE_EXPERIMENTAL=true`）时可用。
+This tool is only available when `OPENCODE_EXPERIMENTAL_LSP_TOOL=true` (or `OPENCODE_EXPERIMENTAL=true`).
 :::
 
 ```json title="opencode.json" {4}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "permission": {
     "lsp": "allow"
   }
 }
 ```
 
-支持的操作包括 `goToDefinition`、`findReferences`、`hover`、`documentSymbol`、`workspaceSymbol`、`goToImplementation`、`prepareCallHierarchy`、`incomingCalls` 和 `outgoingCalls`。
+Supported operations include `goToDefinition`, `findReferences`, `hover`, `documentSymbol`, `workspaceSymbol`, `goToImplementation`, `prepareCallHierarchy`, `incomingCalls`, and `outgoingCalls`.
 
-要配置项目可用的 LSP 服务器，请参阅 [LSP 服务器](/docs/lsp)。
+To configure which LSP servers are available for your project, see [LSP Servers](/docs/lsp).
 
 ---
 
 ### patch
 
-对文件应用补丁。
+Apply patches to files.
 
 ```json title="opencode.json" {4}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "permission": {
     "edit": "allow"
   }
 }
 ```
 
-该工具将补丁文件应用到您的代码库中。适用于应用来自各种来源的 diff 和补丁。
+This tool applies patch files to your codebase. Useful for applying diffs and patches from various sources.
 
 :::note
-`patch` 工具由 `edit` 权限控制，该权限涵盖所有文件修改操作（`edit`、`write`、`patch`、`multiedit`）。
+The `patch` tool is controlled by the `edit` permission, which covers all file modifications (`edit`, `write`, `patch`, `multiedit`).
 :::
 
 ---
 
 ### skill
 
-加载一个[技能](/docs/skills)（即 `SKILL.md` 文件）并在对话中返回其内容。
+Load a [skill](/docs/skills) (a `SKILL.md` file) and return its content in the conversation.
 
 ```json title="opencode.json" {4}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "permission": {
     "skill": "allow"
   }
@@ -229,146 +229,188 @@ description: 管理 LLM 可以使用的工具。
 
 ### todowrite
 
-在编码会话中管理待办事项列表。
+Manage todo lists during coding sessions.
 
 ```json title="opencode.json" {4}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "permission": {
     "todowrite": "allow"
   }
 }
 ```
 
-创建和更新任务列表以跟踪复杂操作的进度。LLM 使用此工具来组织多步骤任务。
+Creates and updates task lists to track progress during complex operations. The LLM uses this to organize multi-step tasks.
 
 :::note
-该工具默认对子代理禁用，但您可以手动启用。[了解更多](/docs/agents/#permissions)
+This tool is disabled for subagents by default, but you can enable it manually. [Learn more](/docs/agents/#permissions)
 :::
 
 ---
 
 ### todoread
 
-读取现有的待办事项列表。
+Read existing todo lists.
 
 ```json title="opencode.json" {4}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "permission": {
     "todoread": "allow"
   }
 }
 ```
 
-读取当前待办事项列表的状态。LLM 使用此工具来跟踪哪些任务待处理、哪些已完成。
+Reads the current todo list state. Used by the LLM to track what tasks are pending or completed.
 
 :::note
-该工具默认对子代理禁用，但您可以手动启用。[了解更多](/docs/agents/#permissions)
+This tool is disabled for subagents by default, but you can enable it manually. [Learn more](/docs/agents/#permissions)
+:::
+
+---
+
+### wikiwrite
+
+Create or update project wiki notes.
+
+```json title="opencode.json" {4}
+{
+  "$schema": "https://cyxcode.ai/config.json",
+  "permission": {
+    "wikiwrite": "allow"
+  }
+}
+```
+
+Writes durable project knowledge into the local wiki. Notes can include `[[wikilinks]]` so later sessions can reuse discovered architecture, decisions, and code relationships.
+
+:::note
+This tool is disabled for subagents by default, but you can enable it manually. [Learn more](/docs/agents/#permissions)
+:::
+
+---
+
+### wikiread
+
+Read project wiki notes.
+
+```json title="opencode.json" {4}
+{
+  "$schema": "https://cyxcode.ai/config.json",
+  "permission": {
+    "wikiread": "allow"
+  }
+}
+```
+
+Searches the project wiki and reads matching note summaries, links, and backlinks. Pass a page id to read note content.
+
+:::note
+This tool is disabled for subagents by default, but you can enable it manually. [Learn more](/docs/agents/#permissions)
 :::
 
 ---
 
 ### webfetch
 
-获取网页内容。
+Fetch web content.
 
 ```json title="opencode.json" {4}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "permission": {
     "webfetch": "allow"
   }
 }
 ```
 
-允许 LLM 获取并读取网页内容。适用于查阅文档或研究在线资源。
+Allows the LLM to fetch and read web pages. Useful for looking up documentation or researching online resources.
 
 ---
 
 ### websearch
 
-在网络上搜索信息。
+Search the web for information.
 
 :::note
-该工具仅在使用 OpenCode 提供商时，或当 `OPENCODE_ENABLE_EXA` 环境变量设置为任意真值（例如 `true` 或 `1`）时可用。
+This tool is only available when using the CyxCode provider or when the `OPENCODE_ENABLE_EXA` environment variable is set to any truthy value (e.g., `true` or `1`).
 
-在启动 OpenCode 时启用：
+To enable when launching CyxCode:
 
 ```bash
-OPENCODE_ENABLE_EXA=1 opencode
+OPENCODE_ENABLE_EXA=1 cyxcode
 ```
 
 :::
 
 ```json title="opencode.json" {4}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "permission": {
     "websearch": "allow"
   }
 }
 ```
 
-使用 Exa AI 进行网络搜索以查找相关信息。适用于研究主题、了解时事动态或获取超出训练数据截止日期的信息。
+Performs web searches using Exa AI to find relevant information online. Useful for researching topics, finding current events, or gathering information beyond the training data cutoff.
 
-无需 API 密钥——该工具无需身份验证即可直接连接到 Exa AI 的托管 MCP 服务。
+No API key is required — the tool connects directly to Exa AI's hosted MCP service without authentication.
 
 :::tip
-当您需要查找信息（发现）时使用 `websearch`，当您需要从特定 URL 获取内容（检索）时使用 `webfetch`。
+Use `websearch` when you need to find information (discovery), and `webfetch` when you need to retrieve content from a specific URL (retrieval).
 :::
 
 ---
 
 ### question
 
-在执行过程中向用户提问。
+Ask the user questions during execution.
 
 ```json title="opencode.json" {4}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "permission": {
     "question": "allow"
   }
 }
 ```
 
-该工具允许 LLM 在执行任务期间向用户提问。适用于以下场景：
+This tool allows the LLM to ask the user questions during a task. It's useful for:
 
-- 收集用户偏好或需求
-- 澄清模糊的指令
-- 获取实现方案的决策
-- 提供方向选择的选项
+- Gathering user preferences or requirements
+- Clarifying ambiguous instructions
+- Getting decisions on implementation choices
+- Offering choices about what direction to take
 
-每个问题包含标题、问题正文和选项列表。用户可以从提供的选项中选择，也可以输入自定义答案。当有多个问题时，用户可以在提交所有答案之前在各问题之间切换浏览。
-
----
-
-## 自定义工具
-
-自定义工具允许您定义 LLM 可以调用的自定义函数。这些函数在您的配置文件中定义，可以执行任意代码。
-
-[了解更多](/docs/custom-tools)关于创建自定义工具的内容。
+Each question includes a header, the question text, and a list of options. Users can select from the provided options or type a custom answer. When there are multiple questions, users can navigate between them before submitting all answers.
 
 ---
 
-## MCP 服务器
+## Custom tools
 
-MCP（Model Context Protocol）服务器允许您集成外部工具和服务，包括数据库访问、API 集成和第三方服务。
+Custom tools let you define your own functions that the LLM can call. These are defined in your config file and can execute arbitrary code.
 
-[了解更多](/docs/mcp-servers)关于配置 MCP 服务器的内容。
-
----
-
-## 内部机制
-
-在内部，`grep`、`glob` 和 `list` 等工具底层使用 [ripgrep](https://github.com/BurntSushi/ripgrep)。默认情况下，ripgrep 遵循 `.gitignore` 中的模式，这意味着 `.gitignore` 中列出的文件和目录将被排除在搜索和列表结果之外。
+[Learn more](/docs/custom-tools) about creating custom tools.
 
 ---
 
-### 忽略模式
+## MCP servers
 
-要包含通常会被忽略的文件，请在项目根目录下创建一个 `.ignore` 文件。该文件可以显式允许某些路径。
+MCP (Model Context Protocol) servers allow you to integrate external tools and services. This includes database access, API integrations, and third-party services.
+
+[Learn more](/docs/mcp-servers) about configuring MCP servers.
+
+---
+
+## Internals
+
+Internally, tools like `grep`, `glob`, and `list` use [ripgrep](https://github.com/BurntSushi/ripgrep) under the hood. By default, ripgrep respects `.gitignore` patterns, which means files and directories listed in your `.gitignore` will be excluded from searches and listings.
+
+---
+
+### Ignore patterns
+
+To include files that would normally be ignored, create a `.ignore` file in your project root. This file can explicitly allow certain paths.
 
 ```text title=".ignore"
 !node_modules/
@@ -376,4 +418,4 @@ MCP（Model Context Protocol）服务器允许您集成外部工具和服务，�
 !build/
 ```
 
-例如，这个 `.ignore` 文件允许 ripgrep 在 `node_modules/`、`dist/` 和 `build/` 目录中进行搜索，即使它们已在 `.gitignore` 中列出。
+For example, this `.ignore` file allows ripgrep to search within `node_modules/`, `dist/`, and `build/` directories even if they're listed in `.gitignore`.

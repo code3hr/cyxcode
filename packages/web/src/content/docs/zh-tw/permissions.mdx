@@ -1,31 +1,31 @@
 ---
-title: 權限
-description: 控制哪些操作需要審批才能執行。
+title: Permissions
+description: Control which actions require approval to run.
 ---
 
-OpenCode 使用 `permission` 設定來決定某個操作是否應自動執行、提示您審批，還是被阻止。
+CyxCode uses the `permission` config to decide whether a given action should run automatically, prompt you, or be blocked.
 
-從 `v1.1.1` 開始，舊版 `tools` 布林設定已被廢棄，並已合併到 `permission` 中。舊版 `tools` 設定仍然支援，以保持向後相容。
-
----
-
-## 操作
-
-每條權限規則解析為以下之一：
-
-- `"allow"` — 無需審批直接執行
-- `"ask"` — 提示審批
-- `"deny"` — 阻止該操作
+As of `v1.1.1`, the legacy `tools` boolean config is deprecated and has been merged into `permission`. The old `tools` config is still supported for backwards compatibility.
 
 ---
 
-## 設定
+## Actions
 
-您可以全域設定權限（使用 `*`），並覆寫特定工具的權限。
+Each permission rule resolves to one of:
+
+- `"allow"` — run without approval
+- `"ask"` — prompt for approval
+- `"deny"` — block the action
+
+---
+
+## Configuration
+
+You can set permissions globally (with `*`), and override specific tools.
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "permission": {
     "*": "ask",
     "bash": "allow",
@@ -34,24 +34,24 @@ OpenCode 使用 `permission` 設定來決定某個操作是否應自動執行、
 }
 ```
 
-您還可以一次性設定所有權限：
+You can also set all permissions at once:
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "permission": "allow"
 }
 ```
 
 ---
 
-## 細粒度規則（物件語法）
+## Granular Rules (Object Syntax)
 
-對於大多數權限，您可以使用物件來根據工具輸入套用不同的操作。
+For most permissions, you can use an object to apply different actions based on the tool input.
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "permission": {
     "bash": {
       "*": "ask",
@@ -68,35 +68,35 @@ OpenCode 使用 `permission` 設定來決定某個操作是否應自動執行、
 }
 ```
 
-規則透過模式比對進行評估，**最後比對的規則優先**。常見做法是將萬用的 `"*"` 規則放在最前面，更具體的規則放在後面。
+Rules are evaluated by pattern match, with the **last matching rule winning**. A common pattern is to put the catch-all `"*"` rule first, and more specific rules after it.
 
-### 萬用字元
+### Wildcards
 
-權限模式使用簡單的萬用字元比對：
+Permission patterns use simple wildcard matching:
 
-- `*` 比對零個或多個任意字元
-- `?` 精確比對一個字元
-- 所有其他字元按字面值比對
+- `*` matches zero or more of any character
+- `?` matches exactly one character
+- All other characters match literally
 
-### 主目錄展開
+### Home Directory Expansion
 
-您可以在模式開頭使用 `~` 或 `$HOME` 來參照您的主目錄。這對於 [`external_directory`](#外部目錄) 規則特別有用。
+You can use `~` or `$HOME` at the start of a pattern to reference your home directory. This is particularly useful for [`external_directory`](#external-directories) rules.
 
 - `~/projects/*` -> `/Users/username/projects/*`
 - `$HOME/projects/*` -> `/Users/username/projects/*`
 - `~` -> `/Users/username`
 
-### 外部目錄
+### External Directories
 
-使用 `external_directory` 允許工具呼叫存取 OpenCode 啟動時工作目錄之外的路徑。這適用於任何接受路徑作為輸入的工具（例如 `read`、`edit`、`list`、`glob`、`grep` 以及許多 `bash` 指令）。
+Use `external_directory` to allow tool calls that touch paths outside the working directory where CyxCode was started. This applies to any tool that takes a path as input (for example `read`, `edit`, `list`, `glob`, `grep`, and many `bash` commands).
 
-主目錄展開（如 `~/...`）僅影響模式的書寫方式。它不會將外部路徑納入當前工作空間，因此工作目錄之外的路徑仍然必須透過 `external_directory` 來允許。
+Home expansion (like `~/...`) only affects how a pattern is written. It does not make an external path part of the current workspace, so paths outside the working directory must still be allowed via `external_directory`.
 
-例如，以下設定允許存取 `~/projects/personal/` 下的所有內容：
+For example, this allows access to everything under `~/projects/personal/`:
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "permission": {
     "external_directory": {
       "~/projects/personal/**": "allow"
@@ -105,11 +105,11 @@ OpenCode 使用 `permission` 設定來決定某個操作是否應自動執行、
 }
 ```
 
-此處允許的任何目錄都會繼承與當前工作空間相同的預設值。由於 [`read` 預設為 `allow`](#預設值)，`external_directory` 下的項目也允許讀取，除非另行覆寫。當需要在這些路徑中限制某個工具時，請新增顯式規則，例如在保留讀取的同時阻止編輯：
+Any directory allowed here inherits the same defaults as the current workspace. Since [`read` defaults to `allow`](#defaults), reads are also allowed for entries under `external_directory` unless overridden. Add explicit rules when a tool should be restricted in these paths, such as blocking edits while keeping reads:
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "permission": {
     "external_directory": {
       "~/projects/personal/**": "allow"
@@ -121,38 +121,39 @@ OpenCode 使用 `permission` 設定來決定某個操作是否應自動執行、
 }
 ```
 
-請將列表限定在受信任的路徑上，並根據需要為其他工具（例如 `bash`）疊加額外的允許或拒絕規則。
+Keep the list focused on trusted paths, and layer extra allow or deny rules as needed for other tools (for example `bash`).
 
 ---
 
-## 可用權限
+## Available Permissions
 
-OpenCode 的權限以工具名稱為鍵，外加幾個安全防護項：
+cyxcode permissions are keyed by tool name, plus a couple of safety guards:
 
-- `read` — 讀取檔案（比對檔案路徑）
-- `edit` — 所有檔案修改（涵蓋 `edit`、`write`、`patch`、`multiedit`）
-- `glob` — 檔案萬用字元比對（比對萬用字元模式）
-- `grep` — 內容搜尋（比對正規表示式模式）
-- `list` — 列出目錄中的檔案（比對目錄路徑）
-- `bash` — 執行 shell 指令（比對解析後的指令，如 `git status --porcelain`）
-- `task` — 啟動子代理（比對子代理類型）
-- `skill` — 載入技能（比對技能名稱）
-- `lsp` — 執行 LSP 查詢（目前不支援細粒度設定）
-- `todoread`、`todowrite` — 讀取/更新待辦事項清單
-- `webfetch` — 擷取 URL（比對 URL）
-- `websearch`、`codesearch` — 網頁/程式碼搜尋（比對查詢內容）
-- `external_directory` — 當工具存取專案工作目錄之外的路徑時觸發
-- `doom_loop` — 當同一工具呼叫以相同輸入重複 3 次時觸發
+- `read` — reading a file (matches the file path)
+- `edit` — all file modifications (covers `edit`, `write`, `patch`, `multiedit`)
+- `glob` — file globbing (matches the glob pattern)
+- `grep` — content search (matches the regex pattern)
+- `list` — listing files in a directory (matches the directory path)
+- `bash` — running shell commands (matches parsed commands like `git status --porcelain`)
+- `task` — launching subagents (matches the subagent type)
+- `skill` — loading a skill (matches the skill name)
+- `lsp` — running LSP queries (currently non-granular)
+- `todoread`, `todowrite` — reading/updating the todo list
+- `wikiread`, `wikiwrite` — reading/updating project wiki notes
+- `webfetch` — fetching a URL (matches the URL)
+- `websearch`, `codesearch` — web/code search (matches the query)
+- `external_directory` — triggered when a tool touches paths outside the project working directory
+- `doom_loop` — triggered when the same tool call repeats 3 times with identical input
 
 ---
 
-## 預設值
+## Defaults
 
-如果您未指定任何設定，OpenCode 將使用寬鬆的預設值：
+If you don’t specify anything, CyxCode starts from permissive defaults:
 
-- 大多數權限預設為 `"allow"`。
-- `doom_loop` 和 `external_directory` 預設為 `"ask"`。
-- `read` 為 `"allow"`，但 `.env` 檔案預設被拒絕：
+- Most permissions default to `"allow"`.
+- `doom_loop` and `external_directory` default to `"ask"`.
+- `read` is `"allow"`, but `.env` files are denied by default:
 
 ```json title="opencode.json"
 {
@@ -169,29 +170,29 @@ OpenCode 的權限以工具名稱為鍵，外加幾個安全防護項：
 
 ---
 
-## "Ask"的作用
+## What “Ask” Does
 
-當 OpenCode 提示審批時，介面提供三種選擇：
+When CyxCode prompts for approval, the UI offers three outcomes:
 
-- `once` — 僅批准本次請求
-- `always` — 批准與建議模式比對的後續請求（在當前 OpenCode 工作階段的剩餘時間內有效）
-- `reject` — 拒絕請求
+- `once` — approve just this request
+- `always` — approve future requests matching the suggested patterns (for the rest of the current CyxCode session)
+- `reject` — deny the request
 
-`always` 所批准的模式集合由工具提供（例如，bash 審批通常會將安全的指令前綴如 `git status*` 加入白名單）。
+The set of patterns that `always` would approve is provided by the tool (for example, bash approvals typically whitelist a safe command prefix like `git status*`).
 
 ---
 
-## 代理
+## Agents
 
-您可以為每個代理單獨覆寫權限。代理權限會與全域設定合併，且代理規則優先。[了解更多](/docs/agents#permissions)關於代理權限的內容。
+You can override permissions per agent. Agent permissions are merged with the global config, and agent rules take precedence. [Learn more](/docs/agents#permissions) about agent permissions.
 
 :::note
-有關更詳細的模式比對範例，請參閱上方的[細粒度規則（物件語法）](#細粒度規則物件語法)部分。
+Refer to the [Granular Rules (Object Syntax)](#granular-rules-object-syntax) section above for more detailed pattern matching examples.
 :::
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "permission": {
     "bash": {
       "*": "ask",
@@ -217,7 +218,7 @@ OpenCode 的權限以工具名稱為鍵，外加幾個安全防護項：
 }
 ```
 
-您還可以在 Markdown 中設定代理權限：
+You can also configure agent permissions in Markdown:
 
 ```markdown title="~/.config/opencode/agents/review.md"
 ---
@@ -233,5 +234,5 @@ Only analyze code and suggest changes.
 ```
 
 :::tip
-對帶參數的指令使用模式比對。`"grep *"` 允許執行 `grep pattern file.txt`，而單獨的 `"grep"` 則會阻止它。像 `git status` 這樣的指令適用於預設行為，但在傳遞參數時需要顯式權限（如 `"git status *"`）。
+Use pattern matching for commands with arguments. `"grep *"` allows `grep pattern file.txt`, while `"grep"` alone would block it. Commands like `git status` work for default behavior but require explicit permission (like `"git status *"`) when arguments are passed.
 :::

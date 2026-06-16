@@ -1,31 +1,31 @@
 ---
-title: 権限
-description: どのアクションの実行に承認が必要かを制御します。
+title: Permissions
+description: Control which actions require approval to run.
 ---
 
-OpenCode は `permission` 設定を使用して、特定のアクションを自動的に実行するか、プロンプトを表示するか、ブロックするかを決定します。
+CyxCode uses the `permission` config to decide whether a given action should run automatically, prompt you, or be blocked.
 
-`v1.1.1` 現在、従来の `tools` ブール値設定は非推奨となり、`permission` にマージされました。古い `tools` 設定は、下位互換性のために引き続きサポートされています。
-
----
-
-## アクション
-
-各権限ルールは次のいずれかに解決されます。
-
-- `"allow"` — 承認なしで実行します
-- `"ask"` — 承認を求めるプロンプト
-- `"deny"` — アクションをブロックする
+As of `v1.1.1`, the legacy `tools` boolean config is deprecated and has been merged into `permission`. The old `tools` config is still supported for backwards compatibility.
 
 ---
 
-## 設定
+## Actions
 
-権限をグローバルに (`*` を使用して) 設定し、特定のツールをオーバーライドできます。
+Each permission rule resolves to one of:
+
+- `"allow"` — run without approval
+- `"ask"` — prompt for approval
+- `"deny"` — block the action
+
+---
+
+## Configuration
+
+You can set permissions globally (with `*`), and override specific tools.
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "permission": {
     "*": "ask",
     "bash": "allow",
@@ -34,24 +34,24 @@ OpenCode は `permission` 設定を使用して、特定のアクションを自
 }
 ```
 
-すべての権限を一度に設定することもできます。
+You can also set all permissions at once:
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "permission": "allow"
 }
 ```
 
 ---
 
-## 詳細なルール (オブジェクト構文)
+## Granular Rules (Object Syntax)
 
-ほとんどの権限では、オブジェクトを使用して、ツール入力に基づいてさまざまなアクションを適用できます。
+For most permissions, you can use an object to apply different actions based on the tool input.
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "permission": {
     "bash": {
       "*": "ask",
@@ -68,35 +68,35 @@ OpenCode は `permission` 設定を使用して、特定のアクションを自
 }
 ```
 
-ルールはパターンマッチによって評価され、**最後に一致したルールが優先されます**。一般的なパターンは、キャッチオール `"*"` ルールを最初に置き、その後により具体的なルールを置くことです。
+Rules are evaluated by pattern match, with the **last matching rule winning**. A common pattern is to put the catch-all `"*"` rule first, and more specific rules after it.
 
-### ワイルドカード
+### Wildcards
 
-許可パターンでは、単純なワイルドカードマッチングを使用します。
+Permission patterns use simple wildcard matching:
 
-- `*` は 0 個以上の任意の文字と一致します
-- `?` は 1 つの文字に正確に一致します
-- 他のすべての文字は文字通り一致します
+- `*` matches zero or more of any character
+- `?` matches exactly one character
+- All other characters match literally
 
-### ホームディレクトリの展開
+### Home Directory Expansion
 
-パターンの先頭で `~` または `$HOME` を使用して、ホームディレクトリを参照できます。これは、[`external_directory`](#external-directories) ルールに特に役立ちます。
+You can use `~` or `$HOME` at the start of a pattern to reference your home directory. This is particularly useful for [`external_directory`](#external-directories) rules.
 
 - `~/projects/*` -> `/Users/username/projects/*`
 - `$HOME/projects/*` -> `/Users/username/projects/*`
 - `~` -> `/Users/username`
 
-### 外部ディレクトリ
+### External Directories
 
-`external_directory` を使用して、OpenCode が開始された作業ディレクトリの外部のパスに触れるツール呼び出しを許可します。これは、パスを入力として受け取るすべてのツール (`read`、`edit`、`list`、`glob`、`grep`、および多くの `bash` コマンドなど) に適用されます。
+Use `external_directory` to allow tool calls that touch paths outside the working directory where CyxCode was started. This applies to any tool that takes a path as input (for example `read`, `edit`, `list`, `glob`, `grep`, and many `bash` commands).
 
-ホーム展開 (`~/...` など) は、パターンの記述方法にのみ影響します。外部パスは現在のワークスペースの一部にはならないため、作業ディレクトリの外部のパスも `external_directory` 経由で許可する必要があります。
+Home expansion (like `~/...`) only affects how a pattern is written. It does not make an external path part of the current workspace, so paths outside the working directory must still be allowed via `external_directory`.
 
-たとえば、これにより、`~/projects/personal/` の下にあるすべてのものへのアクセスが許可されます。
+For example, this allows access to everything under `~/projects/personal/`:
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "permission": {
     "external_directory": {
       "~/projects/personal/**": "allow"
@@ -105,11 +105,11 @@ OpenCode は `permission` 設定を使用して、特定のアクションを自
 }
 ```
 
-ここで許可されるディレクトリはすべて、現在のワークスペースと同じデフォルトを継承します。 [`read` のデフォルトは `allow`](#defaults) であるため、オーバーライドされない限り、`external_directory` の下のエントリの読み取りも許可されます。読み取りを保持しながら編集をブロックするなど、ツールをこれらのパスで制限する必要がある場合は、明示的なルールを追加します。
+Any directory allowed here inherits the same defaults as the current workspace. Since [`read` defaults to `allow`](#defaults), reads are also allowed for entries under `external_directory` unless overridden. Add explicit rules when a tool should be restricted in these paths, such as blocking edits while keeping reads:
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "permission": {
     "external_directory": {
       "~/projects/personal/**": "allow"
@@ -121,38 +121,39 @@ OpenCode は `permission` 設定を使用して、特定のアクションを自
 }
 ```
 
-信頼できるパスに重点を置いたリストを維持し、他のツール (`bash` など) の必要に応じて追加の許可または拒否ルールを追加します。
+Keep the list focused on trusted paths, and layer extra allow or deny rules as needed for other tools (for example `bash`).
 
 ---
 
-## 利用可能な権限
+## Available Permissions
 
-OpenCode の権限は、ツール名に加えて、いくつかの安全対策によってキー化されます。
+cyxcode permissions are keyed by tool name, plus a couple of safety guards:
 
-- `read` — ファイルの読み取り (ファイルパスと一致)
-- `edit` — すべてのファイル変更 (`edit`、`write`、`patch`、`multiedit` をカバー)
-- `glob` — ファイルのグロビング (グロブパターンと一致)
-- `grep` — コンテンツ検索 (正規表現パターンと一致)
-- `list` — ディレクトリ内のファイルのリスト (ディレクトリパスと一致)
-- `bash` — シェルコマンドの実行 (`git status --porcelain` などの解析されたコマンドと一致します)
-- `task` — サブエージェントの起動 (サブエージェントのタイプと一致)
-- `skill` — スキルをロードしています（スキル名と一致します）
-- `lsp` — LSP クエリの実行 (現在は非細分性)
-- `todoread`、`todowrite` — ToDo リストの読み取り/更新
-- `webfetch` — URL を取得します (URL と一致します)
-- `websearch`、`codesearch` — Web/コード検索 (クエリと一致)
-- `external_directory` — ツールがプロジェクトの作業ディレクトリ外のパスにアクセスするとトリガーされます。
-- `doom_loop` — 同じ入力で同じツール呼び出しが 3 回繰り返されたときにトリガーされます。
+- `read` — reading a file (matches the file path)
+- `edit` — all file modifications (covers `edit`, `write`, `patch`, `multiedit`)
+- `glob` — file globbing (matches the glob pattern)
+- `grep` — content search (matches the regex pattern)
+- `list` — listing files in a directory (matches the directory path)
+- `bash` — running shell commands (matches parsed commands like `git status --porcelain`)
+- `task` — launching subagents (matches the subagent type)
+- `skill` — loading a skill (matches the skill name)
+- `lsp` — running LSP queries (currently non-granular)
+- `todoread`, `todowrite` — reading/updating the todo list
+- `wikiread`, `wikiwrite` — reading/updating project wiki notes
+- `webfetch` — fetching a URL (matches the URL)
+- `websearch`, `codesearch` — web/code search (matches the query)
+- `external_directory` — triggered when a tool touches paths outside the project working directory
+- `doom_loop` — triggered when the same tool call repeats 3 times with identical input
 
 ---
 
-## デフォルト
+## Defaults
 
-何も指定しない場合、OpenCode は許容的なデフォルトから開始します。
+If you don’t specify anything, CyxCode starts from permissive defaults:
 
-- ほとんどの権限はデフォルトで `"allow"` に設定されます。
-- `doom_loop` と `external_directory` のデフォルトは `"ask"` です。
-- `read` は `"allow"` ですが、`.env` ファイルはデフォルトで拒否されます。
+- Most permissions default to `"allow"`.
+- `doom_loop` and `external_directory` default to `"ask"`.
+- `read` is `"allow"`, but `.env` files are denied by default:
 
 ```json title="opencode.json"
 {
@@ -169,29 +170,29 @@ OpenCode の権限は、ツール名に加えて、いくつかの安全対策�
 
 ---
 
-## 承認の要求
+## What “Ask” Does
 
-OpenCode が承認を求めるプロンプトを表示すると、UI は 3 つの結果を提供します。
+When CyxCode prompts for approval, the UI offers three outcomes:
 
-- `once` — このリクエストのみを承認します
-- `always` — 提案されたパターンに一致する今後のリクエストを承認します（現在の OpenCode セッションの残りの部分）
-- `reject` — リクエストを拒否します
+- `once` — approve just this request
+- `always` — approve future requests matching the suggested patterns (for the rest of the current CyxCode session)
+- `reject` — deny the request
 
-`always` が承認するパターンのセットは、ツールによって提供されます (たとえば、bash の承認では通常、`git status*` のような安全なコマンドプレフィックスがホワイトリストに登録されます)。
+The set of patterns that `always` would approve is provided by the tool (for example, bash approvals typically whitelist a safe command prefix like `git status*`).
 
 ---
 
-## エージェント
+## Agents
 
-エージェントごとに権限をオーバーライドできます。エージェントの権限はグローバル設定とマージされ、エージェントルールが優先されます。 [エージェントの権限について詳しくは、](/docs/agents#permissions) をご覧ください。
+You can override permissions per agent. Agent permissions are merged with the global config, and agent rules take precedence. [Learn more](/docs/agents#permissions) about agent permissions.
 
 :::note
-パターンマッチングの詳細な例については、上記の[詳細なルール (オブジェクト構文)](#detailed-rules-object-syntax)セクションを参照してください。
+Refer to the [Granular Rules (Object Syntax)](#granular-rules-object-syntax) section above for more detailed pattern matching examples.
 :::
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "permission": {
     "bash": {
       "*": "ask",
@@ -217,7 +218,7 @@ OpenCode が承認を求めるプロンプトを表示すると、UI は 3 つ�
 }
 ```
 
-Markdown でエージェントの権限を構成することもできます。
+You can also configure agent permissions in Markdown:
 
 ```markdown title="~/.config/opencode/agents/review.md"
 ---
@@ -233,52 +234,5 @@ Only analyze code and suggest changes.
 ```
 
 :::tip
-引数のあるコマンドにはパターンマッチングを使用します。 `"grep *"` は `grep pattern file.txt` を許可しますが、`"grep"` だけではブロックされます。 `git status` のようなコマンドはデフォルトの動作で機能しますが、引数を渡すときに明示的な許可 (`"git status *"` など) が必要です。
-:::
-
-```json title="opencode.json"
-{
-  "$schema": "https://opencode.ai/config.json",
-  "permission": {
-    "bash": {
-      "*": "ask",
-      "git *": "allow",
-      "git commit *": "deny",
-      "git push *": "deny",
-      "grep *": "allow"
-    }
-  },
-  "agent": {
-    "build": {
-      "permission": {
-        "bash": {
-          "*": "ask",
-          "git *": "allow",
-          "git commit *": "ask",
-          "git push *": "deny",
-          "grep *": "allow"
-        }
-      }
-    }
-  }
-}
-```
-
-Markdownでエージェントの権限を構成することもできます。
-
-```markdown title="~/.config/opencode/agents/review.md"
----
-description: Code review without edits
-mode: subagent
-permission:
-  edit: deny
-  bash: ask
-  webfetch: deny
----
-
-Only analyze code and suggest changes.
-```
-
-:::tip
-引数のあるコマンドにはパターン マッチングを使用します。 `"grep *"` は `grep pattern file.txt` を許可しますが、`"grep"` だけではブロックされます。 `git status` のようなコマンドはデフォルトの動作で機能しますが、引数を渡すときに明示的な許可 (`"git status *"` など) が必要です。
+Use pattern matching for commands with arguments. `"grep *"` allows `grep pattern file.txt`, while `"grep"` alone would block it. Commands like `git status` work for default behavior but require explicit permission (like `"git status *"`) when arguments are passed.
 :::

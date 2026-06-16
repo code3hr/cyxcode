@@ -1,132 +1,132 @@
 ---
 title: Web
-description: Usando o opencode no seu navegador.
+description: Using CyxCode in your browser.
 ---
 
-O opencode pode ser executado como uma aplicação web no seu navegador, proporcionando a mesma poderosa experiência de codificação com IA sem precisar de um terminal.
+CyxCode can run as a web application in your browser, providing the same powerful AI coding experience without needing a terminal.
 
-![opencode Web - Nova Sessão](../../../assets/web/web-homepage-new-session.png)
+![CyxCode Web - New Session](../../../assets/web/web-homepage-new-session.png)
 
-## Primeiros passos
+## Getting Started
 
-Inicie a interface web executando:
+Start the web interface by running:
 
 ```bash
-opencode web
+cyxcode web
 ```
 
-Isso inicia um servidor local em `127.0.0.1` com uma porta aleatória disponível e abre automaticamente o opencode no seu navegador padrão.
+This starts a local server on `127.0.0.1` with a random available port and automatically opens CyxCode in your default browser.
 
 :::caution
-Se `OPENCODE_SERVER_PASSWORD` não estiver definido, o servidor ficará sem segurança. Isso é aceitável para uso local, mas deve ser configurado para acesso à rede.
+If `OPENCODE_SERVER_PASSWORD` is not set, the server will be unsecured. This is fine for local use but should be set for network access.
 :::
 
-:::tip[Usuários do Windows]
-Para a melhor experiência, execute `opencode web` a partir do [WSL](/docs/windows-wsl) em vez do PowerShell. Isso garante acesso adequado ao sistema de arquivos e integração com o terminal.
+:::tip[Windows Users]
+For the best experience, run `cyxcode web` from [WSL](/docs/windows-wsl) rather than PowerShell. This ensures proper file system access and terminal integration.
 :::
 
 ---
 
-## Configuração
+## Configuration
 
-Você pode configurar o servidor web usando flags de linha de comando ou no seu [arquivo de configuração](/docs/config).
+You can configure the web server using command line flags or in your [config file](/docs/config).
 
-### Porta
+### Port
 
-Por padrão, o opencode escolhe uma porta disponível. Você pode especificar uma porta:
-
-```bash
-opencode web --port 4096
-```
-
-### Nome do Host
-
-Por padrão, o servidor se vincula a `127.0.0.1` (apenas localhost). Para tornar o opencode acessível na sua rede:
+By default, CyxCode picks an available port. You can specify a port:
 
 ```bash
-opencode web --hostname 0.0.0.0
+cyxcode web --port 4096
 ```
 
-Ao usar `0.0.0.0`, o opencode exibirá endereços locais e de rede:
+### Hostname
+
+By default, the server binds to `127.0.0.1` (localhost only). To make CyxCode accessible on your network:
+
+```bash
+cyxcode web --hostname 0.0.0.0
+```
+
+When using `0.0.0.0`, CyxCode will display both local and network addresses:
 
 ```
   Local access:       http://localhost:4096
   Network access:     http://192.168.1.100:4096
 ```
 
-### Descoberta mDNS
+### mDNS Discovery
 
-Ative o mDNS para tornar seu servidor descobrível na rede local:
+Enable mDNS to make your server discoverable on the local network:
 
 ```bash
-opencode web --mdns
+cyxcode web --mdns
 ```
 
-Isso define automaticamente o nome do host como `0.0.0.0` e anuncia o servidor como `opencode.local`.
+This automatically sets the hostname to `0.0.0.0` and advertises the server as `opencode.local`.
 
-Você pode personalizar o nome de domínio mDNS para executar várias instâncias na mesma rede:
+You can customize the mDNS domain name to run multiple instances on the same network:
 
 ```bash
-opencode web --mdns --mdns-domain myproject.local
+cyxcode web --mdns --mdns-domain myproject.local
 ```
 
 ### CORS
 
-Para permitir domínios adicionais para CORS (útil para frontends personalizados):
+To allow additional domains for CORS (useful for custom frontends):
 
 ```bash
-opencode web --cors https://example.com
+cyxcode web --cors https://example.com
 ```
 
-### Autenticação
+### Authentication
 
-Para proteger o acesso, defina uma senha usando a variável de ambiente `OPENCODE_SERVER_PASSWORD`:
+To protect access, set a password using the `OPENCODE_SERVER_PASSWORD` environment variable:
 
 ```bash
-OPENCODE_SERVER_PASSWORD=secret opencode web
+OPENCODE_SERVER_PASSWORD=secret cyxcode web
 ```
 
-O nome de usuário padrão é `opencode`, mas pode ser alterado com `OPENCODE_SERVER_USERNAME`.
+The username defaults to `opencode` but can be changed with `OPENCODE_SERVER_USERNAME`.
 
 ---
 
-## Usando a Interface Web
+## Using the Web Interface
 
-Uma vez iniciada, a interface web fornece acesso às suas sessões do opencode.
+Once started, the web interface provides access to your CyxCode sessions.
 
-### Sessões
+### Sessions
 
-Visualize e gerencie suas sessões a partir da página inicial. Você pode ver sessões ativas e iniciar novas.
+View and manage your sessions from the homepage. You can see active sessions and start new ones.
 
-![opencode Web - Sessão Ativa](../../../assets/web/web-homepage-active-session.png)
+![CyxCode Web - Active Session](../../../assets/web/web-homepage-active-session.png)
 
-### Status do Servidor
+### Server Status
 
-Clique em "Ver Servidores" para visualizar os servidores conectados e seu status.
+Click "See Servers" to view connected servers and their status.
 
-![opencode Web - Ver Servidores](../../../assets/web/web-homepage-see-servers.png)
+![CyxCode Web - See Servers](../../../assets/web/web-homepage-see-servers.png)
 
 ---
 
-## Anexando um Terminal
+## Attaching a Terminal
 
-Você pode anexar um terminal TUI a um servidor web em execução:
+You can attach a terminal TUI to a running web server:
 
 ```bash
 # Start the web server
-opencode web --port 4096
+cyxcode web --port 4096
 
 # In another terminal, attach the TUI
-opencode attach http://localhost:4096
+cyxcode attach http://localhost:4096
 ```
 
-Isso permite que você use tanto a interface web quanto o terminal simultaneamente, compartilhando as mesmas sessões e estado.
+This allows you to use both the web interface and terminal simultaneously, sharing the same sessions and state.
 
 ---
 
-## Arquivo de Configuração
+## Config File
 
-Você também pode configurar as configurações do servidor no seu arquivo de configuração `opencode.json`:
+You can also configure server settings in your `opencode.json` config file:
 
 ```json
 {
@@ -139,4 +139,4 @@ Você também pode configurar as configurações do servidor no seu arquivo de c
 }
 ```
 
-As flags de linha de comando têm precedência sobre as configurações do arquivo de configuração.
+Command line flags take precedence over config file settings.

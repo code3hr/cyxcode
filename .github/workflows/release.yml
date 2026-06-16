@@ -13,7 +13,33 @@ permissions:
   packages: write
 
 jobs:
+  vulnscan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.3.11
+
+      - name: Install dependencies
+        run: bun install
+
+      - name: Run release vulnerability gate
+        working-directory: packages/opencode
+        run: bun run script/vulnscan-gate.ts --root "$GITHUB_WORKSPACE" --code-only --fail-on high --artifact-dir "$GITHUB_WORKSPACE/vulnscan-artifacts"
+
+      - name: Upload vulnerability gate artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-vulnscan
+          path: vulnscan-artifacts
+          if-no-files-found: ignore
+          retention-days: 30
+
   build:
+    needs: vulnscan
     strategy:
       fail-fast: false
       matrix:

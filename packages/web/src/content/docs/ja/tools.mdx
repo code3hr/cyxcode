@@ -1,21 +1,21 @@
 ---
-title: ツール
-description: LLM が使用できるツールを管理します。
+title: Tools
+description: Manage the tools an LLM can use.
 ---
 
-ツールを使用すると、LLM がコードベースでアクションを実行できるようになります。 OpenCode には一連の組み込みツールが付属していますが、[カスタムツール](/docs/custom-tools) または [MCP サーバー](/docs/mcp-servers) を使用して拡張できます。
+Tools allow the LLM to perform actions in your codebase. CyxCode comes with a set of built-in tools, but you can extend it with [custom tools](/docs/custom-tools) or [MCP servers](/docs/mcp-servers).
 
-デフォルトでは、すべてのツールは**有効**になっており、実行するための権限は必要ありません。 [権限](/docs/permissions).
+By default, all tools are **enabled** and don't need permission to run. You can control tool behavior through [permissions](/docs/permissions).
 
 ---
 
-## 設定
+## Configure
 
-`permission` フィールドを使用してツールの動作を制御します。各ツールを許可、拒否、または承認を要求することができます。
+Use the `permission` field to control tool behavior. You can allow, deny, or require approval for each tool.
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "permission": {
     "edit": "deny",
     "bash": "ask",
@@ -24,201 +24,201 @@ description: LLM が使用できるツールを管理します。
 }
 ```
 
-ワイルドカードを使用して複数のツールを一度に制御することもできます。たとえば、MCP サーバーからのすべてのツールの承認を要求するには、次のようにします。
+You can also use wildcards to control multiple tools at once. For example, to require approval for all tools from an MCP server:
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "permission": {
     "mymcp_*": "ask"
   }
 }
 ```
 
-[アクセス許可の構成について詳しくは、](/docs/permissions) をご覧ください。
+[Learn more](/docs/permissions) about configuring permissions.
 
 ---
 
-## 組み込み
+## Built-in
 
-OpenCode で利用可能なすべての組み込みツールを次に示します。
+Here are all the built-in tools available in CyxCode.
 
 ---
 
 ### bash
 
-プロジェクト環境でシェルコマンドを実行します。
+Execute shell commands in your project environment.
 
 ```json title="opencode.json" {4}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "permission": {
     "bash": "allow"
   }
 }
 ```
 
-このツールを使用すると、LLM は `npm install`、`git status`、またはその他のシェルコマンドなどのターミナルコマンドを実行できます。
+This tool allows the LLM to run terminal commands like `npm install`, `git status`, or any other shell command.
 
 ---
 
 ### edit
 
-正確な文字列置換を使用して既存のファイルを変更します。
+Modify existing files using exact string replacements.
 
 ```json title="opencode.json" {4}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "permission": {
     "edit": "allow"
   }
 }
 ```
 
-このツールは、完全に一致するテキストを置き換えることにより、ファイルを正確に編集します。これは、LLM がコードを変更する主な方法です。
+This tool performs precise edits to files by replacing exact text matches. It's the primary way the LLM modifies code.
 
 ---
 
 ### write
 
-新しいファイルを作成するか、既存のファイルを上書きします。
+Create new files or overwrite existing ones.
 
 ```json title="opencode.json" {4}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "permission": {
     "edit": "allow"
   }
 }
 ```
 
-これを使用して、LLM が新しいファイルを作成できるようにします。既存のファイルがすでに存在する場合は上書きされます。
+Use this to allow the LLM to create new files. It will overwrite existing files if they already exist.
 
 :::note
-`write` ツールは、すべてのファイル変更 (`edit`、`edit`、`write`、`patch`) をカバーする `multiedit` 権限によって制御されます。
+The `write` tool is controlled by the `edit` permission, which covers all file modifications (`edit`, `write`, `patch`, `multiedit`).
 :::
 
 ---
 
 ### read
 
-コードベースからファイルの内容を読み取ります。
+Read file contents from your codebase.
 
 ```json title="opencode.json" {4}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "permission": {
     "read": "allow"
   }
 }
 ```
 
-このツールはファイルを読み取り、その内容を返します。大きなファイルの特定の行範囲の読み取りをサポートします。
+This tool reads files and returns their contents. It supports reading specific line ranges for large files.
 
 ---
 
 ### grep
 
-正規表現を使用してファイルの内容を検索します。
+Search file contents using regular expressions.
 
 ```json title="opencode.json" {4}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "permission": {
     "grep": "allow"
   }
 }
 ```
 
-コードベース全体での高速コンテンツ検索。完全な正規表現構文とファイルパターンフィルタリングをサポートします。
+Fast content search across your codebase. Supports full regex syntax and file pattern filtering.
 
 ---
 
 ### glob
 
-パターンマッチングによりファイルを検索します。
+Find files by pattern matching.
 
 ```json title="opencode.json" {4}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "permission": {
     "glob": "allow"
   }
 }
 ```
 
-`**/*.js` や `src/**/*.ts` などの glob パターンを使用してファイルを検索します。一致するファイルパスを変更時間順に並べて返します。
+Search for files using glob patterns like `**/*.js` or `src/**/*.ts`. Returns matching file paths sorted by modification time.
 
 ---
 
 ### list
 
-指定されたパス内のファイルとディレクトリを一覧表示します。
+List files and directories in a given path.
 
 ```json title="opencode.json" {4}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "permission": {
     "list": "allow"
   }
 }
 ```
 
-このツールはディレクトリの内容を一覧表示します。結果をフィルタリングするための glob パターンを受け入れます。
+This tool lists directory contents. It accepts glob patterns to filter results.
 
 ---
 
-### lsp (実験的)
+### lsp (experimental)
 
-構成された LSP サーバーと対話して、定義、参照、ホバー情報、呼び出し階層などのコードインテリジェンス機能を取得します。
+Interact with your configured LSP servers to get code intelligence features like definitions, references, hover info, and call hierarchy.
 
 :::note
-このツールは、`OPENCODE_EXPERIMENTAL_LSP_TOOL=true` (または `OPENCODE_EXPERIMENTAL=true`) の場合にのみ使用できます。
+This tool is only available when `OPENCODE_EXPERIMENTAL_LSP_TOOL=true` (or `OPENCODE_EXPERIMENTAL=true`).
 :::
 
 ```json title="opencode.json" {4}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "permission": {
     "lsp": "allow"
   }
 }
 ```
 
-サポートされている操作には、`goToDefinition`、`findReferences`、`hover`、`documentSymbol`、`workspaceSymbol`、`goToImplementation`、`prepareCallHierarchy`、`incomingCalls`、および `outgoingCalls` が含まれます。
+Supported operations include `goToDefinition`, `findReferences`, `hover`, `documentSymbol`, `workspaceSymbol`, `goToImplementation`, `prepareCallHierarchy`, `incomingCalls`, and `outgoingCalls`.
 
-プロジェクトで使用できる LSP サーバーを構成するには、「LSP Servers](/docs/lsp).
+To configure which LSP servers are available for your project, see [LSP Servers](/docs/lsp).
 
 ---
 
 ### patch
 
-ファイルにパッチを適用します。
+Apply patches to files.
 
 ```json title="opencode.json" {4}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "permission": {
     "edit": "allow"
   }
 }
 ```
 
-このツールは、コードベースにパッチファイルを適用します。さまざまなソースからの差分やパッチを適用するのに役立ちます。
+This tool applies patch files to your codebase. Useful for applying diffs and patches from various sources.
 
 :::note
-`patch` ツールは、すべてのファイル変更 (`edit`、`edit`、`write`、`patch`) をカバーする `multiedit` 権限によって制御されます。
+The `patch` tool is controlled by the `edit` permission, which covers all file modifications (`edit`, `write`, `patch`, `multiedit`).
 :::
 
 ---
 
 ### skill
 
-[skill](/docs/skills) (`SKILL.md` ファイル) をロードし、会話でその内容を返します。
+Load a [skill](/docs/skills) (a `SKILL.md` file) and return its content in the conversation.
 
 ```json title="opencode.json" {4}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "permission": {
     "skill": "allow"
   }
@@ -229,146 +229,188 @@ OpenCode で利用可能なすべての組み込みツールを次に示しま�
 
 ### todowrite
 
-コーディングセッション中に ToDo リストを管理します。
+Manage todo lists during coding sessions.
 
 ```json title="opencode.json" {4}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "permission": {
     "todowrite": "allow"
   }
 }
 ```
 
-タスクリストを作成および更新して、複雑な操作中の進行状況を追跡します。 LLM はこれを使用して、複数ステップのタスクを整理します。
+Creates and updates task lists to track progress during complex operations. The LLM uses this to organize multi-step tasks.
 
 :::note
-このツールはデフォルトではサブエージェントに対して無効になっていますが、手動で有効にすることができます。 [詳細はこちら](/docs/agents/#permissions)
+This tool is disabled for subagents by default, but you can enable it manually. [Learn more](/docs/agents/#permissions)
 :::
 
 ---
 
 ### todoread
 
-既存の ToDo リストを読み取ります。
+Read existing todo lists.
 
 ```json title="opencode.json" {4}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "permission": {
     "todoread": "allow"
   }
 }
 ```
 
-現在の Todo リストの状態を読み取ります。どのタスクが保留中または完了しているかを追跡するために LLM によって使用されます。
+Reads the current todo list state. Used by the LLM to track what tasks are pending or completed.
 
 :::note
-このツールはデフォルトではサブエージェントに対して無効になっていますが、手動で有効にすることができます。 [詳細はこちら](/docs/agents/#permissions)
+This tool is disabled for subagents by default, but you can enable it manually. [Learn more](/docs/agents/#permissions)
+:::
+
+---
+
+### wikiwrite
+
+Create or update project wiki notes.
+
+```json title="opencode.json" {4}
+{
+  "$schema": "https://cyxcode.ai/config.json",
+  "permission": {
+    "wikiwrite": "allow"
+  }
+}
+```
+
+Writes durable project knowledge into the local wiki. Notes can include `[[wikilinks]]` so later sessions can reuse discovered architecture, decisions, and code relationships.
+
+:::note
+This tool is disabled for subagents by default, but you can enable it manually. [Learn more](/docs/agents/#permissions)
+:::
+
+---
+
+### wikiread
+
+Read project wiki notes.
+
+```json title="opencode.json" {4}
+{
+  "$schema": "https://cyxcode.ai/config.json",
+  "permission": {
+    "wikiread": "allow"
+  }
+}
+```
+
+Searches the project wiki and reads matching note summaries, links, and backlinks. Pass a page id to read note content.
+
+:::note
+This tool is disabled for subagents by default, but you can enable it manually. [Learn more](/docs/agents/#permissions)
 :::
 
 ---
 
 ### webfetch
 
-Web コンテンツを取得します。
+Fetch web content.
 
 ```json title="opencode.json" {4}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "permission": {
     "webfetch": "allow"
   }
 }
 ```
 
-LLM が Web ページをフェッチして読み取ることを許可します。ドキュメントの検索やオンラインリソースの調査に役立ちます。
+Allows the LLM to fetch and read web pages. Useful for looking up documentation or researching online resources.
 
 ---
 
 ### websearch
 
-ウェブで情報を検索してください。
+Search the web for information.
 
 :::note
-このツールは、OpenCode プロバイダーを使用している場合、または `OPENCODE_ENABLE_EXA` 環境変数が真実の値 (`true` または `1` など) に設定されている場合にのみ使用できます。
+This tool is only available when using the CyxCode provider or when the `OPENCODE_ENABLE_EXA` environment variable is set to any truthy value (e.g., `true` or `1`).
 
-OpenCode の起動時に有効にするには:
+To enable when launching CyxCode:
 
 ```bash
-OPENCODE_ENABLE_EXA=1 opencode
+OPENCODE_ENABLE_EXA=1 cyxcode
 ```
 
 :::
 
 ```json title="opencode.json" {4}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "permission": {
     "websearch": "allow"
   }
 }
 ```
 
-Exa AI を使用して Web 検索を実行し、オンラインで関連情報を見つけます。トピックの調査、最新のイベントの検索、またはトレーニングデータのカットオフを超えた情報の収集に役立ちます。
+Performs web searches using Exa AI to find relevant information online. Useful for researching topics, finding current events, or gathering information beyond the training data cutoff.
 
-API キーは必要ありません。ツールは認証なしで Exa AI のホストされた MCP サービスに直接接続します。
+No API key is required — the tool connects directly to Exa AI's hosted MCP service without authentication.
 
 :::tip
-情報を見つける必要がある場合 (検出)、`websearch` を使用し、特定の URL からコンテンツを取得する必要がある場合 (取得) は `webfetch` を使用します。
+Use `websearch` when you need to find information (discovery), and `webfetch` when you need to retrieve content from a specific URL (retrieval).
 :::
 
 ---
 
 ### question
 
-実行中にユーザーに質問します。
+Ask the user questions during execution.
 
 ```json title="opencode.json" {4}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "permission": {
     "question": "allow"
   }
 }
 ```
 
-このツールを使用すると、LLM はタスク中にユーザーに質問できるようになります。これは次の場合に役立ちます。
+This tool allows the LLM to ask the user questions during a task. It's useful for:
 
-- ユーザーの好みや要件を収集する
-- 曖昧な指示を明確にする
-- 実装の選択肢について決定を下す
-- どの方向に進むべきかについての選択肢を提供する
+- Gathering user preferences or requirements
+- Clarifying ambiguous instructions
+- Getting decisions on implementation choices
+- Offering choices about what direction to take
 
-各質問には、ヘッダー、質問テキスト、およびオプションのリストが含まれます。ユーザーは、提供されたオプションから選択するか、カスタムの回答を入力できます。複数の質問がある場合、ユーザーはすべての回答を送信する前に質問間を移動できます。
-
----
-
-## カスタムツール
-
-カスタムツールを使用すると、LLM が呼び出すことができる独自の関数を定義できます。これらは設定ファイルで定義されており、任意のコードを実行できます。
-
-[カスタムツールの作成について詳しくは、](/docs/custom-tools) をご覧ください。
+Each question includes a header, the question text, and a list of options. Users can select from the provided options or type a custom answer. When there are multiple questions, users can navigate between them before submitting all answers.
 
 ---
 
-## MCPサーバー
+## Custom tools
 
-MCP (Model Context Protocol) サーバーを使用すると、外部ツールとサービスを統合できます。これには、データベースアクセス、API 統合、サードパーティサービスが含まれます。
+Custom tools let you define your own functions that the LLM can call. These are defined in your config file and can execute arbitrary code.
 
-[MCP サーバーの設定について詳しくは、](/docs/mcp-servers) をご覧ください。
-
----
-
-## 内部動作
-
-内部的には、`grep`、`glob`、`list` などのツールは内部で [ripgrep](https://github.com/BurntSushi/ripgrep) を使用します。デフォルトでは、ripgrep は `.gitignore` パターンを尊重します。つまり、`.gitignore` にリストされているファイルとディレクトリは検索とリストから除外されます。
+[Learn more](/docs/custom-tools) about creating custom tools.
 
 ---
 
-### パターンを無視する
+## MCP servers
 
-通常は無視されるファイルを含めるには、プロジェクトのルートに `.ignore` ファイルを作成します。このファイルでは、特定のパスを明示的に許可できます。
+MCP (Model Context Protocol) servers allow you to integrate external tools and services. This includes database access, API integrations, and third-party services.
+
+[Learn more](/docs/mcp-servers) about configuring MCP servers.
+
+---
+
+## Internals
+
+Internally, tools like `grep`, `glob`, and `list` use [ripgrep](https://github.com/BurntSushi/ripgrep) under the hood. By default, ripgrep respects `.gitignore` patterns, which means files and directories listed in your `.gitignore` will be excluded from searches and listings.
+
+---
+
+### Ignore patterns
+
+To include files that would normally be ignored, create a `.ignore` file in your project root. This file can explicitly allow certain paths.
 
 ```text title=".ignore"
 !node_modules/
@@ -376,4 +418,4 @@ MCP (Model Context Protocol) サーバーを使用すると、外部ツールと
 !build/
 ```
 
-たとえば、この `.ignore` ファイルを使用すると、ripgrep は、`node_modules/` にリストされている場合でも、`dist/`、`build/`、および `.gitignore` ディレクトリ内を検索できます。
+For example, this `.ignore` file allows ripgrep to search within `node_modules/`, `dist/`, and `build/` directories even if they're listed in `.gitignore`.

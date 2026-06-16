@@ -1,12 +1,13 @@
 import { Link } from "@solidjs/meta"
 import { For } from "solid-js"
 import { getRequestEvent } from "solid-js/web"
+import type { FetchEvent } from "@solidjs/start/server"
 import { config } from "~/config"
 import { useLanguage } from "~/context/language"
 import { LOCALES, route, tag } from "~/lib/language"
 
 function skip(path: string) {
-  const evt = getRequestEvent()
+  const evt = getRequestEvent() as FetchEvent | undefined
   if (!evt) return false
 
   const key = "__locale_links_seen"

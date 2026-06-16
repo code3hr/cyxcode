@@ -1,132 +1,132 @@
 ---
 title: Web
-description: 在瀏覽器中使用 OpenCode。
+description: Using CyxCode in your browser.
 ---
 
-OpenCode 可以作為 Web 應用程式在瀏覽器中執行，無需終端機即可獲得同樣強大的 AI 編碼體驗。
+CyxCode can run as a web application in your browser, providing the same powerful AI coding experience without needing a terminal.
 
-![OpenCode Web - New Session](../../../assets/web/web-homepage-new-session.png)
+![CyxCode Web - New Session](../../../assets/web/web-homepage-new-session.png)
 
-## 快速開始
+## Getting Started
 
-執行以下指令啟動 Web 介面：
+Start the web interface by running:
 
 ```bash
-opencode web
+cyxcode web
 ```
 
-這會在 `127.0.0.1` 上啟動一個本地伺服器，使用隨機可用連接埠，並自動在預設瀏覽器中開啟 OpenCode。
+This starts a local server on `127.0.0.1` with a random available port and automatically opens CyxCode in your default browser.
 
 :::caution
-如果未設定 `OPENCODE_SERVER_PASSWORD`，伺服器將沒有安全保護。本地使用沒有問題，但在網路存取時應當設定密碼。
+If `OPENCODE_SERVER_PASSWORD` is not set, the server will be unsecured. This is fine for local use but should be set for network access.
 :::
 
-:::tip[Windows 使用者]
-為獲得最佳體驗，建議從 [WSL](/docs/windows-wsl) 而非 PowerShell 執行 `opencode web`。這可以確保正確的檔案系統存取和終端機整合。
+:::tip[Windows Users]
+For the best experience, run `cyxcode web` from [WSL](/docs/windows-wsl) rather than PowerShell. This ensures proper file system access and terminal integration.
 :::
 
 ---
 
-## 設定
+## Configuration
 
-你可以透過命令列旗標或[設定檔](/docs/config)來設定 Web 伺服器。
+You can configure the web server using command line flags or in your [config file](/docs/config).
 
-### 連接埠
+### Port
 
-預設情況下，OpenCode 會選擇一個可用連接埠。你也可以指定連接埠：
-
-```bash
-opencode web --port 4096
-```
-
-### 主機名稱
-
-預設情況下，伺服器繫結到 `127.0.0.1`（僅限本地存取）。要使 OpenCode 在網路中可存取：
+By default, CyxCode picks an available port. You can specify a port:
 
 ```bash
-opencode web --hostname 0.0.0.0
+cyxcode web --port 4096
 ```
 
-使用 `0.0.0.0` 時，OpenCode 會同時顯示本地位址和網路位址：
+### Hostname
+
+By default, the server binds to `127.0.0.1` (localhost only). To make CyxCode accessible on your network:
+
+```bash
+cyxcode web --hostname 0.0.0.0
+```
+
+When using `0.0.0.0`, CyxCode will display both local and network addresses:
 
 ```
   Local access:       http://localhost:4096
   Network access:     http://192.168.1.100:4096
 ```
 
-### mDNS 探索
+### mDNS Discovery
 
-啟用 mDNS 可以讓你的伺服器在本地網路中被自動探索：
+Enable mDNS to make your server discoverable on the local network:
 
 ```bash
-opencode web --mdns
+cyxcode web --mdns
 ```
 
-這會自動將主機名稱設定為 `0.0.0.0`，並將伺服器廣播為 `opencode.local`。
+This automatically sets the hostname to `0.0.0.0` and advertises the server as `opencode.local`.
 
-你可以自訂 mDNS 網域名稱，以便在同一網路中執行多個實例：
+You can customize the mDNS domain name to run multiple instances on the same network:
 
 ```bash
-opencode web --mdns --mdns-domain myproject.local
+cyxcode web --mdns --mdns-domain myproject.local
 ```
 
 ### CORS
 
-要為 CORS 新增額外的允許網域（適用於自訂前端）：
+To allow additional domains for CORS (useful for custom frontends):
 
 ```bash
-opencode web --cors https://example.com
+cyxcode web --cors https://example.com
 ```
 
-### 身分驗證
+### Authentication
 
-要保護伺服器存取，可以透過 `OPENCODE_SERVER_PASSWORD` 環境變數設定密碼：
+To protect access, set a password using the `OPENCODE_SERVER_PASSWORD` environment variable:
 
 ```bash
-OPENCODE_SERVER_PASSWORD=secret opencode web
+OPENCODE_SERVER_PASSWORD=secret cyxcode web
 ```
 
-使用者名稱預設為 `opencode`，可以透過 `OPENCODE_SERVER_USERNAME` 進行更改。
+The username defaults to `opencode` but can be changed with `OPENCODE_SERVER_USERNAME`.
 
 ---
 
-## 使用 Web 介面
+## Using the Web Interface
 
-啟動後，Web 介面提供對 OpenCode 工作階段的存取。
+Once started, the web interface provides access to your CyxCode sessions.
 
-### 工作階段
+### Sessions
 
-在主頁上查看和管理你的工作階段。你可以查看進行中的工作階段，也可以建立新的工作階段。
+View and manage your sessions from the homepage. You can see active sessions and start new ones.
 
-![OpenCode Web - Active Session](../../../assets/web/web-homepage-active-session.png)
+![CyxCode Web - Active Session](../../../assets/web/web-homepage-active-session.png)
 
-### 伺服器狀態
+### Server Status
 
-點擊「See Servers」可以查看已連線的伺服器及其狀態。
+Click "See Servers" to view connected servers and their status.
 
-![OpenCode Web - See Servers](../../../assets/web/web-homepage-see-servers.png)
+![CyxCode Web - See Servers](../../../assets/web/web-homepage-see-servers.png)
 
 ---
 
-## 連接終端機
+## Attaching a Terminal
 
-你可以將終端機 TUI 連接到正在執行的 Web 伺服器：
+You can attach a terminal TUI to a running web server:
 
 ```bash
-# 啟動 Web 伺服器
-opencode web --port 4096
+# Start the web server
+cyxcode web --port 4096
 
-# 在另一個終端機中連接 TUI
-opencode attach http://localhost:4096
+# In another terminal, attach the TUI
+cyxcode attach http://localhost:4096
 ```
 
-這樣你就可以同時使用 Web 介面和終端機，共享相同的工作階段和狀態。
+This allows you to use both the web interface and terminal simultaneously, sharing the same sessions and state.
 
 ---
 
-## 設定檔
+## Config File
 
-你也可以在 `opencode.json` 設定檔中設定伺服器選項：
+You can also configure server settings in your `opencode.json` config file:
 
 ```json
 {
@@ -139,4 +139,4 @@ opencode attach http://localhost:4096
 }
 ```
 
-命令列旗標的優先順序高於設定檔中的設定。
+Command line flags take precedence over config file settings.

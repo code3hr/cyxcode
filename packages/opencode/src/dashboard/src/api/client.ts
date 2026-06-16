@@ -69,6 +69,7 @@ export interface FindingFilters {
   severity?: string
   status?: string
   target?: string
+  service?: string
   limit?: number
 }
 
@@ -125,11 +126,29 @@ export interface ScanResult {
     }>
   }>
   summary?: string
+  rawOutput?: string
 }
 
 export interface ScansResponse {
   scans: ScanResult[]
   total: number
+}
+
+export interface VulnArtifactSummary {
+  id: string
+  scanID: string
+  kind: "cve-lite-json" | "cve-lite-html" | "cve-lite-sarif" | "cve-lite-cyclonedx"
+  format: "json" | "html" | "sarif" | "cyclonedx"
+  name: string
+  createdAt: number
+  sourcePath?: string
+}
+
+export interface VulnArtifact extends VulnArtifactSummary {
+  report?: unknown
+  content?: string
+  sarif?: unknown
+  document?: unknown
 }
 
 export const scansApi = {
@@ -145,6 +164,55 @@ export const scansApi = {
   },
 
   get: (id: string) => request<{ scan: ScanResult }>(`/pentest/scans/${id}`),
+
+  artifacts: (id: string) => request<{ artifacts: VulnArtifactSummary[] }>(`/pentest/scans/${id}/artifacts`),
+}
+
+// ============================================================================
+// Vulnerability Scan API
+// ============================================================================
+
+export interface VulnScanResponse {
+  scan: ScanResult
+  discovery: {
+    root: string
+    javascript: string[]
+    python: string[]
+    go: string[]
+    rust: string[]
+    containers: string[]
+    supported: string[]
+    planned: string[]
+  }
+  artifact?: VulnArtifactSummary
+  artifacts?: VulnArtifactSummary[]
+  findings: {
+    total: number
+    dependency: number
+    code: number
+    created: number
+  }
+  severity: {
+    critical: number
+    high: number
+    medium: number
+    low: number
+  }
+  gate?: {
+    failOn: "critical" | "high" | "medium" | "low"
+    passed: boolean
+    blocked: number
+  }
+}
+
+export const vulnApi = {
+  scan: (opts?: { target?: string; minSeverity?: "critical" | "high" | "medium" | "low"; failOnSeverity?: "critical" | "high" | "medium" | "low"; createFindings?: boolean }) =>
+    request<VulnScanResponse>("/pentest/vulnscan", {
+      method: "POST",
+      body: JSON.stringify(opts ?? {}),
+    }),
+
+  artifact: (id: string) => request<{ artifact: VulnArtifact }>(`/pentest/vulnscan/artifacts/${id}`),
 }
 
 // ============================================================================

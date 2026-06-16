@@ -1,145 +1,149 @@
 ---
-title: Агенты
-description: Настройте и используйте специализированные агенты.
+title: Agents
+description: Configure and use specialized agents.
 ---
 
-Агенты — это специализированные ИИ-помощники, которых можно настроить для конкретных задач и рабочих процессов. Они позволяют создавать специализированные инструменты с настраиваемыми подсказками, моделями и доступом к инструментам.
+Agents are specialized AI assistants that can be configured for specific tasks and workflows. They allow you to create focused tools with custom prompts, models, and tool access.
 
 :::tip
-Используйте агент плана для анализа кода и просмотра предложений без внесения каких-либо изменений в код.
+Use the plan agent to analyze code and review suggestions without making any code changes.
 :::
 
-Вы можете переключаться между агентами во время сеанса или вызывать их с помощью упоминания `@`.
+You can switch between agents during a session or invoke them with the `@` mention.
 
 ---
 
-## Типы
+## Types
 
-В opencode есть два типа агентов; Первичные агенты и субагенты.
+There are two types of agents in CyxCode; primary agents and subagents.
 
 ---
 
-### Первичные агенты
+### Primary agents
 
-Первичные агенты — это основные помощники, с которыми вы взаимодействуете напрямую. Вы можете переключаться между ними, используя клавишу **Tab** или настроенную привязку клавиш `switch_agent`. Эти агенты ведут ваш основной разговор. Доступ к инструментам настраивается с помощью разрешений — например, при сборке все инструменты включены, а при планировании — ограничены.
+Primary agents are the main assistants you interact with directly. You can cycle through them using the **Tab** key, or your configured `switch_agent` keybind. These agents handle your main conversation. Tool access is configured via permissions — for example, Build has all tools enabled while Plan is restricted.
 
 :::tip
-Вы можете использовать клавишу **Tab** для переключения между основными агентами во время сеанса.
+You can use the **Tab** key to switch between primary agents during a session.
 :::
 
-opencode поставляется с двумя встроенными основными агентами: **Build** и **Plan**. Мы рассмотрим их ниже.
+CyxCode comes with two built-in primary agents, **Build** and **Plan**. We'll
+look at these below.
 
 ---
 
-### Субагенты
+### Subagents
 
-Субагенты — это специализированные помощники, которых основные агенты могут вызывать для выполнения определенных задач. Вы также можете вызвать их вручную, **@ упомянув** их в своих сообщениях.
+Subagents are specialized assistants that primary agents can invoke for specific tasks. You can also manually invoke them by **@ mentioning** them in your messages.
 
-opencode поставляется с двумя встроенными субагентами: **General** и **Explore**. Мы рассмотрим это ниже.
-
----
-
-## Встроенные агенты
-
-opencode поставляется с двумя встроенными основными агентами и двумя встроенными субагентами.
+CyxCode comes with two built-in subagents, **General** and **Explore**. We'll look at this below.
 
 ---
 
-### Использование Build
+## Built-in
 
-_Режим_: `primary`
-
-Build — основной агент **по умолчанию** со всеми включенными инструментами. Это стандартный агент для разработки, где вам необходим полный доступ к файловым операциям и системным командам.
+CyxCode comes with two built-in primary agents and two built-in subagents.
 
 ---
 
-### Использование Plan
+### Use build
 
-_Режим_: `primary`
+_Mode_: `primary`
 
-Агент с ограниченным доступом, предназначенный для планирования и анализа. Мы используем систему разрешений, чтобы предоставить вам больше контроля и предотвратить непреднамеренные изменения.
-По умолчанию для всех следующих параметров установлено значение `ask`:
-
-- `file edits`: Все записи, исправления и изменения.
-- `bash`: все команды bash.
-
-Этот агент полезен, если вы хотите, чтобы LLM анализировал код, предлагал изменения или создавал планы без внесения каких-либо фактических изменений в вашу кодовую базу.
+Build is the **default** primary agent with all tools enabled. This is the standard agent for development work where you need full access to file operations and system commands.
 
 ---
 
-### Использование General
+### Use plan
 
-_Режим_: `subagent`
+_Mode_: `primary`
 
-Универсальный агент для исследования сложных вопросов и выполнения многоэтапных задач. Имеет полный доступ к инструментам (кроме задач), поэтому при необходимости может вносить изменения в файлы. Используйте это для параллельного выполнения нескольких единиц работы.
+A restricted agent designed for planning and analysis. We use a permission system to give you more control and prevent unintended changes.
+By default, all of the following are set to `ask`:
 
----
+- `file edits`: All writes, patches, and edits
+- `bash`: All bash commands
 
-### Использование Explore
-
-_Режим_: `subagent`
-
-Быстрый агент только для чтения для изучения кодовых баз. Невозможно изменить файлы. Используйте это, когда вам нужно быстро найти файлы по шаблонам, выполнить поиск кода по ключевым словам или ответить на вопросы о кодовой базе.
+This agent is useful when you want the LLM to analyze code, suggest changes, or create plans without making any actual modifications to your codebase.
 
 ---
 
-### Использование Compact
+### Use general
 
-_Режим_: `primary`
+_Mode_: `subagent`
 
-Скрытый системный агент, который сжимает длинный контекст в меньшее резюме. Он запускается автоматически при необходимости и не может быть выбран в пользовательском интерфейсе.
-
----
-
-### Использование Title
-
-_Режим_: `primary`
-
-Скрытый системный агент, генерирующий короткие заголовки сессий. Он запускается автоматически и не может быть выбран в пользовательском интерфейсе.
+A general-purpose agent for researching complex questions and executing multi-step tasks. Has full tool access (except todo), so it can make file changes when needed. Use this to run multiple units of work in parallel.
 
 ---
 
-### Использование Summary
+### Use explore
 
-_Режим_: `primary`
+_Mode_: `subagent`
 
-Скрытый системный агент, создающий сводки сеансов. Он запускается автоматически и не может быть выбран в пользовательском интерфейсе.
+A fast, read-only agent for exploring codebases. Cannot modify files. Use this when you need to quickly find files by patterns, search code for keywords, or answer questions about the codebase.
 
 ---
 
-## Использование
+### Use compaction
 
-1. Для основных агентов используйте клавишу **Tab** для переключения между ними во время сеанса. Вы также можете использовать настроенную привязку клавиш `switch_agent`.
+_Mode_: `primary`
 
-2. Субагенты могут быть вызваны:
-   - **Автоматически** основными агентами для выполнения специализированных задач на основе их описаний.
-   - Вручную, **@ упомянув** субагента в своем сообщении. Например.
+Hidden system agent that compacts long context into a smaller summary. It runs automatically when needed and is not selectable in the UI.
+
+---
+
+### Use title
+
+_Mode_: `primary`
+
+Hidden system agent that generates short session titles. It runs automatically and is not selectable in the UI.
+
+---
+
+### Use summary
+
+_Mode_: `primary`
+
+Hidden system agent that creates session summaries. It runs automatically and is not selectable in the UI.
+
+---
+
+## Usage
+
+1. For primary agents, use the **Tab** key to cycle through them during a session. You can also use your configured `switch_agent` keybind.
+
+2. Subagents can be invoked:
+   - **Automatically** by primary agents for specialized tasks based on their descriptions.
+   - Manually by **@ mentioning** a subagent in your message. For example.
 
      ```txt frame="none"
      @general help me search for this function
      ```
 
-3. **Навигация между сеансами**. Когда субагенты создают свои собственные дочерние сеансы, вы можете перемещаться между родительским сеансом и всеми дочерними сеансами, используя:
-   - **\<Leader>+Right** (или настроенная вами комбинация клавиш `session_child_cycle`) для перехода вперед через родительский элемент → дочерний элемент1 → дочерний элемент2 → ... → родительский элемент.
-   - **\<Leader>+Left** (или настроенная вами комбинация клавиш `session_child_cycle_reverse`) для перехода назад по родительскому элементу ← дочерний элемент1 ← дочерний элемент2 ← ... ← родительский элемент
+3. **Navigation between sessions**: When subagents create child sessions, use `session_child_first` (default: **\<Leader>+Down**) to enter the first child session from the parent.
 
-   Это позволяет плавно переключаться между основным разговором и работой специализированного субагента.
+4. Once you are in a child session, use:
+   - `session_child_cycle` (default: **Right**) to cycle to the next child session
+   - `session_child_cycle_reverse` (default: **Left**) to cycle to the previous child session
+   - `session_parent` (default: **Up**) to return to the parent session
+
+   This lets you switch between the main conversation and specialized subagent work.
 
 ---
 
-## Настройка
+## Configure
 
-Вы можете настроить встроенные агенты или создать свои собственные посредством настройки. Агенты можно настроить двумя способами:
+You can customize the built-in agents or create your own through configuration. Agents can be configured in two ways:
 
 ---
 
 ### JSON
 
-Настройте агентов в файле конфигурации `opencode.json`:
+Configure agents in your `opencode.json` config file:
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "agent": {
     "build": {
       "mode": "primary",
@@ -178,10 +182,10 @@ _Режим_: `primary`
 
 ### Markdown
 
-Вы также можете определить агентов, используя файлы Markdown. Поместите их в:
+You can also define agents using markdown files. Place them in:
 
-- Глобальный: `~/.config/opencode/agents/`
-- Для каждого проекта: `.opencode/agents/`
+- Global: `~/.config/opencode/agents/`
+- Per-project: `.opencode/agents/`
 
 ```markdown title="~/.config/opencode/agents/review.md"
 ---
@@ -205,19 +209,19 @@ You are in code review mode. Focus on:
 Provide constructive feedback without making direct changes.
 ```
 
-Имя Markdown файла становится именем агента. Например, `review.md` создает агент `review`.
+The markdown file name becomes the agent name. For example, `review.md` creates a `review` agent.
 
 ---
 
-## Параметры
+## Options
 
-Давайте рассмотрим эти параметры конфигурации подробно.
+Let's look at these configuration options in detail.
 
 ---
 
-### Описание
+### Description
 
-Используйте опцию `description`, чтобы предоставить краткое описание того, что делает агент и когда его использовать.
+Use the `description` option to provide a brief description of what the agent does and when to use it.
 
 ```json title="opencode.json"
 {
@@ -229,15 +233,15 @@ Provide constructive feedback without making direct changes.
 }
 ```
 
-Это **обязательный** параметр конфигурации.
+This is a **required** config option.
 
 ---
 
-### Температура
+### Temperature
 
-Контролируйте случайность и креативность ответов LLM с помощью конфигурации `temperature`.
+Control the randomness and creativity of the LLM's responses with the `temperature` config.
 
-Более низкие значения делают ответы более целенаправленными и детерминированными, а более высокие значения повышают креативность и вариативность.
+Lower values make responses more focused and deterministic, while higher values increase creativity and variability.
 
 ```json title="opencode.json"
 {
@@ -252,11 +256,11 @@ Provide constructive feedback without making direct changes.
 }
 ```
 
-Значения температуры обычно находятся в диапазоне от 0,0 до 1,0:
+Temperature values typically range from 0.0 to 1.0:
 
-- **0,0–0,2**: очень целенаправленные и детерминированные ответы, идеальные для анализа кода и планирования.
-- **0,3–0,5**: сбалансированные ответы с некоторой креативностью, подходят для общих задач разработки.
-- **0,6–1,0**: более творческие и разнообразные ответы, полезные для мозгового штурма и исследования.
+- **0.0-0.2**: Very focused and deterministic responses, ideal for code analysis and planning
+- **0.3-0.5**: Balanced responses with some creativity, good for general development tasks
+- **0.6-1.0**: More creative and varied responses, useful for brainstorming and exploration
 
 ```json title="opencode.json"
 {
@@ -276,15 +280,15 @@ Provide constructive feedback without making direct changes.
 }
 ```
 
-Если температура не указана, opencode использует значения по умолчанию, специфичные для модели; обычно 0 для большинства моделей, 0,55 для моделей Qwen.
+If no temperature is specified, CyxCode uses model-specific defaults; typically 0 for most models, 0.55 for Qwen models.
 
 ---
 
-### Максимальное количество шагов
+### Max steps
 
-Управляйте максимальным количеством агентных итераций, которые агент может выполнить, прежде чем ему придется отвечать только текстом. Это позволяет пользователям, желающим контролировать расходы, устанавливать лимит на агентские действия.
+Control the maximum number of agentic iterations an agent can perform before being forced to respond with text only. This allows users who wish to control costs to set a limit on agentic actions.
 
-Если этот параметр не установлен, агент будет продолжать выполнять итерацию до тех пор, пока модель не решит остановиться или пока пользователь не прервет сеанс.
+If this is not set, the agent will continue to iterate until the model chooses to stop or the user interrupts the session.
 
 ```json title="opencode.json"
 {
@@ -298,17 +302,17 @@ Provide constructive feedback without making direct changes.
 }
 ```
 
-При достижении лимита агент получает специальную системную подсказку с указанием в ответ краткой информации о своей работе и рекомендуемых оставшихся задачах.
+When the limit is reached, the agent receives a special system prompt instructing it to respond with a summarization of its work and recommended remaining tasks.
 
 :::caution
-Устаревшее поле `maxSteps` устарело. Вместо этого используйте `steps`.
+The legacy `maxSteps` field is deprecated. Use `steps` instead.
 :::
 
 ---
 
-### Отключение
+### Disable
 
-Установите `true`, чтобы отключить агент.
+Set to `true` to disable the agent.
 
 ```json title="opencode.json"
 {
@@ -322,9 +326,9 @@ Provide constructive feedback without making direct changes.
 
 ---
 
-### Промпт
+### Prompt
 
-Укажите собственный файл системных приглашений для этого агента с помощью конфигурации `prompt`. Файл подсказки должен содержать инструкции, специфичные для целей агента.
+Specify a custom system prompt file for this agent with the `prompt` config. The prompt file should contain instructions specific to the agent's purpose.
 
 ```json title="opencode.json"
 {
@@ -336,16 +340,16 @@ Provide constructive feedback without making direct changes.
 }
 ```
 
-Этот путь указан относительно того, где находится файл конфигурации. Таким образом, это работает как для глобальной конфигурации opencode, так и для конфигурации конкретного проекта.
+This path is relative to where the config file is located. So this works for both the global CyxCode config and the project specific config.
 
 ---
 
-### Модель
+### Model
 
-Используйте конфигурацию `model`, чтобы переопределить модель этого агента. Полезно для использования разных моделей, оптимизированных под разные задачи. Например, более быстрая модель планирования и более эффективная модель реализации.
+Use the `model` config to override the model for this agent. Useful for using different models optimized for different tasks. For example, a faster model for planning, a more capable model for implementation.
 
 :::tip
-Если вы не укажете модель, основные агенты будут использовать глобально настроенную модель](/docs/config#models), а субагенты будут использовать модель основного агента, вызвавшего субагент.
+If you don’t specify a model, primary agents use the [model globally configured](/docs/config#models) while subagents will use the model of the primary agent that invoked the subagent.
 :::
 
 ```json title="opencode.json"
@@ -358,17 +362,19 @@ Provide constructive feedback without making direct changes.
 }
 ```
 
-Идентификатор модели в вашей конфигурации opencode использует формат `provider/model-id`. Например, если вы используете [OpenCode Zen](/docs/zen), вы должны использовать `opencode/gpt-5.1-codex` для кодекса GPT 5.1.
+The model ID in your CyxCode config uses the format `provider/model-id`. For example, if you're using [CyxCode Zen](/docs/zen), you would use `opencode/gpt-5.1-codex` for GPT 5.1 Codex.
 
 ---
 
-### Инструменты
+### Tools (deprecated)
 
-Контролируйте, какие инструменты доступны в этом агенте, с помощью конфигурации `tools`. Вы можете включить или отключить определенные инструменты, установив для них значение `true` или `false`.
+`tools` is **deprecated**. Prefer the agent's [`permission`](#permissions) field for new configs, updates and more fine-grained control.
+
+Allows you to control which tools are available in this agent. You can enable or disable specific tools by setting them to `true` or `false`. In an agent's `tools` config, `true` is equivalent to `{"*": "allow"}` permission and `false` is equivalent to `{"*": "deny"}` permission.
 
 ```json title="opencode.json" {3-6,9-12}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "tools": {
     "write": true,
     "bash": true
@@ -385,14 +391,14 @@ Provide constructive feedback without making direct changes.
 ```
 
 :::note
-Конфигурация, специфичная для агента, переопределяет глобальную конфигурацию.
+The agent-specific config overrides the global config.
 :::
 
-Вы также можете использовать подстановочные знаки для одновременного управления несколькими инструментами. Например, чтобы отключить все инструменты с сервера MCP:
+You can also use wildcards in legacy `tools` entries to control multiple tools at once. For example, to disable all tools from an MCP server:
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "agent": {
     "readonly": {
       "tools": {
@@ -405,32 +411,32 @@ Provide constructive feedback without making direct changes.
 }
 ```
 
-[Подробнее об инструментах](/docs/tools).
+[Learn more about tools](/docs/tools).
 
 ---
 
-### Разрешения
+### Permissions
 
-Вы можете настроить разрешения, чтобы управлять действиями, которые может выполнять агент. В настоящее время разрешения для инструментов `edit`, `bash` и `webfetch` можно настроить на:
+You can configure permissions to manage what actions an agent can take. Currently, the permissions for the `edit`, `bash`, and `webfetch` tools can be configured to:
 
-- `"ask"` — Запросить подтверждение перед запуском инструмента.
-- `"allow"` — Разрешить все операции без одобрения.
-- `"deny"` — отключить инструмент
+- `"ask"` — Prompt for approval before running the tool
+- `"allow"` — Allow all operations without approval
+- `"deny"` — Disable the tool
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "permission": {
     "edit": "deny"
   }
 }
 ```
 
-Вы можете переопределить эти разрешения для каждого агента.
+You can override these permissions per agent.
 
 ```json title="opencode.json" {3-5,8-10}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "permission": {
     "edit": "deny"
   },
@@ -444,7 +450,7 @@ Provide constructive feedback without making direct changes.
 }
 ```
 
-Вы также можете установить разрешения в агентах Markdown.
+You can also set permissions in Markdown agents.
 
 ```markdown title="~/.config/opencode/agents/review.md"
 ---
@@ -463,11 +469,11 @@ permission:
 Only analyze code and suggest changes.
 ```
 
-Вы можете установить разрешения для определенных команд bash.
+You can set permissions for specific bash commands.
 
 ```json title="opencode.json" {7}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "agent": {
     "build": {
       "permission": {
@@ -481,11 +487,11 @@ Only analyze code and suggest changes.
 }
 ```
 
-Это может использовать glob pattern.
+This can take a glob pattern.
 
 ```json title="opencode.json" {7}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "agent": {
     "build": {
       "permission": {
@@ -498,12 +504,12 @@ Only analyze code and suggest changes.
 }
 ```
 
-Вы также можете использовать подстановочный знак `*` для управления разрешениями для всех команд.
-Поскольку последнее правило сопоставления имеет приоритет, сначала поместите подстановочный знак `*`, а затем конкретные правила.
+And you can also use the `*` wildcard to manage permissions for all commands.
+Since the last matching rule takes precedence, put the `*` wildcard first and specific rules after.
 
 ```json title="opencode.json" {8}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "agent": {
     "build": {
       "permission": {
@@ -517,13 +523,13 @@ Only analyze code and suggest changes.
 }
 ```
 
-[Подробнее о разрешениях](/docs/permissions).
+[Learn more about permissions](/docs/permissions).
 
 ---
 
-### Режим
+### Mode
 
-Управляйте режимом агента с помощью конфигурации `mode`. Опция `mode` используется для определения того, как можно использовать агент.
+Control the agent's mode with the `mode` config. The `mode` option is used to determine how the agent can be used.
 
 ```json title="opencode.json"
 {
@@ -535,13 +541,13 @@ Only analyze code and suggest changes.
 }
 ```
 
-Опция `mode` может быть установлена ​​на `primary`, `subagent` или `all`. Если `mode` не указан, по умолчанию используется `all`.
+The `mode` option can be set to `primary`, `subagent`, or `all`. If no `mode` is specified, it defaults to `all`.
 
 ---
 
-### Скрытый
+### Hidden
 
-Скройте субагент из меню автозаполнения `@` с помощью `hidden: true`. Полезно для внутренних субагентов, которые другие агенты должны вызывать только программно с помощью инструмента Task.
+Hide a subagent from the `@` autocomplete menu with `hidden: true`. Useful for internal subagents that should only be invoked programmatically by other agents via the Task tool.
 
 ```json title="opencode.json"
 {
@@ -554,17 +560,17 @@ Only analyze code and suggest changes.
 }
 ```
 
-Это влияет только на видимость пользователя в меню автозаполнения. Скрытые агенты по-прежнему могут быть вызваны моделью с помощью инструмента «Задачи», если разрешения позволяют.
+This only affects user visibility in the autocomplete menu. Hidden agents can still be invoked by the model via the Task tool if permissions allow.
 
 :::note
-Применяется только к агентам `mode: subagent`.
+Only applies to `mode: subagent` agents.
 :::
 
 ---
 
-### Разрешения задач
+### Task permissions
 
-Управляйте тем, какие субагенты агент может вызывать с помощью инструмента задач с помощью `permission.task`. Использует шаблоны glob для гибкого сопоставления.
+Control which subagents an agent can invoke via the Task tool with `permission.task`. Uses glob patterns for flexible matching.
 
 ```json title="opencode.json"
 {
@@ -583,23 +589,23 @@ Only analyze code and suggest changes.
 }
 ```
 
-Если установлено значение `deny`, субагент полностью удаляется из описания инструмента «Задача», поэтому модель не будет пытаться его вызвать.
+When set to `deny`, the subagent is removed from the Task tool description entirely, so the model won't attempt to invoke it.
 
 :::tip
-Правила оцениваются по порядку, и **побеждает последнее подходящее правило**. В приведенном выше примере `orchestrator-planner` соответствует как `*` (запретить), так и `orchestrator-*` (разрешить), но поскольку `orchestrator-*` идет после `*`, результатом будет `allow`.
+Rules are evaluated in order, and the **last matching rule wins**. In the example above, `orchestrator-planner` matches both `*` (deny) and `orchestrator-*` (allow), but since `orchestrator-*` comes after `*`, the result is `allow`.
 :::
 
 :::tip
-Пользователи всегда могут вызвать любой субагент напрямую через меню автозаполнения `@`, даже если разрешения задач агента запрещают это.
+Users can always invoke any subagent directly via the `@` autocomplete menu, even if the agent's task permissions would deny it.
 :::
 
 ---
 
-### Цвет
+### Color
 
-Настройте внешний вид агента в пользовательском интерфейсе с помощью параметра `color`. Это влияет на то, как агент будет отображаться в интерфейсе.
+Customize the agent's visual appearance in the UI with the `color` option. This affects how the agent appears in the interface.
 
-Используйте допустимый шестнадцатеричный цвет (например, `#FF5733`) или цвет темы: `primary`, `secondary`, `accent`, `success`, `warning`, `error`, `info`.
+Use a valid hex color (e.g., `#FF5733`) or theme color: `primary`, `secondary`, `accent`, `success`, `warning`, `error`, `info`.
 
 ```json title="opencode.json"
 {
@@ -618,7 +624,7 @@ Only analyze code and suggest changes.
 
 ### Top P
 
-Управляйте разнообразием ответов с помощью опции `top_p`. Альтернатива температуре для контроля случайности.
+Control response diversity with the `top_p` option. Alternative to temperature for controlling randomness.
 
 ```json title="opencode.json"
 {
@@ -630,15 +636,15 @@ Only analyze code and suggest changes.
 }
 ```
 
-Значения варьируются от 0,0 до 1,0. Низкие значения делают ответы более целенаправленными, высокие — более разнообразными.
+Values range from 0.0 to 1.0. Lower values are more focused, higher values more diverse.
 
 ---
 
-### Дополнительно
+### Additional
 
-Любые другие параметры, указанные вами в конфигурации вашего агента, будут **передаваться напрямую** поставщику в качестве параметров модели. Это позволяет использовать функции и параметры, специфичные для поставщика.
+Any other options you specify in your agent configuration will be **passed through directly** to the provider as model options. This allows you to use provider-specific features and parameters.
 
-Например, с помощью моделей рассуждения OpenAI вы можете контролировать усилия по рассуждению:
+For example, with OpenAI's reasoning models, you can control the reasoning effort:
 
 ```json title="opencode.json" {6,7}
 {
@@ -653,55 +659,55 @@ Only analyze code and suggest changes.
 }
 ```
 
-Эти дополнительные параметры зависят от модели и поставщика. Проверьте документацию вашего провайдера на наличие доступных параметров.
+These additional options are model and provider-specific. Check your provider's documentation for available parameters.
 
 :::tip
-Запустите `opencode models`, чтобы просмотреть список доступных моделей.
+Run `cyxcode models` to see a list of the available models.
 :::
 
 ---
 
-## Создание агентов
+## Create agents
 
-Вы можете создать новых агентов, используя следующую команду:
+You can create new agents using the following command:
 
 ```bash
-opencode agent create
+cyxcode agent create
 ```
 
-Эта интерактивная команда:
+This interactive command will:
 
-1. Спрашивает, где сохранить агента: глобально или в проекте.
-2. Запрашивает описание того, что должен делать агент.
-3. Создает соответствующий системный промпт и идентификатор.
-4. Позволяет выбрать, к каким инструментам агент будет иметь доступ.
-5. Наконец, создает файл Markdown с конфигурацией агента.
-
----
-
-## Варианты использования
-
-Вот несколько распространенных случаев использования различных агентов.
-
-- **Агент сборки**: полная работа по разработке со всеми включенными инструментами.
-- **Агент планирования**: анализ и планирование без внесения изменений.
-- **Агент проверки**: проверка кода с доступом только для чтения и инструментами документирования.
-- **Агент отладки**: сосредоточен на исследовании с включенными инструментами bash и чтения.
-- **Агент документов**: запись документации с помощью файловых операций, но без системных команд.
+1. Ask where to save the agent; global or project-specific.
+2. Description of what the agent should do.
+3. Generate an appropriate system prompt and identifier.
+4. Let you select which tools the agent can access.
+5. Finally, create a markdown file with the agent configuration.
 
 ---
 
-## Примеры
+## Use cases
 
-Вот несколько примеров агентов, которые могут оказаться вам полезными.
+Here are some common use cases for different agents.
+
+- **Build agent**: Full development work with all tools enabled
+- **Plan agent**: Analysis and planning without making changes
+- **Review agent**: Code review with read-only access plus documentation tools
+- **Debug agent**: Focused on investigation with bash and read tools enabled
+- **Docs agent**: Documentation writing with file operations but no system commands
+
+---
+
+## Examples
+
+Here are some example agents you might find useful.
 
 :::tip
-У вас есть агент, которым вы хотели бы поделиться? [Отправьте PR](https://github.com/anomalyco/opencode).
+Do you have an agent you'd like to share? [Submit a PR](https://github.com/code3hr/cyxcode).
 :::
 
 ---
 
-### Агент документации
+### Documentation agent
 
 ```markdown title="~/.config/opencode/agents/docs-writer.md"
 ---
@@ -723,7 +729,7 @@ Focus on:
 
 ---
 
-### Аудитор безопасности
+### Security auditor
 
 ```markdown title="~/.config/opencode/agents/security-auditor.md"
 ---

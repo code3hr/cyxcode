@@ -4,14 +4,14 @@ description: Verschiedene Modi für unterschiedliche Anwendungsfälle.
 ---
 
 :::caution
-Modi werden jetzt über die Option `agent` in der OpenCode-Konfiguration konfiguriert. Der
+Modi werden jetzt über die Option `agent` in der CyxCode-Konfiguration konfiguriert. Der
 Die Option `mode` ist jetzt veraltet. [Learn more](/docs/agents).
 :::
 
-Mit den Modi in OpenCode können Sie das Verhalten, die Tools und die Eingabeaufforderungen für verschiedene Anwendungsfälle anpassen.
+Mit den Modi in CyxCode können Sie das Verhalten, die Tools und die Eingabeaufforderungen für verschiedene Anwendungsfälle anpassen.
 
 Es verfügt über zwei integrierte Modi: **Build** und **Plan**. Sie können anpassen
-diese oder konfigurieren Sie Ihre eigenen über die OpenCode-Konfiguration.
+diese oder konfigurieren Sie Ihre eigenen über die CyxCode-Konfiguration.
 
 Sie können während einer Sitzung zwischen den Modi wechseln oder diese in Ihrer Konfigurationsdatei konfigurieren.
 
@@ -19,7 +19,7 @@ Sie können während einer Sitzung zwischen den Modi wechseln oder diese in Ihre
 
 ## Integriert
 
-OpenCode verfügt über zwei integrierte Modi.
+CyxCode verfügt über zwei integrierte Modi.
 
 ---
 
@@ -60,7 +60,7 @@ Konfigurieren Sie Modi in Ihrer `opencode.json`-Konfigurationsdatei:
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "mode": {
     "build": {
       "model": "anthropic/claude-sonnet-4-20250514",
@@ -173,7 +173,7 @@ Temperaturwerte liegen typischerweise zwischen 0.0 und 1.0:
 }
 ```
 
-Wenn keine Temperatur angegeben ist, verwendet OpenCode modellspezifische Standardwerte (normalerweise 0 für die meisten Modelle, 0.55 für Qwen-Modelle).
+Wenn keine Temperatur angegeben ist, verwendet CyxCode modellspezifische Standardwerte (normalerweise 0 für die meisten Modelle, 0.55 für Qwen-Modelle).
 
 ---
 
@@ -192,7 +192,7 @@ Geben Sie mit der `prompt`-Konfiguration eine benutzerdefinierte Systemaufforder
 ```
 
 Dieser Pfad ist relativ zum Speicherort der Konfigurationsdatei. Das funktioniert also
-sowohl die globale OpenCode-Konfiguration als auch die projektspezifische Konfiguration.
+sowohl die globale CyxCode-Konfiguration als auch die projektspezifische Konfiguration.
 
 ---
 
@@ -249,7 +249,7 @@ Sie können Ihre eigenen benutzerdefinierten Modi erstellen, indem Sie diese zur
 
 ```json title="opencode.json" {4-14}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "mode": {
     "docs": {
       "prompt": "{file:./prompts/documentation.txt}",

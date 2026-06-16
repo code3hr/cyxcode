@@ -5,6 +5,7 @@ import logoLight from "../asset/logo-ornate-light.svg"
 import logoDark from "../asset/logo-ornate-dark.svg"
 import IMG_SPLASH from "../asset/lander/screenshot-splash.png"
 import { IconCopy, IconCheck } from "../component/icon"
+import { config } from "~/config"
 import { useI18n } from "~/context/i18n"
 import { useLanguage } from "~/context/language"
 
@@ -113,7 +114,7 @@ export default function Home() {
             <h3 data-component="title">npm</h3>
             <button data-copy data-slot="button">
               <span>
-                npm install -g <strong>opencode-ai</strong>
+                npm install -g <strong>cyxcode</strong>
               </span>
               <CopyStatus />
             </button>
@@ -122,7 +123,7 @@ export default function Home() {
             <h3 data-component="title">bun</h3>
             <button data-copy data-slot="button">
               <span>
-                bun install -g <strong>opencode-ai</strong>
+                bun install -g <strong>cyxcode</strong>
               </span>
               <CopyStatus />
             </button>
@@ -131,7 +132,7 @@ export default function Home() {
             <h3 data-component="title">homebrew</h3>
             <button data-copy data-slot="button">
               <span>
-                brew install <strong>opencode</strong>
+                brew install <strong>code3hr/tap/cyxcode</strong>
               </span>
               <CopyStatus />
             </button>
@@ -140,7 +141,7 @@ export default function Home() {
             <h3 data-component="title">paru</h3>
             <button data-copy data-slot="button">
               <span>
-                paru -S <strong>opencode-bin</strong>
+                paru -S <strong>cyxcode-bin</strong>
               </span>
               <CopyStatus />
             </button>
@@ -158,7 +159,7 @@ export default function Home() {
 
         <footer data-component="footer">
           <div data-slot="cell">
-            <a href="https://x.com/opencode">{i18n.t("footer.x")}</a>
+            <a href={config.social.twitter}>{i18n.t("footer.x")}</a>
           </div>
           <div data-slot="cell">
             <a href="https://github.com/code3hr/cyxcode">{i18n.t("footer.github")}</a>

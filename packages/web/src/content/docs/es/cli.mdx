@@ -1,30 +1,30 @@
 ---
 title: CLI
-description: Opciones y comandos de la CLI de OpenCode.
+description: Opciones y comandos de la CLI de CyxCode.
 ---
 
 import { Tabs, TabItem } from "@astrojs/starlight/components"
 
-La CLI de OpenCode de forma predeterminada inicia el [TUI](/docs/tui) cuando se ejecuta sin ningún argumento.
+La CLI de CyxCode de forma predeterminada inicia el [TUI](/docs/tui) cuando se ejecuta sin ningún argumento.
 
 ```bash
-opencode
+cyxcode
 ```
 
-Pero también acepta comandos como se documenta en esta página. Esto le permite interactuar con OpenCode mediante programación.
+Pero también acepta comandos como se documenta en esta página. Esto le permite interactuar con CyxCode mediante programación.
 
 ```bash
-opencode run "Explain how closures work in JavaScript"
+cyxcode run "Explain how closures work in JavaScript"
 ```
 
 ---
 
 ### tui
 
-Inicie la interfaz de usuario del terminal OpenCode.
+Inicie la interfaz de usuario del terminal CyxCode.
 
 ```bash
-opencode [project]
+cyxcode [project]
 ```
 
 #### Opciones
@@ -44,36 +44,36 @@ opencode [project]
 
 ## Comandos
 
-La CLI de OpenCode también tiene los siguientes comandos.
+La CLI de CyxCode también tiene los siguientes comandos.
 
 ---
 
 ### agent
 
-Administrar agentes para OpenCode.
+Administrar agentes para CyxCode.
 
 ```bash
-opencode agent [command]
+cyxcode agent [command]
 ```
 
 ---
 
 ### attach
 
-Conecte una terminal a un servidor backend OpenCode que ya se esté ejecutando y iniciado mediante los comandos `serve` o `web`.
+Conecte una terminal a un servidor backend CyxCode que ya se esté ejecutando y iniciado mediante los comandos `serve` o `web`.
 
 ```bash
-opencode attach [url]
+cyxcode attach [url]
 ```
 
-Esto permite usar TUI con un backend remoto OpenCode. Por ejemplo:
+Esto permite usar TUI con un backend remoto CyxCode. Por ejemplo:
 
 ```bash
 # Start the backend server for web/mobile access
-opencode web --port 4096 --hostname 0.0.0.0
+cyxcode web --port 4096 --hostname 0.0.0.0
 
 # In another terminal, attach the TUI to the running backend
-opencode attach http://10.20.30.40:4096
+cyxcode attach http://10.20.30.40:4096
 ```
 
 #### Opciones
@@ -90,7 +90,7 @@ opencode attach http://10.20.30.40:4096
 Cree un nuevo agente con configuración personalizada.
 
 ```bash
-opencode agent create
+cyxcode agent create
 ```
 
 Este comando lo guiará en la creación de un nuevo agente con un mensaje del sistema personalizado y una configuración de herramientas.
@@ -102,7 +102,7 @@ Este comando lo guiará en la creación de un nuevo agente con un mensaje del si
 Enumere todos los agentes disponibles.
 
 ```bash
-opencode agent list
+cyxcode agent list
 ```
 
 ---
@@ -112,20 +112,20 @@ opencode agent list
 Comando para administrar credenciales e iniciar sesión para proveedores.
 
 ```bash
-opencode auth [command]
+cyxcode auth [command]
 ```
 
 ---
 
 #### login
 
-OpenCode funciona con la lista de proveedores en [Models.dev](https://models.dev), por lo que puede usar `opencode auth login` para configurar las claves API para cualquier proveedor que desee utilizar. Esto se almacena en `~/.local/share/opencode/auth.json`.
+CyxCode funciona con la lista de proveedores en [Models.dev](https://models.dev), por lo que puede usar `cyxcode auth login` para configurar las claves API para cualquier proveedor que desee utilizar. Esto se almacena en `~/.local/share/opencode/auth.json`.
 
 ```bash
-opencode auth login
+cyxcode auth login
 ```
 
-Cuando se inicia OpenCode, carga los proveedores desde el archivo de credenciales. Y si hay claves definidas en sus entornos o un archivo `.env` en su proyecto.
+Cuando se inicia CyxCode, carga los proveedores desde el archivo de credenciales. Y si hay claves definidas en sus entornos o un archivo `.env` en su proyecto.
 
 ---
 
@@ -134,13 +134,13 @@ Cuando se inicia OpenCode, carga los proveedores desde el archivo de credenciale
 Enumera todos los proveedores autenticados tal como están almacenados en el archivo de credenciales.
 
 ```bash
-opencode auth list
+cyxcode auth list
 ```
 
 O la versión corta.
 
 ```bash
-opencode auth ls
+cyxcode auth ls
 ```
 
 ---
@@ -150,7 +150,7 @@ opencode auth ls
 Cierra tu sesión de un proveedor eliminándolo del archivo de credenciales.
 
 ```bash
-opencode auth logout
+cyxcode auth logout
 ```
 
 ---
@@ -160,7 +160,7 @@ opencode auth logout
 Administre el agente GitHub para la automatización del repositorio.
 
 ```bash
-opencode github [command]
+cyxcode github [command]
 ```
 
 ---
@@ -170,7 +170,7 @@ opencode github [command]
 Instale el agente GitHub en su repositorio.
 
 ```bash
-opencode github install
+cyxcode github install
 ```
 
 Esto configura el flujo de trabajo de acciones GitHub necesario y lo guía a través del proceso de configuración. [Más información](/docs/github).
@@ -182,7 +182,7 @@ Esto configura el flujo de trabajo de acciones GitHub necesario y lo guía a tra
 Ejecute el agente GitHub. Esto se usa normalmente en acciones GitHub.
 
 ```bash
-opencode github run
+cyxcode github run
 ```
 
 ##### Opciones
@@ -199,7 +199,7 @@ opencode github run
 Administrar servidores de protocolo de contexto modelo.
 
 ```bash
-opencode mcp [command]
+cyxcode mcp [command]
 ```
 
 ---
@@ -209,7 +209,7 @@ opencode mcp [command]
 Agregue un servidor MCP a su configuración.
 
 ```bash
-opencode mcp add
+cyxcode mcp add
 ```
 
 Este comando lo guiará para agregar un servidor MCP local o remoto.
@@ -221,13 +221,13 @@ Este comando lo guiará para agregar un servidor MCP local o remoto.
 Enumere todos los servidores MCP configurados y su estado de conexión.
 
 ```bash
-opencode mcp list
+cyxcode mcp list
 ```
 
 O utilice la versión corta.
 
 ```bash
-opencode mcp ls
+cyxcode mcp ls
 ```
 
 ---
@@ -237,7 +237,7 @@ opencode mcp ls
 Autentíquese con un servidor MCP habilitado para OAuth.
 
 ```bash
-opencode mcp auth [name]
+cyxcode mcp auth [name]
 ```
 
 Si no proporciona un nombre de servidor, se le pedirá que seleccione entre los servidores compatibles con OAuth disponibles.
@@ -245,13 +245,13 @@ Si no proporciona un nombre de servidor, se le pedirá que seleccione entre los 
 También puede enumerar los servidores compatibles con OAuth y su estado de autenticación.
 
 ```bash
-opencode mcp auth list
+cyxcode mcp auth list
 ```
 
 O utilice la versión corta.
 
 ```bash
-opencode mcp auth ls
+cyxcode mcp auth ls
 ```
 
 ---
@@ -261,7 +261,7 @@ opencode mcp auth ls
 Elimine las credenciales OAuth para un servidor MCP.
 
 ```bash
-opencode mcp logout [name]
+cyxcode mcp logout [name]
 ```
 
 ---
@@ -271,7 +271,7 @@ opencode mcp logout [name]
 Depurar problemas de conexión OAuth para un servidor MCP.
 
 ```bash
-opencode mcp debug <name>
+cyxcode mcp debug <name>
 ```
 
 ---
@@ -281,7 +281,7 @@ opencode mcp debug <name>
 Enumere todos los modelos disponibles de los proveedores configurados.
 
 ```bash
-opencode models [provider]
+cyxcode models [provider]
 ```
 
 Este comando muestra todos los modelos disponibles en sus proveedores configurados en el formato `provider/model`.
@@ -291,7 +291,7 @@ Esto es útil para determinar el nombre exacto del modelo que se usará en [su c
 Opcionalmente, puede pasar un ID de proveedor para filtrar modelos por ese proveedor.
 
 ```bash
-opencode models anthropic
+cyxcode models anthropic
 ```
 
 #### Opciones
@@ -301,10 +301,10 @@ opencode models anthropic
 | `--refresh` | Actualizar la caché de modelos desde models.dev                             |
 | `--verbose` | Utilice una salida del modelo más detallada (incluye metadatos como costos) |
 
-Utilice el indicador `--refresh` para actualizar la lista de modelos almacenados en caché. Esto es útil cuando se han agregado nuevos modelos a un proveedor y desea verlos en OpenCode.
+Utilice el indicador `--refresh` para actualizar la lista de modelos almacenados en caché. Esto es útil cuando se han agregado nuevos modelos a un proveedor y desea verlos en CyxCode.
 
 ```bash
-opencode models --refresh
+cyxcode models --refresh
 ```
 
 ---
@@ -314,23 +314,23 @@ opencode models --refresh
 Ejecute opencode en modo no interactivo pasando un mensaje directamente.
 
 ```bash
-opencode run [message..]
+cyxcode run [message..]
 ```
 
 Esto es útil para secuencias de comandos, automatización o cuando desea una respuesta rápida sin iniciar el TUI completo. Por ejemplo.
 
-```bash "opencode run"
-opencode run Explain the use of context in Go
+```bash "cyxcode run"
+cyxcode run Explain the use of context in Go
 ```
 
-También puede conectarse a una instancia `opencode serve` en ejecución para evitar tiempos de arranque en frío del servidor MCP en cada ejecución:
+También puede conectarse a una instancia `cyxcode serve` en ejecución para evitar tiempos de arranque en frío del servidor MCP en cada ejecución:
 
 ```bash
 # Start a headless server in one terminal
-opencode serve
+cyxcode serve
 
 # In another terminal, run commands that attach to it
-opencode run --attach http://localhost:4096 "Explain async/await in JavaScript"
+cyxcode run --attach http://localhost:4096 "Explain async/await in JavaScript"
 ```
 
 #### Opciones
@@ -354,10 +354,10 @@ opencode run --attach http://localhost:4096 "Explain async/await in JavaScript"
 
 ### serve
 
-Inicie un servidor OpenCode sin cabeza para acceso API. Consulte los [documentos del servidor](/docs/server) para conocer la interfaz HTTP completa.
+Inicie un servidor CyxCode sin cabeza para acceso API. Consulte los [documentos del servidor](/docs/server) para conocer la interfaz HTTP completa.
 
 ```bash
-opencode serve
+cyxcode serve
 ```
 
 Esto inicia un servidor HTTP que proporciona acceso API a la funcionalidad opencode sin la interfaz TUI. Configure `OPENCODE_SERVER_PASSWORD` para habilitar la autenticación básica HTTP (el nombre de usuario predeterminado es `opencode`).
@@ -375,20 +375,20 @@ Esto inicia un servidor HTTP que proporciona acceso API a la funcionalidad openc
 
 ### session
 
-Administrar OpenCode sesiones.
+Administrar CyxCode sesiones.
 
 ```bash
-opencode session [command]
+cyxcode session [command]
 ```
 
 ---
 
 #### list
 
-Enumere todas las sesiones OpenCode.
+Enumere todas las sesiones CyxCode.
 
 ```bash
-opencode session list
+cyxcode session list
 ```
 
 ##### Opciones
@@ -402,10 +402,10 @@ opencode session list
 
 ### stats
 
-Muestre el uso de tokens y las estadísticas de costos para sus sesiones OpenCode.
+Muestre el uso de tokens y las estadísticas de costos para sus sesiones CyxCode.
 
 ```bash
-opencode stats
+cyxcode stats
 ```
 
 #### Opciones
@@ -424,7 +424,7 @@ opencode stats
 Exportar datos de la sesión como JSON.
 
 ```bash
-opencode export [sessionID]
+cyxcode export [sessionID]
 ```
 
 Si no proporciona una ID de sesión, se le pedirá que seleccione entre las sesiones disponibles.
@@ -433,30 +433,30 @@ Si no proporciona una ID de sesión, se le pedirá que seleccione entre las sesi
 
 ### import
 
-Importe datos de sesión desde un archivo JSON o una URL compartida OpenCode.
+Importe datos de sesión desde un archivo JSON o una URL compartida CyxCode.
 
 ```bash
-opencode import <file>
+cyxcode import <file>
 ```
 
-Puede importar desde un archivo local o una URL compartida OpenCode.
+Puede importar desde un archivo local o una URL compartida CyxCode.
 
 ```bash
-opencode import session.json
-opencode import https://opncd.ai/s/abc123
+cyxcode import session.json
+cyxcode import https://opncd.ai/s/abc123
 ```
 
 ---
 
 ### web
 
-Inicie un servidor OpenCode sin cabeza con una interfaz web.
+Inicie un servidor CyxCode sin cabeza con una interfaz web.
 
 ```bash
-opencode web
+cyxcode web
 ```
 
-Esto inicia un servidor HTTP y abre un navegador web para acceder a OpenCode a través de una interfaz web. Configure `OPENCODE_SERVER_PASSWORD` para habilitar la autenticación básica HTTP (el nombre de usuario predeterminado es `opencode`).
+Esto inicia un servidor HTTP y abre un navegador web para acceder a CyxCode a través de una interfaz web. Configure `OPENCODE_SERVER_PASSWORD` para habilitar la autenticación básica HTTP (el nombre de usuario predeterminado es `opencode`).
 
 #### Opciones
 
@@ -474,7 +474,7 @@ Esto inicia un servidor HTTP y abre un navegador web para acceder a OpenCode a t
 Inicie un servidor ACP (Agent Client Protocol).
 
 ```bash
-opencode acp
+cyxcode acp
 ```
 
 Este comando inicia un servidor ACP que se comunica a través de stdin/stdout usando nd-JSON.
@@ -491,10 +491,10 @@ Este comando inicia un servidor ACP que se comunica a través de stdin/stdout us
 
 ### uninstall
 
-Desinstale OpenCode y elimine todos los archivos relacionados.
+Desinstale CyxCode y elimine todos los archivos relacionados.
 
 ```bash
-opencode uninstall
+cyxcode uninstall
 ```
 
 #### Opciones
@@ -513,19 +513,19 @@ opencode uninstall
 Actualiza opencode a la última versión o a una versión específica.
 
 ```bash
-opencode upgrade [target]
+cyxcode upgrade [target]
 ```
 
 Para actualizar a la última versión.
 
 ```bash
-opencode upgrade
+cyxcode upgrade
 ```
 
 Para actualizar a una versión específica.
 
 ```bash
-opencode upgrade v0.1.48
+cyxcode upgrade v0.1.48
 ```
 
 #### Opciones
@@ -538,7 +538,7 @@ opencode upgrade v0.1.48
 
 ## Opciones globales
 
-La CLI de OpenCode toma las siguientes banderas globales.
+La CLI de CyxCode toma las siguientes banderas globales.
 
 | Opción         | Corta | Descripción                                  |
 | -------------- | ----- | -------------------------------------------- |
@@ -551,7 +551,7 @@ La CLI de OpenCode toma las siguientes banderas globales.
 
 ## Variables de entorno
 
-OpenCode se puede configurar mediante variables de entorno.
+CyxCode se puede configurar mediante variables de entorno.
 
 | Variable                              | Type     | Description                                                                     |
 | ------------------------------------- | -------- | ------------------------------------------------------------------------------- |

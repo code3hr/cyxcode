@@ -1,127 +1,128 @@
 ---
-title: Compartilhar
-description: Compartilhe suas conversas do opencode.
+title: Share
+description: Share your CyxCode conversations.
 ---
 
-O recurso de compartilhamento do opencode permite que você crie links públicos para suas conversas do opencode, para que você possa colaborar com colegas de equipe ou obter ajuda de outros.
+CyxCode's share feature allows you to create public links to your CyxCode conversations, so you can collaborate with teammates or get help from others.
 
 :::note
-Conversas compartilhadas são acessíveis publicamente para qualquer pessoa com o link.
+Shared conversations are publicly accessible to anyone with the link.
 :::
 
 ---
 
-## Como funciona
+## How it works
 
-Quando você compartilha uma conversa, o opencode:
+When you share a conversation, CyxCode:
 
-1. Cria uma URL pública única para sua sessão
-2. Sincroniza seu histórico de conversas com nossos servidores
-3. Torna a conversa acessível através do link compartilhável — `opncd.ai/s/<share-id>`
-
----
-
-## Compartilhamento
-
-O opencode suporta três modos de compartilhamento que controlam como as conversas são compartilhadas:
+1. Creates a unique public URL for your session
+2. Syncs your conversation history to our servers
+3. Makes the conversation accessible via the shareable link — `opncd.ai/s/<share-id>`
 
 ---
 
-### Manual (padrão)
+## Sharing
 
-Por padrão, o opencode usa o modo de compartilhamento manual. As sessões não são compartilhadas automaticamente, mas você pode compartilhá-las manualmente usando o comando `/share`:
+CyxCode supports three sharing modes that control how conversations are shared:
+
+---
+
+### Manual (default)
+
+By default, CyxCode uses manual sharing mode. Sessions are not shared automatically, but you can manually share them using the `/share` command:
 
 ```
 /share
 ```
 
-Isso gerará uma URL única que será copiada para sua área de transferência.
+This will generate a unique URL that'll be copied to your clipboard.
 
-Para definir explicitamente o modo manual em seu [arquivo de configuração](/docs/config):
+To explicitly set manual mode in your [config file](/docs/config):
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "share": "manual"
 }
 ```
 
 ---
 
-### Compartilhamento automático
+### Auto-share
 
-Você pode habilitar o compartilhamento automático para todas as novas conversas definindo a opção `share` como `"auto"` em seu [arquivo de configuração](/docs/config):
+You can enable automatic sharing for all new conversations by setting the `share` option to `"auto"` in your [config file](/docs/config):
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "share": "auto"
 }
 ```
 
-Com o compartilhamento automático habilitado, cada nova conversa será compartilhada automaticamente e um link será gerado.
+With auto-share enabled, every new conversation will automatically be shared and a link will be generated.
 
 ---
 
-### Desativado
+### Disabled
 
-Você pode desativar o compartilhamento completamente definindo a opção `share` como `"disabled"` em seu [arquivo de configuração](/docs/config):
+You can disable sharing entirely by setting the `share` option to `"disabled"` in your [config file](/docs/config):
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "share": "disabled"
 }
 ```
 
-Para impor isso em sua equipe para um determinado projeto, adicione-o ao `opencode.json` em seu projeto e faça o check-in no Git.
+To enforce this across your team for a given project, add it to the `opencode.json` in your project and check into Git.
 
 ---
 
-## Cancelar compartilhamento
+## Un-sharing
 
-Para parar de compartilhar uma conversa e removê-la do acesso público:
+To stop sharing a conversation and remove it from public access:
 
 ```
 /unshare
 ```
 
-Isso removerá o link de compartilhamento e excluirá os dados relacionados à conversa.
+This will remove the share link and delete the data related to the conversation.
 
 ---
 
-## Privacidade
+## Privacy
 
-Há algumas coisas a serem lembradas ao compartilhar uma conversa.
-
----
-
-### Retenção de dados
-
-Conversas compartilhadas permanecem acessíveis até que você as descompartilhe explicitamente. Isso inclui:
-
-- Histórico completo da conversa
-- Todas as mensagens e respostas
-- Metadados da sessão
+There are a few things to keep in mind when sharing a conversation.
 
 ---
 
-### Recomendações
+### Data retention
 
-- Compartilhe apenas conversas que não contenham informações sensíveis.
-- Revise o conteúdo da conversa antes de compartilhar.
-- Descompartilhe conversas quando a colaboração estiver completa.
-- Evite compartilhar conversas com código proprietário ou dados confidenciais.
-- Para projetos sensíveis, desative o compartilhamento completamente.
+Shared conversations remain accessible until you explicitly unshare them. This
+includes:
+
+- Full conversation history
+- All messages and responses
+- Session metadata
 
 ---
 
-## Para empresas
+### Recommendations
 
-Para implantações empresariais, o recurso de compartilhamento pode ser:
+- Only share conversations that don't contain sensitive information.
+- Review conversation content before sharing.
+- Unshare conversations when collaboration is complete.
+- Avoid sharing conversations with proprietary code or confidential data.
+- For sensitive projects, disable sharing entirely.
 
-- **Desativado** completamente para conformidade de segurança
-- **Restrito** a usuários autenticados apenas através de SSO
-- **Auto-hospedado** em sua própria infraestrutura
+---
 
-[Saiba mais](/docs/enterprise) sobre como usar o opencode em sua organização.
+## For enterprises
+
+For enterprise deployments, the share feature can be:
+
+- **Disabled** entirely for security compliance
+- **Restricted** to users authenticated through SSO only
+- **Self-hosted** on your own infrastructure
+
+[Learn more](/docs/enterprise) about using CyxCode in your organization.

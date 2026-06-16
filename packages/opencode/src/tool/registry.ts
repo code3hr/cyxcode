@@ -23,6 +23,7 @@ import { ApiScanTool } from "../pentest/apiscan/tool"
 import { NetScanTool } from "../pentest/netscan/tool"
 import { CloudScanTool } from "../pentest/cloudscan/tool"
 import { CVETool } from "../pentest/cve/tool"
+import { VulnScanTool } from "../pentest/vulnscan/tool"
 import { ContainerScanTool } from "../pentest/containerscan/tool"
 import { MobileScanTool } from "../pentest/mobilescan/tool"
 import { WirelessScanTool } from "../pentest/wirelessscan/tool"
@@ -145,6 +146,7 @@ export namespace ToolRegistry {
           WikiWriteTool,
           WebSearchTool,
           CodeSearchTool,
+          VulnScanTool,
           SkillTool,
           ApplyPatchTool,
           ...(Flag.CYXCODE_EXPERIMENTAL_LSP_TOOL ? [LspTool] : []),

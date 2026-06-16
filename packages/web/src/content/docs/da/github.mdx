@@ -1,46 +1,46 @@
 ---
 title: GitHub
-description: Brug OpenCode i GitHub-problemer og Pull Requests.
+description: Use CyxCode in GitHub issues and pull-requests.
 ---
 
-OpenCode integreres med din GitHub arbejdsgang. Nævn `/opencode` eller `/oc` i din kommentar, og OpenCode vil udføre opgaver i din GitHub Actions-løber.
+CyxCode integrates with your GitHub workflow. Mention `/CyxCode` or `/oc` in your comment, and CyxCode will execute tasks within your GitHub Actions runner.
 
 ---
 
-## Funktioner
+## Features
 
-- **Triageproblemer**: Bed OpenCode om at undersøge et problem og forklare dig det.
-- **Ret og implementer**: Bed OpenCode om at løse et problem eller implementere en funktion. Og det vil fungere i en ny branch og indsende en PR med alle ændringerne.
-- **Sikker**: OpenCode løber inde i din GitHubs løbere.
+- **Triage issues**: Ask CyxCode to look into an issue and explain it to you.
+- **Fix and implement**: Ask CyxCode to fix an issue or implement a feature. And it will work in a new branch and submits a PR with all the changes.
+- **Secure**: CyxCode runs inside your GitHub's runners.
 
 ---
 
 ## Installation
 
-Kør følgende kommando i et projekt, der er i en GitHub repo:
+Run the following command in a project that is in a GitHub repo:
 
 ```bash
-opencode github install
+cyxcode github install
 ```
 
-Dette vil lede dig gennem installation af GitHub-appen, oprettelse af arbejdsgangen og opsætning af hemmeligheder.
+This will walk you through installing the GitHub app, creating the workflow, and setting up secrets.
 
 ---
 
-### Manuel opsætning
+### Manual Setup
 
-Eller du kan indstille det manuelt.
+Or you can set it up manually.
 
-1. **Installationsprogrammet GitHub-appen**
+1. **Install the GitHub app**
 
-   Gå over til [**github.com/apps/opencode-agent**](https://github.com/apps/opencode-agent). Sørg for, at det er installeret på mållageret.
+   Head over to [**github.com/apps/CyxCode-agent**](https://github.com/apps/CyxCode-agent). Make sure it's installed on the target repository.
 
-2. **Tilføj arbejdsgangen**
+2. **Add the workflow**
 
-   Tilføj følgende workflow-fil til `.github/workflows/opencode.yml` i din repo. Sørg for at indstille de relevante `model` og nødvendige API-nøgler i `env`.
+   Add the following workflow file to `.github/workflows/CyxCode.yml` in your repo. Make sure to set the appropriate `model` and required API keys in `env`.
 
-   ```yml title=".github/workflows/opencode.yml" {24,26}
-   name: opencode
+   ```yml title=".github/workflows/CyxCode.yml" {24,26}
+   name: CyxCode
 
    on:
      issue_comment:
@@ -49,10 +49,10 @@ Eller du kan indstille det manuelt.
        types: [created]
 
    jobs:
-     opencode:
+     CyxCode:
        if: |
          contains(github.event.comment.body, '/oc') ||
-         contains(github.event.comment.body, '/opencode')
+         contains(github.event.comment.body, '/CyxCode')
        runs-on: ubuntu-latest
        permissions:
          id-token: write
@@ -63,8 +63,8 @@ Eller du kan indstille det manuelt.
               fetch-depth: 1
               persist-credentials: false
 
-          - name: Run OpenCode
-           uses: anomalyco/opencode/github@latest
+          - name: Run CyxCode
+           uses: code3hr/cyxcode/github@latest
            env:
              ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
            with:
@@ -73,21 +73,21 @@ Eller du kan indstille det manuelt.
              # github_token: xxxx
    ```
 
-3. **Opbevar API-nøglerne i hemmeligheder**
+3. **Store the API keys in secrets**
 
-   I din organisation eller dit projekt **indstillinger** skal du udvide **Hemmeligheder og variabler** til venstre og vælge **Handlinger**. Og tilføj de nødvendige API-nøgler.
+   In your organization or project **settings**, expand **Secrets and variables** on the left and select **Actions**. And add the required API keys.
 
 ---
 
-## Konfiguration
+## Configuration
 
-- `model`: Den model, der skal bruges med OpenCode. Antager formatet `provider/model`. Dette er **påkrævet**.
-- `agent`: Agenten, der skal bruges. Skal være en primær agent. Falder tilbage til `default_agent` fra config eller `"build"`, hvis den ikke findes.
-- `share`: Om OpenCode-sessionen skal dele. Standard er **true** for offentlige arkiver.
-- `prompt`: Valgfri brugerdefineret prompt for at tilsidesætte standardadfærden. Brug dette til at tilpasse, hvordan OpenCode behandler anmodninger.
-- `token`: Valgfrit GitHub adgangstoken til at udføre operationer såsom oprettelse af kommentarer, begå ændringer og åbning af Pull Requests. Som standard bruger OpenCode installationsadgangstokenet fra OpenCode GitHub-appen, så commits, kommentarer og Pull Requests ser ud til at komme fra appen.
+- `model`: The model to use with CyxCode. Takes the format of `provider/model`. This is **required**.
+- `agent`: The agent to use. Must be a primary agent. Falls back to `default_agent` from config or `"build"` if not found.
+- `share`: Whether to share the CyxCode session. Defaults to **true** for public repositories.
+- `prompt`: Optional custom prompt to override the default behavior. Use this to customize how CyxCode processes requests.
+- `token`: Optional GitHub access token for performing operations such as creating comments, committing changes, and opening pull requests. By default, CyxCode uses the installation access token from the CyxCode GitHub App, so commits, comments, and pull requests appear as coming from the app.
 
-  Alternativt kan du bruge GitHub Action runners [built-in `GITHUB_TOKEN`](OpenCode) uden at installere OpenCode GitHub appen. Bare sørg for at give de nødvendige tilladelser i dit workflow:
+  Alternatively, you can use the GitHub Action runner's [built-in `GITHUB_TOKEN`](https://docs.github.com/en/actions/tutorials/authenticate-with-github_token) without installing the CyxCode GitHub App. Just make sure to grant the required permissions in your workflow:
 
   ```yaml
   permissions:
@@ -97,36 +97,36 @@ Eller du kan indstille det manuelt.
     issues: write
   ```
 
-  Du kan også bruge en [personal access tokens](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens)(PAT), hvis det foretrækkes.
+  You can also use a [personal access tokens](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens)(PAT) if preferred.
 
 ---
 
-## Understøttede begivenheder
+## Supported Events
 
-OpenCode kan udløses af følgende GitHub hændelser:
+CyxCode can be triggered by the following GitHub events:
 
-| Begivenhedstype               | Udløst af                               | Detaljer                                                                                                                |
-| ----------------------------- | --------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
-| `issue_comment`               | Kommentarer og problemer eller PR       | Nævn `/opencode` eller `/oc` i din kommentar. OpenCode læser kontekst og kan oprette brancher, åbne PR'er eller svare.  |
-| `pull_request_review_comment` | Kommenter specifikke kodelinjer i en PR | Nævn `/opencode` eller `/oc`, mens du gennemgår koden. OpenCode modtager filsti, linjenumre og diff-kontekst.           |
-| `issues`                      | Udgave åbnet eller redigeret            | Udløs automatisk OpenCode, når problemer oprettes eller ændres. Kræver `prompt` input.                                  |
-| `pull_request`                | PR åbnet eller opdateret                | Udløs automatisk OpenCode, når PR'er åbnes, synkroniseres eller genåbnes. Nyttigt til automatiserede kodegennemgange.   |
-| `schedule`                    | Cron-baseret tidsplan                   | Kør OpenCode efter en tidsplan. Kræver `prompt` input. Output går til logfiler og PR'er (intet problem ved kommentere). |
-| `workflow_dispatch`           | Manuel trigger fra GitHub UI            | Udløs OpenCode efter behov via fanen Handlinger. Kræver `prompt` input. Output går til logfiler og PR'er.               |
+| Event Type                    | Triggered By                           | Details                                                                                                           |
+| ----------------------------- | -------------------------------------- | ----------------------------------------------------------------------------------------------------------------- |
+| `issue_comment`               | Comment on an issue or PR              | Mention `/CyxCode` or `/oc` in your comment. CyxCode reads context and can create branches, open PRs, or reply. |
+| `pull_request_review_comment` | Comment on specific code lines in a PR | Mention `/CyxCode` or `/oc` while reviewing code. CyxCode receives file path, line numbers, and diff context.   |
+| `issues`                      | Issue opened or edited                 | Automatically trigger CyxCode when issues are created or modified. Requires `prompt` input.                      |
+| `pull_request`                | PR opened or updated                   | Automatically trigger CyxCode when PRs are opened, synchronized, or reopened. Useful for automated reviews.      |
+| `schedule`                    | Cron-based schedule                    | Run CyxCode on a schedule. Requires `prompt` input. Output goes to logs and PRs (no issue to comment on).        |
+| `workflow_dispatch`           | Manual trigger from GitHub UI          | Trigger CyxCode on demand via Actions tab. Requires `prompt` input. Output goes to logs and PRs.                 |
 
-### Tidsplan eksempel
+### Schedule Example
 
-Kør OpenCode efter en tidsplan for at udføre automatiske opgaver:
+Run CyxCode on a schedule to perform automated tasks:
 
-```yaml title=".github/workflows/opencode-scheduled.yml"
-name: Scheduled OpenCode Task
+```yaml title=".github/workflows/CyxCode-scheduled.yml"
+name: Scheduled CyxCode Task
 
 on:
   schedule:
     - cron: "0 9 * * 1" # Every Monday at 9am UTC
 
 jobs:
-  opencode:
+  CyxCode:
     runs-on: ubuntu-latest
     permissions:
       id-token: write
@@ -139,8 +139,8 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: Run OpenCode
-        uses: anomalyco/opencode/github@latest
+      - name: Run CyxCode
+        uses: code3hr/cyxcode/github@latest
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
         with:
@@ -150,16 +150,16 @@ jobs:
             If you find issues worth addressing, open an issue to track them.
 ```
 
-For planlagte begivenheder er `prompt` input **påkrævet**, da der ikke er nogen kommentarer at udtrække instruktioner fra. Planlagte arbejdsgange kører uden en brugerkontekst til kontrol af tilladelser, så arbejdsgangen skal give `contents: write` og `pull-requests: write`, hvis du forventer, at OpenCode skal oprette brancher eller PR'er.
+For scheduled events, the `prompt` input is **required** since there's no comment to extract instructions from. Scheduled workflows run without a user context to permission-check, so the workflow must grant `contents: write` and `pull-requests: write` if you expect CyxCode to create branches or PRs.
 
 ---
 
-### Pull Request eksempel
+### Pull Request Example
 
-Gennemgå automatisk PR'er, når de åbnes eller opdateres:
+Automatically review PRs when they are opened or updated:
 
-```yaml title=".github/workflows/opencode-review.yml"
-name: opencode-review
+```yaml title=".github/workflows/CyxCode-review.yml"
+name: CyxCode-review
 
 on:
   pull_request:
@@ -177,7 +177,7 @@ jobs:
       - uses: actions/checkout@v6
         with:
           persist-credentials: false
-      - uses: anomalyco/opencode/github@latest
+      - uses: code3hr/cyxcode/github@latest
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -191,15 +191,15 @@ jobs:
             - Suggest improvements
 ```
 
-For `pull_request` hændelser, hvis der ikke er angivet nogen `prompt`, vil OpenCode som standard gennemgå Pull Requesten.
+For `pull_request` events, if no `prompt` is provided, CyxCode defaults to reviewing the pull request.
 
 ---
 
-### Issues Triage eksempel
+### Issues Triage Example
 
-Triage automatisk nye problemer. Dette eksempel filtrerer til konti ældre end 30 dage for at reducere spam:
+Automatically triage new issues. This example filters to accounts older than 30 days to reduce spam:
 
-```yaml title=".github/workflows/opencode-triage.yml"
+```yaml title=".github/workflows/CyxCode-triage.yml"
 name: Issue Triage
 
 on:
@@ -233,7 +233,7 @@ jobs:
         with:
           persist-credentials: false
 
-      - uses: anomalyco/opencode/github@latest
+      - uses: code3hr/cyxcode/github@latest
         if: steps.check.outputs.result == 'true'
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
@@ -246,16 +246,16 @@ jobs:
             Otherwise, do not comment.
 ```
 
-For `issues` begivenheder er `prompt` input **påkrævet**, da der ikke er nogen kommentarer at udtrække instruktioner fra.
+For `issues` events, the `prompt` input is **required** since there's no comment to extract instructions from.
 
 ---
 
-## Brugerdefinerede prompter
+## Custom prompts
 
-Tilsidesæt standardprompten for at tilpasse OpenCodes adfærd til din arbejdsgang.
+Override the default prompt to customize CyxCode's behavior for your workflow.
 
-```yaml title=".github/workflows/opencode.yml"
-- uses: anomalyco/opencode/github@latest
+```yaml title=".github/workflows/CyxCode.yml"
+- uses: code3hr/cyxcode/github@latest
   with:
     model: anthropic/claude-sonnet-4-5
     prompt: |
@@ -265,57 +265,57 @@ Tilsidesæt standardprompten for at tilpasse OpenCodes adfærd til din arbejdsga
       - Suggest improvements
 ```
 
-Dette er nyttigt til at håndhæve specifikke gennemgangskriterier, kodningsstandarder eller fokusområder, der er relevante for dit projekt.
+This is useful for enforcing specific review criteria, coding standards, or focus areas relevant to your project.
 
 ---
 
-## Eksempler
+## Examples
 
-Her er nogle eksempler på, hvordan du kan bruge OpenCode i GitHub.
+Here are some examples of how you can use CyxCode in GitHub.
 
-- **Forklar et problem**
+- **Explain an issue**
 
-  Tilføj denne kommentar i et GitHub-nummer.
-
-  ```
-  /opencode explain this issue
-  ```
-
-  OpenCode vil læse hele tråden, inklusive alle kommentarer, og svare med en klar forklaring.
-
-- **Løs et problem**
-
-  I et GitHub-problem skal du sige:
+  Add this comment in a GitHub issue.
 
   ```
-  /opencode fix this
+  /CyxCode explain this issue
   ```
 
-  Og OpenCode vil oprette en ny branch, implementere ændringer og åbne en PR med ændringer.
+  CyxCode will read the entire thread, including all comments, and reply with a clear explanation.
 
-- **Gennemgå PR'er og foretag ændringer**
+- **Fix an issue**
 
-  Efterlad følgende kommentar på en GitHub PR.
+  In a GitHub issue, say:
+
+  ```
+  /CyxCode fix this
+  ```
+
+  And CyxCode will create a new branch, implement the changes, and open a PR with the changes.
+
+- **Review PRs and make changes**
+
+  Leave the following comment on a GitHub PR.
 
   ```
   Delete the attachment from S3 when the note is removed /oc
   ```
 
-  OpenCode vil implementere den ønskede ændring og forpligtelse til den samme PR.
+  CyxCode will implement the requested change and commit it to the same PR.
 
-- **Gennemgå specifikke kodelinjer**
+- **Review specific code lines**
 
-  Efterlad en kommentar direkte på kodelinjer i PR's faneblad "Filer". OpenCode detekterer automatisk filer, linjenumrene og diff-konteksten for at give præcise svar.
+  Leave a comment directly on code lines in the PR's "Files" tab. CyxCode automatically detects the file, line numbers, and diff context to provide precise responses.
 
   ```
   [Comment on specific lines in Files tab]
   /oc add error handling here
   ```
 
-  Når du kommenterer på specifikke linjer, modtager OpenCode:
-  - Den nøjagtige fil bliver gennemgået
-  - De specifikke kodelinjer
-  - Den omgivende forskellig kontekst
-  - Linjenummeroplysninger
+  When commenting on specific lines, CyxCode receives:
+  - The exact file being reviewed
+  - The specific lines of code
+  - The surrounding diff context
+  - Line number information
 
-  Dette giver mulighed for mere målrettede anmodninger uden at skulle angive filstier eller linjenumre manuelt.
+  This allows for more targeted requests without needing to specify file paths or line numbers manually.

@@ -1,4 +1,5 @@
 import { getRequestEvent } from "solid-js/web"
+import type { FetchEvent } from "@solidjs/start/server"
 import { and, Database, eq, inArray, isNull, sql } from "@cyxcode/console-core/drizzle/index.js"
 import { UserTable } from "@cyxcode/console-core/schema/user.sql.js"
 import { redirect } from "@solidjs/router"
@@ -39,7 +40,7 @@ export function useAuthSession() {
 
 export const getActor = async (workspace?: string): Promise<Actor.Info> => {
   "use server"
-  const evt = getRequestEvent()
+  const evt = getRequestEvent() as FetchEvent | undefined
   if (!evt) throw new Error("No request event")
   if (evt.locals.actor) return evt.locals.actor
   evt.locals.actor = (async () => {
@@ -104,7 +105,7 @@ export const getActor = async (workspace?: string): Promise<Actor.Info> => {
           properties: {
             userID: user.id,
             workspaceID: user.workspaceID,
-            accountID: user.accountID,
+            accountID: user.accountID!,
             role: user.role,
           },
         }
@@ -112,5 +113,5 @@ export const getActor = async (workspace?: string): Promise<Actor.Info> => {
     }
     throw redirect("/auth/authorize")
   })()
-  return evt.locals.actor
+  return evt.locals.actor!
 }

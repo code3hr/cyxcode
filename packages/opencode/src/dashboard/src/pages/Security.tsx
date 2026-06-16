@@ -1,5 +1,17 @@
 import { Component, For, Show, createEffect, createMemo, createSignal } from "solid-js"
-import { watchApi, type WatchAlert, type WatchEvent, type WatchPolicy, type WatchReport } from "../api/client"
+import {
+  findingsApi,
+  scansApi,
+  vulnApi,
+  watchApi,
+  type Finding,
+  type ScanResult,
+  type VulnScanResponse,
+  type WatchAlert,
+  type WatchEvent,
+  type WatchPolicy,
+  type WatchReport,
+} from "../api/client"
 
 type Period = "1h" | "1d" | "7d" | "30d" | "all"
 
@@ -85,6 +97,10 @@ const Security: Component = () => {
   const [sent, setSent] = createSignal<WatchEvent[]>([])
   const [policy, setPolicy] = createSignal<WatchPolicy | null>(null)
   const [effective, setEffective] = createSignal<WatchPolicy | null>(null)
+  const [vuln, setVuln] = createSignal<VulnScanResponse | null>(null)
+  const [vulnScan, setVulnScan] = createSignal<ScanResult | null>(null)
+  const [vulnFindings, setVulnFindings] = createSignal<Finding[]>([])
+  const [vulnRunning, setVulnRunning] = createSignal(false)
   const [draft, setDraft] = createSignal("")
   const [editing, setEditing] = createSignal<number | null>(null)
   const [ruleId, setRuleId] = createSignal("")
@@ -125,7 +141,7 @@ const Security: Component = () => {
     setError(null)
     setMsg(null)
 
-    const [rep, evt, alt, ctx, cfg, eff] = await Promise.all([
+    const [rep, evt, alt, ctx, cfg, eff, scans, findings] = await Promise.all([
       watchApi.report(period()),
       watchApi.query({
         limit: 120,
@@ -143,6 +159,8 @@ const Security: Component = () => {
       }),
       watchApi.policy(),
       watchApi.effectivePolicy(),
+      scansApi.list({ scanType: "vuln", limit: 1 }),
+      findingsApi.list({ limit: 200 }),
     ])
 
     if (rep.error) setError(rep.error)
@@ -151,6 +169,8 @@ const Security: Component = () => {
     if (ctx.error) setError((prev) => prev ?? ctx.error)
     if (cfg.error) setError((prev) => prev ?? cfg.error)
     if (eff.error) setError((prev) => prev ?? eff.error)
+    if (scans.error) setError((prev) => prev ?? scans.error)
+    if (findings.error) setError((prev) => prev ?? findings.error)
 
     if (rep.data) setReport(rep.data.report)
     if (evt.data) setEvents(evt.data.events)
@@ -160,6 +180,8 @@ const Security: Component = () => {
       sync(cfg.data.policy)
     }
     if (eff.data) setEffective(eff.data.policy)
+    if (scans.data) setVulnScan(scans.data.scans[0] ?? null)
+    if (findings.data) setVulnFindings(findings.data.findings.filter((item) => item.scanID === scans.data?.scans[0]?.id))
 
     setLoading(false)
   }
@@ -313,6 +335,29 @@ const Security: Component = () => {
     setSaving(false)
   }
 
+  const runVuln = async () => {
+    setVulnRunning(true)
+    setError(null)
+    setMsg(null)
+
+    const res = await vulnApi.scan({ minSeverity: "high", failOnSeverity: "high", createFindings: true })
+    if (res.error) {
+      setError(res.error)
+      setVulnRunning(false)
+      return
+    }
+
+    if (res.data) {
+      setVuln(res.data)
+      setVulnScan(res.data.scan)
+      const list = await findingsApi.list({ scanID: res.data.scan.id, limit: 200 })
+      if (list.data) setVulnFindings(list.data.findings)
+      if (list.error) setError(list.error)
+      setMsg(`Vulnerability scan completed with ${res.data.findings.total} findings`)
+    }
+    setVulnRunning(false)
+  }
+
   const fmt = (n: number) => n.toLocaleString()
   const when = (ts: number) => new Date(ts).toLocaleString()
   const short = (text?: string) => {
@@ -354,6 +399,79 @@ const Security: Component = () => {
       <Show when={msg()}>
         <div class="bg-cyan-950/50 border border-cyan-800 rounded p-3 text-sm text-cyan-200">{msg()}</div>
       </Show>
+
+      <section class="card">
+        <div class="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+          <div>
+            <div class="card-header mb-1">Vulnerability Scan</div>
+            <div class="text-sm text-gray-400">
+              Known CVE exposure across dependencies, code, and config
+            </div>
+          </div>
+          <button class="btn btn-primary" onClick={runVuln} disabled={vulnRunning()}>
+            {vulnRunning() ? "Scanning..." : "Run Vuln Scan"}
+          </button>
+        </div>
+
+        <div class="mt-4 grid grid-cols-2 md:grid-cols-4 xl:grid-cols-6 gap-3">
+          <Metric label="Findings" value={String(vuln()?.findings.total ?? vulnFindings().length)} tone="text-red-300" />
+          <Metric label="Critical" value={String(vuln()?.severity.critical ?? vulnFindings().filter((item) => item.severity === "critical").length)} tone="text-red-300" />
+          <Metric label="High" value={String(vuln()?.severity.high ?? vulnFindings().filter((item) => item.severity === "high").length)} tone="text-orange-300" />
+          <Metric label="Dependency" value={String(vuln()?.findings.dependency ?? vulnFindings().filter((item) => item.service === "dependency").length)} />
+          <Metric label="Code Pattern" value={String(vuln()?.findings.code ?? vulnFindings().filter((item) => item.service === "code-pattern").length)} />
+          <Metric label="Gate" value={vuln()?.gate ? (vuln()!.gate.passed ? "Pass" : "Fail") : "-"} tone={vuln()?.gate?.passed === false ? "text-red-300" : "text-emerald-300"} />
+        </div>
+
+        <Show when={vulnScan()}>
+          <div class="mt-4 rounded border border-gray-700 bg-gray-900 p-3">
+            <div class="flex flex-wrap items-start justify-between gap-3">
+              <div>
+                <div class="text-sm font-medium text-gray-100">{vulnScan()!.summary ?? "Vulnerability scan completed"}</div>
+                <div class="mt-1 text-xs text-gray-500">{vulnScan()!.target}</div>
+              </div>
+              <span class="badge bg-blue-900 text-blue-200">{new Date(vulnScan()!.startTime).toLocaleString()}</span>
+            </div>
+            <Show when={vuln()?.discovery}>
+              <div class="mt-3 flex flex-wrap gap-2 text-xs">
+                <span class="badge bg-gray-700 text-gray-300">supported: {vuln()!.discovery.supported.join(", ") || "none"}</span>
+                <span class="badge bg-gray-700 text-gray-300">planned: {vuln()!.discovery.planned.join(", ") || "none"}</span>
+              </div>
+            </Show>
+            <Show when={vuln()?.gate}>
+              <div class="mt-3 text-xs text-gray-400">
+                Release gate {vuln()!.gate.passed ? "passed" : "failed"}: {vuln()!.gate.blocked} finding(s) at {vuln()!.gate.failOn}+ severity.
+              </div>
+            </Show>
+          </div>
+        </Show>
+
+        <Show when={vulnFindings().length > 0}>
+          <div class="mt-4 overflow-x-auto">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Severity</th>
+                  <th>Type</th>
+                  <th>Finding</th>
+                  <th>CVEs</th>
+                </tr>
+              </thead>
+              <tbody>
+                <For each={vulnFindings().slice(0, 8)}>
+                  {(item) => (
+                    <tr>
+                      <td><span class={`badge ${item.severity === "critical" ? "bg-red-950 text-red-300" : item.severity === "high" ? "bg-orange-950 text-orange-300" : "bg-gray-700 text-gray-300"}`}>{item.severity}</span></td>
+                      <td>{item.service ?? "vuln"}</td>
+                      <td class="max-w-xl truncate" title={item.title}>{item.title}</td>
+                      <td class="text-xs text-gray-400">{item.cve?.slice(0, 3).join(", ") ?? ""}</td>
+                    </tr>
+                  )}
+                </For>
+              </tbody>
+            </table>
+          </div>
+        </Show>
+      </section>
 
       <Show when={report()}>
         <div class="grid grid-cols-2 md:grid-cols-4 xl:grid-cols-8 gap-3">

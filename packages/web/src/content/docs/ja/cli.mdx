@@ -1,603 +1,604 @@
 ---
 title: CLI
-description: OpenCode CLI のオプションとコマンド。
+description: CyxCode CLI options and commands.
 ---
 
 import { Tabs, TabItem } from "@astrojs/starlight/components"
 
-OpenCode CLI は、引数なしで実行すると、デフォルトで [TUI](/docs/tui) を開始します。
+The CyxCode CLI by default starts the [TUI](/docs/tui) when run without any arguments.
 
 ```bash
-opencode
+cyxcode
 ```
 
-ただし、このページに記載されているようにコマンドも受け入れます。これにより、OpenCode をプログラム的に操作できるようになります。
+But it also accepts commands as documented on this page. This allows you to interact with CyxCode programmatically.
 
 ```bash
-opencode run "Explain how closures work in JavaScript"
+cyxcode run "Explain how closures work in JavaScript"
 ```
 
 ---
 
 ### tui
 
-OpenCode ターミナルユーザーインターフェイスを開始します。
+Start the CyxCode terminal user interface.
 
 ```bash
-opencode [project]
+cyxcode [project]
 ```
 
-#### フラグ
+#### Flags
 
-| フラグ       | ショート    | 説明                                                       |
-| ------------ | ----------- | ---------------------------------------------------------- |
-| `--continue` | `-c`        | 最後のセッションを続行                                     |
-| `--session`  |             | 続行時にセッションをフォーク (`-s` または `--fork` と併用) |
-| `--continue` | `--session` | 続行するセッション ID                                      |
-| `--prompt`   |             | 使用のプロンプト                                           |
-| `--model`    | `-m`        | プロバイダー/モデルの形式で使用するモデル                  |
-| `--agent`    |             | 使用するエージェント                                       |
-| `--port`     |             | リッスンするポート                                         |
-| `--hostname` |             | リッスンするホスト名                                       |
+| Flag         | Short | Description                                                             |
+| ------------ | ----- | ----------------------------------------------------------------------- |
+| `--continue` | `-c`  | Continue the last session                                               |
+| `--session`  | `-s`  | Session ID to continue                                                  |
+| `--fork`     |       | Fork the session when continuing (use with `--continue` or `--session`) |
+| `--prompt`   |       | Prompt to use                                                           |
+| `--model`    | `-m`  | Model to use in the form of provider/model                              |
+| `--agent`    |       | Agent to use                                                            |
+| `--port`     |       | Port to listen on                                                       |
+| `--hostname` |       | Hostname to listen on                                                   |
 
 ---
 
-## コマンド
+## Commands
 
-OpenCode CLI には次のコマンドもあります。
+The CyxCode CLI also has the following commands.
 
 ---
 
 ### agent
 
-OpenCode のエージェントを管理します。
+Manage agents for CyxCode.
 
 ```bash
-opencode agent [command]
+cyxcode agent [command]
 ```
 
 ---
 
 ### attach
 
-`serve` または `web` コマンドを使用して起動された、すでに実行中の OpenCode バックエンドサーバーにターミナルを接続します。
+Attach a terminal to an already running CyxCode backend server started via `serve` or `web` commands.
 
 ```bash
-opencode attach [url]
+cyxcode attach [url]
 ```
 
-これにより、リモート OpenCode バックエンドで TUI を使用できるようになります。例えば：
+This allows using the TUI with a remote CyxCode backend. For example:
 
 ```bash
 # Start the backend server for web/mobile access
-opencode web --port 4096 --hostname 0.0.0.0
+cyxcode web --port 4096 --hostname 0.0.0.0
 
 # In another terminal, attach the TUI to the running backend
-opencode attach http://10.20.30.40:4096
+cyxcode attach http://10.20.30.40:4096
 ```
 
-#### フラグ
+#### Flags
 
-| フラグ      | ショート | 説明                           |
-| ----------- | -------- | ------------------------------ |
-| `--dir`     |          | TUI を開始する作業ディレクトリ |
-| `--session` | `-s`     | 続行するセッション ID          |
+| Flag        | Short | Description                       |
+| ----------- | ----- | --------------------------------- |
+| `--dir`     |       | Working directory to start TUI in |
+| `--session` | `-s`  | Session ID to continue            |
 
 ---
 
 #### create
 
-カスタム構成で新しいエージェントを作成します。
+Create a new agent with custom configuration.
 
 ```bash
-opencode agent create
+cyxcode agent create
 ```
 
-このコマンドは、カスタムシステムプロンプトとツール構成を使用して新しいエージェントを作成する手順を示します。
+This command will guide you through creating a new agent with a custom system prompt and tool configuration.
 
 ---
 
 #### list
 
-利用可能なエージェントをすべてリストします。
+List all available agents.
 
 ```bash
-opencode agent list
+cyxcode agent list
 ```
 
 ---
 
 ### auth
 
-プロバイダーの資格情報とログインを管理するコマンド。
+Command to manage credentials and login for providers.
 
 ```bash
-opencode auth [command]
+cyxcode auth [command]
 ```
 
 ---
 
 #### login
 
-OpenCode は [Models.dev](https://models.dev) のプロバイダーリストを利用しているため、`opencode auth login` を使用して、使用したいプロバイダーの API キーを構成できます。これは `~/.local/share/opencode/auth.json` に保存されます。
+CyxCode is powered by the provider list at [Models.dev](https://models.dev), so you can use `cyxcode auth login` to configure API keys for any provider you'd like to use. This is stored in `~/.local/share/opencode/auth.json`.
 
 ```bash
-opencode auth login
+cyxcode auth login
 ```
 
-OpenCode が起動すると、認証情報ファイルからプロバイダーがロードされます。また、環境またはプロジェクト内の `.env` ファイルで定義されたキーがあるかどうかも確認します。
+When CyxCode starts up it loads the providers from the credentials file. And if there are any keys defined in your environments or a `.env` file in your project.
 
 ---
 
 #### list
 
-認証情報ファイルに保存されているすべての認証されたプロバイダーをリストします。
+Lists all the authenticated providers as stored in the credentials file.
 
 ```bash
-opencode auth list
+cyxcode auth list
 ```
 
-またはショートバージョン。
+Or the short version.
 
 ```bash
-opencode auth ls
+cyxcode auth ls
 ```
 
 ---
 
 #### logout
 
-資格情報ファイルからプロバイダーをクリアすることで、プロバイダーからログアウトします。
+Logs you out of a provider by clearing it from the credentials file.
 
 ```bash
-opencode auth logout
+cyxcode auth logout
 ```
 
 ---
 
 ### github
 
-リポジトリ自動化のための GitHub エージェントを管理します。
+Manage the GitHub agent for repository automation.
 
 ```bash
-opencode github [command]
+cyxcode github [command]
 ```
 
 ---
 
 #### install
 
-GitHub エージェントをリポジトリにインストールします。
+Install the GitHub agent in your repository.
 
 ```bash
-opencode github install
+cyxcode github install
 ```
 
-これにより、必要な GitHub Actions ワークフローが設定され、構成プロセスがガイドされます。 [詳細はこちら](/docs/github)。
+This sets up the necessary GitHub Actions workflow and guides you through the configuration process. [Learn more](/docs/github).
 
 ---
 
 #### run
 
-GitHub エージェントを実行します。これは通常、GitHub Actions で使用されます。
+Run the GitHub agent. This is typically used in GitHub Actions.
 
 ```bash
-opencode github run
+cyxcode github run
 ```
 
-##### フラグ
+##### Flags
 
-| フラグ    | 説明                                                |
-| --------- | --------------------------------------------------- |
-| `--event` | エージェントを実行するための GitHub モック イベント |
-| `--token` | GitHub 個人アクセストークン                         |
+| Flag      | Description                            |
+| --------- | -------------------------------------- |
+| `--event` | GitHub mock event to run the agent for |
+| `--token` | GitHub personal access token           |
 
 ---
 
 ### mcp
 
-モデルコンテキストプロトコルサーバーを管理します。
+Manage Model Context Protocol servers.
 
 ```bash
-opencode mcp [command]
+cyxcode mcp [command]
 ```
 
 ---
 
 #### add
 
-MCP サーバーを構成に追加します。
+Add an MCP server to your configuration.
 
 ```bash
-opencode mcp add
+cyxcode mcp add
 ```
 
-このコマンドは、ローカルまたはリモートの MCP サーバーを追加する手順を示します。
+This command will guide you through adding either a local or remote MCP server.
 
 ---
 
 #### list
 
-構成されているすべての MCP サーバーとその接続ステータスをリストします。
+List all configured MCP servers and their connection status.
 
 ```bash
-opencode mcp list
+cyxcode mcp list
 ```
 
-または、短いバージョンを使用してください。
+Or use the short version.
 
 ```bash
-opencode mcp ls
+cyxcode mcp ls
 ```
 
 ---
 
 #### auth
 
-OAuth 対応の MCP サーバーで認証します。
+Authenticate with an OAuth-enabled MCP server.
 
 ```bash
-opencode mcp auth [name]
+cyxcode mcp auth [name]
 ```
 
-サーバー名を指定しない場合は、利用可能な OAuth 対応サーバーから選択するように求められます。
+If you don't provide a server name, you'll be prompted to select from available OAuth-capable servers.
 
-OAuth 対応サーバーとその認証ステータスを一覧表示することもできます。
+You can also list OAuth-capable servers and their authentication status.
 
 ```bash
-opencode mcp auth list
+cyxcode mcp auth list
 ```
 
-または、短いバージョンを使用してください。
+Or use the short version.
 
 ```bash
-opencode mcp auth ls
+cyxcode mcp auth ls
 ```
 
 ---
 
 #### logout
 
-MCP サーバーの OAuth 資格情報を削除します。
+Remove OAuth credentials for an MCP server.
 
 ```bash
-opencode mcp logout [name]
+cyxcode mcp logout [name]
 ```
 
 ---
 
 #### debug
 
-MCP サーバーの OAuth 接続の問題をデバッグします。
+Debug OAuth connection issues for an MCP server.
 
 ```bash
-opencode mcp debug <name>
+cyxcode mcp debug <name>
 ```
 
 ---
 
 ### models
 
-構成されたプロバイダーから利用可能なすべてのモデルをリストします。
+List all available models from configured providers.
 
 ```bash
-opencode models [provider]
+cyxcode models [provider]
 ```
 
-このコマンドは、構成されたプロバイダー全体で利用可能なすべてのモデルを `provider/model` の形式で表示します。
+This command displays all models available across your configured providers in the format `provider/model`.
 
-これは、[設定](/docs/config/) で使用する正確なモデル名を把握するのに役立ちます。
+This is useful for figuring out the exact model name to use in [your config](/docs/config/).
 
-オプションでプロバイダー ID を渡して、そのプロバイダーによってモデルをフィルターできます。
+You can optionally pass a provider ID to filter models by that provider.
 
 ```bash
-opencode models anthropic
+cyxcode models anthropic
 ```
 
-#### フラグ
+#### Flags
 
-| フラグ      | 説明                                                            |
-| ----------- | --------------------------------------------------------------- |
-| `--refresh` | models.dev からモデルキャッシュを更新します。                   |
-| `--verbose` | より詳細なモデル出力を使用します (コストなどのメタデータを含む) |
+| Flag        | Description                                                  |
+| ----------- | ------------------------------------------------------------ |
+| `--refresh` | Refresh the models cache from models.dev                     |
+| `--verbose` | Use more verbose model output (includes metadata like costs) |
 
-`--refresh` フラグを使用して、キャッシュされたモデルリストを更新します。これは、新しいモデルがプロバイダーに追加され、それを OpenCode で確認したい場合に便利です。
+Use the `--refresh` flag to update the cached model list. This is useful when new models have been added to a provider and you want to see them in CyxCode.
 
 ```bash
-opencode models --refresh
+cyxcode models --refresh
 ```
 
 ---
 
 ### run
 
-プロンプトを直接渡して、非対話モードで opencode を実行します。
+Run CyxCode in non-interactive mode by passing a prompt directly.
 
 ```bash
-opencode run [message..]
+cyxcode run [message..]
 ```
 
-これは、スクリプト作成、自動化、または完全な TUI を起動せずに迅速な回答が必要な場合に便利です。例えば。
+This is useful for scripting, automation, or when you want a quick answer without launching the full TUI. For example.
 
-```bash "opencode run"
-opencode run Explain the use of context in Go
+```bash "cyxcode run"
+cyxcode run Explain the use of context in Go
 ```
 
-実行中の `opencode serve` インスタンスにアタッチして、実行ごとの MCP サーバーのコールドブート時間を回避することもできます。
+You can also attach to a running `cyxcode serve` instance to avoid MCP server cold boot times on every run:
 
 ```bash
 # Start a headless server in one terminal
-opencode serve
+cyxcode serve
 
 # In another terminal, run commands that attach to it
-opencode run --attach http://localhost:4096 "Explain async/await in JavaScript"
+cyxcode run --attach http://localhost:4096 "Explain async/await in JavaScript"
 ```
 
-#### フラグ
+#### Flags
 
-| フラグ       | ショート | 説明                                                                                      |
-| ------------ | -------- | ----------------------------------------------------------------------------------------- |
-| `--command`  |          | 実行するコマンド。引数には message を使用します。                                         |
-| `--continue` | `-c`     | 最後のセッションを続行                                                                    |
-| `--session`  | `-s`     | 続行するセッション ID                                                                     |
-| `--fork`     |          | 続行時にセッションをフォーク (`--continue` または `--session` と併用)                     |
-| `--share`    |          | セッションを共有する                                                                      |
-| `--model`    | `-m`     | プロバイダー/モデルの形式で使用するモデル                                                 |
-| `--agent`    |          | 使用するエージェント                                                                      |
-| `--file`     | `-f`     | メッセージに添付するファイル                                                              |
-| `--format`   |          | 形式: デフォルト (フォーマット済み) または json (生の JSON イベント)                      |
-| `--title`    |          | セッションのタイトル (値が指定されていない場合は、切り詰められたプロンプトが使用されます) |
-| `--attach`   |          | 実行中の opencode サーバー (http://localhost:4096 など) に接続します。                    |
-| `--port`     |          | ローカルサーバーのポート (デフォルトはランダムポート)                                     |
+| Flag         | Short | Description                                                             |
+| ------------ | ----- | ----------------------------------------------------------------------- |
+| `--command`  |       | The command to run, use message for args                                |
+| `--continue` | `-c`  | Continue the last session                                               |
+| `--session`  | `-s`  | Session ID to continue                                                  |
+| `--fork`     |       | Fork the session when continuing (use with `--continue` or `--session`) |
+| `--share`    |       | Share the session                                                       |
+| `--model`    | `-m`  | Model to use in the form of provider/model                              |
+| `--agent`    |       | Agent to use                                                            |
+| `--file`     | `-f`  | File(s) to attach to message                                            |
+| `--format`   |       | Format: default (formatted) or json (raw JSON events)                   |
+| `--title`    |       | Title for the session (uses truncated prompt if no value provided)      |
+| `--attach`   |       | Attach to a running cyxcode server (e.g., http://localhost:4096)       |
+| `--port`     |       | Port for the local server (defaults to random port)                     |
 
 ---
 
 ### serve
 
-API アクセスのためにヘッドレス OpenCode サーバーを起動します。完全な HTTP インターフェイスについては、[サーバーのドキュメント](/docs/server) を確認してください。
+Start a headless CyxCode server for API access. Check out the [server docs](/docs/server) for the full HTTP interface.
 
 ```bash
-opencode serve
+cyxcode serve
 ```
 
-これにより、TUI インターフェイスを使用せずに opencode 機能への API アクセスを提供する HTTP サーバーが起動します。 `OPENCODE_SERVER_PASSWORD` を設定して HTTP 基本認証を有効にします (ユーザー名のデフォルトは `opencode`)。
+This starts an HTTP server that provides API access to CyxCode functionality without the TUI interface. Set `OPENCODE_SERVER_PASSWORD` to enable HTTP basic auth (username defaults to `opencode`).
 
-#### フラグ
+#### Flags
 
-| フラグ       | 説明                                    |
-| ------------ | --------------------------------------- |
-| `--port`     | リッスンするポート                      |
-| `--hostname` | リッスンするホスト名                    |
-| `--mdns`     | mDNS 検出を有効にする                   |
-| `--cors`     | CORS を許可する追加のブラウザーオリジン |
+| Flag         | Description                                |
+| ------------ | ------------------------------------------ |
+| `--port`     | Port to listen on                          |
+| `--hostname` | Hostname to listen on                      |
+| `--mdns`     | Enable mDNS discovery                      |
+| `--cors`     | Additional browser origin(s) to allow CORS |
 
 ---
 
 ### session
 
-OpenCode セッションを管理します。
+Manage CyxCode sessions.
 
 ```bash
-opencode session [command]
+cyxcode session [command]
 ```
 
 ---
 
 #### list
 
-すべての OpenCode セッションをリストします。
+List all CyxCode sessions.
 
 ```bash
-opencode session list
+cyxcode session list
 ```
 
-##### フラグ
+##### Flags
 
-| フラグ        | ショート | 説明                                     |
-| ------------- | -------- | ---------------------------------------- |
-| `--max-count` | `-n`     | 最新のセッションを N 個に制限            |
-| `--format`    |          | 出力形式: テーブルまたは json (テーブル) |
+| Flag          | Short | Description                          |
+| ------------- | ----- | ------------------------------------ |
+| `--max-count` | `-n`  | Limit to N most recent sessions      |
+| `--format`    |       | Output format: table or json (table) |
 
 ---
 
 ### stats
 
-OpenCode セッションのトークンの使用状況とコストの統計を表示します。
+Show token usage and cost statistics for your CyxCode sessions.
 
 ```bash
-opencode stats
+cyxcode stats
 ```
 
-#### フラグ
+#### Flags
 
-| フラグ      | 説明                                                                                       |
-| ----------- | ------------------------------------------------------------------------------------------ |
-| `--days`    | 過去 N 日間の統計を表示 (全期間)                                                           |
-| `--tools`   | 表示するツールの数 (すべて)                                                                |
-| `--models`  | モデルの使用状況の内訳を表示 (デフォルトでは非表示)。上位 N 件を表示するには数値を渡します |
-| `--project` | プロジェクトでフィルタリング (全プロジェクト、空文字列: 現在のプロジェクト)                |
+| Flag        | Description                                                                 |
+| ----------- | --------------------------------------------------------------------------- |
+| `--days`    | Show stats for the last N days (all time)                                   |
+| `--tools`   | Number of tools to show (all)                                               |
+| `--models`  | Show model usage breakdown (hidden by default). Pass a number to show top N |
+| `--project` | Filter by project (all projects, empty string: current project)             |
 
 ---
 
 ### export
 
-セッションデータを JSON としてエクスポートします。
+Export session data as JSON.
 
 ```bash
-opencode export [sessionID]
+cyxcode export [sessionID]
 ```
 
-セッション ID を指定しない場合は、利用可能なセッションから選択するように求められます。
+If you don't provide a session ID, you'll be prompted to select from available sessions.
 
 ---
 
 ### import
 
-JSON ファイルまたは OpenCode 共有 URL からセッションデータをインポートします。
+Import session data from a JSON file or CyxCode share URL.
 
 ```bash
-opencode import <file>
+cyxcode import <file>
 ```
 
-ローカルファイルまたは OpenCode 共有 URL からインポートできます。
+You can import from a local file or an CyxCode share URL.
 
 ```bash
-opencode import session.json
-opencode import https://opncd.ai/s/abc123
+cyxcode import session.json
+cyxcode import https://opncd.ai/s/abc123
 ```
 
 ---
 
 ### web
 
-Web インターフェイスを使用してヘッドレス OpenCode サーバーを起動します。
+Start a headless CyxCode server with a web interface.
 
 ```bash
-opencode web
+cyxcode web
 ```
 
-これにより、HTTP サーバーが起動し、Web ブラウザが開き、Web インターフェイスを通じて OpenCode にアクセスします。 `OPENCODE_SERVER_PASSWORD` を設定して HTTP 基本認証を有効にします (ユーザー名のデフォルトは `opencode`)。
+This starts an HTTP server and opens a web browser to access CyxCode through a web interface. Set `OPENCODE_SERVER_PASSWORD` to enable HTTP basic auth (username defaults to `opencode`).
 
-#### フラグ
+#### Flags
 
-| フラグ       | 説明                                    |
-| ------------ | --------------------------------------- |
-| `--port`     | リッスンするポート                      |
-| `--hostname` | リッスンするホスト名                    |
-| `--mdns`     | mDNS 検出を有効にする                   |
-| `--cors`     | CORS を許可する追加のブラウザーオリジン |
+| Flag         | Description                                |
+| ------------ | ------------------------------------------ |
+| `--port`     | Port to listen on                          |
+| `--hostname` | Hostname to listen on                      |
+| `--mdns`     | Enable mDNS discovery                      |
+| `--cors`     | Additional browser origin(s) to allow CORS |
 
 ---
 
 ### acp
 
-ACP (エージェントクライアントプロトコル) サーバーを起動します。
+Start an ACP (Agent Client Protocol) server.
 
 ```bash
-opencode acp
+cyxcode acp
 ```
 
-このコマンドは、nd-JSON を使用して stdin/stdout 経由で通信する ACP サーバーを起動します。
+This command starts an ACP server that communicates via stdin/stdout using nd-JSON.
 
-#### フラグ
+#### Flags
 
-| フラグ       | 説明                 |
-| ------------ | -------------------- |
-| `--cwd`      | 作業ディレクトリ     |
-| `--port`     | リッスンするポート   |
-| `--hostname` | リッスンするホスト名 |
+| Flag         | Description           |
+| ------------ | --------------------- |
+| `--cwd`      | Working directory     |
+| `--port`     | Port to listen on     |
+| `--hostname` | Hostname to listen on |
 
 ---
 
 ### uninstall
 
-OpenCode をアンインストールし、関連ファイルをすべて削除します。
+Uninstall CyxCode and remove all related files.
 
 ```bash
-opencode uninstall
+cyxcode uninstall
 ```
 
-#### フラグ
+#### Flags
 
-| フラグ          | ショート | 説明                                         |
-| --------------- | -------- | -------------------------------------------- |
-| `--keep-config` | `-c`     | 構成ファイルを保持する                       |
-| `--keep-data`   | `-d`     | セッションデータとスナップショットを保持する |
-| `--dry-run`     |          | 削除せずに削除される内容を表示する           |
-| `--force`       | `-f`     | 確認プロンプトをスキップする                 |
+| Flag            | Short | Description                                 |
+| --------------- | ----- | ------------------------------------------- |
+| `--keep-config` | `-c`  | Keep configuration files                    |
+| `--keep-data`   | `-d`  | Keep session data and snapshots             |
+| `--dry-run`     |       | Show what would be removed without removing |
+| `--force`       | `-f`  | Skip confirmation prompts                   |
 
 ---
 
 ### upgrade
 
-opencode を最新バージョンまたは特定のバージョンに更新します。
+Updates CyxCode to the latest version or a specific version.
 
 ```bash
-opencode upgrade [target]
+cyxcode upgrade [target]
 ```
 
-最新バージョンにアップグレードするには。
+To upgrade to the latest version.
 
 ```bash
-opencode upgrade
+cyxcode upgrade
 ```
 
-特定のバージョンにアップグレードするには。
+To upgrade to a specific version.
 
 ```bash
-opencode upgrade v0.1.48
+cyxcode upgrade v0.1.48
 ```
 
-#### フラグ
+#### Flags
 
-| フラグ     | ショート | 説明                                                   |
-| ---------- | -------- | ------------------------------------------------------ |
-| `--method` | `-m`     | 使用されたインストール方法。curl, npm, pnpm, bun, brew |
+| Flag       | Short | Description                                                       |
+| ---------- | ----- | ----------------------------------------------------------------- |
+| `--method` | `-m`  | The installation method that was used; curl, npm, pnpm, bun, brew |
 
 ---
 
-## グローバルフラグ
+## Global Flags
 
-opencode CLI は次のグローバルフラグを受け取ります。
+The CyxCode CLI takes the following global flags.
 
-| フラグ         | ショート | 説明                                  |
-| -------------- | -------- | ------------------------------------- |
-| `--help`       | `-h`     | ヘルプを表示                          |
-| `--version`    | `-v`     | バージョン番号を出力                  |
-| `--print-logs` |          | ログを標準エラー出力に出力            |
-| `--log-level`  |          | ログレベル (DEBUG、INFO、WARN、ERROR) |
-
----
-
-## 環境変数
-
-OpenCode は環境変数を使用して構成できます。
-
-| 変数                                  | タイプ   | 説明                                                                |
-| ------------------------------------- | -------- | ------------------------------------------------------------------- |
-| `OPENCODE_AUTO_SHARE`                 | ブール値 | セッションを自動的に共有する                                        |
-| `OPENCODE_GIT_BASH_PATH`              | 文字列   | Windows 上で実行可能な Git Bash へのパス                            |
-| `OPENCODE_CONFIG`                     | 文字列   | 構成ファイルへのパス                                                |
-| `OPENCODE_CONFIG_DIR`                 | 文字列   | config ディレクトリへのパス                                         |
-| `OPENCODE_CONFIG_CONTENT`             | 文字列   | インライン JSON 構成コンテンツ                                      |
-| `OPENCODE_DISABLE_AUTOUPDATE`         | ブール値 | 自動更新チェックを無効にする                                        |
-| `OPENCODE_DISABLE_PRUNE`              | ブール値 | 古いデータのプルーニングを無効にする                                |
-| `OPENCODE_DISABLE_TERMINAL_TITLE`     | ブール値 | ターミナルタイトルの自動更新を無効にする                            |
-| `OPENCODE_PERMISSION`                 | 文字列   | インライン化された json 権限設定                                    |
-| `OPENCODE_DISABLE_DEFAULT_PLUGINS`    | ブール値 | デフォルトのプラグインを無効にする                                  |
-| `OPENCODE_DISABLE_LSP_DOWNLOAD`       | ブール値 | LSP サーバーの自動ダウンロードを無効にする                          |
-| `OPENCODE_ENABLE_EXPERIMENTAL_MODELS` | ブール値 | 実験モデルを有効にする                                              |
-| `OPENCODE_DISABLE_AUTOCOMPACT`        | ブール値 | 自動コンテキスト圧縮を無効にする                                    |
-| `OPENCODE_DISABLE_CLAUDE_CODE`        | ブール値 | `.claude` からの読み取りを無効にする (プロンプト + スキル)          |
-| `OPENCODE_DISABLE_CLAUDE_CODE_PROMPT` | ブール値 | `~/.claude/CLAUDE.md` の読み取りを無効にする                        |
-| `OPENCODE_DISABLE_CLAUDE_CODE_SKILLS` | ブール値 | `.claude/skills` のロードを無効にする                               |
-| `OPENCODE_DISABLE_MODELS_FETCH`       | ブール値 | リモートソースからのモデルの取得を無効にする                        |
-| `OPENCODE_FAKE_VCS`                   | 文字列   | テスト目的の偽の VCS プロバイダー                                   |
-| `OPENCODE_DISABLE_FILETIME_CHECK`     | ブール値 | 最適化のためにファイル時間チェックを無効にする                      |
-| `OPENCODE_CLIENT`                     | 文字列   | クライアント識別子 (デフォルトは `cli`)                             |
-| `OPENCODE_ENABLE_EXA`                 | ブール値 | Exa Web 検索ツールを有効にする                                      |
-| `OPENCODE_SERVER_PASSWORD`            | 文字列   | `serve`/`web` の基本認証を有効にする                                |
-| `OPENCODE_SERVER_USERNAME`            | 文字列   | 基本認証ユーザー名 (デフォルト `opencode`) をオーバーライドします。 |
-| `OPENCODE_MODELS_URL`                 | 文字列   | モデル設定を取得するためのカスタム URL                              |
+| Flag           | Short | Description                          |
+| -------------- | ----- | ------------------------------------ |
+| `--help`       | `-h`  | Display help                         |
+| `--version`    | `-v`  | Print version number                 |
+| `--print-logs` |       | Print logs to stderr                 |
+| `--log-level`  |       | Log level (DEBUG, INFO, WARN, ERROR) |
 
 ---
 
-### 実験的
+## Environment variables
 
-これらの環境変数により、変更または削除される可能性のある実験的な機能が有効になります。
+CyxCode can be configured using environment variables.
 
-| 変数                                            | タイプ   | 説明                                             |
-| ----------------------------------------------- | -------- | ------------------------------------------------ |
-| `OPENCODE_EXPERIMENTAL`                         | ブール値 | すべての実験的機能を有効にする                   |
-| `OPENCODE_EXPERIMENTAL_ICON_DISCOVERY`          | ブール値 | アイコン検出を有効にする                         |
-| `OPENCODE_EXPERIMENTAL_DISABLE_COPY_ON_SELECT`  | ブール値 | TUI で選択時のコピーを無効にする                 |
-| `OPENCODE_EXPERIMENTAL_BASH_DEFAULT_TIMEOUT_MS` | 数値     | bash コマンドのデフォルトのタイムアウト (ミリ秒) |
-| `OPENCODE_EXPERIMENTAL_OUTPUT_TOKEN_MAX`        | 数値     | LLM 応答の最大出力トークン                       |
-| `OPENCODE_EXPERIMENTAL_FILEWATCHER`             | ブール値 | ディレクトリ全体のファイル監視を有効にする       |
-| `OPENCODE_EXPERIMENTAL_OXFMT`                   | ブール値 | oxfmt フォーマッタを有効にする                   |
-| `OPENCODE_EXPERIMENTAL_LSP_TOOL`                | ブール値 | 実験的な LSP ツールを有効にする                  |
-| `OPENCODE_EXPERIMENTAL_DISABLE_FILEWATCHER`     | ブール値 | ファイルウォッチャーを無効にする                 |
-| `OPENCODE_EXPERIMENTAL_EXA`                     | ブール値 | 実験的な Exa 機能を有効にする                    |
-| `OPENCODE_EXPERIMENTAL_LSP_TY`                  | ブール値 | python ファイルの TY LSP を有効にする            |
-| `OPENCODE_EXPERIMENTAL_MARKDOWN`                | ブール値 | 試験的な Markdown 機能を有効にする               |
-| `OPENCODE_EXPERIMENTAL_PLAN_MODE`               | ブール値 | プランモードを有効にする                         |
+| Variable                              | Type    | Description                                       |
+| ------------------------------------- | ------- | ------------------------------------------------- |
+| `OPENCODE_AUTO_SHARE`                 | boolean | Automatically share sessions                      |
+| `OPENCODE_GIT_BASH_PATH`              | string  | Path to Git Bash executable on Windows            |
+| `OPENCODE_CONFIG`                     | string  | Path to config file                               |
+| `OPENCODE_TUI_CONFIG`                 | string  | Path to TUI config file                           |
+| `OPENCODE_CONFIG_DIR`                 | string  | Path to config directory                          |
+| `OPENCODE_CONFIG_CONTENT`             | string  | Inline json config content                        |
+| `OPENCODE_DISABLE_AUTOUPDATE`         | boolean | Disable automatic update checks                   |
+| `OPENCODE_DISABLE_PRUNE`              | boolean | Disable pruning of old data                       |
+| `OPENCODE_DISABLE_TERMINAL_TITLE`     | boolean | Disable automatic terminal title updates          |
+| `OPENCODE_PERMISSION`                 | string  | Inlined json permissions config                   |
+| `OPENCODE_DISABLE_DEFAULT_PLUGINS`    | boolean | Disable default plugins                           |
+| `OPENCODE_DISABLE_LSP_DOWNLOAD`       | boolean | Disable automatic LSP server downloads            |
+| `OPENCODE_ENABLE_EXPERIMENTAL_MODELS` | boolean | Enable experimental models                        |
+| `OPENCODE_DISABLE_AUTOCOMPACT`        | boolean | Disable automatic context compaction              |
+| `OPENCODE_DISABLE_CLAUDE_CODE`        | boolean | Disable reading from `.claude` (prompt + skills)  |
+| `OPENCODE_DISABLE_CLAUDE_CODE_PROMPT` | boolean | Disable reading `~/.claude/CLAUDE.md`             |
+| `OPENCODE_DISABLE_CLAUDE_CODE_SKILLS` | boolean | Disable loading `.claude/skills`                  |
+| `OPENCODE_DISABLE_MODELS_FETCH`       | boolean | Disable fetching models from remote sources       |
+| `OPENCODE_FAKE_VCS`                   | string  | Fake VCS provider for testing purposes            |
+| `OPENCODE_DISABLE_FILETIME_CHECK`     | boolean | Disable file time checking for optimization       |
+| `OPENCODE_CLIENT`                     | string  | Client identifier (defaults to `cli`)             |
+| `OPENCODE_ENABLE_EXA`                 | boolean | Enable Exa web search tools                       |
+| `OPENCODE_SERVER_PASSWORD`            | string  | Enable basic auth for `serve`/`web`               |
+| `OPENCODE_SERVER_USERNAME`            | string  | Override basic auth username (default `opencode`) |
+| `OPENCODE_MODELS_URL`                 | string  | Custom URL for fetching models configuration      |
+
+---
+
+### Experimental
+
+These environment variables enable experimental features that may change or be removed.
+
+| Variable                                        | Type    | Description                             |
+| ----------------------------------------------- | ------- | --------------------------------------- |
+| `OPENCODE_EXPERIMENTAL`                         | boolean | Enable all experimental features        |
+| `OPENCODE_EXPERIMENTAL_ICON_DISCOVERY`          | boolean | Enable icon discovery                   |
+| `OPENCODE_EXPERIMENTAL_DISABLE_COPY_ON_SELECT`  | boolean | Disable copy on select in TUI           |
+| `OPENCODE_EXPERIMENTAL_BASH_DEFAULT_TIMEOUT_MS` | number  | Default timeout for bash commands in ms |
+| `OPENCODE_EXPERIMENTAL_OUTPUT_TOKEN_MAX`        | number  | Max output tokens for LLM responses     |
+| `OPENCODE_EXPERIMENTAL_FILEWATCHER`             | boolean | Enable file watcher for entire dir      |
+| `OPENCODE_EXPERIMENTAL_OXFMT`                   | boolean | Enable oxfmt formatter                  |
+| `OPENCODE_EXPERIMENTAL_LSP_TOOL`                | boolean | Enable experimental LSP tool            |
+| `OPENCODE_EXPERIMENTAL_DISABLE_FILEWATCHER`     | boolean | Disable file watcher                    |
+| `OPENCODE_EXPERIMENTAL_EXA`                     | boolean | Enable experimental Exa features        |
+| `OPENCODE_EXPERIMENTAL_LSP_TY`                  | boolean | Enable TY LSP for python files          |
+| `OPENCODE_EXPERIMENTAL_MARKDOWN`                | boolean | Enable experimental markdown features   |
+| `OPENCODE_EXPERIMENTAL_PLAN_MODE`               | boolean | Enable plan mode                        |

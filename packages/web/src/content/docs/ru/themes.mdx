@@ -1,34 +1,34 @@
 ---
-title: Темы
-description: Выберите встроенную тему или определите свою собственную.
+title: Themes
+description: Select a built-in theme or define your own.
 ---
 
-С помощью opencode вы можете выбрать одну из нескольких встроенных тем, использовать тему, которая адаптируется к теме вашего терминала, или определить свою собственную тему.
+With CyxCode you can select from one of several built-in themes, use a theme that adapts to your terminal theme, or define your own custom theme.
 
-По умолчанию opencode использует нашу собственную тему `opencode`.
-
----
-
-## Требования к терминалу
-
-Чтобы темы корректно отображались в полной цветовой палитре, ваш терминал должен поддерживать **truecolor** (24-битный цвет). Большинство современных терминалов поддерживают это по умолчанию, но вам может потребоваться включить его:
-
-- **Проверьте поддержку**: запустите `echo $COLORTERM` — должен появиться `truecolor` или `24bit`.
-- **Включить truecolor**: установите переменную среды `COLORTERM=truecolor` в профиле shell.
-- **Совместимость терминала**: убедитесь, что ваш эмулятор терминала поддерживает 24-битный цвет (большинство современных терминалов, таких как iTerm2, Alacritty, Kitty, Windows Terminal и последние версии GNOME Terminal, поддерживают).
-
-Без поддержки truecolor темы могут отображаться с пониженной точностью цветопередачи или вернуться к ближайшему приближению к 256 цветам.
+By default, CyxCode uses our own `cyxcode` theme.
 
 ---
 
-## Встроенные темы
+## Terminal requirements
 
-opencode поставляется с несколькими встроенными темами.
+For themes to display correctly with their full color palette, your terminal must support **truecolor** (24-bit color). Most modern terminals support this by default, but you may need to enable it:
 
-| Имя                    | Описание                                                                     |
+- **Check support**: Run `echo $COLORTERM` - it should output `truecolor` or `24bit`
+- **Enable truecolor**: Set the environment variable `COLORTERM=truecolor` in your shell profile
+- **Terminal compatibility**: Ensure your terminal emulator supports 24-bit color (most modern terminals like iTerm2, Alacritty, Kitty, Windows Terminal, and recent versions of GNOME Terminal do)
+
+Without truecolor support, themes may appear with reduced color accuracy or fall back to the nearest 256-color approximation.
+
+---
+
+## Built-in themes
+
+CyxCode comes with several built-in themes.
+
+| Name                   | Description                                                                  |
 | ---------------------- | ---------------------------------------------------------------------------- |
-| `system`               | Адаптируется к фоновому цвету терминала                                      |
-| `tokyonight`           | Based on the [tokyonight](https://github.com/folke/tokyonight.nvim) theme    |
+| `system`               | Adapts to your terminal’s background color                                   |
+| `tokyonight`           | Based on the [Tokyonight](https://github.com/folke/tokyonight.nvim) theme    |
 | `everforest`           | Based on the [Everforest](https://github.com/sainnhe/everforest) theme       |
 | `ayu`                  | Based on the [Ayu](https://github.com/ayu-theme) dark theme                  |
 | `catppuccin`           | Based on the [Catppuccin](https://github.com/catppuccin) theme               |
@@ -36,73 +36,73 @@ opencode поставляется с несколькими встроенным
 | `gruvbox`              | Based on the [Gruvbox](https://github.com/morhetz/gruvbox) theme             |
 | `kanagawa`             | Based on the [Kanagawa](https://github.com/rebelot/kanagawa.nvim) theme      |
 | `nord`                 | Based on the [Nord](https://github.com/nordtheme/nord) theme                 |
-| `matrix`               | Хакерская тема: зеленый на черном                                            |
+| `matrix`               | Hacker-style green on black theme                                            |
 | `one-dark`             | Based on the [Atom One](https://github.com/Th3Whit3Wolf/one-nvim) Dark theme |
 
-И более того, мы постоянно добавляем новые темы.
+And more, we are constantly adding new themes.
 
 ---
 
-## Системная тема
+## System theme
 
-Тема `system` автоматически адаптируется к цветовой схеме вашего терминала. В отличие от традиционных тем, использующих фиксированные цвета, тема _system_:
+The `system` theme is designed to automatically adapt to your terminal's color scheme. Unlike traditional themes that use fixed colors, the _system_ theme:
 
-- **Создает шкалу серого**: создает пользовательскую шкалу серого на основе цвета фона вашего терминала, обеспечивая оптимальный контраст.
-- **Использует цвета ANSI**: использует стандартные цвета ANSI (0–15) для подсветки синтаксиса и элементов пользовательского интерфейса, которые соответствуют цветовой палитре вашего терминала.
-- **Сохраняет настройки терминала по умолчанию**: использует `none` для цветов текста и фона, чтобы сохранить естественный вид вашего терминала.
+- **Generates gray scale**: Creates a custom gray scale based on your terminal's background color, ensuring optimal contrast.
+- **Uses ANSI colors**: Leverages standard ANSI colors (0-15) for syntax highlighting and UI elements, which respect your terminal's color palette.
+- **Preserves terminal defaults**: Uses `none` for text and background colors to maintain your terminal's native appearance.
 
-Системная тема предназначена для пользователей, которые:
+The system theme is for users who:
 
-- Хотите, чтобы opencode соответствовал внешнему виду их терминала
-- Используйте пользовательские цветовые схемы терминала
-- Предпочитайте единообразный вид для всех терминальных приложений.
+- Want CyxCode to match their terminal's appearance
+- Use custom terminal color schemes
+- Prefer a consistent look across all terminal applications
 
 ---
 
-## Использование темы
+## Using a theme
 
-Вы можете выбрать тему, вызвав выбор темы с помощью команды `/theme`. Или вы можете указать это в файле [tui.json](/docs/config#tui).
+You can select a theme by bringing up the theme select with the `/theme` command. Or you can specify it in `tui.json`.
 
 ```json title="tui.json" {3}
 {
-  "$schema": "https://opencode.ai/tui.json",
+  "$schema": "https://cyxcode.ai/tui.json",
   "theme": "tokyonight"
 }
 ```
 
 ---
 
-## Пользовательские темы
+## Custom themes
 
-opencode поддерживает гибкую систему тем на основе JSON, которая позволяет пользователям легко создавать и настраивать темы.
-
----
-
-### Иерархия
-
-Темы загружаются из нескольких каталогов в следующем порядке: более поздние каталоги переопределяют предыдущие:
-
-1. **Встроенные темы** – они встроены в двоичный файл.
-2. **Каталог конфигурации пользователя** – определяется в `~/.config/opencode/themes/*.json` или `$XDG_CONFIG_HOME/opencode/themes/*.json`.
-3. **Корневой каталог проекта** – определено в `<project-root>/.opencode/themes/*.json`.
-4. **Текущий рабочий каталог** – определено в `./.opencode/themes/*.json`.
-
-Если несколько каталогов содержат тему с одинаковым именем, будет использоваться тема из каталога с более высоким приоритетом.
+CyxCode supports a flexible JSON-based theme system that allows users to create and customize themes easily.
 
 ---
 
-### Создание темы
+### Hierarchy
 
-Чтобы создать собственную тему, создайте файл JSON в одном из каталогов темы.
+Themes are loaded from multiple directories in the following order where later directories override earlier ones:
 
-Для глобальных тем:
+1. **Built-in themes** - These are embedded in the binary
+2. **User config directory** - Defined in `~/.config/opencode/themes/*.json` or `$XDG_CONFIG_HOME/opencode/themes/*.json`
+3. **Project root directory** - Defined in the `<project-root>/.opencode/themes/*.json`
+4. **Current working directory** - Defined in `./.opencode/themes/*.json`
+
+If multiple directories contain a theme with the same name, the theme from the directory with higher priority will be used.
+
+---
+
+### Creating a theme
+
+To create a custom theme, create a JSON file in one of the theme directories.
+
+For user-wide themes:
 
 ```bash no-frame
 mkdir -p ~/.config/opencode/themes
 vim ~/.config/opencode/themes/my-theme.json
 ```
 
-Для тем проекта:
+And for project-specific themes.
 
 ```bash no-frame
 mkdir -p .opencode/themes
@@ -111,40 +111,40 @@ vim .opencode/themes/my-theme.json
 
 ---
 
-### Формат JSON
+### JSON format
 
-В темах используется гибкий формат JSON с поддержкой:
+Themes use a flexible JSON format with support for:
 
-- **Шестнадцатеричные цвета**: `"#ffffff"`
-- **Цвета ANSI**: `3` (0–255).
-- **Ссылки на цвета**: `"primary"` или пользовательские определения.
-- **Темный/светлый варианты**: `{"dark": "#000", "light": "#fff"}`
-- **Нет цвета**: `"none"` — используется цвет терминала по умолчанию или прозрачный.
-
----
-
-### Определения цвета
-
-Раздел `defs` является необязательным и позволяет вам определять повторно используемые цвета, на которые можно ссылаться в теме.
+- **Hex colors**: `"#ffffff"`
+- **ANSI colors**: `3` (0-255)
+- **Color references**: `"primary"` or custom definitions
+- **Dark/light variants**: `{"dark": "#000", "light": "#fff"}`
+- **No color**: `"none"` - Uses the terminal's default color or transparent
 
 ---
 
-### Настройки терминала по умолчанию
+### Color definitions
 
-Специальное значение `"none"` можно использовать для любого цвета, чтобы наследовать цвет терминала по умолчанию. Это особенно полезно для создания тем, которые органично сочетаются с цветовой схемой вашего терминала:
-
-- `"text": "none"` — использует цвет переднего плана терминала по умолчанию.
-- `"background": "none"` — использует цвет фона терминала по умолчанию.
+The `defs` section is optional and it allows you to define reusable colors that can be referenced in the theme.
 
 ---
 
-### Пример
+### Terminal defaults
 
-Вот пример пользовательской темы:
+The special value `"none"` can be used for any color to inherit the terminal's default color. This is particularly useful for creating themes that blend seamlessly with your terminal's color scheme:
+
+- `"text": "none"` - Uses terminal's default foreground color
+- `"background": "none"` - Uses terminal's default background color
+
+---
+
+### Example
+
+Here's an example of a custom theme:
 
 ```json title="my-theme.json"
 {
-  "$schema": "https://opencode.ai/theme.json",
+  "$schema": "https://cyxcode.ai/theme.json",
   "defs": {
     "nord0": "#2E3440",
     "nord1": "#3B4252",

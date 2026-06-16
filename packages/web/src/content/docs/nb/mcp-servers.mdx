@@ -1,33 +1,33 @@
 ---
-title: MCP-servere
-description: Legg til lokale og eksterne MCP-verktøy.
+title: MCP servers
+description: Add local and remote MCP tools.
 ---
 
-Du kan legge til eksterne verktøy i OpenCode ved å bruke _Model Context Protocol_ eller MCP. OpenCode støtter både lokale og eksterne servere.
+You can add external tools to CyxCode using the _Model Context Protocol_, or MCP. CyxCode supports both local and remote servers.
 
-Når de er lagt til, er MCP-verktøy automatisk tilgjengelige for LLM sammen med innebygde verktøy.
+Once added, MCP tools are automatically available to the LLM alongside built-in tools.
 
 ---
 
-#### Advarsler
+#### Caveats
 
-Når du bruker en MCP-server, legger den til konteksten. Dette kan fort gå opp hvis du har mange verktøy. Så vi anbefaler å være forsiktig med hvilke MCP-servere du bruker.
+When you use an MCP server, it adds to the context. This can quickly add up if you have a lot of tools. So we recommend being careful with which MCP servers you use.
 
 :::tip
-MCP-servere legger til konteksten din, så du vil være forsiktig med hvilke du aktiverer.
+MCP servers add to your context, so you want to be careful with which ones you enable.
 :::
 
-Enkelte MCP-servere, som GitHub MCP-serveren, har en tendens til å legge til mange tokens og kan lett overskride kontekstgrensen.
+Certain MCP servers, like the GitHub MCP server, tend to add a lot of tokens and can easily exceed the context limit.
 
 ---
 
-## Aktivering
+## Enable
 
-Du kan definere MCP-servere i [OpenCode Config](https://opencode.ai/docs/config/) under `mcp`. Legg til hver MCP med et unikt navn. Du kan referere til den MCP ved navn når du spør LLM-en.
+You can define MCP servers in your [CyxCode Config](https://cyxcode.ai/docs/config/) under `mcp`. Add each MCP with a unique name. You can refer to that MCP by name when prompting the LLM.
 
 ```jsonc title="opencode.jsonc" {6}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "mcp": {
     "name-of-mcp-server": {
       // ...
@@ -40,19 +40,19 @@ Du kan definere MCP-servere i [OpenCode Config](https://opencode.ai/docs/config/
 }
 ```
 
-Du kan også deaktivere en server ved å sette `enabled` til `false`. Dette er nyttig hvis du vil deaktivere en server midlertidig uten å fjerne den fra konfigurasjonen.
+You can also disable a server by setting `enabled` to `false`. This is useful if you want to temporarily disable a server without removing it from your config.
 
 ---
 
-### Overstyring av fjernstandarder
+### Overriding remote defaults
 
-Organisasjoner kan tilby standard MCP-servere via deres `.well-known/opencode`-endepunkt. Disse serverne kan være deaktivert som standard, slik at brukere kan melde seg på de de trenger.
+Organizations can provide default MCP servers via their `.well-known/CyxCode` endpoint. These servers may be disabled by default, allowing users to opt-in to the ones they need.
 
-For å aktivere en spesifikk server fra organisasjonens eksterne konfigurasjon, legg den til i din lokale konfigurasjon med `enabled: true`:
+To enable a specific server from your organization's remote config, add it to your local config with `enabled: true`:
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "mcp": {
     "jira": {
       "type": "remote",
@@ -63,17 +63,17 @@ For å aktivere en spesifikk server fra organisasjonens eksterne konfigurasjon, 
 }
 ```
 
-Dine lokale konfigurasjonsverdier overstyrer de eksterne standardinnstillingene. Se [config precedence](/docs/config#precedence-order) for flere detaljer.
+Your local config values override the remote defaults. See [config precedence](/docs/config#precedence-order) for more details.
 
 ---
 
-## Lokal
+## Local
 
-Legg til lokale MCP-servere ved å bruke `type` til `"local"` i MCP-objektet.
+Add local MCP servers using `type` to `"local"` within the MCP object.
 
 ```jsonc title="opencode.jsonc" {15}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "mcp": {
     "my-local-mcp-server": {
       "type": "local",
@@ -88,13 +88,13 @@ Legg til lokale MCP-servere ved å bruke `type` til `"local"` i MCP-objektet.
 }
 ```
 
-Kommandoen er hvordan den lokale MCP-serveren startes. Du kan også sende inn en liste over miljøvariabler.
+The command is how the local MCP server is started. You can also pass in a list of environment variables as well.
 
-For eksempel, her er hvordan du kan legge til test [`@modelcontextprotocol/server-everything`](https://www.npmjs.com/package/@modelcontextprotocol/server-everything) MCP serveren.
+For example, here's how you can add the test [`@modelcontextprotocol/server-everything`](https://www.npmjs.com/package/@modelcontextprotocol/server-everything) MCP server.
 
 ```jsonc title="opencode.jsonc"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "mcp": {
     "mcp_everything": {
       "type": "local",
@@ -104,7 +104,7 @@ For eksempel, her er hvordan du kan legge til test [`@modelcontextprotocol/serve
 }
 ```
 
-Og for å bruke den kan du legge til `use the mcp_everything tool` i ledetekstene mine.
+And to use it I can add `use the mcp_everything tool` to my prompts.
 
 ```txt "mcp_everything"
 use the mcp_everything tool to add the number 3 and 4
@@ -112,27 +112,27 @@ use the mcp_everything tool to add the number 3 and 4
 
 ---
 
-#### Alternativer
+#### Options
 
-Her er alle alternativene for å konfigurere en lokal MCP-server.
+Here are all the options for configuring a local MCP server.
 
-| Alternativ    | Type    | Påkrevd | Beskrivelse                                                                              |
-| ------------- | ------- | ------- | ---------------------------------------------------------------------------------------- |
-| `type`        | String  | Y       | Type MCP servertilkobling, må være `"local"`.                                            |
-| `command`     | Array   | Y       | Kommando og argumenter for å kjøre MCP-serveren.                                         |
-| `environment` | Object  |         | Miljøvariabler som skal angis når serveren kjøres.                                       |
-| `enabled`     | Boolean |         | Aktiver eller deaktiver MCP-serveren ved oppstart.                                       |
-| `timeout`     | Number  |         | Tidsavbrudd i ms for henting av verktøy fra MCP-serveren. Standard er 5000 (5 sekunder). |
+| Option        | Type    | Required | Description                                                                         |
+| ------------- | ------- | -------- | ----------------------------------------------------------------------------------- |
+| `type`        | String  | Y        | Type of MCP server connection, must be `"local"`.                                   |
+| `command`     | Array   | Y        | Command and arguments to run the MCP server.                                        |
+| `environment` | Object  |          | Environment variables to set when running the server.                               |
+| `enabled`     | Boolean |          | Enable or disable the MCP server on startup.                                        |
+| `timeout`     | Number  |          | Timeout in ms for fetching tools from the MCP server. Defaults to 5000 (5 seconds). |
 
 ---
 
-## Ekstern
+## Remote
 
-Legg til eksterne MCP-servere ved å sette `type` til `"remote"`.
+Add remote MCP servers by setting `type` to `"remote"`.
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "mcp": {
     "my-remote-mcp": {
       "type": "remote",
@@ -146,40 +146,40 @@ Legg til eksterne MCP-servere ved å sette `type` til `"remote"`.
 }
 ```
 
-`url` er URL til den eksterne MCP serveren og med alternativet `headers` kan du sende inn en liste over headere.
+The `url` is the URL of the remote MCP server and with the `headers` option you can pass in a list of headers.
 
 ---
 
-#### Alternativer
+#### Options
 
-| Alternativ | Type    | Påkrevd | Beskrivelse                                                                              |
-| ---------- | ------- | ------- | ---------------------------------------------------------------------------------------- |
-| `type`     | String  | Y       | Type MCP servertilkobling, må være `"remote"`.                                           |
-| `url`      | String  | Y       | URL av den eksterne MCP-serveren.                                                        |
-| `enabled`  | Boolean |         | Aktiver eller deaktiver MCP-serveren ved oppstart.                                       |
-| `headers`  | Object  |         | Headere å sende med forespørselen.                                                       |
-| `oauth`    | Object  |         | OAuth-autentiseringskonfigurasjon. Se delen [OAuth](#oauth) nedenfor.                    |
-| `timeout`  | Number  |         | Tidsavbrudd i ms for henting av verktøy fra MCP-serveren. Standard er 5000 (5 sekunder). |
+| Option    | Type    | Required | Description                                                                         |
+| --------- | ------- | -------- | ----------------------------------------------------------------------------------- |
+| `type`    | String  | Y        | Type of MCP server connection, must be `"remote"`.                                  |
+| `url`     | String  | Y        | URL of the remote MCP server.                                                       |
+| `enabled` | Boolean |          | Enable or disable the MCP server on startup.                                        |
+| `headers` | Object  |          | Headers to send with the request.                                                   |
+| `oauth`   | Object  |          | OAuth authentication configuration. See [OAuth](#oauth) section below.              |
+| `timeout` | Number  |          | Timeout in ms for fetching tools from the MCP server. Defaults to 5000 (5 seconds). |
 
 ---
 
 ## OAuth
 
-OpenCode håndterer automatisk OAuth-autentisering for eksterne MCP-servere. Når en server krever autentisering, vil OpenCode:
+CyxCode automatically handles OAuth authentication for remote MCP servers. When a server requires authentication, CyxCode will:
 
-1. Oppdag 401-svaret og start OAuth-flyten
-2. Bruk **Dynamisk klientregistrering (RFC 7591)** hvis det støttes av serveren
-3. Lagre tokens sikkert for fremtidige forespørsler
+1. Detect the 401 response and initiate the OAuth flow
+2. Use **Dynamic Client Registration (RFC 7591)** if supported by the server
+3. Store tokens securely for future requests
 
 ---
 
-### Automatisk
+### Automatic
 
-For de fleste OAuth-aktiverte MCP-servere er ingen spesiell konfigurasjon nødvendig. Bare konfigurer den eksterne serveren:
+For most OAuth-enabled MCP servers, no special configuration is needed. Just configure the remote server:
 
 ```json title="opencode.json"
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "mcp": {
     "my-oauth-server": {
       "type": "remote",
@@ -189,17 +189,17 @@ For de fleste OAuth-aktiverte MCP-servere er ingen spesiell konfigurasjon nødve
 }
 ```
 
-Hvis serveren krever autentisering, vil OpenCode be deg om å autentisere når du prøver å bruke den for første gang. Hvis ikke, kan du [utløse flyten manuelt](#authenticating) med `opencode mcp auth <server-name>`.
+If the server requires authentication, CyxCode will prompt you to authenticate when you first try to use it. If not, you can [manually trigger the flow](#authenticating) with `cyxcode mcp auth <server-name>`.
 
 ---
 
-### Forhåndsregistrert
+### Pre-registered
 
-Hvis du har klientlegitimasjon fra MCP-serverleverandøren, kan du konfigurere dem:
+If you have client credentials from the MCP server provider, you can configure them:
 
 ```json title="opencode.json" {7-11}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "mcp": {
     "my-oauth-server": {
       "type": "remote",
@@ -216,39 +216,39 @@ Hvis du har klientlegitimasjon fra MCP-serverleverandøren, kan du konfigurere d
 
 ---
 
-### Autentisering
+### Authenticating
 
-Du kan utløse autentisering manuelt eller administrere legitimasjon.
+You can manually trigger authentication or manage credentials.
 
-Autentiser med en spesifikk MCP-server:
-
-```bash
-opencode mcp auth my-oauth-server
-```
-
-Liste alle MCP-servere og deres autentiseringsstatus:
+Authenticate with a specific MCP server:
 
 ```bash
-opencode mcp list
+cyxcode mcp auth my-oauth-server
 ```
 
-Fjern lagret legitimasjon:
+List all MCP servers and their auth status:
 
 ```bash
-opencode mcp logout my-oauth-server
+cyxcode mcp list
 ```
 
-Kommandoen `mcp auth` åpner nettleseren din for autorisasjon. Etter at du har godkjent, vil OpenCode lagre tokens sikkert i `~/.local/share/opencode/mcp-auth.json`.
+Remove stored credentials:
+
+```bash
+cyxcode mcp logout my-oauth-server
+```
+
+The `mcp auth` command will open your browser for authorization. After you authorize, CyxCode will store the tokens securely in `~/.local/share/opencode/mcp-auth.json`.
 
 ---
 
-#### Deaktivering av OAuth
+#### Disabling OAuth
 
-Hvis du vil deaktivere automatisk OAuth for en server (f.eks. for servere som bruker API-nøkler i stedet), setter du `oauth` til `false`:
+If you want to disable automatic OAuth for a server (e.g., for servers that use API keys instead), set `oauth` to `false`:
 
 ```json title="opencode.json" {7}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "mcp": {
     "my-api-key-server": {
       "type": "remote",
@@ -264,44 +264,44 @@ Hvis du vil deaktivere automatisk OAuth for en server (f.eks. for servere som br
 
 ---
 
-#### OAuth-alternativer
+#### OAuth Options
 
-| Alternativ     | Type            | Beskrivelse                                                                            |
-| -------------- | --------------- | -------------------------------------------------------------------------------------- |
-| `oauth`        | Object \| false | OAuth-konfigurasjonsobjekt, eller `false` for å deaktivere automatisk OAuth-deteksjon. |
-| `clientId`     | String          | OAuth-klient ID. Hvis ikke oppgitt, vil dynamisk klientregistrering bli forsøkt.       |
-| `clientSecret` | String          | OAuth-klienthemmelighet, hvis det kreves av autorisasjonsserveren.                     |
-| `scope`        | String          | OAuth-omfang å be om under autorisasjon.                                               |
+| Option         | Type            | Description                                                                      |
+| -------------- | --------------- | -------------------------------------------------------------------------------- |
+| `oauth`        | Object \| false | OAuth config object, or `false` to disable OAuth auto-detection.                 |
+| `clientId`     | String          | OAuth client ID. If not provided, dynamic client registration will be attempted. |
+| `clientSecret` | String          | OAuth client secret, if required by the authorization server.                    |
+| `scope`        | String          | OAuth scopes to request during authorization.                                    |
 
-#### Feilsøking
+#### Debugging
 
-Hvis en ekstern MCP-server ikke klarer å autentisere, kan du diagnostisere problemer med:
+If a remote MCP server is failing to authenticate, you can diagnose issues with:
 
 ```bash
 # View auth status for all OAuth-capable servers
-opencode mcp auth list
+cyxcode mcp auth list
 
 # Debug connection and OAuth flow for a specific server
-opencode mcp debug my-oauth-server
+cyxcode mcp debug my-oauth-server
 ```
 
-Kommandoen `mcp debug` viser gjeldende autentiseringsstatus, tester HTTP-tilkoblingen og forsøker OAuth-oppdagelsesflyten.
+The `mcp debug` command shows the current auth status, tests HTTP connectivity, and attempts the OAuth discovery flow.
 
 ---
 
-## Administrering
+## Manage
 
-MCP-ene dine er tilgjengelige som verktøy i OpenCode, sammen med innebygde verktøy. Så du kan administrere dem gjennom OpenCode-konfigurasjonen som alle andre verktøy.
+Your MCPs are available as tools in CyxCode, alongside built-in tools. So you can manage them through the CyxCode config like any other tool.
 
 ---
 
-### Globalt
+### Global
 
-Dette betyr at du kan aktivere eller deaktivere dem globalt.
+This means that you can enable or disable them globally.
 
 ```json title="opencode.json" {14}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "mcp": {
     "my-mcp-foo": {
       "type": "local",
@@ -318,11 +318,11 @@ Dette betyr at du kan aktivere eller deaktivere dem globalt.
 }
 ```
 
-Vi kan også bruke et globmønster for å deaktivere alle matchende MCP-er.
+We can also use a glob pattern to disable all matching MCPs.
 
 ```json title="opencode.json" {14}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "mcp": {
     "my-mcp-foo": {
       "type": "local",
@@ -339,20 +339,20 @@ Vi kan også bruke et globmønster for å deaktivere alle matchende MCP-er.
 }
 ```
 
-Her bruker vi globmønsteret `my-mcp*` for å deaktivere alle MCP-er.
+Here we are using the glob pattern `my-mcp*` to disable all MCPs.
 
 ---
 
 ### Per agent
 
-Hvis du har et stort antall MCP-servere, vil du kanskje bare aktivere dem per agent og deaktivere dem globalt. Slik gjør du dette:
+If you have a large number of MCP servers you may want to only enable them per agent and disable them globally. To do this:
 
-1. Deaktiver det som et verktøy globalt.
-2. Aktiver MCP-serveren som et verktøy i [agent config](/docs/agents#tools).
+1. Disable it as a tool globally.
+2. In your [agent config](/docs/agents#tools), enable the MCP server as a tool.
 
 ```json title="opencode.json" {11, 14-18}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "mcp": {
     "my-mcp": {
       "type": "local",
@@ -375,16 +375,16 @@ Hvis du har et stort antall MCP-servere, vil du kanskje bare aktivere dem per ag
 
 ---
 
-#### Glob-mønstre
+#### Glob patterns
 
-Glob-mønsteret bruker enkle regex-globing-mønstre:
+The glob pattern uses simple regex globbing patterns:
 
-- `*` samsvarer med null eller flere av alle tegn (f.eks. `"my-mcp*"` samsvarer med `my-mcp_search`, `my-mcp_list`, osv.)
-- `?` samsvarer med nøyaktig ett tegn
-- Alle andre karakterer samsvarer bokstavelig talt
+- `*` matches zero or more of any character (e.g., `"my-mcp*"` matches `my-mcp_search`, `my-mcp_list`, etc.)
+- `?` matches exactly one character
+- All other characters match literally
 
 :::note
-MCP serververktøy er registrert med servernavn som prefiks, så for å deaktivere alle verktøy for en server bruker du bare:
+MCP server tools are registered with server name as prefix, so to disable all tools for a server simply use:
 
 ```
 "mymcpservername_*": false
@@ -394,19 +394,19 @@ MCP serververktøy er registrert med servernavn som prefiks, så for å deaktive
 
 ---
 
-## Eksempler
+## Examples
 
-Nedenfor er eksempler på noen vanlige MCP-servere. Du kan sende inn en PR hvis du vil dokumentere andre servere.
+Below are examples of some common MCP servers. You can submit a PR if you want to document other servers.
 
 ---
 
 ### Sentry
 
-Legg til [Sentry MCP-serveren](https://mcp.sentry.dev) for å samhandle med Sentry-prosjektene og problemene dine.
+Add the [Sentry MCP server](https://mcp.sentry.dev) to interact with your Sentry projects and issues.
 
 ```json title="opencode.json" {4-8}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "mcp": {
     "sentry": {
       "type": "remote",
@@ -417,15 +417,15 @@ Legg til [Sentry MCP-serveren](https://mcp.sentry.dev) for å samhandle med Sent
 }
 ```
 
-Etter å ha lagt til konfigurasjonen, autentiser med Sentry:
+After adding the configuration, authenticate with Sentry:
 
 ```bash
-opencode mcp auth sentry
+cyxcode mcp auth sentry
 ```
 
-Dette åpner et nettleservindu for å fullføre OAuth-flyten og koble OpenCode til Sentry-kontoen din.
+This will open a browser window to complete the OAuth flow and connect CyxCode to your Sentry account.
 
-Når du er autentisert, kan du bruke Sentry-verktøy i ledetekstene dine for å spørre etter problemer, prosjekter og feildata.
+Once authenticated, you can use Sentry tools in your prompts to query issues, projects, and error data.
 
 ```txt "use sentry"
 Show me the latest unresolved issues in my project. use sentry
@@ -435,11 +435,11 @@ Show me the latest unresolved issues in my project. use sentry
 
 ### Context7
 
-Legg til [Context7 MCP-serveren](https://github.com/upstash/context7) for å søke gjennom dokumenter.
+Add the [Context7 MCP server](https://github.com/upstash/context7) to search through docs.
 
 ```json title="opencode.json" {4-7}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "mcp": {
     "context7": {
       "type": "remote",
@@ -449,11 +449,11 @@ Legg til [Context7 MCP-serveren](https://github.com/upstash/context7) for å sø
 }
 ```
 
-Hvis du har registrert deg for en gratis konto, kan du bruke API-nøkkelen din og få høyere satsgrenser.
+If you have signed up for a free account, you can use your API key and get higher rate-limits.
 
 ```json title="opencode.json" {7-9}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "mcp": {
     "context7": {
       "type": "remote",
@@ -466,15 +466,15 @@ Hvis du har registrert deg for en gratis konto, kan du bruke API-nøkkelen din o
 }
 ```
 
-Her antar vi at du har `CONTEXT7_API_KEY` miljøvariabelen satt.
+Here we are assuming that you have the `CONTEXT7_API_KEY` environment variable set.
 
-Legg til `use context7` i instruksjonene for å bruke Context7 MCP-serveren.
+Add `use context7` to your prompts to use Context7 MCP server.
 
 ```txt "use context7"
 Configure a Cloudflare Worker script to cache JSON API responses for five minutes. use context7
 ```
 
-Alternativt kan du legge til noe slikt til din [AGENTS.md](/docs/rules/).
+Alternatively, you can add something like this to your [AGENTS.md](/docs/rules/).
 
 ```md title="AGENTS.md"
 When you need to search docs, use `context7` tools.
@@ -484,11 +484,11 @@ When you need to search docs, use `context7` tools.
 
 ### Grep by Vercel
 
-Legg til [Grep by Vercel](https://grep.app) MCP-serveren for å søke gjennom kodebiter på GitHub.
+Add the [Grep by Vercel](https://grep.app) MCP server to search through code snippets on GitHub.
 
 ```json title="opencode.json" {4-7}
 {
-  "$schema": "https://opencode.ai/config.json",
+  "$schema": "https://cyxcode.ai/config.json",
   "mcp": {
     "gh_grep": {
       "type": "remote",
@@ -498,127 +498,14 @@ Legg til [Grep by Vercel](https://grep.app) MCP-serveren for å søke gjennom ko
 }
 ```
 
-Siden vi kalte MCP-serveren vår `gh_grep`, kan du legge til `use the gh_grep tool` i spørsmålene dine for å få agenten til å bruke den.
+Since we named our MCP server `gh_grep`, you can add `use the gh_grep tool` to your prompts to get the agent to use it.
 
 ```txt "use the gh_grep tool"
 What's the right way to set a custom domain in an SST Astro component? use the gh_grep tool
 ```
 
-Alternativt kan du legge til noe slikt til din [AGENTS.md](/docs/rules/).
+Alternatively, you can add something like this to your [AGENTS.md](/docs/rules/).
 
 ```md title="AGENTS.md"
 If you are unsure how to do something, use `gh_grep` to search code examples from GitHub.
 ```
-
----
-
-### Helicone
-
-[Helicone](https://helicone.ai) er en LLM observerbarhetsplattform som gir logging, overvåking og analyser for AI-applikasjonene dine. Helicone AI Gateway ruter forespørslene dine til riktig leverandør automatisk basert på modellen.
-
-1. Gå over til [Helicone](https://helicone.ai), opprett en konto og generer en API nøkkel fra dashbordet.
-
-2. Kjør kommandoen `/connect` og søk etter **Helicone**.
-
-   ```txt
-   /connect
-   ```
-
-3. Skriv inn Helicone API-nøkkelen.
-
-   ```txt
-   ┌ API key
-   │
-   │
-   └ enter
-   ```
-
-4. Kjør kommandoen `/models` for å velge en modell.
-
-   ```txt
-   /models
-   ```
-
-For flere leverandører og avanserte funksjoner som bufring og hastighetsbegrensning, sjekk [Helicone-dokumentasjonen](https://docs.helicone.ai).
-
-#### Valgfrie konfigurasjoner
-
-I tilfelle du ser en funksjon eller modell fra Helicone som ikke konfigureres automatisk gjennom OpenCode, kan du alltid konfigurere den selv.
-
-Her er [Helicone's Model Directory](https://helicone.ai/models), du trenger denne for å hente ID-ene til modellene du vil legge til.
-
-```jsonc title="~/.config/opencode/opencode.jsonc"
-{
-  "$schema": "https://opencode.ai/config.json",
-  "provider": {
-    "helicone": {
-      "npm": "@ai-sdk/openai-compatible",
-      "name": "Helicone",
-      "options": {
-        "baseURL": "https://ai-gateway.helicone.ai",
-      },
-      "models": {
-        "gpt-4o": {
-          // Model ID (from Helicone's model directory page)
-          "name": "GPT-4o", // Your own custom name for the model
-        },
-        "claude-sonnet-4-20250514": {
-          "name": "Claude Sonnet 4",
-        },
-      },
-    },
-  },
-}
-```
-
-#### Egendefinerte headere
-
-Helicone støtter tilpassede headere for funksjoner som bufring, brukersporing og øktadministrasjon. Legg dem til leverandørkonfigurasjonen din ved å bruke `options.headers`:
-
-```jsonc title="~/.config/opencode/opencode.jsonc"
-{
-  "$schema": "https://opencode.ai/config.json",
-  "provider": {
-    "helicone": {
-      "npm": "@ai-sdk/openai-compatible",
-      "name": "Helicone",
-      "options": {
-        "baseURL": "https://ai-gateway.helicone.ai",
-        "headers": {
-          "Helicone-Cache-Enabled": "true",
-          "Helicone-User-Id": "opencode",
-        },
-      },
-    },
-  },
-}
-```
-
-##### Sesjonssporing
-
-Helicones [Sessions](https://docs.helicone.ai/features/sessions) funksjon lar deg gruppere relaterte LLM forespørsler sammen. Bruk [opencode-helicone-session](https://github.com/H2Shami/opencode-helicone-session) plugin for automatisk å logge hver OpenCode-samtale som en økt i Helicone.
-
-```bash
-npm install -g opencode-helicone-session
-```
-
-Legg den til i konfigurasjonen din.
-
-```json title="opencode.json"
-{
-  "plugin": ["opencode-helicone-session"]
-}
-```
-
-Programtillegget injiserer `Helicone-Session-Id` og `Helicone-Session-Name` overskrifter i forespørslene dine. På Helicones Sessions-side vil du se hver OpenCode-samtale oppført som en separat økt.
-
-##### Vanlige Helicone-headere
-
-| Overskrift                 | Beskrivelse                                                                |
-| -------------------------- | -------------------------------------------------------------------------- |
-| `Helicone-Cache-Enabled`   | Aktiver responsbufring (`true`/`false`)                                    |
-| `Helicone-User-Id`         | Spor beregninger etter bruker                                              |
-| `Helicone-Property-[Name]` | Legg til egendefinerte egenskaper (f.eks. `Helicone-Property-Environment`) |
-| `Helicone-Prompt-Id`       | Knytt forespørsler til spørsmålsversjoner                                  |
-
-Se [Helicone Header Directory](https://docs.helicone.ai/helicone-headers/header-directory) for alle tilgjengelige overskrifter.
