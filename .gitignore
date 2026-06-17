@@ -54,3 +54,6 @@ CLAUDE.md
 /docs/DOWNLOAD-STATS.md
 /docs/cve-lite-integration.md
 /docs/vulnscan-usage.md
+
+# Local-only starter docs kept off the public repo
+/packages/docs/
