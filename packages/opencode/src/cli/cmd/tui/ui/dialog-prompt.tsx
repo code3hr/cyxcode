@@ -6,7 +6,7 @@ import { useKeyboard } from "@opentui/solid"
 
 export type DialogPromptProps = {
   title: string
-  description?: () => JSX.Element
+  description?: JSX.Element | (() => JSX.Element)
   placeholder?: string
   value?: string
   onConfirm?: (value: string) => void
@@ -39,12 +39,12 @@ export function DialogPrompt(props: DialogPromptProps) {
         <text attributes={TextAttributes.BOLD} fg={theme.text}>
           {props.title}
         </text>
-        <text fg={theme.textMuted} onMouseUp={() => dialog.clear()}>
+      <text fg={theme.textMuted} onMouseUp={() => dialog.clear()}>
           esc
         </text>
       </box>
       <box gap={1}>
-        {props.description}
+        {typeof props.description === "function" ? props.description() : props.description}
         <textarea
           onSubmit={() => {
             props.onConfirm?.(textarea.plainText)
