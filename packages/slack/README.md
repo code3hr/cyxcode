@@ -1,27 +1,21 @@
 # @cyxcode/slack
 
-Slack bot integration for opencode that creates threaded conversations.
+Slack integration for CyxCode that opens threaded bot conversations.
 
 ## Setup
 
-1. Create a Slack app at https://api.slack.com/apps
-2. Enable Socket Mode
-3. Add the following OAuth scopes:
-   - `chat:write`
-   - `app_mentions:read`
-   - `channels:history`
-   - `groups:history`
-4. Install the app to your workspace
-5. Set environment variables in `.env`:
-   - `SLACK_BOT_TOKEN` - Bot User OAuth Token
-   - `SLACK_SIGNING_SECRET` - Signing Secret from Basic Information
-   - `SLACK_APP_TOKEN` - App-Level Token from Basic Information
+Set the Slack credentials in your environment:
 
-## Usage
+- `SLACK_BOT_TOKEN`
+- `SLACK_SIGNING_SECRET`
+- `SLACK_APP_TOKEN`
 
-```bash
-# Edit .env with your Slack app credentials
-bun dev
+## Development
+
+```sh
+bun install
+bun run dev
+bun run typecheck
 ```
 
-The bot will respond to messages in channels where it's added, creating separate opencode sessions for each thread.
+The bot responds in channels where it is installed and keeps separate sessions per thread.

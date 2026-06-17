@@ -1,15 +1,21 @@
-# js
+# cyxcode
 
-To install dependencies:
+Core CyxCode agent package and CLI entry point.
 
-```bash
+## Commands
+
+Run these from this directory:
+
+```sh
 bun install
+bun run dev
+bun run build
+bun run typecheck
+bun run test
 ```
 
-To run:
+## Notes
 
-```bash
-bun run index.ts
-```
-
-This project was created using `bun init` in bun v1.2.12. [Bun](https://bun.sh) is a fast all-in-one JavaScript runtime.
+- `src` contains the agent, CLI, and supporting modules.
+- `bin/cyxcode` is the published executable entry point.
+- `bun run script/build.ts` is the package build pipeline used for releases.
