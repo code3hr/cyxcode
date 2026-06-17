@@ -1,6 +1,3 @@
-import { glob, globSync, type GlobOptions } from "glob"
-import { minimatch } from "minimatch"
-
 export namespace Glob {
   export interface Options {
     cwd?: string
@@ -10,25 +7,30 @@ export namespace Glob {
     symlink?: boolean
   }
 
-  function toGlobOptions(options: Options): GlobOptions {
+  function opts(options: Options) {
     return {
       cwd: options.cwd,
       absolute: options.absolute,
       dot: options.dot,
-      follow: options.symlink ?? false,
-      nodir: options.include !== "all",
+      followSymlinks: options.symlink ?? false,
+      onlyFiles: options.include !== "all",
     }
   }
 
   export async function scan(pattern: string, options: Options = {}): Promise<string[]> {
-    return glob(pattern, toGlobOptions(options)) as Promise<string[]>
+    const glob = new Bun.Glob(pattern)
+    const result = []
+    for await (const item of glob.scan(opts(options))) {
+      result.push(item)
+    }
+    return result
   }
 
   export function scanSync(pattern: string, options: Options = {}): string[] {
-    return globSync(pattern, toGlobOptions(options)) as string[]
+    return Array.from(new Bun.Glob(pattern).scanSync(opts(options)))
   }
 
   export function match(pattern: string, filepath: string): boolean {
-    return minimatch(filepath, pattern, { dot: true })
+    return new Bun.Glob(pattern).match(filepath)
   }
 }
