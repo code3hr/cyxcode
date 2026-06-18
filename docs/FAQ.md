@@ -166,16 +166,16 @@ If they're interested in upstreaming any of this, we're open to it. But we're no
 - We rebranded CLI, TUI, config, and docs — not internal paths
 
 **What we maintain:**
-- 5 source files in `src/cyxcode/` (router, skills, memory, dream, learned)
-- 5 test files (88 tests, 3 skipped)
-- Pattern definitions in skill classes
-- Documentation
+- the CyxCode-specific runtime surface under `packages/opencode/src/cyxcode/`
+- the matching tests under `packages/opencode/test/cyxcode/`
+- the docs and release metadata that describe CyxCode behavior
+- the smallest possible number of upstream-facing integration points
 
 **What we don't touch:**
-- Core OpenCode architecture
-- TUI rendering
-- Session management
-- Tool implementations (except bash hook)
+- broad upstream rewrites
+- compatibility internals that would break existing paths or state
+- docs that are already in sync with the code
+- the upstream sync boundary unless a CyxCode feature depends on it
 
 The fork surface is intentionally small. We add, we don't rewrite.
 
@@ -213,25 +213,17 @@ bun test packages/opencode/test/cyxcode/
 
 **A:** Fair question. We have tests now:
 
+```bash
+cd packages/opencode && bun test test/cyxcode/
 ```
-bun test test/cyxcode/
 
- 88 pass
- 3 skip
- 0 fail
-```
+The current suite covers the CyxCode-specific runtime paths and a few skipped cases remain around `substituteCaptures` regex escaping.
 
 **Test coverage:**
 
-| File | Tests | Coverage |
-|------|-------|----------|
-| `router.test.ts` | 12 | Skill registration, matching, stats |
-| `base-skill.test.ts` | 22 | Pattern matching, capture extraction, fix execution |
-| `learned.test.ts` | 20 | Pattern generation, regex escaping, PendingCapture |
-| `memory.test.ts` | 18 | Query scoring, keyword matching, edge cases |
-| `dream.test.ts` | 18 | Orient, deduplicate, validate, persist stats |
+The suite covers routing, pattern matching, capture extraction, learned pattern generation, memory lookup, dream consolidation, and related path handling.
 
-The 3 skipped tests document a known bug in `substituteCaptures` (regex escaping issue).
+A few skipped cases remain around `substituteCaptures` regex escaping.
 
 Is it production-quality? It's moving that direction. The core pattern matching and learning system is tested. Integration with OpenCode's bash tool is tested manually via the debug mode (`CYXCODE_DEBUG=true`).
 
@@ -253,17 +245,17 @@ The fix suggestions are text — you control how/where they execute.
 ### Q: The error interception approach is clever. But the more patterns you add, the more merge conflicts on upstream pulls.
 
 **A:** Patterns are isolated. They live in:
-- `src/cyxcode/skills/` (3 skill files with pattern arrays)
-- `.opencode/cyxcode-learned.json` (user's learned patterns)
+- `packages/opencode/src/cyxcode/skills/` and `packages/opencode/src/cyxcode/community-packs/`
+- `.cyxcode/patterns/learned.json` for the current state, with `.opencode/cyxcode-learned.json` still supported as the legacy path
 
-These files don't exist in upstream OpenCode. Zero merge conflicts on pattern additions.
+These files don't exist in upstream OpenCode. Pattern additions stay isolated from most upstream churn.
 
 The only merge-sensitive code is:
-- `src/cyxcode/router.ts` (skill orchestration)
-- `src/session/prompt/index.ts` (short-circuit hook)
-- `src/bash/bash.ts` (tool result hook)
+- `packages/opencode/src/cyxcode/router.ts` (skill orchestration)
+- `packages/opencode/src/session/prompt.ts` (short-circuit hook)
+- `packages/opencode/src/cli/cmd/tui/app.tsx` and the bash/tool result path where CyxCode attaches runtime hooks
 
-That's ~200 lines of integration code across 3 files. Upstream changes to these files require manual review, but it's manageable.
+Those are the files to inspect first when upstream sync work touches CyxCode behavior.
 
 ---
 

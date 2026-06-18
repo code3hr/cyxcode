@@ -6,7 +6,7 @@
 
 ## What it is
 
-The recall layer is CyxCode's semantic memory over everything you've already indexed: project memories, learned patterns, and auto-captured errors. When the 170+ hardcoded patterns miss, recall scans your prior indexed knowledge for *semantically similar* prior errors and injects them into the LLM's context — **without a single API call**.
+The recall layer is CyxCode's semantic memory over everything you've already indexed: project memories, learned patterns, and auto-captured errors. When the built-in patterns miss, recall scans your prior indexed knowledge for *semantically similar* prior errors and injects them into the LLM's context — **without a single API call**.
 
 It is:
 
@@ -35,7 +35,7 @@ Recall fixes this: when the regex misses, recall does a vector similarity search
 
 ### 1. Recurring errors with different surface syntax
 
-You hit `pnpm install failed: ENOENT lockfile` on Monday. The AI solves it (costs tokens), `learned.ts` captures the fix, and recall indexes the error+fix pair. On Thursday you hit `npm ci broken - lockfile missing` — different package manager, different words, same class of problem. The 170+ regex patterns won't match (they're syntactically different). But recall scores it at ~0.85 similarity against Monday's indexed entry and injects that prior context into the LLM's prompt. The LLM gets "you solved something like this before, here's what worked" and produces the fix on the first turn instead of the multi-turn diagnostic.
+You hit `pnpm install failed: ENOENT lockfile` on Monday. The AI solves it (costs tokens), `learned.ts` captures the fix, and recall indexes the error+fix pair. On Thursday you hit `npm ci broken - lockfile missing` — different package manager, different words, same class of problem. The built-in patterns won't match (they're syntactically different). But recall scores it at ~0.85 similarity against Monday's indexed entry and injects that prior context into the LLM's prompt. The LLM gets "you solved something like this before, here's what worked" and produces the fix on the first turn instead of the multi-turn diagnostic.
 
 **Savings:** ~2000-4000 tokens per recurrence (3-turn diagnostic compressed to 1 turn). Compounds over a month of daily development.
 
@@ -73,7 +73,7 @@ Every token you spend on a novel error becomes a free hint for every *similar* f
  Shell command fails
         │
         ▼
- 170+ regex patterns checked first (free, <1 ms)
+ 136 built-in regex patterns checked first (free, <1 ms)
         │
         ├─ HIT ──► apply fix, record stats, done
         │

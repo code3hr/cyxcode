@@ -2,9 +2,11 @@
 
 *We automate the AI that automates us.*
 
+Sponsor the project: [github.com/sponsors/CYXWIZ-Lab](https://github.com/sponsors/CYXWIZ-Lab)
+
 [![CyxCode Terminal UI](packages/web/src/assets/lander/screenshot-cyxcode.png)](https://github.com/code3hr/cyxcode)
 
-170+ error patterns. Zero tokens. The AI pays once, CyxCode remembers forever.
+136 built-in error patterns. Community packs and learned patterns extend coverage.
 
 ---
 
@@ -30,7 +32,7 @@
 
 ## What is CyxCode?
 
-CyxCode is a fork of [OpenCode](https://opencode.ai) that intercepts known errors **before** the LLM sees them. 170+ regex patterns match common errors and provide instant fixes — for free.
+CyxCode is a fork of [OpenCode](https://opencode.ai) that intercepts known errors **before** the LLM sees them. 136 built-in regex patterns match common errors instantly, and community packs plus learned patterns extend coverage.
 
 ```
 Traditional AI:  Every error -> LLM -> tokens burned -> response
@@ -87,9 +89,9 @@ Run `/cyxinit` inside CyxCode to initialize your project:
 ```
 
 This creates `.cyxcode/` with:
-- **Slash commands**: /dream, /correct, /remember, /learn, etc. (7 bundled)
-- **Directory structure**: memory/, patterns/, history/, command/
-- **Config**: Project type detection, gitignore entries
+- **Slash commands**: bundled command files plus built-ins like `/cyxinit` and `/update`
+- **Directory structure**: `history/`, `memory/`, `patterns/`, `wiki/`, `codegraph/`, `agent/`, and `command/`
+- **Config**: project type detection, gitignore entries, and migration metadata
 
 Or use the CLI: `cyxcode init` (same result, runs outside TUI).
 
@@ -133,7 +135,7 @@ When CyxCode misses a pattern, the AI handles it. But CyxCode **learns from that
 1. AI handles the error (costs tokens once)
 2. CyxCode captures the error output + AI's fix
 3. Generates a regex pattern automatically
-4. Saves to `.opencode/cyxcode-learned.json` as pending
+4. Saves to `.cyxcode/patterns/learned.json` as pending, with `.opencode/cyxcode-learned.json` still supported as the legacy path
 5. Run `/learn-patterns` to review and approve
 
 ### Reviewing Learned Patterns (`/learn-patterns`)
@@ -161,13 +163,13 @@ The AI forgets everything between sessions. CyxCode fixes that with **indexed pr
 
 ![CyxCode Memory System](packages/web/src/assets/lander/screenshot-cyxcode-memory.png)
 
-Run `/remember` to save project knowledge. The AI detects duplicates, extracts tags, and stores compact 1-5 line memories in `.opencode/memory/`. Each memory has tags for relevance matching.
+Run `/remember` to save project knowledge. The AI detects duplicates, extracts tags, and stores compact 1-5 line memories in `.cyxcode/memory/` or the legacy `.opencode/memory/` path. Each memory has tags for relevance matching.
 
 ### How It Works
 
 ```
 Session 1: /remember "auth.ts uses JWT with bcrypt, middleware at line 50"
-           -> Saved to .opencode/memory/auth-jwt-bcrypt-middleware.md
+           -> Saved to .cyxcode/memory/auth-jwt-bcrypt-middleware.md
            -> Tagged: [auth, jwt, bcrypt, middleware]
 
 Session 2: "what does auth.ts do?"
@@ -200,7 +202,7 @@ Memories are also captured automatically when sessions compact. The compaction s
 Pattern matching catches 80% of known errors for free. The other 20% used to fall through to the LLM and evaporate at session end. **Recall** is a passive semantic index over everything CyxCode already captures — project memories and learned patterns — so similar prior errors surface automatically on pattern miss.
 
 ```
-Shell error -> 170+ regex patterns checked (free, <1 ms)
+Shell error -> 136 built-in regex patterns checked (free, <1 ms)
                |
                +-- HIT  -> apply fix, done
                |
@@ -405,14 +407,14 @@ Full design: **[State Versioning Design](docs/STATE-VERSIONING.md)**
 
 ## Supported Categories
 
-3 skills, 16 categories, 170+ patterns:
+4 pattern groups, 16 categories, 136 built-in patterns:
 
-| Skill | Categories | Patterns |
-|-------|-----------|----------|
-| **Recovery** | Node, Git, Python, Docker, Build, System | 51 |
-| **Security** | SSL, Auth, SSH, Network, Scan | 39 |
-| **DevOps** | Kubernetes, Terraform, CI/CD, Cloud, Ansible | 46 |
-| **Community** | Bun, Rust, Go, Ruby | 35 |
+| Group | Categories |
+|-------|------------|
+| **Recovery** | Node, Git, Python, Docker, Build, System |
+| **Security** | SSL, Auth, SSH, Network, Scan |
+| **DevOps** | Kubernetes, Terraform, CI/CD, Cloud, Ansible |
+| **Community packs** | Bun, Rust, Go, Ruby |
 
 Community packs are bundled and auto-installed to `~/.cyxcode/community/` on first use. Manage with `cyxcode community list|install|remove`.
 
@@ -518,7 +520,7 @@ Available at `http://localhost:4096/dashboard` when running in web/server mode. 
 
 | Phase | Focus | Status |
 |-------|-------|--------|
-| 1-6 | Skill system, router, 136 patterns, bash integration | **Done** |
+| 1-6 | Skill system, router, built-in patterns, bash integration | **Done** |
 | 7 | Debug mode (`CYXCODE_DEBUG`) | **Done** |
 | 8 | LLM short-circuit on pattern match | **Done** |
 | 9 | Shell mode (`!`) zero-token matching | **Done** |

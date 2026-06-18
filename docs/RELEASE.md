@@ -8,14 +8,14 @@ Run the smoke harness from `packages/opencode`.
 
 ```bash
 cd packages/opencode
-bun run script/smoke-release.ts --version 2.3.7
+bun run script/smoke-release.ts --version <version>
 ```
 
 Use `--exe` when testing a manually downloaded or locally built binary.
 
 ```bash
 cd packages/opencode
-bun run script/smoke-release.ts --exe ../../.release-smoke/v2.3.7/bin/cyxcode.exe
+bun run script/smoke-release.ts --exe ../../.release-smoke/<version>/bin/cyxcode.exe
 ```
 
 Useful options:

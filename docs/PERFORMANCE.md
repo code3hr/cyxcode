@@ -1,5 +1,10 @@
 # CyxCode Performance
 
+## AVX2 Note
+
+If your CPU does not support AVX2, install the Bun baseline build and put it on your `PATH` before running CyxCode.
+The exact download method depends on your platform. The important part is using a baseline Bun build instead of the default AVX2-optimized one.
+
 ## Response Times
 
 Measured from user input to fix displayed in the TUI.

@@ -23,7 +23,7 @@ Status:
 | Requirement | Status | Notes |
 | --- | --- | --- |
 | `debian/` directory | Done | Packaging exists in repo |
-| Tagged release | Done | Use the current tagged release when submitting |
+| Tagged release | Done | Use the latest tagged CyxCode release when submitting |
 | License | Done | MIT |
 | Homepage | Done | `https://github.com/code3hr/cyxcode` |
 | Documentation | Done | README and docs |
@@ -90,8 +90,8 @@ cyxcode/
 Manual install path for GitHub release artifacts:
 
 ```bash
-wget https://github.com/code3hr/cyxcode/releases/download/v1.1.0/cyxcode_1.1.0-1_all.deb
-sudo dpkg -i cyxcode_1.1.0-1_all.deb
+wget https://github.com/code3hr/cyxcode/releases/download/<tag>/cyxcode_<version>-1_all.deb
+sudo dpkg -i cyxcode_<version>-1_all.deb
 sudo apt-get install -f
 ```
 

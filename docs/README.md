@@ -21,6 +21,7 @@ This directory contains project documentation that should help users, operators,
 | [ADDING-PATTERNS.md](ADDING-PATTERNS.md) | Add deterministic error patterns. |
 | [CONTRIBUTING-PATTERNS.md](CONTRIBUTING-PATTERNS.md) | Contribute reusable pattern fixes. |
 | [PROJECT.md](PROJECT.md) | Project boundaries, compatibility stance, and cleanup principles. |
+| [tofix.md](tofix.md) | Upstream sync findings and next-step notes. |
 
 ## Feature Docs
 
