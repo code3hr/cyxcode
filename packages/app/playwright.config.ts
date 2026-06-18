@@ -32,9 +32,9 @@ export default defineConfig({
   },
   use: {
     baseURL,
-    trace: "on-first-retry",
-    screenshot: "only-on-failure",
-    video: "retain-on-failure",
+    trace: process.env.PLAYWRIGHT_TRACE ?? "on-first-retry",
+    screenshot: process.env.PLAYWRIGHT_SCREENSHOT ?? "only-on-failure",
+    video: process.env.PLAYWRIGHT_VIDEO ?? "retain-on-failure",
   },
   projects: [
     {

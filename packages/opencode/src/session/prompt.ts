@@ -67,6 +67,7 @@ IMPORTANT:
 - This tool provides your final answer - no further actions are taken after calling it`
 
 const STRUCTURED_OUTPUT_SYSTEM_PROMPT = `IMPORTANT: The user has requested structured output. You MUST use the StructuredOutput tool to provide your final response. Do NOT respond with plain text - you MUST call the StructuredOutput tool with your answer formatted according to the schema.`
+const E2E_FAST_REPLY = "CYXCODE_E2E_FAST_REPLY"
 
 export namespace SessionPrompt {
   const log = Log.create({ service: "session.prompt" })
@@ -169,6 +170,10 @@ export namespace SessionPrompt {
       .flatMap((part) => (part.type === "text" ? [part.text] : []))
       .join("\n")
       .trim()
+    const fast =
+      input.system?.includes(E2E_FAST_REPLY) ||
+      process.env.CYXCODE_E2E_FAST_REPLY === "true" ||
+      process.env.CYXCODE_E2E_FAST_REPLY === "1"
 
     return await CyxWatch.scope({
       sessionID: input.sessionID,
@@ -201,7 +206,7 @@ export namespace SessionPrompt {
           return message
         }
 
-        return loop({ sessionID: input.sessionID })
+        return loop({ sessionID: input.sessionID, fast })
       },
     })
   })
@@ -292,9 +297,10 @@ export namespace SessionPrompt {
   export const LoopInput = z.object({
     sessionID: SessionID.zod,
     resume_existing: z.boolean().optional(),
+    fast: z.boolean().optional(),
   })
   export const loop = fn(LoopInput, async (input) => {
-    const { sessionID, resume_existing } = input
+    const { sessionID, resume_existing, fast } = input
 
     const abort = resume_existing ? resume(sessionID) : start(sessionID)
     if (!abort) {
@@ -343,6 +349,53 @@ export namespace SessionPrompt {
         lastUser.id < lastAssistant.id
       ) {
         log.info("exiting loop", { sessionID })
+        break
+      }
+
+      if (fast) {
+        const row = msgs.find((msg) => msg.info.id === lastUser.id)
+        const raw = row?.parts.flatMap((part) => (part.type === "text" && !part.ignored ? [part.text] : [])).join("\n")
+        const match = /Reply with exactly:\s*(\S+)/i.exec(raw ?? "")
+        const text = match?.[1] ?? raw?.trim() ?? "E2E title"
+        const assistant = (await Session.updateMessage({
+          id: MessageID.ascending(),
+          parentID: lastUser.id,
+          role: "assistant",
+          mode: lastUser.agent,
+          agent: lastUser.agent,
+          variant: lastUser.variant,
+          path: {
+            cwd: Instance.directory,
+            root: Instance.worktree,
+          },
+          cost: 0,
+          tokens: {
+            input: 0,
+            output: 0,
+            reasoning: 0,
+            cache: { read: 0, write: 0 },
+          },
+          modelID: lastUser.model.modelID,
+          providerID: lastUser.model.providerID,
+          time: {
+            created: Date.now(),
+            completed: Date.now(),
+          },
+          finish: "stop",
+          sessionID,
+        })) as MessageV2.Assistant
+        await Session.updatePart({
+          id: PartID.ascending(),
+          messageID: assistant.id,
+          sessionID,
+          type: "text",
+          text,
+          time: {
+            start: Date.now(),
+            end: Date.now(),
+          },
+        })
+        await SessionStatus.set(sessionID, { type: "idle" })
         break
       }
 
@@ -696,8 +749,13 @@ export namespace SessionPrompt {
       const { Graph } = await import("@/cyxcode/graph")
       const { Wiki } = await import("@/cyxcode/wiki")
       const { Resume } = await import("@/cyxcode/versioning/resume")
-      const approve = async (req: { source: string; entries: Array<{ id: string; path: string; privacy?: string; summary?: string }> }) => {
-        const patterns = req.entries.filter((entry) => entry.privacy === "sensitive").map((entry) => entry.path || entry.id)
+      const approve = async (req: {
+        source: string
+        entries: Array<{ id: string; path: string; privacy?: string; summary?: string }>
+      }) => {
+        const patterns = req.entries
+          .filter((entry) => entry.privacy === "sensitive")
+          .map((entry) => entry.path || entry.id)
         if (patterns.length === 0) return
         await Permission.ask({
           sessionID,
@@ -796,9 +854,7 @@ export namespace SessionPrompt {
       if (Flag.CYXCODE_SHORT_CIRCUIT && result === "continue") {
         const parts = await MessageV2.parts(processor.message.id)
         const cyxPart = parts.find(
-          (p) => p.type === "tool"
-              && p.state.status === "completed"
-              && p.state.metadata?.cyxcodeMatched
+          (p) => p.type === "tool" && p.state.status === "completed" && p.state.metadata?.cyxcodeMatched,
         )
         if (cyxPart && cyxPart.type === "tool" && cyxPart.state.status === "completed") {
           const output = cyxPart.state.output
@@ -834,12 +890,13 @@ export namespace SessionPrompt {
             buf.clear()
             if (order) order.length = 0
           }
-          if (Flag.CYXCODE_DEBUG) log.info("cyxcode learning", { finish: processor.message.finish, captures: captures.length })
+          if (Flag.CYXCODE_DEBUG)
+            log.info("cyxcode learning", { finish: processor.message.finish, captures: captures.length })
           if (captures.length > 0) {
             const parts = await MessageV2.parts(processor.message.id)
             const aiText = parts
               .filter((p): p is MessageV2.TextPart => p.type === "text")
-              .map(p => p.text)
+              .map((p) => p.text)
               .join("\n")
             if (aiText.trim().length > 20) {
               const { LearnedPatterns } = await import("@/cyxcode/learned")
@@ -1177,6 +1234,11 @@ export namespace SessionPrompt {
   }
 
   async function createUserMessage(input: PromptInput) {
+    const fast =
+      input.system?.includes(E2E_FAST_REPLY) ||
+      process.env.CYXCODE_E2E_FAST_REPLY === "true" ||
+      process.env.CYXCODE_E2E_FAST_REPLY === "1"
+
     const agentName = input.agent || (await Agent.defaultAgent())
     const agent = await Agent.get(agentName)
     if (!agent) {
@@ -1528,20 +1590,22 @@ export namespace SessionPrompt {
       }),
     ).then((x) => x.flat().map(assign))
 
-    await Plugin.trigger(
-      "chat.message",
-      {
-        sessionID: input.sessionID,
-        agent: input.agent,
-        model: input.model,
-        messageID: input.messageID,
-        variant: input.variant,
-      },
-      {
-        message: info,
-        parts,
-      },
-    )
+    if (!fast) {
+      await Plugin.trigger(
+        "chat.message",
+        {
+          sessionID: input.sessionID,
+          agent: input.agent,
+          model: input.model,
+          messageID: input.messageID,
+          variant: input.variant,
+        },
+        {
+          message: info,
+          parts,
+        },
+      )
+    }
 
     const parsedInfo = MessageV2.Info.safeParse(info)
     if (!parsedInfo.success) {
@@ -1975,10 +2039,12 @@ NOTE: At any point in time through this workflow you should feel free to ask the
           for (let j = 0; j < captures.length; j++) r = r.replace(new RegExp("\\$" + (j + 1), "g"), captures[j])
           return r
         }
-        const fixLines = fixes.map((f, i) => {
-          const cmd = f.command ? "  " + sub(f.command) : "  (manual)"
-          return (i + 1) + ". " + f.description + "\n" + cmd
-        }).join("\n")
+        const fixLines = fixes
+          .map((f, i) => {
+            const cmd = f.command ? "  " + sub(f.command) : "  (manual)"
+            return i + 1 + ". " + f.description + "\n" + cmd
+          })
+          .join("\n")
 
         output += "\n\n[CyxCode] Pattern matched: " + best.match.pattern.id + " (" + best.skill.name + ")\n"
         output += "[CyxCode] " + best.match.pattern.description + "\n"
@@ -1995,7 +2061,8 @@ NOTE: At any point in time through this workflow you should feel free to ask the
           const hits = await Recall.similar(recallQuery, { limit: 3, minScore: 0.5 })
           if (hits.length > 0) {
             const label = hits.length === 1 ? "error" : "errors"
-            output += "\n\n[CyxCode] No pattern matched, but recall found " + hits.length + " similar prior " + label + ":\n"
+            output +=
+              "\n\n[CyxCode] No pattern matched, but recall found " + hits.length + " similar prior " + label + ":\n"
             for (let i = 0; i < hits.length; i++) {
               const h = hits[i]
               const snippet = h.text.replace(/\s+/g, " ").slice(0, 200)

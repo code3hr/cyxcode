@@ -12,156 +12,182 @@ import { tmpdir } from "../fixture/fixture"
 
 Log.init({ print: false })
 
+let gate = Promise.resolve()
+const serial = async <T>(fn: () => Promise<T>) => {
+  const run = gate.then(fn, fn)
+  gate = run.then(
+    () => undefined,
+    () => undefined,
+  )
+  return run
+}
+
 describe("session.prompt missing file", () => {
   test("does not fail the prompt when a file part is missing", async () => {
-    await using tmp = await tmpdir({
-      git: true,
-      config: {
-        agent: {
-          build: {
-            model: "openai/gpt-5.2",
-          },
-        },
-      },
-    })
-
-    await Instance.provide({
-      directory: tmp.path,
-      fn: async () => {
-        const session = await Session.create({})
-
-        const missing = path.join(tmp.path, "does-not-exist.ts")
-        const msg = await SessionPrompt.prompt({
-          sessionID: session.id,
-          agent: "build",
-          noReply: true,
-          parts: [
-            { type: "text", text: "please review @does-not-exist.ts" },
-            {
-              type: "file",
-              mime: "text/plain",
-              url: `file://${missing}`,
-              filename: "does-not-exist.ts",
-            },
-          ],
-        })
-
-        if (msg.info.role !== "user") throw new Error("expected user message")
-
-        const hasFailure = msg.parts.some(
-          (part) => part.type === "text" && part.synthetic && part.text.includes("Read tool failed to read"),
-        )
-        expect(hasFailure).toBe(true)
-
-        await Session.remove(session.id)
-      },
-    })
-  })
-
-  test("keeps stored part order stable when file resolution is async", async () => {
-    await using tmp = await tmpdir({
-      git: true,
-      config: {
-        agent: {
-          build: {
-            model: "openai/gpt-5.2",
-          },
-        },
-      },
-    })
-
-    await Instance.provide({
-      directory: tmp.path,
-      fn: async () => {
-        const session = await Session.create({})
-
-        const missing = path.join(tmp.path, "still-missing.ts")
-        const msg = await SessionPrompt.prompt({
-          sessionID: session.id,
-          agent: "build",
-          noReply: true,
-          parts: [
-            {
-              type: "file",
-              mime: "text/plain",
-              url: `file://${missing}`,
-              filename: "still-missing.ts",
-            },
-            { type: "text", text: "after-file" },
-          ],
-        })
-
-        if (msg.info.role !== "user") throw new Error("expected user message")
-
-        const stored = await MessageV2.get({
-          sessionID: session.id,
-          messageID: msg.info.id,
-        })
-        const text = stored.parts.filter((part) => part.type === "text").map((part) => part.text)
-
-        expect(text[0]?.startsWith("Called the Read tool with the following input:")).toBe(true)
-        expect(text[1]?.includes("Read tool failed to read")).toBe(true)
-        expect(text[2]).toBe("after-file")
-
-        await Session.remove(session.id)
-      },
-    })
-  })
-})
-
-describe("session.prompt special characters", () => {
-  test("handles filenames with # character", async () => {
-    await using tmp = await tmpdir({
-      git: true,
-      init: async (dir) => {
-        await Bun.write(path.join(dir, "file#name.txt"), "special content\n")
-      },
-    })
-
-    await Instance.provide({
-      directory: tmp.path,
-      fn: async () => {
-        const session = await Session.create({})
-        const template = "Read @file#name.txt"
-        const parts = await SessionPrompt.resolvePromptParts(template)
-        const fileParts = parts.filter((part) => part.type === "file")
-
-        expect(fileParts.length).toBe(1)
-        expect(fileParts[0].filename).toBe("file#name.txt")
-        expect(fileParts[0].url).toContain("%23")
-
-        const decodedPath = fileURLToPath(fileParts[0].url)
-        expect(decodedPath).toBe(path.join(tmp.path, "file#name.txt"))
-
-        const message = await SessionPrompt.prompt({
-          sessionID: session.id,
-          parts,
-          noReply: true,
-        })
-        const stored = await MessageV2.get({ sessionID: session.id, messageID: message.info.id })
-        const textParts = stored.parts.filter((part) => part.type === "text")
-        const hasContent = textParts.some((part) => part.text.includes("special content"))
-        expect(hasContent).toBe(true)
-
-        await Session.remove(session.id)
-      },
-    })
-  })
-})
-
-describe("session.prompt agent variant", () => {
-  test("applies agent variant only when using agent model", async () => {
-    const prev = process.env.OPENAI_API_KEY
-    process.env.OPENAI_API_KEY = "test-openai-key"
-
-    try {
+    await serial(async () => {
       await using tmp = await tmpdir({
         git: true,
         config: {
           agent: {
             build: {
               model: "openai/gpt-5.2",
-              variant: "xhigh",
+            },
+          },
+        },
+      })
+
+      await Instance.provide({
+        directory: tmp.path,
+        fn: async () => {
+          const session = await Session.create({})
+
+          const missing = path.join(tmp.path, "does-not-exist.ts")
+          const msg = await SessionPrompt.prompt({
+            sessionID: session.id,
+            agent: "build",
+            noReply: true,
+            parts: [
+              { type: "text", text: "please review @does-not-exist.ts" },
+              {
+                type: "file",
+                mime: "text/plain",
+                url: `file://${missing}`,
+                filename: "does-not-exist.ts",
+              },
+            ],
+          })
+
+          if (msg.info.role !== "user") throw new Error("expected user message")
+
+          const hasFailure = msg.parts.some(
+            (part) => part.type === "text" && part.synthetic && part.text.includes("Read tool failed to read"),
+          )
+          expect(hasFailure).toBe(true)
+
+          await Session.remove(session.id)
+        },
+      })
+    })
+  })
+
+  test("keeps stored part order stable when file resolution is async", async () => {
+    await serial(async () => {
+      await using tmp = await tmpdir({
+        git: true,
+        config: {
+          agent: {
+            build: {
+              model: "openai/gpt-5.2",
+            },
+          },
+        },
+      })
+
+      await Instance.provide({
+        directory: tmp.path,
+        fn: async () => {
+          const session = await Session.create({})
+
+          const missing = path.join(tmp.path, "still-missing.ts")
+          const msg = await SessionPrompt.prompt({
+            sessionID: session.id,
+            agent: "build",
+            noReply: true,
+            parts: [
+              {
+                type: "file",
+                mime: "text/plain",
+                url: `file://${missing}`,
+                filename: "still-missing.ts",
+              },
+              { type: "text", text: "after-file" },
+            ],
+          })
+
+          if (msg.info.role !== "user") throw new Error("expected user message")
+
+          const stored = await MessageV2.get({
+            sessionID: session.id,
+            messageID: msg.info.id,
+          })
+          const text = stored.parts.filter((part) => part.type === "text").map((part) => part.text)
+
+          expect(text[0]?.startsWith("Called the Read tool with the following input:")).toBe(true)
+          expect(text[1]?.includes("Read tool failed to read")).toBe(true)
+          expect(text[2]).toBe("after-file")
+
+          await Session.remove(session.id)
+        },
+      })
+    })
+  })
+})
+
+describe("session.prompt special characters", () => {
+  test("handles filenames with # character", async () => {
+    await serial(async () => {
+      await using tmp = await tmpdir({
+        git: true,
+        init: async (dir) => {
+          await Bun.write(path.join(dir, "file#name.txt"), "special content\n")
+        },
+      })
+
+      await Instance.provide({
+        directory: tmp.path,
+        fn: async () => {
+          const session = await Session.create({})
+          const template = "Read @file#name.txt"
+          const parts = await SessionPrompt.resolvePromptParts(template)
+          const fileParts = parts.filter((part) => part.type === "file")
+
+          expect(fileParts.length).toBe(1)
+          expect(fileParts[0].filename).toBe("file#name.txt")
+          expect(fileParts[0].url).toContain("%23")
+
+          const decodedPath = fileURLToPath(fileParts[0].url)
+          expect(decodedPath).toBe(path.join(tmp.path, "file#name.txt"))
+
+          const message = await SessionPrompt.prompt({
+            sessionID: session.id,
+            parts,
+            noReply: true,
+          })
+          const stored = await MessageV2.get({ sessionID: session.id, messageID: message.info.id })
+          const textParts = stored.parts.filter((part) => part.type === "text")
+          const hasContent = textParts.some((part) => part.text.includes("special content"))
+          expect(hasContent).toBe(true)
+
+          await Session.remove(session.id)
+        },
+      })
+    })
+  })
+})
+
+describe("session.prompt agent variant", () => {
+  test("applies agent variant only when using agent model", async () => {
+    await serial(async () => {
+      await using tmp = await tmpdir({
+        git: true,
+        config: {
+          agent: {
+            build: {
+              model: "openai/gpt-5.2",
+              variant: "custom",
+            },
+          },
+          provider: {
+            openai: {
+              models: {
+                "gpt-5.2": {
+                  variants: {
+                    custom: {
+                      extraOption: "custom-value",
+                    },
+                  },
+                },
+              },
             },
           },
         },
@@ -190,7 +216,7 @@ describe("session.prompt agent variant", () => {
           })
           if (match.info.role !== "user") throw new Error("expected user message")
           expect(match.info.model).toEqual({ providerID: ProviderID.make("openai"), modelID: ModelID.make("gpt-5.2") })
-          expect(match.info.variant).toBe("xhigh")
+          expect(match.info.variant).toBe("custom")
 
           const override = await SessionPrompt.prompt({
             sessionID: session.id,
@@ -205,84 +231,129 @@ describe("session.prompt agent variant", () => {
           await Session.remove(session.id)
         },
       })
-    } finally {
-      if (prev === undefined) delete process.env.OPENAI_API_KEY
-      else process.env.OPENAI_API_KEY = prev
-    }
+    })
+  })
+})
+
+describe("session.prompt e2e fast reply", () => {
+  test("returns a synthetic reply without hitting provider code", async () => {
+    await serial(async () => {
+      await using tmp = await tmpdir({
+        git: true,
+        config: {
+          agent: {
+            build: {
+              model: "openai/gpt-5.2",
+            },
+          },
+        },
+      })
+
+      await Instance.provide({
+        directory: tmp.path,
+        fn: async () => {
+          const session = await Session.create({})
+          await SessionPrompt.prompt({
+            sessionID: session.id,
+            agent: "build",
+            system: "CYXCODE_E2E_FAST_REPLY",
+            parts: [{ type: "text", text: "Reply with exactly: PROBE_OK" }],
+          })
+
+          const msg = await MessageV2.get({
+            sessionID: session.id,
+            messageID: (await Session.messages({ sessionID: session.id })).at(-1)!.info.id,
+          })
+          const text = msg.parts
+            .filter((part) => part.type === "text")
+            .map((part) => part.text)
+            .join("\n")
+
+          expect(text).toContain("PROBE_OK")
+          await Session.remove(session.id)
+        },
+      })
+    })
   })
 })
 
 describe("session.agent-resolution", () => {
   test("unknown agent throws typed error", async () => {
-    await using tmp = await tmpdir({ git: true })
-    await Instance.provide({
-      directory: tmp.path,
-      fn: async () => {
-        const session = await Session.create({})
-        const err = await SessionPrompt.prompt({
-          sessionID: session.id,
-          agent: "nonexistent-agent-xyz",
-          noReply: true,
-          parts: [{ type: "text", text: "hello" }],
-        }).then(
-          () => undefined,
-          (e) => e,
-        )
-        expect(err).toBeDefined()
-        expect(err).not.toBeInstanceOf(TypeError)
-        expect(NamedError.Unknown.isInstance(err)).toBe(true)
-        if (NamedError.Unknown.isInstance(err)) {
-          expect(err.data.message).toContain('Agent not found: "nonexistent-agent-xyz"')
-        }
-      },
+    await serial(async () => {
+      await using tmp = await tmpdir({ git: true })
+      await Instance.provide({
+        directory: tmp.path,
+        fn: async () => {
+          const session = await Session.create({})
+          const err = await SessionPrompt.prompt({
+            sessionID: session.id,
+            agent: "nonexistent-agent-xyz",
+            noReply: true,
+            parts: [{ type: "text", text: "hello" }],
+          }).then(
+            () => undefined,
+            (e) => e,
+          )
+          expect(err).toBeDefined()
+          expect(err).not.toBeInstanceOf(TypeError)
+          expect(NamedError.Unknown.isInstance(err)).toBe(true)
+          if (NamedError.Unknown.isInstance(err)) {
+            expect(err.data.message).toContain('Agent not found: "nonexistent-agent-xyz"')
+          }
+        },
+      })
     })
   }, 30000)
 
   test("unknown agent error includes available agent names", async () => {
-    await using tmp = await tmpdir({ git: true })
-    await Instance.provide({
-      directory: tmp.path,
-      fn: async () => {
-        const session = await Session.create({})
-        const err = await SessionPrompt.prompt({
-          sessionID: session.id,
-          agent: "nonexistent-agent-xyz",
-          noReply: true,
-          parts: [{ type: "text", text: "hello" }],
-        }).then(
-          () => undefined,
-          (e) => e,
-        )
-        expect(NamedError.Unknown.isInstance(err)).toBe(true)
-        if (NamedError.Unknown.isInstance(err)) {
-          expect(err.data.message).toContain("build")
-        }
-      },
+    await serial(async () => {
+      await using tmp = await tmpdir({ git: true })
+      await Instance.provide({
+        directory: tmp.path,
+        fn: async () => {
+          const session = await Session.create({})
+          const err = await SessionPrompt.prompt({
+            sessionID: session.id,
+            agent: "nonexistent-agent-xyz",
+            noReply: true,
+            parts: [{ type: "text", text: "hello" }],
+          }).then(
+            () => undefined,
+            (e) => e,
+          )
+          expect(NamedError.Unknown.isInstance(err)).toBe(true)
+          if (NamedError.Unknown.isInstance(err)) {
+            expect(err.data.message).toContain("build")
+          }
+        },
+      })
     })
   }, 30000)
 
   test("unknown command throws typed error with available names", async () => {
-    await using tmp = await tmpdir({ git: true })
-    await Instance.provide({
-      directory: tmp.path,
-      fn: async () => {
-        const session = await Session.create({})
-        const err = await SessionPrompt.command({
-          sessionID: session.id,
-          command: "nonexistent-command-xyz",
-          arguments: "",
-        }).then(
-          () => undefined,
-          (e) => e,
-        )
-        expect(err).toBeDefined()
-        expect(err).not.toBeInstanceOf(TypeError)
-        expect(NamedError.Unknown.isInstance(err)).toBe(true)
-        if (NamedError.Unknown.isInstance(err)) {
-          expect(err.data.message).toContain('Command not found: "nonexistent-command-xyz"')
-          expect(err.data.message).toContain("init")
-        }
-      },
+    await serial(async () => {
+      await using tmp = await tmpdir({ git: true })
+      await Instance.provide({
+        directory: tmp.path,
+        fn: async () => {
+          const session = await Session.create({})
+          const err = await SessionPrompt.command({
+            sessionID: session.id,
+            command: "nonexistent-command-xyz",
+            arguments: "",
+          }).then(
+            () => undefined,
+            (e) => e,
+          )
+          expect(err).toBeDefined()
+          expect(err).not.toBeInstanceOf(TypeError)
+          expect(NamedError.Unknown.isInstance(err)).toBe(true)
+          if (NamedError.Unknown.isInstance(err)) {
+            expect(err.data.message).toContain('Command not found: "nonexistent-command-xyz"')
+            expect(err.data.message).toContain("init")
+          }
+        },
+      })
     })
   }, 30000)
 })

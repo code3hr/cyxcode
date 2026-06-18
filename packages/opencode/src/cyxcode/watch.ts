@@ -276,7 +276,11 @@ function score(input: { kind: WatchKind; path?: string; cmd?: string; bytes?: nu
       flags.push("risky_shell")
       risk += 25
     }
-    if (/(^|\s)(env|printenv|set|export)(\s|$)/.test(cmd) || cmd.includes("get-childitem env:") || /(\$env:|\$[a-z0-9_]*(token|secret|key|password)|%[a-z0-9_]*(token|secret|key|password)%)/i.test(input.cmd)) {
+    if (
+      /(^|\s)(env|printenv|set|export)(\s|$)/.test(cmd) ||
+      cmd.includes("get-childitem env:") ||
+      /(\$env:|\$[a-z0-9_]*(token|secret|key|password)|%[a-z0-9_]*(token|secret|key|password)%)/i.test(input.cmd)
+    ) {
       flags.push("env_access")
       risk += 35
     }
@@ -285,7 +289,11 @@ function score(input: { kind: WatchKind; path?: string; cmd?: string; bytes?: nu
   return { risk, flags }
 }
 
-function decide(input: { kind: WatchKind; path?: string; cmd?: string; bytes?: number }, flags: string[], risk: number): WatchDecision {
+function decide(
+  input: { kind: WatchKind; path?: string; cmd?: string; bytes?: number },
+  flags: string[],
+  risk: number,
+): WatchDecision {
   if (input.kind === "shell.command") {
     const cmd = input.cmd?.toLowerCase() ?? ""
     if (cmd.includes("rm -rf") || cmd.includes("del /s") || cmd.includes("format ")) return "block"
@@ -373,11 +381,20 @@ function detect(entry: WatchEntry, list: WatchEntry[]) {
     }
   }
 
-  const same = list.filter((row) => row.sessionID && row.sessionID === entry.sessionID && row.messageID && row.messageID === entry.messageID)
+  const same = list.filter(
+    (row) => row.sessionID && row.sessionID === entry.sessionID && row.messageID && row.messageID === entry.messageID,
+  )
   const risky = same.filter((row) => row.risk > 0)
   const kinds = new Set(risky.map((row) => row.kind))
   const first = same[0]
-  if (entry.sessionID && entry.messageID && risky.length >= 3 && kinds.size >= 2 && first && entry.ts - first.ts <= 10 * 60 * 1000) {
+  if (
+    entry.sessionID &&
+    entry.messageID &&
+    risky.length >= 3 &&
+    kinds.size >= 2 &&
+    first &&
+    entry.ts - first.ts <= 10 * 60 * 1000
+  ) {
     add("prompt_drift", Math.max(entry.risk, 25), ["prompt_mismatch", "multi_action"])
   }
 
@@ -386,7 +403,9 @@ function detect(entry: WatchEntry, list: WatchEntry[]) {
     add("repeated_sensitive", Math.max(entry.risk, 35), [...entry.flags])
   }
 
-  return out.filter((row, i, all) => i === all.findIndex((next) => alertKey(entry, row.kind) === alertKey(entry, next.kind)))
+  return out.filter(
+    (row, i, all) => i === all.findIndex((next) => alertKey(entry, row.kind) === alertKey(entry, next.kind)),
+  )
 }
 
 function guard(input: { permission: string; patterns: string[]; metadata?: Record<string, unknown> }): WatchGuard {
@@ -415,7 +434,12 @@ function guard(input: { permission: string; patterns: string[]; metadata?: Recor
       decision,
       risk: out.risk,
       flags: out.flags,
-      reason: decision === "block" ? "destructive shell command" : out.flags.includes("risky_shell") ? "risky shell command" : undefined,
+      reason:
+        decision === "block"
+          ? "destructive shell command"
+          : out.flags.includes("risky_shell")
+            ? "risky shell command"
+            : undefined,
     })
   }
 
@@ -455,7 +479,11 @@ function guard(input: { permission: string; patterns: string[]; metadata?: Recor
     })
   }
 
-  if (input.permission === "websearch" || input.permission === "codesearch" || input.permission === "external_directory") {
+  if (
+    input.permission === "websearch" ||
+    input.permission === "codesearch" ||
+    input.permission === "external_directory"
+  ) {
     const decision: WatchDecision = "require-approval"
     return apply({
       decision,
@@ -473,7 +501,10 @@ function guard(input: { permission: string; patterns: string[]; metadata?: Recor
   })
 }
 
-function entry(input: { permission: string; patterns: string[]; metadata?: Record<string, unknown> }, out: WatchGuard): Omit<WatchEntry, "id" | "ts" | "project" | "sessionID" | "messageID" | "prompt"> {
+function entry(
+  input: { permission: string; patterns: string[]; metadata?: Record<string, unknown> },
+  out: WatchGuard,
+): Omit<WatchEntry, "id" | "ts" | "project" | "sessionID" | "messageID" | "prompt"> {
   const meta = input.metadata ?? {}
   const str = (key: string) => {
     const value = meta[key]
@@ -575,7 +606,10 @@ function persistSync(entry: WatchEntry) {
   return entry
 }
 
-function denied(input: { permission: string; patterns: string[]; metadata?: Record<string, unknown> }, out: WatchGuard) {
+function denied(
+  input: { permission: string; patterns: string[]; metadata?: Record<string, unknown> },
+  out: WatchGuard,
+) {
   const scope = current()
   const { ts, id } = now()
   persistSync({
@@ -761,21 +795,30 @@ export namespace CyxWatch {
     })
   }
 
-  export async function request(input: { url: string; method?: string; bytes?: number; sessionID?: string; messageID?: string; guard?: WatchGuard }) {
+  export async function request(input: {
+    url: string
+    method?: string
+    bytes?: number
+    sessionID?: string
+    messageID?: string
+    guard?: WatchGuard
+  }) {
     const out = score({
       kind: "network.outbound",
       bytes: input.bytes,
     })
     const flags = input.guard?.flags ?? out.flags
     const risk = input.guard?.risk ?? out.risk
-    const decision = input.guard?.decision ?? decide(
-      {
-        kind: "network.outbound",
-        bytes: input.bytes,
-      },
-      flags,
-      risk,
-    )
+    const decision =
+      input.guard?.decision ??
+      decide(
+        {
+          kind: "network.outbound",
+          bytes: input.bytes,
+        },
+        flags,
+        risk,
+      )
     const { ts, id } = now()
     return await persist({
       id,
@@ -807,13 +850,15 @@ export namespace CyxWatch {
     })
     const flags = input.guard?.flags ?? out.flags
     const risk = input.guard?.risk ?? out.risk
-    const decision = input.guard?.decision ?? decide(
-      {
-        kind: "network.websocket",
-      },
-      flags,
-      risk,
-    )
+    const decision =
+      input.guard?.decision ??
+      decide(
+        {
+          kind: "network.websocket",
+        },
+        flags,
+        risk,
+      )
     const { ts, id } = now()
     return await persist({
       id,
@@ -838,11 +883,19 @@ export namespace CyxWatch {
     })
   }
 
-  export function classify(input: { permission: string; patterns: string[]; metadata?: Record<string, unknown> }): WatchGuard {
+  export function classify(input: {
+    permission: string
+    patterns: string[]
+    metadata?: Record<string, unknown>
+  }): WatchGuard {
     return guard(input)
   }
 
-  export function enforce(input: { permission: string; patterns: string[]; metadata?: Record<string, unknown> }): WatchGuard {
+  export function enforce(input: {
+    permission: string
+    patterns: string[]
+    metadata?: Record<string, unknown>
+  }): WatchGuard {
     const out = guard(input)
     if (out.decision === "block" || out.decision === "require-approval") {
       denied(input, out)
@@ -905,7 +958,10 @@ export namespace CyxWatch {
       requireApproval: rows.filter((entry) => entry.decision === "require-approval").length,
       block: rows.filter((entry) => entry.decision === "block").length,
     }
-    const flags = item(rows.flatMap((entry) => entry.flags), (flag) => flag)
+    const flags = item(
+      rows.flatMap((entry) => entry.flags),
+      (flag) => flag,
+    )
     const top = item(rows, (entry) => entry.path)
       .map((row) => ({ path: row.name, count: row.count }))
       .slice(0, 10)
