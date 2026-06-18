@@ -22,6 +22,7 @@ This directory contains project documentation that should help users, operators,
 | [CONTRIBUTING-PATTERNS.md](CONTRIBUTING-PATTERNS.md) | Contribute reusable pattern fixes. |
 | [PROJECT.md](PROJECT.md) | Project boundaries, compatibility stance, and cleanup principles. |
 | [tofix.md](tofix.md) | Upstream sync findings and next-step notes. |
+| [E2E-REPORT.md](E2E-REPORT.md) | Deterministic prompt e2e report and smoke command. |
 
 ## Feature Docs
 
