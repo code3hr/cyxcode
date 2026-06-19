@@ -58,7 +58,7 @@ Pin a specific version:
 curl -fsSL https://raw.githubusercontent.com/code3hr/cyxcode/HEAD/install | bash -s -- --version 2.3.2
 ```
 
-The installer drops the `cyxcode` binary into `~/.opencode/bin` and adds it to `PATH`. Releases live at [github.com/code3hr/cyxcode/releases](https://github.com/code3hr/cyxcode/releases).
+The installer drops the `cyxcode` binary into `~/.opencode/bin` and adds it to `PATH`. Releases live at [github.com/code3hr/cyxcode/releases](https://github.com/code3hr/cyxcode/releases). Sponsor the project at [github.com/sponsors/CYXWIZ-Lab](https://github.com/sponsors/CYXWIZ-Lab).
 
 ### Upgrading
 
