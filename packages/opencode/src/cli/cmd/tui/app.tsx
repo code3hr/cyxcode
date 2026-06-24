@@ -381,6 +381,18 @@ function App(props: { onSnapshot?: () => Promise<string[]> }) {
       },
     },
     {
+      title: "Show CyxCode history",
+      value: "cyxcode.history",
+      category: "CyxCode",
+      slash: {
+        name: "history",
+      },
+      onSelect: async () => {
+        const { Changelog } = await import("@/cyxcode/versioning/changelog")
+        await DialogAlert.show(dialog, "CyxCode History", await Changelog.summary())
+      },
+    },
+    {
       title: "Switch session",
       value: "session.list",
       keybind: "session_list",

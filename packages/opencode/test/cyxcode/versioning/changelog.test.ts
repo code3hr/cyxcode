@@ -2,6 +2,7 @@ import { describe, expect, test, beforeEach, afterEach } from "bun:test"
 import fs from "fs/promises"
 import path from "path"
 import os from "os"
+import { Changelog } from "../../../src/cyxcode/versioning/changelog"
 
 /**
  * Changelog Tests
@@ -79,6 +80,29 @@ describe("Changelog", () => {
     expect(recent).toHaveLength(5)
     expect(recent[0].data.index).toBe(15)
     expect(recent[4].data.index).toBe(19)
+  })
+
+  test("format renders recent history entries", () => {
+    const text = Changelog.format([
+      {
+        type: "commit",
+        timestamp: "2026-06-24T10:00:00.000Z",
+        data: { hash: "abcdef123456", trigger: "session-end", files: 2, session: "demo" },
+      },
+      {
+        type: "correction-reinforced",
+        timestamp: "2026-06-24T10:01:00.000Z",
+        data: { rule: "use bun", strength: 2 },
+      },
+    ])
+
+    expect(text).toContain("2026-06-24 10:00:00Z  commit")
+    expect(text).toContain("session-end abcdef12 2 files demo")
+    expect(text).toContain("correction-reinforced  use bun strength 2")
+  })
+
+  test("format handles empty history", () => {
+    expect(Changelog.format([])).toBe("No CyxCode history entries found.")
   })
 
   test("empty file returns empty array", async () => {

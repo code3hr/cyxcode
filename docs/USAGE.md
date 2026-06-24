@@ -82,6 +82,7 @@ Type `/` followed by the command name:
 | `/cyxinit` | Initialize `.cyxcode/` directory (migrates from `.opencode/` if exists) |
 | `/dream` | Run dream consolidation — deduplicate, validate, persist stats, update AGENTS.md |
 | `/resume` | Show the latest CyxCode recovery state |
+| `/history` | Show recent CyxCode versioning events |
 | `/sessions` | Choose a full stored conversation |
 | `/remember <info>` | Save a memory about your project for future sessions |
 | `/learn-patterns` | Review and approve learned error patterns |
@@ -474,10 +475,11 @@ Expected result: the AI should see the correction in the system prompt and prefe
 3. **Auto-commit**: CyxCode saves compact state snapshots on session end and after compaction. `Ctrl+C`, `SIGTERM`, and terminal hangup also try to commit before exit.
 4. **HEAD snapshot**: `.cyxcode/history/HEAD.json` points to the latest state commit in `.cyxcode/history/commits/`.
 5. **Resume command**: `/resume` shows the latest HEAD recovery summary in the TUI.
-6. **Resume prompt**: The latest HEAD commit is loaded into the next prompt as `<cyxcode-resume>`.
-7. **Corrections**: Saved via `/correct`, loaded into the system prompt sorted by strength.
-8. **Drift detection**: If AI stops following a correction, its strength increases automatically.
-9. **Dream integration**: Corrections with strength >= 3 auto-promoted to AGENTS.md. Unused corrections decay over time.
+6. **History command**: `/history` shows recent versioning events from `.cyxcode/history/changelog.json`.
+7. **Resume prompt**: The latest HEAD commit is loaded into the next prompt as `<cyxcode-resume>`.
+8. **Corrections**: Saved via `/correct`, loaded into the system prompt sorted by strength.
+9. **Drift detection**: If AI stops following a correction, its strength increases automatically.
+10. **Dream integration**: Corrections with strength >= 3 auto-promoted to AGENTS.md. Unused corrections decay over time.
 
 ### Commands
 
@@ -486,6 +488,7 @@ Expected result: the AI should see the correction in the system prompt and prefe
 | `/correct <rule>` | Save a behavioral correction (strength: 1, increases on reinforcement) |
 | `/dream` | Consolidate state — promote, decay, archive |
 | `/resume` | Show the latest CyxCode recovery state from `.cyxcode/history/HEAD.json` |
+| `/history` | Show recent CyxCode versioning events from `.cyxcode/history/changelog.json` |
 | `/sessions` | Open previous stored conversations in the TUI |
 | `cyxcode session list` | List stored sessions from the CLI |
 
