@@ -245,7 +245,7 @@ export const GithubInstallCommand = cmd({
                 "",
                 "    3. Go to a GitHub issue and comment `/cyxcode summarize` to see the agent in action",
                 "",
-                "   Learn more about the GitHub agent - https://github.com/code3hr/cyxcode/tree/dev/docs",
+                "   Learn more about the GitHub agent - https://cyxcode.ai/docs/github/#usage-examples",
               ].join("\n"),
             )
           }
