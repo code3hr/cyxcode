@@ -16,7 +16,7 @@ import { Script } from "@cyxcode/script"
 import pkg from "../package.json"
 
 const modelsUrl = process.env.CYXCODE_MODELS_URL || "https://models.dev"
-const icon = path.resolve(dir, "../ui/src/assets/favicon/favicon-v3.ico")
+const icon = path.resolve(dir, "../../ico.ico")
 // Fetch and generate models.dev snapshot
 const modelsData = process.env.MODELS_DEV_API_JSON
   ? await Bun.file(process.env.MODELS_DEV_API_JSON).text()
