@@ -16,6 +16,7 @@ import { Script } from "@cyxcode/script"
 import pkg from "../package.json"
 
 const modelsUrl = process.env.CYXCODE_MODELS_URL || "https://models.dev"
+const icon = path.resolve(dir, "../ui/src/assets/favicon/favicon-v3.ico")
 // Fetch and generate models.dev snapshot
 const modelsData = process.env.MODELS_DEV_API_JSON
   ? await Bun.file(process.env.MODELS_DEV_API_JSON).text()
@@ -190,7 +191,9 @@ for (const item of targets) {
       target: name.replace(pkg.name, "bun") as any,
       outfile: `dist/${name}/bin/cyxcode`,
       execArgv: [`--user-agent=opencode/${Script.version}`, "--use-system-ca", "--"],
-      windows: {},
+      windows: {
+        icon,
+      },
     },
     entrypoints: ["./src/index.ts", parserWorker, workerPath],
     define: {
