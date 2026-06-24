@@ -64,10 +64,47 @@ export namespace Server {
     ".map": "application/json; charset=utf-8",
     ".png": "image/png",
     ".svg": "image/svg+xml",
+    ".ttf": "font/ttf",
     ".txt": "text/plain; charset=utf-8",
+    ".webmanifest": "application/manifest+json; charset=utf-8",
     ".webp": "image/webp",
     ".woff": "font/woff",
     ".woff2": "font/woff2",
+  }
+  const api = [
+    "/api",
+    "/agent",
+    "/auth",
+    "/command",
+    "/config",
+    "/cyxcode",
+    "/cyxwatch",
+    "/doc",
+    "/event",
+    "/experimental",
+    "/file",
+    "/find",
+    "/formatter",
+    "/global",
+    "/instance",
+    "/log",
+    "/lsp",
+    "/mcp",
+    "/path",
+    "/pentest",
+    "/permission",
+    "/project",
+    "/provider",
+    "/pty",
+    "/question",
+    "/session",
+    "/skill",
+    "/tui",
+    "/vcs",
+  ]
+
+  function isAPI(url: string) {
+    return api.some((item) => url === item || url.startsWith(`${item}/`))
   }
 
   export const Default = lazy(() => createApp({}))
@@ -605,8 +642,7 @@ export namespace Server {
         },
       )
       .all("/*", async (c) => {
-        const url = c.req.path
-        if (url === "/api" || url.startsWith("/api/")) {
+        if (isAPI(c.req.path)) {
           return c.json({ error: "API route not found" }, 404)
         }
         return appRoute(c)

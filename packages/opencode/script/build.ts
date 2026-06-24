@@ -19,6 +19,27 @@ const modelsUrl = process.env.CYXCODE_MODELS_URL || "https://models.dev"
 const icon = path.resolve(dir, "../../ico.ico")
 const web = path.resolve(dir, "../app")
 const dash = path.join(dir, "src/dashboard")
+
+async function materialize() {
+  const root = path.join(web, "public")
+  const out = path.join(web, "dist")
+  const base = path.resolve(dir, "..")
+  const files = await fs.promises.readdir(root, { withFileTypes: true })
+  await Promise.all(
+    files
+      .filter((entry) => entry.isFile())
+      .map(async (entry) => {
+        const file = path.join(root, entry.name)
+        if ((await fs.promises.stat(file)).size > 256) return
+        const text = (await Bun.file(file).text()).trim()
+        if (!text.startsWith("../")) return
+        const target = path.resolve(root, text)
+        if (!target.startsWith(base + path.sep)) return
+        await Bun.write(path.join(out, entry.name), await Bun.file(target).arrayBuffer())
+      }),
+  )
+}
+
 // Fetch and generate models.dev snapshot
 const modelsData = process.env.MODELS_DEV_API_JSON
   ? await Bun.file(process.env.MODELS_DEV_API_JSON).text()
@@ -163,6 +184,7 @@ if (!skipInstall) {
 const base = process.env.CYXCODE_APP_BASE
 process.env.CYXCODE_APP_BASE = "/app/"
 await $`bun run build`.cwd(web)
+await materialize()
 if (base === undefined) delete process.env.CYXCODE_APP_BASE
 else process.env.CYXCODE_APP_BASE = base
 await $`bun run build`.cwd(dash)
