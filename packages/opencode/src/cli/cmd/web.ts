@@ -2,7 +2,6 @@ import { Server } from "../../server/server"
 import { UI } from "../ui"
 import { cmd } from "./cmd"
 import { withNetworkOptions, resolveNetworkOptions } from "../network"
-import { Flag } from "../../flag/flag"
 import open from "open"
 import { networkInterfaces } from "os"
 
@@ -33,10 +32,10 @@ export const WebCommand = cmd({
   builder: (yargs) => withNetworkOptions(yargs),
   describe: "start cyxcode server and open web interface",
   handler: async (args) => {
-    if (!Flag.CYXCODE_SERVER_PASSWORD) {
+    const opts = await resolveNetworkOptions(args)
+    if (!opts.password) {
       UI.println(UI.Style.TEXT_WARNING_BOLD + "!  " + "CYXCODE_SERVER_PASSWORD is not set; server is unsecured.")
     }
-    const opts = await resolveNetworkOptions(args)
     const server = Server.listen(opts)
     UI.empty()
     UI.println(UI.logo("  "))
@@ -44,7 +43,7 @@ export const WebCommand = cmd({
 
     if (opts.hostname === "0.0.0.0") {
       // Show localhost for local access
-      const localhostUrl = `http://localhost:${server.port}`
+      const localhostUrl = `http://localhost:${server.port}/app/`
       UI.println(UI.Style.TEXT_INFO_BOLD + "  Local access:      ", UI.Style.TEXT_NORMAL, localhostUrl)
 
       // Show network IPs for remote access
@@ -70,7 +69,7 @@ export const WebCommand = cmd({
       // Open localhost in browser
       open(localhostUrl.toString()).catch(() => {})
     } else {
-      const displayUrl = server.url.toString()
+      const displayUrl = new URL("/app/", server.url).toString()
       UI.println(UI.Style.TEXT_INFO_BOLD + "  Web interface:    ", UI.Style.TEXT_NORMAL, displayUrl)
       open(displayUrl).catch(() => {})
     }

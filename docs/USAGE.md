@@ -615,6 +615,97 @@ For an installed CLI, launch web mode:
 cyxcode web
 ```
 
+The installed CLI serves the main web app and dashboard locally from the same
+CyxCode server. By default it opens `http://127.0.0.1:4096/app/` or the
+configured server port.
+
+```text
+http://127.0.0.1:4096/app/
+http://127.0.0.1:4096/dashboard/
+```
+
+### Configuration
+
+Global server settings live in the CyxCode config directory. On Windows this is
+usually:
+
+```text
+%USERPROFILE%\.config\cyxcode\config.json
+```
+
+Project settings live in:
+
+```text
+<project>\.cyxcode\config.json
+```
+
+CyxCode discovers project config by walking up from the current directory. It
+prefers `.cyxcode` first, then `.opencode` for legacy compatibility. Global
+config is loaded first, then project config overrides it. Environment variables
+override matching runtime values when supported.
+
+Example:
+
+```json
+{
+  "$schema": "https://cyxcode.ai/config.json",
+  "server": {
+    "hostname": "127.0.0.1",
+    "port": 4096,
+    "username": "cyxcode",
+    "password": "change-this-password",
+    "mdns": false
+  }
+}
+```
+
+`CYXCODE_SERVER_USERNAME` and `CYXCODE_SERVER_PASSWORD` override these config
+values when set in the environment.
+
+Common config settings:
+
+| Setting | Scope | Description |
+|---------|-------|-------------|
+| `model` | global/project | Main model in `provider/model` format |
+| `small_model` | global/project | Lightweight model for title and small tasks |
+| `provider` | global/project | Provider definitions, API options, local model endpoints, model metadata |
+| `server.hostname` | global | Host for `cyxcode serve` and `cyxcode web` |
+| `server.port` | global | Port for `cyxcode serve` and `cyxcode web` |
+| `server.username` | global | Basic auth username for web/server mode |
+| `server.password` | global | Basic auth password for web/server mode |
+| `disabled_providers` | global/project | Providers to hide/disable |
+| `enabled_providers` | global/project | Allow only these providers |
+| `share` | global/project | Sharing mode: `manual`, `auto`, or `disabled` |
+| `autoupdate` | global | Auto-update behavior: `true`, `false`, or `notify` |
+| `snapshot` | global/project | Enable or disable filesystem snapshot tracking |
+| `plugin` | global/project | Plugin imports to load |
+| `command` | global/project | Custom slash command definitions |
+| `skills` | global/project | Additional skill folders |
+
+Local model example with Ollama:
+
+```json
+{
+  "$schema": "https://cyxcode.ai/config.json",
+  "model": "ollama/qwen2.5-coder:7b",
+  "provider": {
+    "ollama": {
+      "npm": "@ai-sdk/openai-compatible",
+      "name": "Ollama Local",
+      "options": {
+        "baseURL": "http://localhost:11434/v1",
+        "apiKey": "ollama"
+      },
+      "models": {
+        "qwen2.5-coder:7b": {
+          "name": "Qwen2.5 Coder 7B"
+        }
+      }
+    }
+  }
+}
+```
+
 For local development from this repository, start the backend, main web app, and
 dashboard dev app separately:
 
@@ -632,22 +723,18 @@ cd D:\Dev\Failed\cyxcode\packages\opencode\src\dashboard
 npm run dev -- --host 127.0.0.1 --port 3002
 ```
 
-Open the main local web app:
+Open the local dashboard:
 
 ```text
-http://127.0.0.1:3000/
-http://127.0.0.1:3000/dashboard/
-http://127.0.0.1:3000/dashboard/security
-http://127.0.0.1:3000/dashboard/reports
+http://127.0.0.1:4096/app/
+http://127.0.0.1:4096/dashboard/
+http://127.0.0.1:4096/dashboard/security
+http://127.0.0.1:4096/dashboard/reports
 ```
 
 The dashboard dev app is also directly available at
 `http://127.0.0.1:3002/dashboard/`. The backend/API is available at
 `http://127.0.0.1:4096/`.
-
-The split local setup is temporary. `docs/WEB-ENTRYPOINT.md` tracks the
-remaining work to make `cyxcode web --hostname 127.0.0.1 --port 4096` serve the
-app and dashboard consistently as one local web entrypoint.
 
 The app dashboard pages at `/dashboard/reports` and `/dashboard/security` show:
 - report generation and previews
@@ -700,9 +787,24 @@ All audit entries are automatically scrubbed of secrets (API keys, JWTs, passwor
 |----------|---------|-------------|
 | `CYXCODE_DEBUG` | `false` | Enable verbose logging (pattern matching, database, bus events, startup details) |
 | `CYXCODE_SHORT_CIRCUIT` | `true` | Skip LLM on pattern match. `false` to always use AI |
+| `CYXCODE_CONFIG_DIR` | — | Additional config directory to load |
+| `CYXCODE_CONFIG_CONTENT` | — | Inline JSON/JSONC config content |
+| `CYXCODE_DISABLE_PROJECT_CONFIG` | `false` | Ignore project `.cyxcode` and `.opencode` config |
+| `CYXCODE_DISABLE_AUTOUPDATE` | `false` | Disable auto-update checks |
+| `CYXCODE_ALWAYS_NOTIFY_UPDATE` | `false` | Always notify when an update is available |
+| `CYXCODE_DISABLE_AUTOCOMPACT` | `false` | Disable automatic session compaction |
+| `CYXCODE_DISABLE_PRUNE` | `false` | Disable pruning behavior |
+| `CYXCODE_DISABLE_MODELS_FETCH` | `false` | Disable fetching live model metadata |
+| `CYXCODE_MODELS_PATH` | — | Read model metadata from a local file |
+| `CYXCODE_MODELS_URL` | `https://models.dev` | Alternate models metadata endpoint |
 | `ANTHROPIC_API_KEY` | — | Claude API key |
 | `OPENAI_API_KEY` | — | OpenAI API key |
-| `CYXCODE_SERVER_PASSWORD` | — | Password for server mode |
+| `CYXCODE_SERVER_USERNAME` | `opencode` | Basic auth username for server mode; overrides `server.username` |
+| `CYXCODE_SERVER_PASSWORD` | — | Basic auth password for server mode; overrides `server.password` |
+| `CYXCODE_APP_URL` | — | Development override for the main web app origin |
+| `CYXCODE_DASHBOARD_URL` | — | Development override for the dashboard origin |
+| `CYXCODE_MEMORY_KEY` | — | Key material for CyxCode memory encryption |
+| `CYXCODE_GIT_BASH_PATH` | — | Explicit Git Bash path on Windows |
 
 ### Debug Mode
 

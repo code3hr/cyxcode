@@ -3,6 +3,7 @@ import desktopPlugin from "./vite"
 
 export default defineConfig({
   plugins: [desktopPlugin] as any,
+  base: process.env.CYXCODE_APP_BASE ?? "/",
   server: {
     host: "0.0.0.0",
     allowedHosts: true,

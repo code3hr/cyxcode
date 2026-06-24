@@ -282,6 +282,7 @@ export function AppInterface(props: {
   defaultServer: ServerConnection.Key
   servers?: Array<ServerConnection.Any>
   router?: Component<BaseRouterProps>
+  routerBase?: string
   disableHealthCheck?: boolean
 }) {
   return (
@@ -292,6 +293,7 @@ export function AppInterface(props: {
             <GlobalSyncProvider>
               <Dynamic
                 component={props.router ?? Router}
+                base={props.routerBase}
                 root={(routerProps) => <RouterRoot appChildren={props.children}>{routerProps.children}</RouterRoot>}
               >
                 <Route path="/" component={HomeRoute} />

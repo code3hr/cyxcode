@@ -1,7 +1,6 @@
 import { Server } from "../../server/server"
 import { cmd } from "./cmd"
 import { withNetworkOptions, resolveNetworkOptions } from "../network"
-import { Flag } from "../../flag/flag"
 import { Workspace } from "../../control-plane/workspace"
 import { Project } from "../../project/project"
 import { Installation } from "../../installation"
@@ -11,10 +10,10 @@ export const ServeCommand = cmd({
   builder: (yargs) => withNetworkOptions(yargs),
   describe: "starts a headless cyxcode server",
   handler: async (args) => {
-    if (!Flag.CYXCODE_SERVER_PASSWORD) {
+    const opts = await resolveNetworkOptions(args)
+    if (!opts.password) {
       console.log("Warning: CYXCODE_SERVER_PASSWORD is not set; server is unsecured.")
     }
-    const opts = await resolveNetworkOptions(args)
     const server = Server.listen(opts)
     console.log(`cyxcode server listening on http://${server.hostname}:${server.port}`)
 

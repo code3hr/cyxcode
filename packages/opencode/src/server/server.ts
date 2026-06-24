@@ -1,10 +1,11 @@
 import { Log } from "../util/log"
 import { describeRoute, generateSpecs, validator, resolver, openAPIRouteHandler } from "hono-openapi"
-import { Hono } from "hono"
+import { Hono, type Context } from "hono"
 import { cors } from "hono/cors"
 import { proxy } from "hono/proxy"
 import { basicAuth } from "hono/basic-auth"
 import z from "zod"
+import path from "path"
 import { Provider } from "../provider/provider"
 import { NamedError } from "@cyxcode/util/error"
 import { LSP } from "../lsp"
@@ -51,11 +52,109 @@ globalThis.AI_SDK_LOG_WARNINGS = false
 
 export namespace Server {
   const log = Log.create({ service: "server" })
+  const csp =
+    "default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; media-src 'self' data:; connect-src 'self' data:"
+  const types: Record<string, string> = {
+    ".css": "text/css; charset=utf-8",
+    ".gif": "image/gif",
+    ".html": "text/html; charset=utf-8",
+    ".ico": "image/x-icon",
+    ".js": "text/javascript; charset=utf-8",
+    ".json": "application/json; charset=utf-8",
+    ".map": "application/json; charset=utf-8",
+    ".png": "image/png",
+    ".svg": "image/svg+xml",
+    ".txt": "text/plain; charset=utf-8",
+    ".webp": "image/webp",
+    ".woff": "font/woff",
+    ".woff2": "font/woff2",
+  }
 
   export const Default = lazy(() => createApp({}))
 
-  export const createApp = (opts: { cors?: string[] }): Hono => {
+  export const createApp = (opts: { cors?: string[]; username?: string; password?: string }): Hono => {
     const app = new Hono()
+    function headers(file: string) {
+      return {
+        "Content-Type": types[path.extname(file)] ?? "application/octet-stream",
+        "Content-Security-Policy": csp,
+      }
+    }
+
+    async function local(dir: string, rel: string) {
+      const root = path.resolve(path.dirname(process.execPath), dir)
+      const file = path.resolve(root, rel)
+      const valid = file === root || file.startsWith(root + path.sep)
+      const asset = valid ? Bun.file(file) : undefined
+      if (!asset || !(await asset.exists())) return
+      return new Response(asset, { headers: headers(file) })
+    }
+
+    async function remote(c: Context, base: string, url: string) {
+      const response = await proxy(`${base}${url}`, {
+        ...c.req,
+        headers: {
+          ...c.req.raw.headers,
+          host: new URL(base).host,
+        },
+      })
+      response.headers.set("Content-Security-Policy", csp)
+      return response
+    }
+
+    async function serve(
+      c: Context,
+      opts: { dir: string; prefix: string; env: string; dev: string; strip?: boolean; fallback?: boolean },
+    ) {
+      const url = c.req.path
+      const configured = process.env[opts.env]
+      const req = opts.strip && url.startsWith(opts.prefix) ? (url.slice(opts.prefix.length) || "/") : url
+      if (configured) return remote(c, configured, req)
+      const rel =
+        url === opts.prefix || url === `${opts.prefix}/`
+          ? "index.html"
+          : url.startsWith(`${opts.prefix}/`)
+            ? url.slice(`${opts.prefix}/`.length)
+            : url.slice(1)
+      const asset = await local(opts.dir, rel)
+      if (asset) return asset
+      if (opts.fallback || url.startsWith(`${opts.prefix}/`)) {
+        const index = await local(opts.dir, "index.html")
+        if (index) return index
+      }
+      if (Installation.isLocal()) return remote(c, opts.dev, req)
+      return c.text(`CyxCode ${opts.dir} assets were not found. Reinstall CyxCode or rebuild the release package.`, 503)
+    }
+
+    async function root(c: Context, next: () => Promise<void>) {
+      const url = c.req.path
+      if (url === "/" || url.startsWith("/app") || url.startsWith("/dashboard")) return next()
+      if (url.slice(1).includes("/")) return next()
+      const asset = await local("app", url.slice(1))
+      if (asset) return asset
+      return next()
+    }
+
+    function appRoute(c: Context) {
+      return serve(c, {
+        dir: "app",
+        prefix: "/app",
+        env: "CYXCODE_APP_URL",
+        dev: "http://127.0.0.1:3000",
+        strip: true,
+        fallback: true,
+      })
+    }
+
+    function dashboard(c: Context) {
+      return serve(c, {
+        dir: "dashboard",
+        prefix: "/dashboard",
+        env: "CYXCODE_DASHBOARD_URL",
+        dev: "http://127.0.0.1:3002",
+      })
+    }
+
     return app
       .onError((err, c) => {
         log.error("failed", {
@@ -80,9 +179,9 @@ export namespace Server {
         // Allow CORS preflight requests to succeed without auth.
         // Browser clients sending Authorization headers will preflight with OPTIONS.
         if (c.req.method === "OPTIONS") return next()
-        const password = Flag.CYXCODE_SERVER_PASSWORD
+        const password = opts.password ?? Flag.CYXCODE_SERVER_PASSWORD
         if (!password) return next()
-        const username = Flag.CYXCODE_SERVER_USERNAME ?? "opencode"
+        const username = opts.username ?? Flag.CYXCODE_SERVER_USERNAME ?? "opencode"
         return basicAuth({ username, password })(c, next)
       })
       .use(async (c, next) => {
@@ -128,6 +227,12 @@ export namespace Server {
           },
         }),
       )
+      .get("/", (c) => c.redirect("/app/"))
+      .all("/app", appRoute)
+      .all("/app/*", appRoute)
+      .all("/dashboard", dashboard)
+      .all("/dashboard/*", dashboard)
+      .use(root)
       .route("/global", GlobalRoutes())
       .put(
         "/auth/:providerID",
@@ -500,26 +605,11 @@ export namespace Server {
         },
       )
       .all("/*", async (c) => {
-        const path = c.req.path
-        if (path === "/api" || path.startsWith("/api/")) {
+        const url = c.req.path
+        if (url === "/api" || url.startsWith("/api/")) {
           return c.json({ error: "API route not found" }, 404)
         }
-        const base =
-          process.env.CYXCODE_DASHBOARD_URL ??
-          (Installation.isLocal() ? "http://127.0.0.1:3000" : "https://app.cyxcode.ai")
-
-        const response = await proxy(`${base}${path}`, {
-          ...c.req,
-          headers: {
-            ...c.req.raw.headers,
-            host: new URL(base).host,
-          },
-        })
-        response.headers.set(
-          "Content-Security-Policy",
-          "default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; media-src 'self' data:; connect-src 'self' data:",
-        )
-        return response
+        return appRoute(c)
       })
   }
 
@@ -547,6 +637,8 @@ export namespace Server {
     mdns?: boolean
     mdnsDomain?: string
     cors?: string[]
+    username?: string
+    password?: string
   }) {
     url = new URL(`http://${opts.hostname}:${opts.port}`)
     const app = createApp(opts)

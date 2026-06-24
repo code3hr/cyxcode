@@ -55,6 +55,8 @@ export async function resolveNetworkOptions(args: NetworkOptions) {
   const configCors = config?.server?.cors ?? []
   const argsCors = Array.isArray(args.cors) ? args.cors : args.cors ? [args.cors] : []
   const cors = [...configCors, ...argsCors]
+  const username = process.env.CYXCODE_SERVER_USERNAME ?? config?.server?.username
+  const password = process.env.CYXCODE_SERVER_PASSWORD ?? config?.server?.password
 
-  return { hostname, port, mdns, mdnsDomain, cors }
+  return { hostname, port, mdns, mdnsDomain, cors, username, password }
 }

@@ -114,6 +114,8 @@ const getDefaultUrl = () => {
   return getCurrentUrl()
 }
 
+const base = import.meta.env.BASE_URL === "/" ? undefined : import.meta.env.BASE_URL.replace(/\/$/, "")
+
 const platform: Platform = {
   platform: "web",
   version: pkg.version,
@@ -138,6 +140,7 @@ if (root instanceof HTMLElement) {
           <AppInterface
             defaultServer={ServerConnection.Key.make(getDefaultUrl())}
             servers={[server]}
+            routerBase={base}
             disableHealthCheck
           />
         </AppBaseProviders>

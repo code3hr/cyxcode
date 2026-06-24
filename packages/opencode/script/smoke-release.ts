@@ -80,7 +80,7 @@ async function probe(name: string, url: string, ms: number) {
 async function main() {
   const ver = arg("version")
   const exe =
-    arg("exe") ??
+    (arg("exe") ? path.resolve(arg("exe")!) : undefined) ??
     (ver
       ? path.join(repo, ".release-smoke", `v${ver}`, "bin", process.platform === "win32" ? "cyxcode.exe" : "cyxcode")
       : undefined)
@@ -108,7 +108,6 @@ async function main() {
       XDG_DATA_HOME: path.join(xdg, "data"),
       XDG_CACHE_HOME: path.join(xdg, "cache"),
       CYXCODE_DB: path.join(state, "cyxcode-smoke.db"),
-      CYXCODE_DASHBOARD_URL: process.env.CYXCODE_DASHBOARD_URL ?? "http://127.0.0.1:3002",
       CYXCODE_DISABLE_MODELS_FETCH: "1",
       CYXCODE_DISABLE_LSP_DOWNLOAD: "1",
     },
@@ -120,6 +119,8 @@ async function main() {
     const base = `http://127.0.0.1:${port}`
     const checks = await Promise.all([
       probe("path", `${base}/path`, num("request-ms", 10_000)),
+      probe("app", `${base}/app/`, num("request-ms", 10_000)),
+      probe("dashboard", `${base}/dashboard/`, num("request-ms", 10_000)),
       probe("graph", `${base}/experimental/codegraph/graph`, num("request-ms", 10_000)),
     ])
 

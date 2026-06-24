@@ -17,6 +17,8 @@ import pkg from "../package.json"
 
 const modelsUrl = process.env.CYXCODE_MODELS_URL || "https://models.dev"
 const icon = path.resolve(dir, "../../ico.ico")
+const web = path.resolve(dir, "../app")
+const dash = path.join(dir, "src/dashboard")
 // Fetch and generate models.dev snapshot
 const modelsData = process.env.MODELS_DEV_API_JSON
   ? await Bun.file(process.env.MODELS_DEV_API_JSON).text()
@@ -155,7 +157,15 @@ const binaries: Record<string, string> = {}
 if (!skipInstall) {
   await $`bun install --os="*" --cpu="*" @opentui/core@${pkg.dependencies["@opentui/core"]}`
   await $`bun install --os="*" --cpu="*" @parcel/watcher@${pkg.dependencies["@parcel/watcher"]}`
+  await $`bun install --frozen-lockfile`.cwd(web)
+  await $`bun install --frozen-lockfile`.cwd(dash)
 }
+const base = process.env.CYXCODE_APP_BASE
+process.env.CYXCODE_APP_BASE = "/app/"
+await $`bun run build`.cwd(web)
+if (base === undefined) delete process.env.CYXCODE_APP_BASE
+else process.env.CYXCODE_APP_BASE = base
+await $`bun run build`.cwd(dash)
 for (const item of targets) {
   const name = [
     pkg.name,
@@ -204,6 +214,15 @@ for (const item of targets) {
       CYXCODE_CHANNEL: `'${Script.channel}'`,
       CYXCODE_LIBC: item.os === "linux" ? `'${item.abi ?? "glibc"}'` : "",
     },
+  })
+
+  await fs.promises.rm(path.join(dir, "dist", name, "bin", "dashboard"), { recursive: true, force: true })
+  await fs.promises.rm(path.join(dir, "dist", name, "bin", "app"), { recursive: true, force: true })
+  await fs.promises.cp(path.join(web, "dist"), path.join(dir, "dist", name, "bin", "app"), {
+    recursive: true,
+  })
+  await fs.promises.cp(path.join(dash, "dist"), path.join(dir, "dist", name, "bin", "dashboard"), {
+    recursive: true,
   })
 
   // Smoke test: only run if binary is for current platform
