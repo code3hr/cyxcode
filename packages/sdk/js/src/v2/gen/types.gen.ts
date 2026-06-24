@@ -2344,7 +2344,7 @@ export type Command = {
   description?: string
   agent?: string
   model?: string
-  source?: "command" | "mcp" | "skill"
+  source?: "command" | "cyxcode" | "mcp" | "skill"
   template: string
   subtask?: boolean
   hints: Array<string>

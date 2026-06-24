@@ -1,4 +1,6 @@
 import { describe, expect, test } from "bun:test"
+import { Resume } from "../../../src/cyxcode/versioning/resume"
+import type { Commit } from "../../../src/cyxcode/versioning/types"
 
 /**
  * Resume Tests
@@ -7,6 +9,35 @@ import { describe, expect, test } from "bun:test"
  */
 
 describe("Resume", () => {
+  test("summary formats a HEAD commit for display", () => {
+    const commit: Commit = {
+      hash: "abc123",
+      parent: null,
+      timestamp: "2026-06-24T00:00:00.000Z",
+      trigger: "activity",
+      session: {
+        slug: "test-session",
+        timestamp: "2026-06-24T00:00:00.000Z",
+      },
+      state: {
+        goal: "Fix TUI resume",
+        workingFiles: ["src/app.tsx"],
+        inProgress: "Adding /resume",
+        completed: ["Added tests"],
+        discoveries: ["HEAD stores compact state"],
+        activeMemories: [],
+        activePatterns: [],
+      },
+    }
+
+    const text = Resume.summary(commit)
+
+    expect(text).toContain("Context from previous session (test-session)")
+    expect(text).toContain("Previous session goal: Fix TUI resume")
+    expect(text).toContain("In progress: Adding /resume")
+    expect(text).toContain("Active files: src/app.tsx")
+  })
+
   test("resume format has correct tags", () => {
     const content = "Previous session goal: test\nIn progress: building"
     const output = `<cyxcode-resume>\nContext from previous session (test-slug):\n${content}\n</cyxcode-resume>`

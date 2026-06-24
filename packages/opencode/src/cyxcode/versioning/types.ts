@@ -14,7 +14,7 @@ export type Commit = {
   hash: string
   parent: string | null
   timestamp: string
-  trigger: "compaction" | "session-end" | "manual" | "branch-create" | "branch-merge"
+  trigger: "activity" | "compaction" | "session-end" | "manual" | "branch-create" | "branch-merge"
   session: {
     slug: string
     timestamp: string

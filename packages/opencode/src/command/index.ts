@@ -5,9 +5,11 @@ import { SessionID, MessageID } from "@/session/schema"
 import { Effect, Layer, ServiceMap } from "effect"
 import z from "zod"
 import { Config } from "../config/config"
+import { ConfigMarkdown } from "../config/markdown"
 import { MCP } from "../mcp"
 import { Skill } from "../skill"
 import { Log } from "../util/log"
+import { CyxCommands } from "../cyxcode/commands-builtin"
 import PROMPT_INITIALIZE from "./template/initialize.txt"
 import PROMPT_REVIEW from "./template/review.txt"
 
@@ -36,7 +38,7 @@ export namespace Command {
       description: z.string().optional(),
       agent: z.string().optional(),
       model: z.string().optional(),
-      source: z.enum(["command", "mcp", "skill"]).optional(),
+      source: z.enum(["command", "cyxcode", "mcp", "skill"]).optional(),
       // workaround for zod not supporting async functions natively so we use getters
       // https://zod.dev/v4/changelog?id=zfunction
       template: z.promise(z.string()).or(z.string()),
@@ -97,6 +99,29 @@ export namespace Command {
           },
           subtask: true,
           hints: hints(PROMPT_REVIEW),
+        }
+
+        for (const item of CyxCommands) {
+          const md = ConfigMarkdown.parseText(item.template, `cyxcode:${item.name}`)
+          const config = {
+            name: item.name,
+            ...md.data,
+            template: md.content.trim(),
+          }
+          const parsed = Config.Command.safeParse(config)
+          if (!parsed.success) continue
+          commands[item.name] = {
+            name: item.name,
+            agent: parsed.data.agent,
+            model: parsed.data.model,
+            description: parsed.data.description,
+            source: "cyxcode",
+            get template() {
+              return parsed.data.template
+            },
+            subtask: parsed.data.subtask,
+            hints: hints(parsed.data.template),
+          }
         }
 
         for (const [name, command] of Object.entries(cfg.command ?? {})) {

@@ -9,9 +9,10 @@ import { MessageV2 } from "@/session/message-v2"
 import { Session } from "@/session"
 import { SessionID as SessionIDType } from "@/session/schema"
 import { Log } from "@/util/log"
+import { Bus } from "@/bus"
 import { Commits } from "./commit"
 import { Changelog } from "./changelog"
-import type { CommitState } from "./types"
+import { historyBasePath, type CommitState } from "./types"
 
 const log = Log.create({ service: "cyxcode-versioning" })
 
@@ -22,6 +23,8 @@ export type * from "./types"
 
 // Track last active session for process exit handler
 let lastSessionID: string | undefined
+let timer: ReturnType<typeof setTimeout> | undefined
+let running = false
 
 export namespace StateVersioning {
 
@@ -31,7 +34,7 @@ export namespace StateVersioning {
 
   export async function autoCommit(
     sessionID: string,
-    trigger: "compaction" | "session-end" | "manual",
+    trigger: "activity" | "compaction" | "session-end" | "manual",
   ): Promise<void> {
     try {
       const state = await extractState(sessionID)
@@ -52,7 +55,7 @@ export namespace StateVersioning {
 
       // Only log to changelog for main branch commits
       // Branch commits are tracked via branch-merge event
-      if (!branchSessionID) {
+      if (!branchSessionID && trigger !== "activity") {
         await Changelog.append({
           type: "commit",
           timestamp: commit.timestamp,
@@ -74,6 +77,19 @@ export namespace StateVersioning {
     } catch (e) {
       log.warn("Auto-commit failed", { error: e })
     }
+  }
+
+  export function activity(sessionID: string) {
+    lastSessionID = sessionID
+    if (timer) clearTimeout(timer)
+    timer = setTimeout(() => {
+      timer = undefined
+      if (running) return
+      running = true
+      autoCommit(sessionID, "activity").finally(() => {
+        running = false
+      })
+    }, 2000)
   }
 }
 
@@ -179,12 +195,24 @@ export function registerExitHandler() {
   exitHandlerRegistered = true
 
   const handler = async () => {
+    if (timer) {
+      clearTimeout(timer)
+      timer = undefined
+    }
     if (lastSessionID) {
       try {
         await StateVersioning.autoCommit(lastSessionID, "session-end")
       } catch {}
     }
   }
+
+  Bus.subscribe(MessageV2.Event.Updated, (evt) => {
+    StateVersioning.activity(evt.properties.info.sessionID)
+  })
+
+  Bus.subscribe(MessageV2.Event.PartUpdated, (evt) => {
+    StateVersioning.activity(evt.properties.part.sessionID)
+  })
 
   // beforeExit fires on clean exit (not on SIGINT/SIGTERM)
   process.on("beforeExit", () => {
@@ -217,13 +245,8 @@ export function registerExitHandler() {
       try {
         const fs = require("fs")
         const path = require("path")
-        let dir = process.cwd()
-        for (let i = 0; i < 10; i++) {
-          const candidate = path.join(dir, ".opencode", "history")
-          try { fs.accessSync(candidate); break } catch {}
-          dir = path.dirname(dir)
-        }
-        const exitMarker = path.join(dir, ".opencode", "history", "pending-commit.json")
+        const exitMarker = path.join(historyBasePath(), "pending-commit.json")
+        fs.mkdirSync(path.dirname(exitMarker), { recursive: true })
         fs.writeFileSync(exitMarker, JSON.stringify({ sessionID: lastSessionID, timestamp: new Date().toISOString() }))
       } catch {}
     }

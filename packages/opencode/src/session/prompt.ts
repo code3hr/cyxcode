@@ -773,6 +773,7 @@ export namespace SessionPrompt {
       const versioningMod = await import("@/cyxcode/versioning/index")
       versioningMod.StateVersioning.trackSession(sessionID)
       versioningMod.registerExitHandler()
+      await versioningMod.StateVersioning.autoCommit(sessionID, "activity")
       const system = [
         ...(await SystemPrompt.environment(model)),
         ...(skills ? [skills] : []),

@@ -68,9 +68,7 @@ export namespace ConfigMarkdown {
     return content.replace(frontmatter, () => processed)
   }
 
-  export async function parse(filePath: string) {
-    const template = await Filesystem.readText(filePath)
-
+  export function parseText(template: string, source: string) {
     try {
       const md = matter(template)
       return md
@@ -80,13 +78,17 @@ export namespace ConfigMarkdown {
       } catch (err) {
         throw new FrontmatterError(
           {
-            path: filePath,
-            message: `${filePath}: Failed to parse YAML frontmatter: ${err instanceof Error ? err.message : String(err)}`,
+            path: source,
+            message: `${source}: Failed to parse YAML frontmatter: ${err instanceof Error ? err.message : String(err)}`,
           },
           { cause: err },
         )
       }
     }
+  }
+
+  export async function parse(filePath: string) {
+    return parseText(await Filesystem.readText(filePath), filePath)
   }
 
   export const FrontmatterError = NamedError.create(

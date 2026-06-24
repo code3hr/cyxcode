@@ -363,6 +363,24 @@ function App(props: { onSnapshot?: () => Promise<string[]> }) {
   const connected = useConnected()
   command.register(() => [
     {
+      title: "Show CyxCode resume state",
+      value: "cyxcode.resume",
+      category: "CyxCode",
+      suggested: true,
+      slash: {
+        name: "resume",
+      },
+      onSelect: async () => {
+        const { Resume } = await import("@/cyxcode/versioning/resume")
+        const text = await Resume.latestSummary()
+        await DialogAlert.show(
+          dialog,
+          "CyxCode Resume",
+          text ?? "No CyxCode recovery state found. Start a session and let CyxCode save .cyxcode/history/HEAD.json first.",
+        )
+      },
+    },
+    {
       title: "Switch session",
       value: "session.list",
       keybind: "session_list",
@@ -370,7 +388,6 @@ function App(props: { onSnapshot?: () => Promise<string[]> }) {
       suggested: sync.data.session.length > 0,
       slash: {
         name: "sessions",
-        aliases: ["resume", "continue"],
       },
       onSelect: () => {
         dialog.replace(() => <DialogSessionList />)
@@ -424,6 +441,7 @@ function App(props: { onSnapshot?: () => Promise<string[]> }) {
       category: "Agent",
       slash: {
         name: "models",
+        aliases: ["model"],
       },
       onSelect: () => {
         dialog.replace(() => <DialogModel />)

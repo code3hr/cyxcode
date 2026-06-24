@@ -4,11 +4,16 @@ description: Consolidate CyxCode memories, patterns, and stats (dream cycle)
 
 Run the CyxCode dream consolidation cycle. This cleans up accumulated state from previous sessions.
 
-Read ALL of these files:
-1. `.opencode/memory/index.json` and every `.md` file listed in its entries
-2. `.opencode/cyxcode-learned.json` (pending and approved patterns)
-3. `.opencode/cyxcode-stats.json` (router stats — matches, misses, hit rate, tokens saved)
-4. `AGENTS.md` at the project root
+Find the project state directory by searching upward from the current directory:
+1. Prefer `.cyxcode/` when it exists.
+2. Fall back to `.opencode/` only when `.cyxcode/` does not exist.
+
+Read ALL of these files when present:
+1. `<state-dir>/memory/index.json` and every `.md` file listed in its entries
+2. `.cyxcode/patterns/learned.json` or legacy `.opencode/cyxcode-learned.json` (pending and approved patterns)
+3. `.cyxcode/stats.json` or legacy `.opencode/cyxcode-stats.json` (router stats: matches, misses, hit rate, tokens saved)
+4. `<state-dir>/history/corrections/*.json` (behavioral corrections)
+5. `AGENTS.md` at the project root
 
 Then perform these consolidation steps:
 

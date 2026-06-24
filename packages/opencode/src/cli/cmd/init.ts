@@ -190,7 +190,8 @@ async function initProject(dir: string, migrate: boolean): Promise<void> {
   console.log("  /correct \"rule\"     \u2014 Save a behavioral correction")
   console.log("  /remember \"info\"    \u2014 Save a project memory")
   console.log("  /dream              \u2014 Consolidate memories and patterns")
-  console.log("  /resume             \u2014 Load previous session context")
+  console.log("  /resume             \u2014 Show latest recovery state")
+  console.log("  cyxcode --continue  \u2014 Continue the last stored session")
   console.log("")
 }
 

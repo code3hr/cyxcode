@@ -1,12 +1,13 @@
 import { spawn, type ChildProcess } from "child_process"
 import fs from "fs"
 import path from "path"
-import { fileURLToPath } from "url"
 import { Log } from "@/util/log"
 import { CyxWatch } from "../watch"
 import { cacheDir } from "./paths"
 import { RECALL_MODEL } from "./types"
 import { RecallError } from "./errors"
+// @ts-expect-error Bun supports text imports for local JavaScript assets.
+import script from "./sidecar.node.js" with { type: "text" }
 
 const log = Log.create({ service: "cyxcode-recall-sidecar" })
 
@@ -29,7 +30,14 @@ function bin(): string {
 }
 
 function file(): string {
-  return fileURLToPath(new URL("./sidecar.node.js", import.meta.url))
+  const target = path.join(cacheDir(), "sidecar.node.js")
+  try {
+    fs.mkdirSync(path.dirname(target), { recursive: true })
+    if (fs.readFileSync(target, "utf-8") !== script) fs.writeFileSync(target, script)
+  } catch {
+    fs.writeFileSync(target, script)
+  }
+  return target
 }
 
 function reset() {

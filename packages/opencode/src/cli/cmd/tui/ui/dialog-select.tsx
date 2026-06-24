@@ -130,9 +130,15 @@ export function DialogSelect<T>(props: DialogSelectProps<T>) {
   })
 
   const dimensions = useTerminalDimensions()
-  const height = createMemo(() => Math.min(rows(), Math.floor(dimensions().height / 2) - 6))
+  const height = createMemo(() => Math.max(1, Math.min(rows(), Math.floor(dimensions().height / 2) - 6)))
 
   const selected = createMemo(() => flat()[store.selected])
+
+  function id(option: DialogSelectOption<T>) {
+    const value = JSON.stringify(option.value)
+    const hash = value.split("").reduce((acc, char) => ((acc << 5) - acc + char.charCodeAt(0)) | 0, 0)
+    return `option-${Math.abs(hash)}`
+  }
 
   createEffect(
     on([() => store.filter, () => props.current], ([filter, current]) => {
@@ -158,12 +164,14 @@ export function DialogSelect<T>(props: DialogSelectProps<T>) {
   }
 
   function moveTo(next: number, center = false) {
-    setStore("selected", next)
-    const option = selected()
+    if (flat().length === 0) return
+    const index = Math.max(0, Math.min(next, flat().length - 1))
+    const option = flat()[index]
+    setStore("selected", index)
     if (option) props.onMove?.(option)
     if (!scroll) return
     const target = scroll.getChildren().find((child) => {
-      return child.id === JSON.stringify(selected()?.value)
+      return child.id === id(option)
     })
     if (!target) return
     const y = target.y - scroll.y
@@ -294,7 +302,7 @@ export function DialogSelect<T>(props: DialogSelectProps<T>) {
                     const current = createMemo(() => isDeepEqual(option.value, props.current))
                     return (
                       <box
-                        id={JSON.stringify(option.value)}
+                        id={id(option)}
                         flexDirection="row"
                         onMouseMove={() => {
                           setStore("input", "mouse")

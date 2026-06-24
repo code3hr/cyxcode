@@ -81,6 +81,8 @@ Type `/` followed by the command name:
 |---------|-------------|
 | `/cyxinit` | Initialize `.cyxcode/` directory (migrates from `.opencode/` if exists) |
 | `/dream` | Run dream consolidation — deduplicate, validate, persist stats, update AGENTS.md |
+| `/resume` | Show the latest CyxCode recovery state |
+| `/sessions` | Choose a full stored conversation |
 | `/remember <info>` | Save a memory about your project for future sessions |
 | `/learn-patterns` | Review and approve learned error patterns |
 | `/correct <rule>` | Save a behavioral correction for future sessions |
@@ -361,19 +363,121 @@ Even when explicitly asked to use npm, the correction takes priority:
 
 ### Resume
 
-When you start a new session, CyxCode loads the previous session's context automatically — no need to re-explain what you were working on.
+If a coding session stops in the middle of work, CyxCode does not rely on the model's memory. It persists a compact project state outside the model, then reloads that state when you continue.
 
 ![Resume](../packages/web/src/assets/lander/screenshot-cyxcode-resume.png)
 
-The AI reads the `<cyxcode-resume>` context and knows: *"In the previous session, you were reading package.json — it was in progress."*
+Use the existing session when you want the full conversation back:
+
+```bash
+cyxcode --continue
+```
+
+Or open the TUI and choose the prior session:
+
+```text
+/sessions
+```
+
+For cross-session recovery, CyxCode also writes a compact HEAD snapshot under `.cyxcode/history/` (or legacy `.opencode/history/`). To view the latest recovery state directly in the TUI:
+
+```text
+/resume
+```
+
+On the next prompt, the system prompt includes the same state as a `<cyxcode-resume>` block with the previous goal, in-progress request, active files, and useful discoveries.
+
+That means you can ask:
+
+```text
+What were we working on before the terminal closed?
+```
+
+The AI should answer from the saved CyxCode state instead of starting blank.
+
+This is a recovery summary, not a full transcript. Use `cyxcode --continue`, `cyxcode -s <sessionID>`, or `/sessions` for the full stored conversation. Hard kills can still lose the last few seconds if the process cannot finish writing the snapshot.
+
+### Test resume recovery
+
+```bash
+cyxcode init
+cyxcode
+```
+
+In the TUI, ask CyxCode to start a concrete task that reads or edits files. For example:
+
+```text
+Inspect the TUI command autocomplete and explain how CyxCode slash commands are shown.
+```
+
+After it begins working, exit cleanly with `Ctrl+C`. Then verify that a state snapshot exists:
+
+```bash
+cat .cyxcode/history/HEAD.json
+ls .cyxcode/history/commits
+```
+
+Reopen CyxCode:
+
+```bash
+cyxcode --continue
+```
+
+View the saved recovery state:
+
+```text
+/resume
+```
+
+Ask:
+
+```text
+What were we working on before the terminal closed?
+```
+
+Expected result: `/resume` and the answer should mention the previous goal, in-progress task, or active files from the saved state. If `.cyxcode/` has not been initialized, check the legacy paths instead:
+
+```bash
+cat .opencode/history/HEAD.json
+ls .opencode/history/commits
+```
+
+### Test behavioral corrections
+
+Behavioral corrections are versioned rules that load into future prompts.
+
+```text
+/correct always use bun, not npm
+```
+
+Verify that CyxCode saved the correction:
+
+```bash
+ls .cyxcode/history/corrections
+cat .cyxcode/history/corrections/*.json
+```
+
+Run the same `/correct` rule again to reinforce it. The matching JSON file should keep the same `id` and increment `strength`.
+
+Start a new session and ask for something that conflicts with the rule:
+
+```text
+install a package with npm
+```
+
+Expected result: the AI should see the correction in the system prompt and prefer Bun. After a correction reaches strength 3, `/dream` can promote it into `AGENTS.md`.
 
 ### How it works
 
-1. **Auto-commit**: State is saved after each session (goal, working files, progress)
-2. **Corrections**: Saved via `/correct`, loaded into system prompt sorted by strength
-3. **Resume**: HEAD commit loaded on session start — AI picks up where it left off
-4. **Drift detection**: If AI stops following a correction, its strength increases automatically
-5. **Dream integration**: Corrections with strength >= 3 auto-promoted to AGENTS.md. Unused corrections decay over time.
+1. **Session storage**: Existing conversations can be reopened with `cyxcode --continue`, `cyxcode -s <sessionID>`, or `/sessions`.
+2. **Activity commits**: CyxCode saves a compact snapshot after the user prompt starts and debounces saves while messages and tool results update.
+3. **Auto-commit**: CyxCode saves compact state snapshots on session end and after compaction. `Ctrl+C`, `SIGTERM`, and terminal hangup also try to commit before exit.
+4. **HEAD snapshot**: `.cyxcode/history/HEAD.json` points to the latest state commit in `.cyxcode/history/commits/`.
+5. **Resume command**: `/resume` shows the latest HEAD recovery summary in the TUI.
+6. **Resume prompt**: The latest HEAD commit is loaded into the next prompt as `<cyxcode-resume>`.
+7. **Corrections**: Saved via `/correct`, loaded into the system prompt sorted by strength.
+8. **Drift detection**: If AI stops following a correction, its strength increases automatically.
+9. **Dream integration**: Corrections with strength >= 3 auto-promoted to AGENTS.md. Unused corrections decay over time.
 
 ### Commands
 
@@ -381,7 +485,9 @@ The AI reads the `<cyxcode-resume>` context and knows: *"In the previous session
 |---------|-------------|
 | `/correct <rule>` | Save a behavioral correction (strength: 1, increases on reinforcement) |
 | `/dream` | Consolidate state — promote, decay, archive |
-| `/history` | Show commit log and correction history |
+| `/resume` | Show the latest CyxCode recovery state from `.cyxcode/history/HEAD.json` |
+| `/sessions` | Open previous stored conversations in the TUI |
+| `cyxcode session list` | List stored sessions from the CLI |
 
 ---
 
