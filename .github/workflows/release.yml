@@ -47,13 +47,13 @@ jobs:
           - os: ubuntu-latest
             target: linux-x64
             artifact: cyxcode-linux-x64
-          - os: ubuntu-latest
+          - os: ubuntu-24.04-arm
             target: linux-arm64
             artifact: cyxcode-linux-arm64
-          - os: macos-14
+          - os: macos-15-intel
             target: darwin-x64
             artifact: cyxcode-darwin-x64
-          - os: macos-latest
+          - os: macos-15
             target: darwin-arm64
             artifact: cyxcode-darwin-arm64
           - os: windows-latest
@@ -82,6 +82,9 @@ jobs:
 
       - name: Build CLI
         working-directory: packages/opencode
+        timeout-minutes: 20
+        env:
+          CYXCODE_TARGET: ${{ matrix.target }}
         run: bun run build --single
 
       - name: Package Linux/macOS Binary

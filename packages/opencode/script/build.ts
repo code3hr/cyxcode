@@ -87,6 +87,7 @@ console.log(`Loaded ${migrations.length} migrations`)
 const singleFlag = process.argv.includes("--single")
 const baselineFlag = process.argv.includes("--baseline")
 const skipInstall = process.argv.includes("--skip-install")
+const target = process.env.CYXCODE_TARGET ?? process.argv.find((item) => item.startsWith("--target="))?.slice("--target=".length)
 
 const allTargets: {
   os: string
@@ -151,7 +152,20 @@ const allTargets: {
   },
 ]
 
-const targets = singleFlag
+function id(item: (typeof allTargets)[number]) {
+  return [
+    item.os === "win32" ? "windows" : item.os,
+    item.arch,
+    item.avx2 === false ? "baseline" : undefined,
+    item.abi,
+  ]
+    .filter(Boolean)
+    .join("-")
+}
+
+const targets = target
+  ? allTargets.filter((item) => id(item) === target)
+  : singleFlag
   ? allTargets.filter((item) => {
       if (item.os !== process.platform || item.arch !== process.arch) {
         return false
@@ -171,6 +185,11 @@ const targets = singleFlag
       return true
     })
   : allTargets
+
+if (target && targets.length === 0) {
+  console.error(`Unknown build target: ${target}`)
+  process.exit(1)
+}
 
 await $`rm -rf dist`
 
