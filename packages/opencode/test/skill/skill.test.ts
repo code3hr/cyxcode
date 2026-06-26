@@ -59,6 +59,36 @@ Instructions here.
   })
 })
 
+test("discovers skills from .cyxcode/skills/ directory", async () => {
+  await using tmp = await tmpdir({
+    git: true,
+    init: async (dir) => {
+      const skillDir = path.join(dir, ".cyxcode", "skills", "lean-software-guardrails")
+      await Bun.write(
+        path.join(skillDir, "SKILL.md"),
+        `---
+name: lean-software-guardrails
+description: Lean guardrails for software engineering work.
+---
+
+# Lean Software Guardrails
+`,
+      )
+    },
+  })
+
+  await Instance.provide({
+    directory: tmp.path,
+    fn: async () => {
+      const skills = await Skill.all()
+      expect(skills.length).toBe(1)
+      const skill = skills.find((s) => s.name === "lean-software-guardrails")
+      expect(skill).toBeDefined()
+      expect(skill!.location).toContain(path.join(".cyxcode", "skills", "lean-software-guardrails", "SKILL.md"))
+    },
+  })
+})
+
 test("returns skill directories from Skill.dirs", async () => {
   await using tmp = await tmpdir({
     git: true,

@@ -13,9 +13,9 @@ const state = path.join(xdgState!, app)
 
 export namespace Global {
   export const Path = {
-    // Allow override via CYXWIZ_TEST_HOME for test isolation
+    // Allow home override for test isolation
     get home() {
-      return process.env.CYXWIZ_TEST_HOME || os.homedir()
+      return process.env.CYXWIZ_TEST_HOME || process.env.CYXCODE_TEST_HOME || os.homedir()
     },
     data,
     bin: path.join(cache, "bin"),

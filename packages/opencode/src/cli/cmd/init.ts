@@ -9,6 +9,7 @@ import fs from "fs/promises"
 import path from "path"
 import { cmd } from "./cmd"
 import { CyxPaths } from "../../cyxcode/paths"
+import { DefaultSkills } from "../../cyxcode/default-skills"
 
 export const InitCommand = cmd({
   command: "init",
@@ -116,6 +117,7 @@ async function initProject(dir: string, migrate: boolean): Promise<void> {
     "history/corrections",
     "memory",
     "patterns",
+    "skills",
     "agent",
     "command",
   ]
@@ -146,6 +148,7 @@ async function initProject(dir: string, migrate: boolean): Promise<void> {
 
   // Copy global corrections if they exist
   await copyGlobalCorrections(cyxDir)
+  const seeded = await DefaultSkills.seed(cyxDir)
 
   // Print what we created
   console.log("  Created .cyxcode/")
@@ -153,6 +156,7 @@ async function initProject(dir: string, migrate: boolean): Promise<void> {
   for (const sub of created) {
     console.log(`  Created .cyxcode/${sub}/`)
   }
+  if (seeded > 0) console.log(`  Added default lean-software-guardrails skill`)
   console.log("  Added .cyxcode/history/ to .gitignore")
 
   // Migration
@@ -208,10 +212,12 @@ async function initGlobal(): Promise<void> {
     "memory",
     "patterns",
     "community",
+    "skills",
   ]
 
   await fs.mkdir(globalDir, { recursive: true })
   const created = await ensureDirs(globalDir, subdirs)
+  const seeded = await DefaultSkills.seed(globalDir)
 
   // Write config.json if missing
   const configPath = CyxPaths.globalConfigPath()
@@ -229,6 +235,7 @@ async function initGlobal(): Promise<void> {
   for (const sub of created) {
     console.log(`  Created ${sub}/`)
   }
+  if (seeded > 0) console.log("  Added default lean-software-guardrails skill")
   console.log(`  Created config.json`)
 
   console.log(`\nGlobal CyxCode initialized at ${globalDir}\n`)

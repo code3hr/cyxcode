@@ -40,6 +40,7 @@ process.env["CYXCODE_MODELS_PATH"] = path.join(import.meta.dir, "tool", "fixture
 const testHome = path.join(dir, "home")
 await fs.mkdir(testHome, { recursive: true })
 process.env["CYXCODE_TEST_HOME"] = testHome
+process.env["CYXWIZ_TEST_HOME"] = testHome
 
 // Set test managed config directory to isolate tests from system managed settings
 const testManagedConfigDir = path.join(dir, "managed")

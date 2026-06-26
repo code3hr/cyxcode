@@ -1,0 +1,4 @@
+interface:
+  display_name: "Lean Software Guardrails"
+  short_description: "Guard against software bloat."
+  default_prompt: "Use lean-software-guardrails to review this software task or codebase for avoidable complexity, bloated features, weak decomposition, and missing simplicity-oriented validation."

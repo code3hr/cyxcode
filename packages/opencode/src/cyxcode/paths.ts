@@ -97,7 +97,7 @@ function findProjectRoot(): { root: string; mode: "cyxcode" | "opencode" } {
 
 function homeDir(): string {
   // Respect test home override (from global/index.ts pattern)
-  return process.env.CYXWIZ_TEST_HOME || os.homedir()
+  return process.env.CYXWIZ_TEST_HOME || process.env.CYXCODE_TEST_HOME || os.homedir()
 }
 
 // --- Public API ---

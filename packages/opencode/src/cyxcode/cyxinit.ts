@@ -8,6 +8,7 @@
 import fs from "fs/promises"
 import path from "path"
 import { CyxPaths } from "./paths"
+import { DefaultSkills } from "./default-skills"
 
 type InitResult = {
   success: boolean
@@ -96,6 +97,7 @@ export async function initProjectFromTUI(): Promise<InitResult> {
       "wiki",
       "codegraph",
       "patterns",
+      "skills",
       "agent",
       "command",
     ]
@@ -123,6 +125,7 @@ export async function initProjectFromTUI(): Promise<InitResult> {
     // Add to project .gitignore
     const rootGitignore = path.join(dir, ".gitignore")
     await ensureGitignoreEntry(rootGitignore, ".cyxcode/history/")
+    const seeded = await DefaultSkills.seed(cyxDir)
 
     // Invalidate path cache
     CyxPaths.invalidateCache()
@@ -149,6 +152,8 @@ export async function initProjectFromTUI(): Promise<InitResult> {
       ? `Initialized .cyxcode/ (migrated ${migrated} files)`
       : downloaded > 0
       ? `Initialized .cyxcode/ (${downloaded} commands downloaded)`
+      : seeded > 0
+      ? `Initialized .cyxcode/ (default skill installed)`
       : `Initialized .cyxcode/ (${projectType} project)`
 
     return {

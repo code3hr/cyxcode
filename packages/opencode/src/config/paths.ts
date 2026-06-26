@@ -43,6 +43,13 @@ export namespace ConfigPaths {
         : []),
       ...(await Array.fromAsync(
         Filesystem.up({
+          targets: [".cyxcode"],
+          start: Global.Path.home,
+          stop: Global.Path.home,
+        }),
+      )),
+      ...(await Array.fromAsync(
+        Filesystem.up({
           targets: [".opencode"],
           start: Global.Path.home,
           stop: Global.Path.home,

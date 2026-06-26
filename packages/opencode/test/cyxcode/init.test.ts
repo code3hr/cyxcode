@@ -3,6 +3,7 @@ import fs from "fs/promises"
 import path from "path"
 import os from "os"
 import { CyxPaths } from "../../src/cyxcode/paths"
+import { DefaultSkills } from "../../src/cyxcode/default-skills"
 
 /**
  * cyxcode init Tests
@@ -36,6 +37,7 @@ describe("cyxcode init — directory creation", () => {
       "history/corrections",
       "memory",
       "patterns",
+      "skills",
       "agent",
       "command",
     ]
@@ -110,6 +112,19 @@ describe("cyxcode init — directory creation", () => {
 
     expect(alreadyPresent).toBe(true)
   })
+
+  test("seeds lean software guardrails as default skill", async () => {
+    const cyxDir = path.join(tmpDir, ".cyxcode")
+    await fs.mkdir(cyxDir, { recursive: true })
+
+    const seeded = await DefaultSkills.seed(cyxDir)
+    const skill = path.join(cyxDir, "skills", "lean-software-guardrails")
+
+    expect(seeded).toBeGreaterThan(0)
+    expect(await fs.readFile(path.join(skill, "SKILL.md"), "utf-8")).toContain("name: lean-software-guardrails")
+    expect(await fs.readFile(path.join(skill, "references", "wirth-lean-software.md"), "utf-8")).toContain("Source-Derived Lean Software Guidance")
+    expect(await DefaultSkills.seed(cyxDir)).toBe(0)
+  })
 })
 
 describe("cyxcode init --global", () => {
@@ -129,7 +144,7 @@ describe("cyxcode init --global", () => {
 
   test("creates ~/.cyxcode/ with all subdirectories", async () => {
     const globalDir = path.join(tmpHome, ".cyxcode")
-    const subdirs = ["corrections", "memory", "patterns", "community"]
+    const subdirs = ["corrections", "memory", "patterns", "community", "skills"]
 
     await fs.mkdir(globalDir, { recursive: true })
     for (const sub of subdirs) {
