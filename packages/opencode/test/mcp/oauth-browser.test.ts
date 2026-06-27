@@ -247,3 +247,39 @@ test("open() is called with the authorization URL", async () => {
     },
   })
 })
+
+test("authorization callback receives the URL before browser open waits", async () => {
+  await using tmp = await tmpdir({
+    init: async (dir) => {
+      await Bun.write(
+        `${dir}/opencode.json`,
+        JSON.stringify({
+          $schema: "https://cyxcode.ai/config.json",
+          mcp: {
+            "test-oauth-server-4": {
+              type: "remote",
+              url: "https://example.com/mcp",
+            },
+          },
+        }),
+      )
+    },
+  })
+
+  await Instance.provide({
+    directory: tmp.path,
+    fn: async () => {
+      let url: string | undefined
+      const auth = MCP.authenticate("test-oauth-server-4", (value) => {
+        url = value
+      }).catch(() => undefined)
+
+      await new Promise((resolve) => setTimeout(resolve, 2_000))
+      await McpOAuthCallback.stop()
+      await auth
+
+      expect(url).toContain("https://")
+      expect(openCalledWith).toBe(url)
+    },
+  })
+})

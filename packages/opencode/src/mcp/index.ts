@@ -17,7 +17,7 @@ import z from "zod/v4"
 import { Instance } from "../project/instance"
 import { Installation } from "../installation"
 import { withTimeout } from "@/util/timeout"
-import { McpOAuthProvider } from "./oauth-provider"
+import { McpOAuthPendingProvider, McpOAuthProvider } from "./oauth-provider"
 import { McpOAuthCallback } from "./oauth-callback"
 import { McpAuth } from "./auth"
 import { BusEvent } from "../bus/bus-event"
@@ -141,6 +141,7 @@ export namespace MCP {
           CallToolResultSchema,
           {
             resetTimeoutOnProgress: true,
+            onprogress: () => {},
             timeout,
           },
         )
@@ -150,7 +151,7 @@ export namespace MCP {
 
   // Store transports for OAuth servers to allow finishing auth
   type TransportWithAuth = StreamableHTTPClientTransport | SSEClientTransport
-  const pendingOAuthTransports = new Map<string, TransportWithAuth>()
+  const pendingOAuthTransports = new Map<string, { transport: TransportWithAuth; provider?: McpOAuthPendingProvider }>()
 
   // Prompt cache types
   type PromptInfo = Awaited<ReturnType<MCPClient["listPrompts"]>>["prompts"][number]
@@ -418,7 +419,7 @@ export namespace MCP {
               }).catch((e) => log.debug("failed to show toast", { error: e }))
             } else {
               // Store transport for later finishAuth call
-              pendingOAuthTransports.set(key, transport)
+              pendingOAuthTransports.set(key, { transport })
               status = { status: "needs_auth" as const }
               // Show toast for needs_auth
               Bus.publish(TuiEvent.ToastShow, {
@@ -780,7 +781,7 @@ export namespace MCP {
     // OAuth config is optional - if not provided, we'll use auto-discovery
     const oauthConfig = typeof mcpConfig.oauth === "object" ? mcpConfig.oauth : undefined
     let capturedUrl: URL | undefined
-    const authProvider = new McpOAuthProvider(
+    const authProvider = new McpOAuthPendingProvider(
       mcpName,
       mcpConfig.url,
       {
@@ -807,12 +808,13 @@ export namespace MCP {
         version: Installation.VERSION,
       })
       await client.connect(transport)
+      await authProvider.commit()
       // If we get here, we're already authenticated
       return { authorizationUrl: "" }
     } catch (error) {
       if (error instanceof UnauthorizedError && capturedUrl) {
         // Store transport for finishAuth
-        pendingOAuthTransports.set(mcpName, transport)
+        pendingOAuthTransports.set(mcpName, { transport, provider: authProvider })
         return { authorizationUrl: capturedUrl.toString() }
       }
       throw error
@@ -823,7 +825,7 @@ export namespace MCP {
    * Complete OAuth authentication after user authorizes in browser.
    * Opens the browser and waits for callback.
    */
-  export async function authenticate(mcpName: string): Promise<Status> {
+  export async function authenticate(mcpName: string, onAuthorization?: (url: string) => void): Promise<Status> {
     const { authorizationUrl } = await startAuth(mcpName)
 
     if (!authorizationUrl) {
@@ -845,6 +847,7 @@ export namespace MCP {
     // Register the callback BEFORE opening the browser to avoid race condition
     // when the IdP has an active SSO session and redirects immediately
     const callbackPromise = McpOAuthCallback.waitForCallback(oauthState)
+    onAuthorization?.(authorizationUrl)
 
     try {
       const subprocess = await open(authorizationUrl)
@@ -893,15 +896,16 @@ export namespace MCP {
    * Complete OAuth authentication with the authorization code.
    */
   export async function finishAuth(mcpName: string, authorizationCode: string): Promise<Status> {
-    const transport = pendingOAuthTransports.get(mcpName)
+    const pending = pendingOAuthTransports.get(mcpName)
 
-    if (!transport) {
+    if (!pending) {
       throw new Error(`No pending OAuth flow for MCP server: ${mcpName}`)
     }
 
     try {
       // Call finishAuth on the transport
-      await transport.finishAuth(authorizationCode)
+      await pending.transport.finishAuth(authorizationCode)
+      await pending.provider?.commit()
 
       // Clear the code verifier after successful auth
       await McpAuth.clearCodeVerifier(mcpName)
@@ -928,7 +932,7 @@ export namespace MCP {
       log.error("failed to finish oauth", { mcpName, error })
       return {
         status: "failed",
-        error: error instanceof Error ? error.message : String(error),
+        error: `OAuth completion failed: ${error instanceof Error ? error.message : String(error)}`,
       }
     }
   }

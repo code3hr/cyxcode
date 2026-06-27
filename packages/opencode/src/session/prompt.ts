@@ -1083,7 +1083,8 @@ export namespace SessionPrompt {
       const execute = item.execute
       if (!execute) continue
 
-      const transformed = ProviderTransform.schema(input.model, asSchema(item.inputSchema).jsonSchema)
+      const schema = asSchema(item.inputSchema).jsonSchema
+      const transformed = ProviderTransform.schema(input.model, { ...schema, properties: schema.properties ?? {} })
       item.inputSchema = jsonSchema(transformed)
       // Wrap execute to add plugin hooks and format output
       item.execute = async (args, opts) => {

@@ -18,6 +18,7 @@ const transportCalls: Array<{
 // Controls whether the mock transport simulates a 401 that triggers the SDK
 // auth flow (which calls provider.state()) or a simple UnauthorizedError.
 let simulateAuthFlow = true
+let finishAuthFails = false
 
 // Mock the transport constructors to simulate OAuth auto-auth on 401
 mock.module("@modelcontextprotocol/sdk/client/streamableHttp.js", () => ({
@@ -58,7 +59,9 @@ mock.module("@modelcontextprotocol/sdk/client/streamableHttp.js", () => ({
       }
       throw new MockUnauthorizedError()
     }
-    async finishAuth(_code: string) {}
+    async finishAuth(_code: string) {
+      if (finishAuthFails) throw new Error("Token exchange failed")
+    }
   },
 }))
 
@@ -94,6 +97,7 @@ mock.module("@modelcontextprotocol/sdk/client/auth.js", () => ({
 beforeEach(() => {
   transportCalls.length = 0
   simulateAuthFlow = true
+  finishAuthFails = false
 })
 
 // Import modules after mocking
@@ -194,6 +198,46 @@ test("state() returns existing state when one is saved", async () => {
       // state() should return the existing state
       const state = await provider.state()
       expect(state).toBe(existingState)
+    },
+  })
+})
+
+test("failed reauthentication preserves existing credentials", async () => {
+  await using tmp = await tmpdir({
+    init: async (dir) => {
+      await Bun.write(
+        `${dir}/opencode.json`,
+        JSON.stringify({
+          $schema: "https://cyxcode.ai/config.json",
+          mcp: {
+            "test-reauth": {
+              type: "remote",
+              url: "https://example.com/mcp",
+            },
+          },
+        }),
+      )
+    },
+  })
+
+  await Instance.provide({
+    directory: tmp.path,
+    fn: async () => {
+      const { McpAuth } = await import("../../src/mcp/auth")
+      const client = { clientId: "dynamic-client", clientSecret: "dynamic-secret" }
+      await McpAuth.updateClientInfo("test-reauth", client, "https://example.com/mcp")
+      await McpAuth.updateTokens("test-reauth", { accessToken: "working-token" }, "https://example.com/mcp")
+
+      expect((await MCP.startAuth("test-reauth")).authorizationUrl).toContain("https://auth.example.com/authorize")
+      finishAuthFails = true
+
+      expect(await MCP.finishAuth("test-reauth", "invalid-code")).toEqual({
+        status: "failed",
+        error: "OAuth completion failed: Token exchange failed",
+      })
+      const entry = await McpAuth.get("test-reauth")
+      expect(entry?.tokens?.accessToken).toBe("working-token")
+      expect(entry?.clientInfo).toEqual(client)
     },
   })
 })

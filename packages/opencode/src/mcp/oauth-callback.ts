@@ -24,6 +24,15 @@ const HTML_SUCCESS = `<!DOCTYPE html>
 </body>
 </html>`
 
+function escapeHtml(value: string) {
+  return value
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#39;")
+}
+
 const HTML_ERROR = (error: string) => `<!DOCTYPE html>
 <html>
 <head>
@@ -40,7 +49,7 @@ const HTML_ERROR = (error: string) => `<!DOCTYPE html>
   <div class="container">
     <h1>Authorization Failed</h1>
     <p>An error occurred during authorization.</p>
-    <div class="error">${error}</div>
+    <div class="error">${escapeHtml(error)}</div>
   </div>
 </body>
 </html>`
@@ -57,6 +66,17 @@ export namespace McpOAuthCallback {
 
   const CALLBACK_TIMEOUT_MS = 5 * 60 * 1000 // 5 minutes
 
+  function stopIfIdle() {
+    if (pendingAuths.size > 0 || !server) return
+    const current = server
+    setTimeout(() => {
+      if (pendingAuths.size > 0 || server !== current) return
+      current.stop()
+      server = undefined
+      log.info("oauth callback server stopped")
+    }, 0)
+  }
+
   export async function ensureRunning(): Promise<void> {
     if (server) return
 
@@ -67,6 +87,7 @@ export namespace McpOAuthCallback {
     }
 
     server = Bun.serve({
+      hostname: "127.0.0.1",
       port: OAUTH_CALLBACK_PORT,
       fetch(req) {
         const url = new URL(req.url)
@@ -88,7 +109,7 @@ export namespace McpOAuthCallback {
           log.error("oauth callback missing state parameter", { url: url.toString() })
           return new Response(HTML_ERROR(errorMsg), {
             status: 400,
-            headers: { "Content-Type": "text/html" },
+            headers: { "Content-Type": "text/html; charset=utf-8" },
           })
         }
 
@@ -99,16 +120,17 @@ export namespace McpOAuthCallback {
             clearTimeout(pending.timeout)
             pendingAuths.delete(state)
             pending.reject(new Error(errorMsg))
+            stopIfIdle()
           }
           return new Response(HTML_ERROR(errorMsg), {
-            headers: { "Content-Type": "text/html" },
+            headers: { "Content-Type": "text/html; charset=utf-8" },
           })
         }
 
         if (!code) {
           return new Response(HTML_ERROR("No authorization code provided"), {
             status: 400,
-            headers: { "Content-Type": "text/html" },
+            headers: { "Content-Type": "text/html; charset=utf-8" },
           })
         }
 
@@ -118,7 +140,7 @@ export namespace McpOAuthCallback {
           log.error("oauth callback with invalid state", { state, pendingStates: Array.from(pendingAuths.keys()) })
           return new Response(HTML_ERROR(errorMsg), {
             status: 400,
-            headers: { "Content-Type": "text/html" },
+            headers: { "Content-Type": "text/html; charset=utf-8" },
           })
         }
 
@@ -127,9 +149,10 @@ export namespace McpOAuthCallback {
         clearTimeout(pending.timeout)
         pendingAuths.delete(state)
         pending.resolve(code)
+        stopIfIdle()
 
         return new Response(HTML_SUCCESS, {
-          headers: { "Content-Type": "text/html" },
+          headers: { "Content-Type": "text/html; charset=utf-8" },
         })
       },
     })
@@ -143,6 +166,7 @@ export namespace McpOAuthCallback {
         if (pendingAuths.has(oauthState)) {
           pendingAuths.delete(oauthState)
           reject(new Error("OAuth callback timeout - authorization took too long"))
+          stopIfIdle()
         }
       }, CALLBACK_TIMEOUT_MS)
 
@@ -156,6 +180,7 @@ export namespace McpOAuthCallback {
       clearTimeout(pending.timeout)
       pendingAuths.delete(mcpName)
       pending.reject(new Error("Authorization cancelled"))
+      stopIfIdle()
     }
   }
 

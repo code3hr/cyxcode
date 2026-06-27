@@ -25,9 +25,9 @@ export interface McpOAuthCallbacks {
 
 export class McpOAuthProvider implements OAuthClientProvider {
   constructor(
-    private mcpName: string,
-    private serverUrl: string,
-    private config: McpOAuthConfig,
+    protected mcpName: string,
+    protected serverUrl: string,
+    protected config: McpOAuthConfig,
     private callbacks: McpOAuthCallbacks,
   ) {}
 
@@ -179,6 +179,63 @@ export class McpOAuthProvider implements OAuthClientProvider {
         await McpAuth.set(this.mcpName, entry)
         break
     }
+  }
+}
+
+export class McpOAuthPendingProvider extends McpOAuthProvider {
+  private client?: OAuthClientInformationFull
+  private token?: OAuthTokens
+
+  override async clientInformation(): Promise<OAuthClientInformation | undefined> {
+    if (!this.config.clientId) return this.client
+    return {
+      client_id: this.config.clientId,
+      client_secret: this.config.clientSecret,
+    }
+  }
+
+  override async saveClientInformation(info: OAuthClientInformationFull): Promise<void> {
+    this.client = info
+  }
+
+  override async tokens(): Promise<OAuthTokens | undefined> {
+    return this.token
+  }
+
+  override async saveTokens(tokens: OAuthTokens): Promise<void> {
+    this.token = tokens
+  }
+
+  override async invalidateCredentials(type: "all" | "client" | "tokens"): Promise<void> {
+    if (type === "all" || type === "client") this.client = undefined
+    if (type === "all" || type === "tokens") this.token = undefined
+  }
+
+  async commit(): Promise<void> {
+    if (this.client && !this.config.clientId) {
+      await McpAuth.updateClientInfo(
+        this.mcpName,
+        {
+          clientId: this.client.client_id,
+          clientSecret: this.client.client_secret,
+          clientIdIssuedAt: this.client.client_id_issued_at,
+          clientSecretExpiresAt: this.client.client_secret_expires_at,
+        },
+        this.serverUrl,
+      )
+    }
+
+    if (!this.token) return
+    await McpAuth.updateTokens(
+      this.mcpName,
+      {
+        accessToken: this.token.access_token,
+        refreshToken: this.token.refresh_token,
+        expiresAt: this.token.expires_in ? Date.now() / 1000 + this.token.expires_in : undefined,
+        scope: this.token.scope,
+      },
+      this.serverUrl,
+    )
   }
 }
 
