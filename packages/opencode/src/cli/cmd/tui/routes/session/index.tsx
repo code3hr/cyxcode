@@ -1641,6 +1641,7 @@ function InlineTool(props: {
   complete: any
   pending: string
   spinner?: boolean
+  separate?: boolean
   children: JSX.Element
   part: ToolPart
   onClick?: () => void
@@ -1689,6 +1690,10 @@ function InlineTool(props: {
         const el = this as BoxRenderable
         const parent = el.parent
         if (!parent) {
+          return
+        }
+        if (props.separate) {
+          setMargin(1)
           return
         }
         if (el.height > 1) {
@@ -2028,6 +2033,7 @@ function Task(props: ToolProps<typeof TaskTool>) {
       complete={props.input.description}
       pending="Delegating..."
       part={props.part}
+      separate={true}
       onClick={() => {
         if (props.metadata.sessionId) {
           navigate({ type: "session", sessionID: props.metadata.sessionId })
