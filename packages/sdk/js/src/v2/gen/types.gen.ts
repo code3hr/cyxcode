@@ -1973,6 +1973,9 @@ export type OAuth = {
 export type ApiAuth = {
   type: "api"
   key: string
+  metadata?: {
+    [key: string]: string
+  }
 }
 
 export type WellKnownAuth = {

@@ -46,6 +46,7 @@ export function DialogConnectProvider(props: { provider: string }) {
   const [store, setStore] = createStore({
     methodIndex: undefined as undefined | number,
     authorization: undefined as undefined | ProviderAuthAuthorization,
+    inputs: undefined as undefined | Record<string, string>,
     state: "pending" as undefined | "pending" | "complete" | "error" | "prompt",
     error: undefined as string | undefined,
   })
@@ -54,6 +55,7 @@ export function DialogConnectProvider(props: { provider: string }) {
     | { type: "method.select"; index: number }
     | { type: "method.reset" }
     | { type: "auth.prompt" }
+    | { type: "auth.inputs"; inputs: Record<string, string> }
     | { type: "auth.pending" }
     | { type: "auth.complete"; authorization: ProviderAuthAuthorization }
     | { type: "auth.error"; error: string }
@@ -64,6 +66,7 @@ export function DialogConnectProvider(props: { provider: string }) {
         if (action.type === "method.select") {
           draft.methodIndex = action.index
           draft.authorization = undefined
+          draft.inputs = undefined
           draft.state = undefined
           draft.error = undefined
           return
@@ -71,12 +74,19 @@ export function DialogConnectProvider(props: { provider: string }) {
         if (action.type === "method.reset") {
           draft.methodIndex = undefined
           draft.authorization = undefined
+          draft.inputs = undefined
           draft.state = undefined
           draft.error = undefined
           return
         }
         if (action.type === "auth.prompt") {
           draft.state = "prompt"
+          draft.error = undefined
+          return
+        }
+        if (action.type === "auth.inputs") {
+          draft.inputs = action.inputs
+          draft.state = undefined
           draft.error = undefined
           return
         }
@@ -132,6 +142,15 @@ export function DialogConnectProvider(props: { provider: string }) {
     const method = methods()[index]
     dispatch({ type: "method.select", index })
 
+    if (method.type === "api" && method.prompts?.length) {
+      if (!inputs) {
+        dispatch({ type: "auth.prompt" })
+        return
+      }
+      dispatch({ type: "auth.inputs", inputs })
+      return
+    }
+
     if (method.type === "oauth") {
       if (method.prompts?.length && !inputs) {
         dispatch({ type: "auth.prompt" })
@@ -171,7 +190,7 @@ export function DialogConnectProvider(props: { provider: string }) {
     }
   }
 
-  function OAuthPromptsView() {
+  function AuthPromptsView() {
     const [formStore, setFormStore] = createStore({
       value: {} as Record<string, string>,
       index: 0,
@@ -205,6 +224,10 @@ export function DialogConnectProvider(props: { provider: string }) {
       const next = prompts().findIndex((prompt, i) => i > index && matches(prompt, value))
       if (next !== -1) {
         setFormStore("index", next)
+        return
+      }
+      if (method()?.type === "api") {
+        dispatch({ type: "auth.inputs", inputs: value })
         return
       }
       await selectMethod(store.methodIndex, value)
@@ -385,6 +408,7 @@ export function DialogConnectProvider(props: { provider: string }) {
         auth: {
           type: "api",
           key: apiKey,
+          ...(store.inputs ? { metadata: store.inputs } : {}),
         },
       })
       await complete()
@@ -585,7 +609,7 @@ export function DialogConnectProvider(props: { provider: string }) {
                 </div>
               </Match>
               <Match when={store.state === "prompt"}>
-                <OAuthPromptsView />
+                <AuthPromptsView />
               </Match>
               <Match when={store.state === "error"}>
                 <div class="text-14-regular text-text-base">
