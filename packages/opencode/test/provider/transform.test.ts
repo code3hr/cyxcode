@@ -240,6 +240,22 @@ describe("ProviderTransform.options - gpt-5 textVerbosity", () => {
     const result = ProviderTransform.options({ model, sessionID, providerOptions: {} })
     expect(result.textVerbosity).toBeUndefined()
   })
+
+  test("openai-compatible gpt-5 models omit Responses-only reasoningSummary", () => {
+    const model = {
+      ...createGpt5Model("gpt-5.4"),
+      id: "cortecs/gpt-5.4",
+      providerID: "cortecs",
+      api: {
+        id: "gpt-5.4",
+        url: "https://api.cortecs.ai/v1",
+        npm: "@ai-sdk/openai-compatible",
+      },
+    }
+    const result = ProviderTransform.options({ model, sessionID, providerOptions: {} })
+    expect(result.reasoningEffort).toBe("medium")
+    expect(result.reasoningSummary).toBeUndefined()
+  })
 })
 
 describe("ProviderTransform.options - gateway", () => {
@@ -784,6 +800,59 @@ describe("ProviderTransform.schema - gemini non-object properties removal", () =
     const result = ProviderTransform.schema(openaiModel, schema) as any
 
     expect(result.properties.data.properties).toBeDefined()
+  })
+})
+
+describe("ProviderTransform.schema - gemini type arrays", () => {
+  const geminiModel = {
+    providerID: "google",
+    api: {
+      id: "gemini-3-pro",
+    },
+  } as any
+
+  test("splits a multi-type array into anyOf", () => {
+    const schema = {
+      type: "object",
+      properties: {
+        status: { type: ["number", "string"], description: "status filter" },
+      },
+    } as any
+
+    const result = ProviderTransform.schema(geminiModel, schema) as any
+
+    expect(result.properties.status.type).toBeUndefined()
+    expect(result.properties.status.anyOf).toEqual([{ type: "number" }, { type: "string" }])
+    expect(result.properties.status.description).toBe("status filter")
+  })
+
+  test("lifts null into nullable for nullable type arrays", () => {
+    const schema = {
+      type: "object",
+      properties: {
+        maybe: { type: ["string", "null"] },
+      },
+    } as any
+
+    const result = ProviderTransform.schema(geminiModel, schema) as any
+
+    expect(result.properties.maybe.type).toBeUndefined()
+    expect(result.properties.maybe.anyOf).toEqual([{ type: "string" }])
+    expect(result.properties.maybe.nullable).toBe(true)
+  })
+
+  test("collapses all-null type arrays to null", () => {
+    const schema = {
+      type: "object",
+      properties: {
+        nothing: { type: ["null"] },
+      },
+    } as any
+
+    const result = ProviderTransform.schema(geminiModel, schema) as any
+
+    expect(result.properties.nothing.type).toBe("null")
+    expect(result.properties.nothing.anyOf).toBeUndefined()
   })
 })
 

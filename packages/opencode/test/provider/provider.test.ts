@@ -227,6 +227,9 @@ test("custom provider with npm package", async () => {
                 "custom-model": {
                   name: "Custom Model",
                   tool_call: true,
+                  interleaved: {
+                    field: "reasoning",
+                  },
                   limit: {
                     context: 128000,
                     output: 4096,
@@ -249,6 +252,9 @@ test("custom provider with npm package", async () => {
       expect(providers[ProviderID.make("custom-provider")]).toBeDefined()
       expect(providers[ProviderID.make("custom-provider")].name).toBe("Custom Provider")
       expect(providers[ProviderID.make("custom-provider")].models["custom-model"]).toBeDefined()
+      expect(providers[ProviderID.make("custom-provider")].models["custom-model"].capabilities.interleaved).toEqual({
+        field: "reasoning",
+      })
     },
   })
 })
@@ -374,6 +380,31 @@ test("defaultModel returns first available model when no config set", async () =
         path.join(dir, "opencode.json"),
         JSON.stringify({
           $schema: "https://cyxcode.ai/config.json",
+        }),
+      )
+    },
+  })
+  await Instance.provide({
+    directory: tmp.path,
+    init: async () => {
+      Env.set("ANTHROPIC_API_KEY", "test-api-key")
+    },
+    fn: async () => {
+      const model = await Provider.defaultModel()
+      expect(model.providerID).toBeDefined()
+      expect(model.modelID).toBeDefined()
+    },
+  })
+})
+
+test("defaultModel treats empty provider config as no allowlist", async () => {
+  await using tmp = await tmpdir({
+    init: async (dir) => {
+      await Bun.write(
+        path.join(dir, "opencode.json"),
+        JSON.stringify({
+          $schema: "https://cyxcode.ai/config.json",
+          provider: {},
         }),
       )
     },

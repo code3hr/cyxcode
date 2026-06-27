@@ -797,7 +797,14 @@ export namespace ProviderTransform {
     if (input.model.api.id.includes("gpt-5") && !input.model.api.id.includes("gpt-5-chat")) {
       if (!input.model.api.id.includes("gpt-5-pro")) {
         result["reasoningEffort"] = "medium"
-        result["reasoningSummary"] = "auto"
+        if (
+          input.model.api.npm === "@ai-sdk/openai" ||
+          input.model.api.npm === "@ai-sdk/azure" ||
+          input.model.api.npm === "@ai-sdk/github-copilot" ||
+          input.model.api.npm === "@ai-sdk/amazon-bedrock/mantle"
+        ) {
+          result["reasoningSummary"] = "auto"
+        }
       }
 
       // Only set textVerbosity for non-chat gpt-5.x models
@@ -1070,6 +1077,18 @@ export namespace ProviderTransform {
             result[key] = sanitizeGemini(value)
           } else {
             result[key] = value
+          }
+        }
+
+        if (Array.isArray(result.type)) {
+          const nullable = result.type.includes("null")
+          const types = result.type.filter((item: unknown) => item !== "null")
+          if (types.length === 0) {
+            result.type = "null"
+          } else {
+            delete result.type
+            result.anyOf = types.map((item: unknown) => ({ type: item }))
+            if (nullable) result.nullable = true
           }
         }
 
