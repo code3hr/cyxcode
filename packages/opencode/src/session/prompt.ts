@@ -745,6 +745,7 @@ export namespace SessionPrompt {
 
       // Build system prompt, adding structured output instruction if needed
       const skills = await SystemPrompt.skills(agent)
+      const mcp = await SystemPrompt.mcp(agent, session.permission ?? [])
       const { Memory } = await import("@/cyxcode/memory")
       const { Graph } = await import("@/cyxcode/graph")
       const { Wiki } = await import("@/cyxcode/wiki")
@@ -776,6 +777,7 @@ export namespace SessionPrompt {
       await versioningMod.StateVersioning.autoCommit(sessionID, "activity")
       const system = [
         ...(await SystemPrompt.environment(model)),
+        ...(mcp ? [mcp] : []),
         ...(skills ? [skills] : []),
         ...(await Resume.forSystemPrompt()),
         ...(await InstructionPrompt.system()),

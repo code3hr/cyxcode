@@ -11,6 +11,7 @@ import PROMPT_CODEX from "./prompt/codex.txt"
 import PROMPT_TRINITY from "./prompt/trinity.txt"
 import type { Provider } from "@/provider/provider"
 import type { Agent } from "@/agent/agent"
+import { MCP } from "@/mcp"
 import { Permission } from "@/permission"
 import { Skill } from "@/skill"
 
@@ -63,6 +64,23 @@ export namespace SystemPrompt {
       // the agents seem to ingest the information about skills a bit better if we present a more verbose
       // version of them here and a less verbose version in tool description, rather than vice versa.
       Skill.fmt(list, { verbose: true }),
+    ].join("\n")
+  }
+
+  export async function mcp(agent: Agent.Info, ruleset: Permission.Ruleset = []) {
+    const merged = Permission.merge(agent.permission, ruleset)
+    const instructions = (await MCP.instructions()).filter((item) => {
+      if (item.tools.length === 0) return true
+      return Permission.disabled(item.tools, merged).size < item.tools.length
+    })
+    if (instructions.length === 0) return
+
+    return [
+      "<mcp_instructions>",
+      ...instructions.map((item) =>
+        [`<server name=${JSON.stringify(item.name)}>`, item.instructions, "</server>"].join("\n"),
+      ),
+      "</mcp_instructions>",
     ].join("\n")
   }
 }

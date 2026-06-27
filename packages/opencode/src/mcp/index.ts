@@ -40,6 +40,17 @@ export namespace MCP {
     .meta({ ref: "McpResource" })
   export type Resource = z.infer<typeof Resource>
 
+  export const ResourceTemplate = z
+    .object({
+      name: z.string(),
+      uriTemplate: z.string(),
+      description: z.string().optional(),
+      mimeType: z.string().optional(),
+      client: z.string(),
+    })
+    .meta({ ref: "McpResourceTemplate" })
+  export type ResourceTemplate = z.infer<typeof ResourceTemplate>
+
   export const ToolsChanged = BusEvent.define(
     "mcp.tools.changed",
     z.object({
@@ -63,6 +74,18 @@ export namespace MCP {
   )
 
   type MCPClient = Client
+
+  function sanitize(value: string) {
+    return value.replace(/[^a-zA-Z0-9_-]/g, "_")
+  }
+
+  function toolName(clientName: string, name: string) {
+    return sanitize(clientName) + "_" + sanitize(name)
+  }
+
+  function clientInstructions(client: MCPClient) {
+    return (client as MCPClient & { getInstructions?: () => string | undefined }).getInstructions?.()?.trim()
+  }
 
   export const Status = z
     .discriminatedUnion("status", [
@@ -109,8 +132,29 @@ export namespace MCP {
     })
   export type Status = z.infer<typeof Status>
 
+  export interface ServerInstructions {
+    name: string
+    instructions: string
+    tools: string[]
+  }
+
   // Register notification handlers for MCP client
   function registerNotificationHandlers(client: MCPClient, serverName: string) {
+    client.onclose = () => {
+      void state()
+        .then((s) => {
+          if (s.clients[serverName] !== client) return
+          delete s.clients[serverName]
+          delete s.instructions[serverName]
+          s.status[serverName] = { status: "failed", error: "Connection closed" }
+          log.warn("mcp connection closed", { server: serverName })
+          void Bus.publish(ToolsChanged, { server: serverName })
+        })
+        .catch((error) => {
+          log.warn("failed to clear closed mcp client", { server: serverName, error })
+        })
+    }
+
     client.setNotificationHandler(ToolListChangedNotificationSchema, async () => {
       log.info("tools list changed notification received", { server: serverName })
       Bus.publish(ToolsChanged, { server: serverName })
@@ -133,7 +177,7 @@ export namespace MCP {
       description: mcpTool.description ?? "",
       inputSchema: jsonSchema(schema),
       execute: async (args: unknown) => {
-        return client.callTool(
+        const result = await client.callTool(
           {
             name: mcpTool.name,
             arguments: (args || {}) as Record<string, unknown>,
@@ -145,6 +189,11 @@ export namespace MCP {
             timeout,
           },
         )
+        if (result.structuredContent === undefined || result.structuredContent === null) return result
+        return {
+          ...result,
+          content: [{ type: "text" as const, text: JSON.stringify(result.structuredContent) }],
+        }
       },
     })
   }
@@ -157,6 +206,7 @@ export namespace MCP {
   type PromptInfo = Awaited<ReturnType<MCPClient["listPrompts"]>>["prompts"][number]
 
   type ResourceInfo = Awaited<ReturnType<MCPClient["listResources"]>>["resources"][number]
+  type ResourceTemplateInfo = Awaited<ReturnType<MCPClient["listResourceTemplates"]>>["resourceTemplates"][number]
   type McpEntry = NonNullable<Config.Info["mcp"]>[string]
   function isMcpConfigured(entry: McpEntry): entry is Config.Mcp {
     return typeof entry === "object" && entry !== null && "type" in entry
@@ -186,6 +236,7 @@ export namespace MCP {
       const config = cfg.mcp ?? {}
       const clients: Record<string, MCPClient> = {}
       const status: Record<string, Status> = {}
+      const instructions: Record<string, string> = {}
 
       await Promise.all(
         Object.entries(config).map(async ([key, mcp]) => {
@@ -207,12 +258,15 @@ export namespace MCP {
 
           if (result.mcpClient) {
             clients[key] = result.mcpClient
+            const text = clientInstructions(result.mcpClient)
+            if (text) instructions[key] = text
           }
         }),
       )
       return {
         status,
         clients,
+        instructions,
       }
     },
     async (state) => {
@@ -241,6 +295,7 @@ export namespace MCP {
         ),
       )
       pendingOAuthTransports.clear()
+      state.instructions = {}
     },
   )
 
@@ -269,7 +324,7 @@ export namespace MCP {
 
   async function fetchResourcesForClient(clientName: string, client: Client) {
     const resources = await client.listResources().catch((e) => {
-      log.error("failed to get prompts", { clientName, error: e.message })
+      log.error("failed to get resources", { clientName, error: e.message })
       return undefined
     })
 
@@ -278,13 +333,32 @@ export namespace MCP {
     }
 
     const commands: Record<string, ResourceInfo & { client: string }> = {}
+    const escaped = clientName.replaceAll("%", "%25").replaceAll(":", "%3A")
 
     for (const resource of resources.resources) {
-      const sanitizedClientName = clientName.replace(/[^a-zA-Z0-9_-]/g, "_")
-      const sanitizedResourceName = resource.name.replace(/[^a-zA-Z0-9_-]/g, "_")
-      const key = sanitizedClientName + ":" + sanitizedResourceName
+      const key = escaped + ":" + resource.uri
 
       commands[key] = { ...resource, client: clientName }
+    }
+    return commands
+  }
+
+  async function fetchResourceTemplatesForClient(clientName: string, client: Client) {
+    const templates = await client.listResourceTemplates().catch((e) => {
+      log.error("failed to get resource templates", { clientName, error: e.message })
+      return undefined
+    })
+
+    if (!templates) {
+      return
+    }
+
+    const commands: Record<string, ResourceTemplateInfo & { client: string }> = {}
+    const escaped = clientName.replaceAll("%", "%25").replaceAll(":", "%3A")
+
+    for (const template of templates.resourceTemplates) {
+      const key = escaped + ":" + template.uriTemplate
+      commands[key] = { ...template, client: clientName }
     }
     return commands
   }
@@ -304,6 +378,7 @@ export namespace MCP {
     }
     if (!result.mcpClient) {
       s.status[name] = result.status
+      delete s.instructions[name]
       return {
         status: s.status,
       }
@@ -317,6 +392,9 @@ export namespace MCP {
     }
     s.clients[name] = result.mcpClient
     s.status[name] = result.status
+    const text = clientInstructions(result.mcpClient)
+    if (text) s.instructions[name] = text
+    if (!text) delete s.instructions[name]
 
     return {
       status: s.status,
@@ -580,16 +658,22 @@ export namespace MCP {
 
     const s = await state()
     s.status[name] = result.status
-    if (result.mcpClient) {
-      // Close existing client if present to prevent memory leaks
-      const existingClient = s.clients[name]
-      if (existingClient) {
-        await existingClient.close().catch((error) => {
-          log.error("Failed to close existing MCP client", { name, error })
-        })
-      }
-      s.clients[name] = result.mcpClient
+    if (!result.mcpClient) {
+      delete s.instructions[name]
+      return
     }
+
+    // Close existing client if present to prevent memory leaks
+    const existingClient = s.clients[name]
+    if (existingClient) {
+      await existingClient.close().catch((error) => {
+        log.error("Failed to close existing MCP client", { name, error })
+      })
+    }
+    s.clients[name] = result.mcpClient
+    const text = clientInstructions(result.mcpClient)
+    if (text) s.instructions[name] = text
+    if (!text) delete s.instructions[name]
   }
 
   export async function disconnect(name: string) {
@@ -601,6 +685,7 @@ export namespace MCP {
       })
       delete s.clients[name]
     }
+    delete s.instructions[name]
     s.status[name] = { status: "disabled" }
   }
 
@@ -626,6 +711,7 @@ export namespace MCP {
           }
           s.status[clientName] = failedStatus
           delete s.clients[clientName]
+          delete s.instructions[clientName]
           return undefined
         })
         return { clientName, client, toolsResult }
@@ -638,12 +724,33 @@ export namespace MCP {
       const entry = isMcpConfigured(mcpConfig) ? mcpConfig : undefined
       const timeout = entry?.timeout ?? defaultTimeout
       for (const mcpTool of toolsResult.tools) {
-        const sanitizedClientName = clientName.replace(/[^a-zA-Z0-9_-]/g, "_")
-        const sanitizedToolName = mcpTool.name.replace(/[^a-zA-Z0-9_-]/g, "_")
-        result[sanitizedClientName + "_" + sanitizedToolName] = await convertMcpTool(mcpTool, client, timeout)
+        result[toolName(clientName, mcpTool.name)] = await convertMcpTool(mcpTool, client, timeout)
       }
     }
     return result
+  }
+
+  export async function instructions(): Promise<ServerInstructions[]> {
+    const s = await state()
+    return (
+      await Promise.all(
+        Object.entries(s.instructions).map(async ([name, instructions]) => {
+          const client = s.clients[name]
+          if (!client || s.status[name]?.status !== "connected") return
+          const tools = await client.listTools().catch((e) => {
+            log.error("failed to get tools for instructions", { name, error: e.message })
+            return undefined
+          })
+          return {
+            name,
+            instructions,
+            tools: tools?.tools.map((tool) => toolName(name, tool.name)) ?? [],
+          }
+        }),
+      )
+    )
+      .filter((item): item is ServerInstructions => item !== undefined)
+      .sort((a, b) => a.name.localeCompare(b.name))
   }
 
   export async function prompts() {
@@ -667,19 +774,46 @@ export namespace MCP {
     return prompts
   }
 
-  export async function resources() {
+  export async function resources(server?: string) {
     const s = await state()
     const clientsSnapshot = await clients()
 
     const result = Object.fromEntries<ResourceInfo & { client: string }>(
       (
         await Promise.all(
-          Object.entries(clientsSnapshot).map(async ([clientName, client]) => {
-            if (s.status[clientName]?.status !== "connected") {
+          Object.entries(clientsSnapshot).map(async ([name, client]) => {
+            if (s.status[name]?.status !== "connected") {
+              return []
+            }
+            if (server && name !== server) {
               return []
             }
 
-            return Object.entries((await fetchResourcesForClient(clientName, client)) ?? {})
+            return Object.entries((await fetchResourcesForClient(name, client)) ?? {})
+          }),
+        )
+      ).flat(),
+    )
+
+    return result
+  }
+
+  export async function resourceTemplates(clientName?: string) {
+    const s = await state()
+    const clientsSnapshot = await clients()
+
+    const result = Object.fromEntries<ResourceTemplateInfo & { client: string }>(
+      (
+        await Promise.all(
+          Object.entries(clientsSnapshot).map(async ([name, client]) => {
+            if (s.status[name]?.status !== "connected") {
+              return []
+            }
+            if (clientName && name !== clientName) {
+              return []
+            }
+
+            return Object.entries((await fetchResourceTemplatesForClient(name, client)) ?? {})
           }),
         )
       ).flat(),
