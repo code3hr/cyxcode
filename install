@@ -290,8 +290,18 @@ download_and_install() {
         unzip -q "$tmp_dir/$filename" -d "$tmp_dir"
     fi
 
-    mv "$tmp_dir/cyxcode" "$INSTALL_DIR"
-    chmod 755 "${INSTALL_DIR}/cyxcode"
+    rm -f "$tmp_dir/$filename"
+    rm -rf "$tmp_dir/.cyxcode" "$tmp_dir/.gitignore"
+    rm -rf "$INSTALL_DIR/app" "$INSTALL_DIR/dashboard" "$INSTALL_DIR/default-skills" "$INSTALL_DIR/commands" "$INSTALL_DIR/.cyxcode"
+    rm -f "$INSTALL_DIR/.gitignore"
+    rm -f "$INSTALL_DIR/cyxcode" "$INSTALL_DIR/cyxcode.exe"
+    cp -R "$tmp_dir"/. "$INSTALL_DIR"/
+    if [ -f "$INSTALL_DIR/cyxcode.exe" ]; then
+        chmod 755 "$INSTALL_DIR/cyxcode.exe"
+    fi
+    if [ -f "$INSTALL_DIR/cyxcode" ]; then
+        chmod 755 "$INSTALL_DIR/cyxcode"
+    fi
     rm -rf "$tmp_dir"
 }
 
