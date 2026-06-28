@@ -13,6 +13,7 @@ import { CyxPaths } from "../../src/cyxcode/paths"
 describe("CyxPaths", () => {
   let tmpDir: string
   let origCwd: string
+  const home = () => process.env.CYXWIZ_TEST_HOME || process.env.CYXCODE_TEST_HOME || os.homedir()
 
   beforeEach(async () => {
     tmpDir = await fs.mkdtemp(path.join(os.tmpdir(), "cyxpaths-test-"))
@@ -143,28 +144,23 @@ describe("CyxPaths", () => {
 
   describe("global paths", () => {
     test("globalDir points to ~/.cyxcode/", () => {
-      const home = process.env.CYXWIZ_TEST_HOME || os.homedir()
-      expect(CyxPaths.globalDir()).toBe(path.join(home, ".cyxcode"))
+      expect(CyxPaths.globalDir()).toBe(path.join(home(), ".cyxcode"))
     })
 
     test("globalLearnedPath points to ~/.cyxcode/patterns/learned.json", () => {
-      const home = process.env.CYXWIZ_TEST_HOME || os.homedir()
-      expect(CyxPaths.globalLearnedPath()).toBe(path.join(home, ".cyxcode", "patterns", "learned.json"))
+      expect(CyxPaths.globalLearnedPath()).toBe(path.join(home(), ".cyxcode", "patterns", "learned.json"))
     })
 
     test("globalMemoryDir points to ~/.cyxcode/memory/", () => {
-      const home = process.env.CYXWIZ_TEST_HOME || os.homedir()
-      expect(CyxPaths.globalMemoryDir()).toBe(path.join(home, ".cyxcode", "memory"))
+      expect(CyxPaths.globalMemoryDir()).toBe(path.join(home(), ".cyxcode", "memory"))
     })
 
     test("globalCorrectionsDir points to ~/.cyxcode/corrections/", () => {
-      const home = process.env.CYXWIZ_TEST_HOME || os.homedir()
-      expect(CyxPaths.globalCorrectionsDir()).toBe(path.join(home, ".cyxcode", "corrections"))
+      expect(CyxPaths.globalCorrectionsDir()).toBe(path.join(home(), ".cyxcode", "corrections"))
     })
 
     test("globalCommunityDir points to ~/.cyxcode/community/", () => {
-      const home = process.env.CYXWIZ_TEST_HOME || os.homedir()
-      expect(CyxPaths.globalCommunityDir()).toBe(path.join(home, ".cyxcode", "community"))
+      expect(CyxPaths.globalCommunityDir()).toBe(path.join(home(), ".cyxcode", "community"))
     })
   })
 

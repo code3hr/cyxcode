@@ -126,6 +126,25 @@ python3 -c 'import flask'
 | Normal + match | 1 | ~600 | ~3-5s | ~$0.001 |
 | Normal + no match | 2 | ~1,200 | ~5-8s | ~$0.002 |
 
+### Controlling Short-Circuit Behavior
+
+CyxCode short-circuits when a known error pattern matches, so the fix is shown without spending another LLM call. You can turn this off when you want the AI to inspect the failure itself.
+
+Per turn, say it naturally:
+
+```
+please no pattern matching for this run
+skip cyxcode recovery now
+turn off short-circuit behavior
+```
+
+Environment controls:
+
+| Setting | Effect |
+|---------|--------|
+| `CYXCODE_SHORT_CIRCUIT=false` or `CYXCODE_SHORT_CIRCUIT=0` | Disable the normal-mode LLM short-circuit. Pattern matching can still report shell recovery hints. |
+| `CYXCODE_DISABLE_PATTERN_MATCHING=true` or `CYXCODE_DISABLE_PATTERN_MATCHING=1` | Disable CyxCode pattern matching/recovery globally. |
+
 ---
 
 ## Pattern Learning

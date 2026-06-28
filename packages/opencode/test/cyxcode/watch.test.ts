@@ -52,7 +52,16 @@ afterEach(async () => {
   if (recall !== undefined && state) state.disabled = recall
   process.chdir(cwd)
   CyxPaths.invalidateCache()
-  await fs.rm(dir, { recursive: true, force: true, maxRetries: 10, retryDelay: 100 })
+  const rm = async (left: number): Promise<void> => {
+    Bun.gc(true)
+    await sleep(100)
+    return fs.rm(dir, { recursive: true, force: true }).catch((err) => {
+      if (!(typeof err === "object" && err !== null && "code" in err && err.code === "EBUSY")) throw err
+      if (left <= 1) throw err
+      return rm(left - 1)
+    })
+  }
+  await rm(30)
 })
 
 function ctx(ruleset: Permission.Ruleset = []) {

@@ -53,6 +53,7 @@ import { Truncate } from "@/tool/truncate"
 import { decodeDataUrl } from "@/util/data-url"
 import { Process } from "@/util/process"
 import { CyxWatch } from "@/cyxcode/watch"
+import { shouldSkipPatternMatch, shouldSkipPatternMatchFromMessages } from "@/cyxcode/pattern-match"
 import { Config } from "@/config/config"
 
 // @ts-ignore
@@ -326,12 +327,16 @@ export namespace SessionPrompt {
       let msgs = await MessageV2.filterCompacted(MessageV2.stream(sessionID))
 
       let lastUser: MessageV2.User | undefined
+      let lastUserMessage: MessageV2.WithParts | undefined
       let lastAssistant: MessageV2.Assistant | undefined
       let lastFinished: MessageV2.Assistant | undefined
       let tasks: (MessageV2.CompactionPart | MessageV2.SubtaskPart)[] = []
       for (let i = msgs.length - 1; i >= 0; i--) {
         const msg = msgs[i]
-        if (!lastUser && msg.info.role === "user") lastUser = msg.info as MessageV2.User
+        if (!lastUser && msg.info.role === "user") {
+          lastUser = msg.info as MessageV2.User
+          lastUserMessage = msg
+        }
         if (!lastAssistant && msg.info.role === "assistant") lastAssistant = msg.info as MessageV2.Assistant
         if (!lastFinished && msg.info.role === "assistant" && msg.info.finish)
           lastFinished = msg.info as MessageV2.Assistant
@@ -343,6 +348,7 @@ export namespace SessionPrompt {
       }
 
       if (!lastUser) throw new Error("No user message found in stream. This should never happen.")
+      const skipPattern = shouldSkipPatternMatch(lastUserMessage?.parts)
       if (
         lastAssistant?.finish &&
         !["tool-calls", "unknown"].includes(lastAssistant.finish) &&
@@ -854,7 +860,7 @@ export namespace SessionPrompt {
       }
 
       // CyxCode short-circuit: skip LLM when pattern matched
-      if (Flag.CYXCODE_SHORT_CIRCUIT && result === "continue") {
+      if (Flag.CYXCODE_SHORT_CIRCUIT && !skipPattern && result === "continue") {
         const parts = await MessageV2.parts(processor.message.id)
         const cyxPart = parts.find(
           (p) => p.type === "tool" && p.state.status === "completed" && p.state.metadata?.cyxcodeMatched,
@@ -1797,9 +1803,11 @@ NOTE: At any point in time through this workflow you should feel free to ask the
       })
       .optional(),
     command: z.string(),
+    skipPattern: z.boolean().optional(),
   })
   export type ShellInput = z.infer<typeof ShellInput>
   export async function shell(input: ShellInput) {
+    const history = await MessageV2.filterCompacted(MessageV2.stream(input.sessionID))
     const abort = start(input.sessionID)
     if (!abort) {
       throw new Session.BusyError(input.sessionID)
@@ -1858,6 +1866,7 @@ NOTE: At any point in time through this workflow you should feel free to ask the
     }
     await Session.updatePart(userPart)
 
+    const skipPattern = input.skipPattern ?? shouldSkipPatternMatchFromMessages(history)
     const msg: MessageV2.Assistant = {
       id: MessageID.ascending(),
       sessionID: input.sessionID,
@@ -2029,7 +2038,7 @@ NOTE: At any point in time through this workflow you should feel free to ask the
 
     // CyxCode: Pattern-based error recovery for shell commands (zero AI tokens)
     let cyxMatched = false
-    if (proc.exitCode !== 0 && proc.exitCode !== null && !aborted) {
+    if (!skipPattern && proc.exitCode !== 0 && proc.exitCode !== null && !aborted) {
       initCyxCode()
       if ((globalThis as any).__cyxcode_learned_ready) await (globalThis as any).__cyxcode_learned_ready
       const router = getRouter()

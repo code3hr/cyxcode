@@ -19,6 +19,7 @@ import { Truncate } from "./truncate"
 import { Plugin } from "@/plugin"
 import { getRouter, initCyxCode } from "@/cyxcode"
 import { CyxWatch } from "@/cyxcode/watch"
+import { shouldSkipPatternMatchFromMessages } from "@/cyxcode/pattern-match"
 
 const MAX_METADATA_LENGTH = 30_000
 const DEFAULT_TIMEOUT = Flag.CYXCODE_EXPERIMENTAL_BASH_DEFAULT_TIMEOUT_MS || 2 * 60 * 1000
@@ -265,7 +266,8 @@ export const BashTool = Tool.define("bash", async () => {
 
       // CyxCode: Pattern-based error recovery
       let cyxMatched = false
-      if (proc.exitCode !== 0 && proc.exitCode !== null) {
+      const skipPatternMatch = shouldSkipPatternMatchFromMessages(ctx.messages)
+      if (!skipPatternMatch && proc.exitCode !== 0 && proc.exitCode !== null) {
         initCyxCode()
         // Ensure learned patterns are loaded before matching
         if ((globalThis as any).__cyxcode_learned_ready) await (globalThis as any).__cyxcode_learned_ready

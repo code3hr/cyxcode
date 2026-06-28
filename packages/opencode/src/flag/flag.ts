@@ -34,6 +34,7 @@ export namespace Flag {
     CYXCODE_DISABLE_CLAUDE_CODE || truthy("CYXCODE_DISABLE_CLAUDE_CODE_SKILLS")
   export const CYXCODE_DISABLE_EXTERNAL_SKILLS =
     CYXCODE_DISABLE_CLAUDE_CODE_SKILLS || truthy("CYXCODE_DISABLE_EXTERNAL_SKILLS")
+  export declare const CYXCODE_DISABLE_PATTERN_MATCHING: boolean
   export declare const CYXCODE_DISABLE_PROJECT_CONFIG: boolean
   export const CYXCODE_FAKE_VCS = process.env["CYXCODE_FAKE_VCS"]
   export declare const CYXCODE_CLIENT: string
@@ -102,6 +103,14 @@ Object.defineProperty(Flag, "CYXCODE_DISABLE_PROJECT_CONFIG", {
 Object.defineProperty(Flag, "CYXCODE_TUI_CONFIG", {
   get() {
     return process.env["CYXCODE_TUI_CONFIG"]
+  },
+  enumerable: true,
+  configurable: false,
+})
+
+Object.defineProperty(Flag, "CYXCODE_DISABLE_PATTERN_MATCHING", {
+  get() {
+    return truthy("CYXCODE_DISABLE_PATTERN_MATCHING")
   },
   enumerable: true,
   configurable: false,
