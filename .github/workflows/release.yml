@@ -94,7 +94,7 @@ jobs:
           DIST_DIR=$(ls -d */ | head -1)
           cd "$DIST_DIR/bin"
           chmod +x cyxcode
-          tar -czvf ${{ matrix.artifact }}.tar.gz cyxcode app dashboard
+          tar -czvf ${{ matrix.artifact }}.tar.gz *
           mv ${{ matrix.artifact }}.tar.gz $GITHUB_WORKSPACE/
 
       - name: Package Windows Binary
@@ -104,7 +104,7 @@ jobs:
           cd packages/opencode/dist
           $distDir = Get-ChildItem -Directory | Select-Object -First 1
           cd "$($distDir.Name)/bin"
-          Compress-Archive -Path cyxcode.exe,app,dashboard -DestinationPath ${{ matrix.artifact }}.zip
+          Compress-Archive -Path * -DestinationPath ${{ matrix.artifact }}.zip
           Move-Item ${{ matrix.artifact }}.zip $env:GITHUB_WORKSPACE/
 
       - name: Upload Artifact
