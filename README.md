@@ -52,10 +52,12 @@ Grab a prebuilt binary — Linux, macOS, or Windows (via WSL/Git Bash):
 curl -fsSL https://raw.githubusercontent.com/code3hr/cyxcode/HEAD/install | bash
 ```
 
+Latest release: [v3.0.1](https://github.com/code3hr/cyxcode/releases/tag/v3.0.1)
+
 Pin a specific version:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/code3hr/cyxcode/HEAD/install | bash -s -- --version 2.3.2
+curl -fsSL https://raw.githubusercontent.com/code3hr/cyxcode/HEAD/install | bash -s -- --version 3.0.1
 ```
 
 The installer drops the `cyxcode` binary into `~/.opencode/bin` and adds it to `PATH`. Releases live at [github.com/code3hr/cyxcode/releases](https://github.com/code3hr/cyxcode/releases). Sponsor the project at [github.com/sponsors/CYXWIZ-Lab](https://github.com/sponsors/CYXWIZ-Lab).
