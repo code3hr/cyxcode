@@ -10,7 +10,7 @@ import path from "path"
 import { Log } from "@/util/log"
 
 const log = Log.create({ service: "cyxcode-default-skills" })
-const root = path.join(import.meta.dir, "default-skills")
+const roots = [path.join(import.meta.dir, "default-skills"), path.join(path.dirname(process.execPath), "default-skills")]
 const names = ["lean-software-guardrails"]
 
 async function copy(from: string, dest: string): Promise<number> {
@@ -30,18 +30,22 @@ async function copy(from: string, dest: string): Promise<number> {
   const count = await Promise.all(
     (await fs.readdir(from)).map((item) => copy(path.join(from, item), path.join(dest, item))),
   )
-  return count.reduce((sum, item) => sum + item, 0)
+  return count.reduce<number>((sum, item) => sum + item, 0)
 }
 
 export namespace DefaultSkills {
   export async function seed(dir: string): Promise<number> {
     let count = 0
     for (const name of names) {
-      try {
-        count += await copy(path.join(root, name), path.join(dir, "skills", name))
-      } catch (err) {
-        log.warn("failed to seed default skill", { name, error: err })
+      let done = false
+      for (const root of roots) {
+        try {
+          count += await copy(path.join(root, name), path.join(dir, "skills", name))
+          done = true
+          break
+        } catch {}
       }
+      if (!done) log.warn("failed to seed default skill", { name })
     }
     return count
   }

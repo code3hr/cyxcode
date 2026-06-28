@@ -12,8 +12,7 @@ import { CyxPaths } from "./paths"
 
 const log = Log.create({ service: "cyxcode-commands" })
 
-// Path to embedded commands (relative to this file)
-const EMBEDDED_DIR = path.join(import.meta.dir, "commands")
+const roots = [path.join(import.meta.dir, "commands"), path.join(path.dirname(process.execPath), "commands")]
 
 // List of bundled commands to copy
 const BUNDLED_COMMANDS = [
@@ -59,23 +58,27 @@ export namespace CommandsDownload {
     const failed: string[] = []
 
     for (const filename of BUNDLED_COMMANDS) {
+      const destPath = path.join(commandDir, filename)
+
+      // Don't overwrite existing commands (user may have customized)
       try {
-        const srcPath = path.join(EMBEDDED_DIR, filename)
-        const destPath = path.join(commandDir, filename)
+        await fs.access(destPath)
+        log.debug("Command already exists, skipping", { filename })
+        continue
+      } catch {}
 
-        // Don't overwrite existing commands (user may have customized)
+      let done = false
+      for (const root of roots) {
         try {
-          await fs.access(destPath)
-          log.debug("Command already exists, skipping", { filename })
-          continue
+          await fs.copyFile(path.join(root, filename), destPath)
+          downloaded++
+          done = true
+          log.debug("Copied command", { filename })
+          break
         } catch {}
-
-        // Copy from embedded file
-        await fs.copyFile(srcPath, destPath)
-        downloaded++
-        log.debug("Copied command", { filename })
-      } catch (err) {
-        log.warn("Error copying command", { filename, error: err })
+      }
+      if (!done) {
+        log.warn("Error copying command", { filename })
         failed.push(filename)
       }
     }

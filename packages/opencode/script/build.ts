@@ -257,10 +257,18 @@ for (const item of targets) {
 
   await fs.promises.rm(path.join(dir, "dist", name, "bin", "dashboard"), { recursive: true, force: true })
   await fs.promises.rm(path.join(dir, "dist", name, "bin", "app"), { recursive: true, force: true })
+  await fs.promises.rm(path.join(dir, "dist", name, "bin", "default-skills"), { recursive: true, force: true })
+  await fs.promises.rm(path.join(dir, "dist", name, "bin", "commands"), { recursive: true, force: true })
   await fs.promises.cp(path.join(web, "dist"), path.join(dir, "dist", name, "bin", "app"), {
     recursive: true,
   })
   await fs.promises.cp(path.join(dash, "dist"), path.join(dir, "dist", name, "bin", "dashboard"), {
+    recursive: true,
+  })
+  await fs.promises.cp(path.join(dir, "src", "cyxcode", "default-skills"), path.join(dir, "dist", name, "bin", "default-skills"), {
+    recursive: true,
+  })
+  await fs.promises.cp(path.join(dir, "src", "cyxcode", "commands"), path.join(dir, "dist", name, "bin", "commands"), {
     recursive: true,
   })
 
