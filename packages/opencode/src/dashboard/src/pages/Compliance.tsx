@@ -131,7 +131,9 @@ const Compliance: Component = () => {
       <div class="flex items-center justify-between">
         <div>
           <h1 class="text-2xl font-bold text-gray-100">Compliance</h1>
-          <p class="text-gray-400 mt-1">Map findings to compliance frameworks</p>
+          <p class="text-gray-400 mt-1">
+            Map security findings into compliance controls, run framework assessments, and see pass/fail/partial scoring per category.
+          </p>
         </div>
       </div>
 

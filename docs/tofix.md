@@ -8,27 +8,33 @@ CyxCode is a fork of OpenCode. The goal is to pull in safe upstream fixes withou
 
 ## Upstream Findings
 
-I checked the upstream OpenCode repo. The latest release I found is `v1.17.8` from June 17, 2026. The notable additions are:
+I checked the upstream OpenCode repo. The latest release I found is `v1.17.11` from June 25, 2026. Recent notable additions are:
 
+- Session snapshots and revert controls for rolling a session back to an earlier message, including file changes.
 - Faster session timelines with less flicker and scroll jumping.
 - MCP/provider fixes:
+  - MCP OAuth now always prints the manual sign-in URL.
   - OpenAI-compatible providers now accept MCP tool schemas that previously failed validation.
   - Cloudflare AI Gateway now receives the configured API key correctly.
   - MCP tools without declared schema properties now work with stricter providers.
   - Long-running MCP tools keep their timeout alive when they report progress.
   - MCP OAuth now shuts down its callback server after auth or cancel, and failures show the server error text.
+  - MCP server instructions, resource templates, resource reads, namespaced resource tools, and structured error details were improved.
 - Desktop UX:
   - A Home tab toggle to switch between Home and the last tab.
   - A faster file and folder picker in the v2 layout.
+  - Draggable tabs, Chrome-style tab cycle shortcuts, per-tab prompt drafts, mobile bottom navigation, and more stable session routing.
 
 I also checked the current upstream `dev` history. The newest work is mostly small fixes and refactors:
 
-- titlebar tab overflow handling
+- titlebar tab overflow and layout handling
 - duplicate renderable ID handling in the TUI
 - subtask spacing in the TUI
 - project copy refactors for v2
 - structured MCP output
 - cleanup of closed MCP clients
+- tab-scoped session servers, draft routing, and composer shortcut fixes
+- public schema and SDK runtime operation refactors
 
 ## Safe Way To Stay Current
 

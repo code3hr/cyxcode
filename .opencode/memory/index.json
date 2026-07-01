@@ -13,8 +13,8 @@
       ],
       "summary": "auth.ts uses JWT with bcrypt for password hashing, middleware at line 50",
       "created": "2026-03-26",
-      "accessed": "2026-06-07",
-      "accessCount": 25,
+      "accessed": "2026-06-24",
+      "accessCount": 30,
       "privacy": "never_send"
     },
     {
@@ -28,8 +28,8 @@
       ],
       "summary": "User asked to save a concise project memory in `.opencode/memory/`.",
       "created": "2026-05-18",
-      "accessed": "2026-06-07",
-      "accessCount": 17,
+      "accessed": "2026-06-24",
+      "accessCount": 44,
       "privacy": "private"
     }
   ]

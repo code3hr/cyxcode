@@ -1,5 +1,5 @@
 import { Component, createSignal, createEffect, createMemo, Show, For, onCleanup } from "solid-js"
-import { useParams } from "@solidjs/router"
+import { A, useParams } from "@solidjs/router"
 import { scansApi, vulnApi, type ScanResult, type VulnArtifactSummary } from "../api/client"
 import { DataTable, type Column } from "../components/shared/DataTable"
 import { sseClient } from "../api/sse"
@@ -11,7 +11,9 @@ const Scans: Component = () => {
   const [activeScans, setActiveScans] = createSignal<string[]>([])
   const [selectedScan, setSelectedScan] = createSignal<ScanResult | null>(null)
   const [loading, setLoading] = createSignal(true)
+  const [scanning, setScanning] = createSignal(false)
   const [error, setError] = createSignal<string | null>(null)
+  const [msg, setMsg] = createSignal<string | null>(null)
   const vuln = createMemo(() => parse(selectedScan()))
 
   const fetchScans = async () => {
@@ -52,6 +54,26 @@ const Scans: Component = () => {
     a.download = item.name
     a.click()
     URL.revokeObjectURL(url)
+  }
+
+  const runVuln = async () => {
+    setScanning(true)
+    setError(null)
+    setMsg(null)
+
+    const res = await vulnApi.scan({ minSeverity: "high", failOnSeverity: "high", createFindings: true })
+    if (res.error) {
+      setError(res.error)
+      setScanning(false)
+      return
+    }
+
+    if (res.data) {
+      setScans((prev) => [res.data!.scan, ...prev.filter((scan) => scan.id !== res.data!.scan.id)])
+      setSelectedScan(res.data.scan)
+      setMsg(`Scan completed. ${res.data.findings.total} findings detected.`)
+    }
+    setScanning(false)
   }
 
   createEffect(() => {
@@ -181,7 +203,9 @@ const Scans: Component = () => {
       <div class="flex items-center justify-between">
         <div>
           <h1 class="text-2xl font-bold text-gray-100">Scans</h1>
-          <p class="text-gray-400 mt-1">Network and vulnerability scan results</p>
+          <p class="text-gray-400 mt-1">
+            Scan history and live jobs in one place. Select any scan to inspect artifacts, rerun detection, and download JSON/HTML scan reports.
+          </p>
         </div>
         <div class="flex items-center gap-4">
           <Show when={activeScans().length > 0}>
@@ -189,6 +213,9 @@ const Scans: Component = () => {
               {activeScans().length} active scan{activeScans().length > 1 ? "s" : ""}
             </span>
           </Show>
+          <button class="btn btn-primary" onClick={runVuln} disabled={scanning()}>
+            {scanning() ? "Scanning..." : "Run Vuln Scan"}
+          </button>
           <span class="text-sm text-gray-400">{scans().length} scans</span>
         </div>
       </div>
@@ -196,6 +223,11 @@ const Scans: Component = () => {
       <Show when={error()}>
         <div class="bg-red-900/50 border border-red-700 rounded-lg p-4 text-red-200">
           {error()}
+        </div>
+      </Show>
+      <Show when={msg()}>
+        <div class="rounded-lg border border-cyan-800 bg-cyan-950/50 p-4 text-cyan-200">
+          {msg()}
         </div>
       </Show>
 
@@ -208,6 +240,7 @@ const Scans: Component = () => {
             data={scans()}
             loading={loading()}
             emptyMessage="No scans found"
+            emptyState={<Empty scanning={scanning()} onScan={runVuln} />}
             onRowClick={(s) => setSelectedScan(s)}
           />
         </div>
@@ -457,6 +490,23 @@ const Scans: Component = () => {
     </div>
   )
 }
+
+const Empty: Component<{ scanning: boolean; onScan: () => void }> = (props) => (
+  <div class="mx-auto flex max-w-xl flex-col items-center gap-3 px-4 py-8">
+    <div class="text-base font-semibold text-gray-100">No scan history is stored yet</div>
+    <div class="text-sm leading-6 text-gray-400">
+      This page lists saved scan records. Run a vulnerability scan to create a scan entry, artifacts, and any matching findings.
+    </div>
+    <div class="flex flex-wrap justify-center gap-2">
+      <button class="btn btn-primary text-sm" onClick={props.onScan} disabled={props.scanning}>
+        {props.scanning ? "Scanning..." : "Run Vuln Scan"}
+      </button>
+      <A href="/security" class="btn btn-secondary text-sm">
+        Open CyxWatch
+      </A>
+    </div>
+  </div>
+)
 
 type Raw = {
   artifacts?: VulnArtifactSummary[]

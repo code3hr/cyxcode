@@ -174,6 +174,10 @@ export default defineConfig({
       sidebar: [
         "",
         "config",
+        {
+          label: "Upstream opencode docs",
+          link: "https://opencode.ai/docs/",
+        },
         "providers",
         "network",
         "enterprise",

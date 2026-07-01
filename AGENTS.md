@@ -140,3 +140,9 @@ const table = sqliteTable("session", {
 
 - `.opencode/memory/index.json` is the lookup source of truth; add or update the matching `.md` file and the index entry together so saved memories stay discoverable.
 - Security pattern notes live in `packages/opencode/src/cyxcode/skills/security/patterns/`; `auth.ts` is the current JWT and malformed-token reference.
+
+## C/C++ Build Error Patterns
+
+- Missing `config.h` (`fatal error C1083` / `No such file or directory`): `config.h` is the canonical auto-generated config header in C build systems (CMake `configure_file()`, autoconf). Fix: create `config.h` with the expected defines (scan source for `APP_VERSION`, `PACKAGE_VERSION`, `HAVE_*`) or run the configure step (`cmake -B build`, `./configure`).
+- Windows `.cmd` build scripts fail with `command not found` in bash/WSL — the real error (e.g., missing generated header) is masked by the platform mismatch. Check for `.sh`/`Makefile` alternatives or use `cmd.exe /C` to invoke.
+- `.cyxcode/patterns/` (or `.opencode/patterns/`) is the directory for project-local error patterns; when empty, no localized error recognition is active.

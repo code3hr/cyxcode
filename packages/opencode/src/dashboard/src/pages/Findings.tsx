@@ -1,6 +1,6 @@
 import { Component, createSignal, createEffect, Show, For, onCleanup } from "solid-js"
 import { useParams, useSearchParams, A } from "@solidjs/router"
-import { findingsApi, type Finding, type FindingFilters } from "../api/client"
+import { findingsApi, vulnApi, type Finding, type FindingFilters } from "../api/client"
 import { SeverityBadge } from "../components/shared/SeverityBadge"
 import { StatusBadge } from "../components/shared/StatusBadge"
 import { DataTable, type Column } from "../components/shared/DataTable"
@@ -13,7 +13,9 @@ const Findings: Component = () => {
   const [findings, setFindings] = createSignal<Finding[]>([])
   const [selectedFinding, setSelectedFinding] = createSignal<Finding | null>(null)
   const [loading, setLoading] = createSignal(true)
+  const [scanning, setScanning] = createSignal(false)
   const [error, setError] = createSignal<string | null>(null)
+  const [msg, setMsg] = createSignal<string | null>(null)
 
   // Filter state
   const [severityFilter, setSeverityFilter] = createSignal(searchParams.severity || "")
@@ -124,6 +126,25 @@ const Findings: Component = () => {
     fetchFindings()
   }
 
+  const runVuln = async () => {
+    setScanning(true)
+    setError(null)
+    setMsg(null)
+
+    const res = await vulnApi.scan({ minSeverity: "high", failOnSeverity: "high", createFindings: true })
+    if (res.error) {
+      setError(res.error)
+      setScanning(false)
+      return
+    }
+
+    if (res.data) {
+      await fetchFindings()
+      setMsg(`Scan completed. ${res.data.findings.created} finding records created.`)
+    }
+    setScanning(false)
+  }
+
   const columns: Column<Finding>[] = [
     {
       key: "severity",
@@ -171,9 +192,14 @@ const Findings: Component = () => {
       <div class="flex items-center justify-between">
         <div>
           <h1 class="text-2xl font-bold text-gray-100">Findings</h1>
-          <p class="text-gray-400 mt-1">Security findings from scans and assessments</p>
+          <p class="text-gray-400 mt-1">
+            Security findings detected from scans and assessments. Filter by severity/status/target, open a finding for details, and mark status when triaged.
+          </p>
         </div>
         <div class="flex items-center gap-2">
+          <button class="btn btn-primary" onClick={runVuln} disabled={scanning()}>
+            {scanning() ? "Scanning..." : "Run Vuln Scan"}
+          </button>
           <span class="text-sm text-gray-400">{findings().length} findings</span>
         </div>
       </div>
@@ -250,6 +276,11 @@ const Findings: Component = () => {
           {error()}
         </div>
       </Show>
+      <Show when={msg()}>
+        <div class="rounded-lg border border-cyan-800 bg-cyan-950/50 p-4 text-cyan-200">
+          {msg()}
+        </div>
+      </Show>
 
       {/* Main content */}
       <div class="flex gap-6">
@@ -260,6 +291,14 @@ const Findings: Component = () => {
             data={findings()}
             loading={loading()}
             emptyMessage="No findings found"
+            emptyState={
+              <Empty
+                filtered={Boolean(severityFilter() || statusFilter() || targetFilter() || kind())}
+                scanning={scanning()}
+                onScan={runVuln}
+                onClear={clearFilters}
+              />
+            }
             onRowClick={(f) => setSelectedFinding(f)}
           />
         </div>
@@ -414,6 +453,35 @@ const Findings: Component = () => {
     </div>
   )
 }
+
+const Empty: Component<{
+  filtered: boolean
+  scanning: boolean
+  onScan: () => void
+  onClear: () => void
+}> = (props) => (
+  <div class="mx-auto flex max-w-xl flex-col items-center gap-3 px-4 py-8">
+    <div class="text-base font-semibold text-gray-100">
+      {props.filtered ? "No findings match these filters" : "No findings have been created yet"}
+    </div>
+    <div class="text-sm leading-6 text-gray-400">
+      Findings are stored after a vulnerability scan creates records. Run a scan from here, or clear filters if the data is hidden by the current view.
+    </div>
+    <div class="flex flex-wrap justify-center gap-2">
+      <button class="btn btn-primary text-sm" onClick={props.onScan} disabled={props.scanning}>
+        {props.scanning ? "Scanning..." : "Run Vuln Scan"}
+      </button>
+      <Show when={props.filtered}>
+        <button class="btn btn-secondary text-sm" onClick={props.onClear}>
+          Clear Filters
+        </button>
+      </Show>
+      <A href="/security" class="btn btn-secondary text-sm">
+        Open CyxWatch
+      </A>
+    </div>
+  </div>
+)
 
 function label(service?: string) {
   const labels: Record<string, string> = {

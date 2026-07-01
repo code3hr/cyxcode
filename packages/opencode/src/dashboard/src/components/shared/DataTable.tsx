@@ -12,6 +12,7 @@ interface DataTableProps<T> {
   data: T[]
   loading?: boolean
   emptyMessage?: string
+  emptyState?: JSX.Element
   onRowClick?: (item: T) => void
   keyField?: keyof T
 }
@@ -34,8 +35,7 @@ export function DataTable<T extends Record<string, any>>(props: DataTableProps<T
             <tr>
               <td colspan={props.columns.length} class="text-center py-8">
                 <div class="flex items-center justify-center gap-2">
-                  <div class="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-500"></div>
-                  <span class="text-gray-400">Loading...</span>
+                  <span class="animate-pulse text-sm text-gray-400">Loading...</span>
                 </div>
               </td>
             </tr>
@@ -43,8 +43,8 @@ export function DataTable<T extends Record<string, any>>(props: DataTableProps<T
 
           <Show when={!props.loading && props.data.length === 0}>
             <tr>
-              <td colspan={props.columns.length} class="text-center py-8 text-gray-400">
-                {props.emptyMessage || "No data available"}
+              <td colspan={props.columns.length} class="py-8 text-center text-gray-400">
+                {props.emptyState || props.emptyMessage || "No data available"}
               </td>
             </tr>
           </Show>

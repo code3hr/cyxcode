@@ -91,7 +91,9 @@ const Reports: Component = () => {
       <div class="flex items-center justify-between">
         <div>
           <h1 class="text-2xl font-bold text-gray-100">Reports</h1>
-          <p class="text-gray-400 mt-1">Generate security assessment reports</p>
+          <p class="text-gray-400 mt-1">
+            Configure report type and filters, generate a snapshot of current findings, then download the report file for sharing or audit trails.
+          </p>
         </div>
       </div>
 

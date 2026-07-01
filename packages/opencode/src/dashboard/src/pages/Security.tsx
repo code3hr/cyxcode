@@ -373,11 +373,11 @@ const Security: Component = () => {
           <p class="text-gray-400 mt-1">Runtime telemetry, policy decisions, and secret-leak signals</p>
         </div>
         <div class="flex flex-wrap items-center gap-2">
-          <div class="flex rounded border border-gray-700 overflow-hidden">
+          <div class="flex rounded bg-gray-900 overflow-hidden">
             <For each={periods}>
               {(item) => (
                 <button
-                  class={`px-3 py-2 text-sm border-r border-gray-700 last:border-r-0 ${
+                  class={`px-3 py-2 text-sm ${
                     period() === item.id ? "bg-cyan-500/15 text-cyan-300" : "bg-gray-900 text-gray-400 hover:text-gray-100"
                   }`}
                   onClick={() => setPeriod(item.id)}
@@ -394,10 +394,10 @@ const Security: Component = () => {
       </div>
 
       <Show when={error()}>
-        <div class="bg-red-950/60 border border-red-800 rounded p-3 text-sm text-red-200">{error()}</div>
+        <div class="bg-red-950/60 rounded p-3 text-sm text-red-200">{error()}</div>
       </Show>
       <Show when={msg()}>
-        <div class="bg-cyan-950/50 border border-cyan-800 rounded p-3 text-sm text-cyan-200">{msg()}</div>
+        <div class="bg-cyan-950/50 rounded p-3 text-sm text-cyan-200">{msg()}</div>
       </Show>
 
       <section class="card">
@@ -423,7 +423,7 @@ const Security: Component = () => {
         </div>
 
         <Show when={vulnScan()}>
-          <div class="mt-4 rounded border border-gray-700 bg-gray-900 p-3">
+          <div class="mt-4 rounded bg-gray-900 p-3">
             <div class="flex flex-wrap items-start justify-between gap-3">
               <div>
                 <div class="text-sm font-medium text-gray-100">{vulnScan()!.summary ?? "Vulnerability scan completed"}</div>
@@ -557,7 +557,7 @@ const Security: Component = () => {
               <Show when={alerts().length > 0} fallback={<div class="text-sm text-gray-500">No alerts in this window.</div>}>
                 <For each={alerts()}>
                   {(row) => (
-                    <div class="rounded border border-gray-700 bg-gray-900 p-3">
+                    <div class="rounded bg-gray-900 p-3">
                       <div class="flex items-start justify-between gap-3">
                         <div class="min-w-0">
                           <div class="text-sm font-medium text-gray-100 truncate">{row.title}</div>
@@ -597,7 +597,7 @@ const Security: Component = () => {
             <Show when={sent().length > 0} fallback={<div class="text-sm text-gray-500">No memory context sent in this window.</div>}>
               <For each={sent()}>
                 {(row) => (
-                  <div class="rounded border border-gray-700 bg-gray-900 p-3">
+                  <div class="rounded bg-gray-900 p-3">
                     <div class="flex flex-wrap items-start justify-between gap-3">
                       <div>
                         <div class="text-sm font-medium text-gray-100">{when(row.ts)}</div>
@@ -609,7 +609,7 @@ const Security: Component = () => {
                         <span class="badge bg-gray-700 text-gray-300">{row.path ?? "memory"}</span>
                       </div>
                     </div>
-                    <pre class="mt-3 max-h-72 overflow-y-auto rounded border border-gray-800 bg-black/20 p-3 text-xs leading-5 text-gray-300 whitespace-pre-wrap break-words">
+                    <pre class="mt-3 max-h-72 overflow-y-auto rounded bg-black/20 p-3 text-xs leading-5 text-gray-300 whitespace-pre-wrap break-words">
                       {(row.text ?? "").slice(0, 4000)}
                     </pre>
                   </div>
@@ -634,7 +634,7 @@ const Security: Component = () => {
               <Show when={policy()?.rules.length} fallback={<div class="text-sm text-gray-500">No project policy rules configured.</div>}>
                 <For each={policy()?.rules ?? []}>
                   {(rule, index) => (
-                    <div class={`rounded border p-3 ${editing() === index() ? "border-cyan-700 bg-cyan-950/20" : "border-gray-700 bg-gray-900"}`}>
+                    <div class={`rounded p-3 ${editing() === index() ? "bg-cyan-950/20" : "bg-gray-900"}`}>
                       <div class="flex items-center justify-between gap-3">
                         <div class="font-medium text-gray-100 truncate">{rule.id ?? rule.description ?? "rule"}</div>
                         <Decision value={rule.decision} />
@@ -779,13 +779,13 @@ const Metric: Component<{ label: string; value: string; tone?: string }> = (prop
 
 const Decision: Component<{ value: WatchEvent["decision"] }> = (props) => {
   const cls = () => {
-    if (props.value === "block") return "bg-red-950 text-red-300 border-red-800"
-    if (props.value === "require-approval") return "bg-yellow-950 text-yellow-300 border-yellow-800"
-    if (props.value === "warn") return "bg-orange-950 text-orange-300 border-orange-800"
-    return "bg-emerald-950 text-emerald-300 border-emerald-800"
+    if (props.value === "block") return "bg-red-950 text-red-300"
+    if (props.value === "require-approval") return "bg-yellow-950 text-yellow-300"
+    if (props.value === "warn") return "bg-orange-950 text-orange-300"
+    return "bg-emerald-950 text-emerald-300"
   }
 
-  return <span class={`inline-flex rounded border px-2 py-0.5 text-xs ${cls()}`}>{props.value}</span>
+  return <span class={`inline-flex rounded px-2 py-0.5 text-xs ${cls()}`}>{props.value}</span>
 }
 
 export default Security

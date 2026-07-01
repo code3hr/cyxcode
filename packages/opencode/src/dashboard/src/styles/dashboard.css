@@ -8,7 +8,16 @@
   }
 
   body {
-    @apply min-h-screen;
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    font-family: Inter, "Segoe UI", -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif;
+  }
+
+  #root {
+    min-height: 100vh;
+    margin: 0;
+    background: #0b1220;
   }
 
   ::-webkit-scrollbar {
@@ -29,44 +38,52 @@
 }
 
 @layer components {
+  .page-shell {
+    @apply relative flex h-full min-h-0 flex-col space-y-6;
+  }
+
   .card {
-    @apply bg-gray-800 rounded border border-gray-700 p-4;
+    @apply rounded-[16px] border border-white/5 bg-[#131d31] p-5 text-slate-100 shadow-[0_18px_40px_-28px_rgba(0,0,0,0.8)] backdrop-blur;
   }
 
   .card-header {
-    @apply text-lg font-semibold text-gray-100 mb-4;
+    @apply text-[22px] font-semibold leading-tight text-white;
+  }
+
+  .subhead {
+    @apply mt-1 text-sm text-slate-400;
   }
 
   .btn {
-    @apply px-4 py-2 rounded font-medium transition-colors duration-200;
+    @apply rounded px-4 py-2 text-sm font-medium transition-all duration-200;
   }
 
   .btn-primary {
-    @apply bg-blue-600 hover:bg-blue-700 text-white;
+    @apply bg-cyan-500 text-slate-950 hover:bg-cyan-400;
   }
 
   .btn-secondary {
-    @apply bg-gray-700 hover:bg-gray-600 text-gray-100;
+    @apply border border-white/10 bg-white/5 text-slate-200 hover:bg-white/10;
   }
 
   .btn-danger {
-    @apply bg-red-600 hover:bg-red-700 text-white;
+    @apply bg-rose-500/90 text-white hover:bg-rose-400;
   }
 
   .btn-success {
-    @apply bg-green-600 hover:bg-green-700 text-white;
+    @apply bg-emerald-500/90 text-white hover:bg-emerald-400;
   }
 
   .input {
-    @apply bg-gray-900 border border-gray-700 rounded px-3 py-2 text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent;
+    @apply rounded border border-white/10 bg-white/5 px-3 py-2 text-slate-100 placeholder:text-slate-500 focus:border-cyan-300 focus:outline-none focus:ring-0;
   }
 
   .select {
-    @apply bg-gray-900 border border-gray-700 rounded px-3 py-2 text-gray-100 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent;
+    @apply rounded border border-white/10 bg-white/5 px-3 py-2 text-slate-100 focus:border-cyan-300 focus:outline-none focus:ring-0;
   }
 
   .badge {
-    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+    @apply inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium;
   }
 
   .badge-critical {
@@ -86,7 +103,7 @@
   }
 
   .badge-info {
-    @apply bg-gray-700 text-gray-300;
+    @apply bg-sky-500/15 text-sky-200;
   }
 
   .table {
@@ -94,35 +111,39 @@
   }
 
   .table th {
-    @apply px-4 py-3 text-xs font-medium text-gray-400 uppercase tracking-wider border-b border-gray-700;
+    @apply px-4 py-3 text-xs font-medium uppercase tracking-wider text-slate-400;
   }
 
   .table td {
-    @apply px-4 py-3 text-sm text-gray-300 border-b border-gray-700;
+    @apply px-4 py-3 text-sm text-slate-300;
   }
 
   .table tr:hover td {
-    @apply bg-gray-750;
+    @apply bg-white/[0.04];
   }
 
   .nav-link {
-    @apply flex items-center gap-3 px-2.5 py-2 text-sm text-gray-400 hover:text-gray-100 hover:bg-gray-900 rounded transition-colors;
+    @apply flex items-center gap-3 rounded px-2.5 py-2 text-sm text-slate-300 transition-colors hover:bg-white/[0.08] hover:text-white;
   }
 
   .nav-link-active {
-    @apply text-cyan-300 bg-gray-900;
+    @apply bg-cyan-400/15 text-cyan-200;
   }
 
   .stat-card {
-    @apply bg-gray-800 rounded p-4 border border-gray-700;
+    @apply rounded-[16px] border border-white/5 bg-[#131d31] p-5 shadow-[0_18px_40px_-30px_rgba(0,0,0,0.7)] backdrop-blur;
   }
 
   .stat-value {
-    @apply text-2xl font-bold text-gray-100;
+    @apply text-3xl font-semibold text-white;
   }
 
   .stat-label {
-    @apply text-sm text-gray-400;
+    @apply text-sm text-slate-400;
+  }
+
+  .stat-trend {
+    @apply mt-3 inline-flex items-center text-xs font-medium;
   }
 }
 

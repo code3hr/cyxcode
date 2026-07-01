@@ -45,7 +45,9 @@ const Tokens: Component = () => {
       <div class="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
         <div>
           <h1 class="text-2xl font-bold text-gray-100">Token Efficiency</h1>
-          <p class="text-gray-400 mt-1">Pattern matches, misses, correction drift, and memory load savings</p>
+          <p class="text-gray-400 mt-1">
+            Track token savings versus usage, pattern matching health, correction drift, and recent audit events for tuning AI efficiency over time.
+          </p>
         </div>
         <div class="flex flex-wrap items-center gap-2">
           <div class="flex rounded border border-gray-700 overflow-hidden">

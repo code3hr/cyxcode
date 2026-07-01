@@ -1,5 +1,5 @@
 import { Component, createSignal, createEffect, Show, For, onCleanup } from "solid-js"
-import { useParams } from "@solidjs/router"
+import { A, useParams } from "@solidjs/router"
 import { monitorsApi, type Monitor, type MonitorRun } from "../api/client"
 import { StatusBadge } from "../components/shared/StatusBadge"
 import { DataTable, type Column } from "../components/shared/DataTable"
@@ -13,8 +13,19 @@ const Monitors: Component = () => {
   const [selectedMonitor, setSelectedMonitor] = createSignal<Monitor | null>(null)
   const [runningMonitors, setRunningMonitors] = createSignal<string[]>([])
   const [loading, setLoading] = createSignal(true)
+  const [open, setOpen] = createSignal(false)
+  const [creating, setCreating] = createSignal(false)
   const [triggering, setTriggering] = createSignal<string | null>(null)
   const [error, setError] = createSignal<string | null>(null)
+  const [msg, setMsg] = createSignal<string | null>(null)
+  const [name, setName] = createSignal("")
+  const [desc, setDesc] = createSignal("")
+  const [raw, setRaw] = createSignal("")
+  const [tool, setTool] = createSignal("nmap")
+  const [args, setArgs] = createSignal("")
+  const [hours, setHours] = createSignal("24")
+  const [sev, setSev] = createSignal("low")
+  const [state, setState] = createSignal<Exclude<Monitor["status"], "error">>("paused")
 
   const fetchMonitors = async () => {
     setLoading(true)
@@ -55,6 +66,108 @@ const Monitors: Component = () => {
       setError(result.error)
     } else {
       setRunningMonitors((prev) => [...prev, monitorId])
+    }
+  }
+
+  const create = async () => {
+    const targets = raw()
+      .split(/[\n,]/)
+      .map((item) => item.trim())
+      .filter(Boolean)
+    const hrs = Number(hours())
+
+    if (!name().trim()) {
+      setError("Monitor name is required")
+      return
+    }
+    if (targets.length === 0) {
+      setError("At least one target is required")
+      return
+    }
+    if (!Number.isFinite(hrs) || hrs <= 0) {
+      setError("Interval must be greater than zero")
+      return
+    }
+
+    setCreating(true)
+    setError(null)
+    setMsg(null)
+
+    const result = await monitorsApi.create({
+      name: name().trim(),
+      description: desc().trim() || undefined,
+      targets,
+      tools: [
+        {
+          tool: tool(),
+          args: args().trim() || undefined,
+          createFindings: true,
+        },
+      ],
+      schedule: {
+        type: "interval",
+        intervalMs: Math.round(hrs * 60 * 60 * 1000),
+        maxRuns: 0,
+      },
+      alerts: {
+        enabled: true,
+        minSeverity: sev(),
+        newFindingsOnly: true,
+        channels: ["bus"],
+      },
+      status: state(),
+    })
+
+    setCreating(false)
+    if (result.error) {
+      setError(result.error)
+      return
+    }
+    if (result.data) {
+      setMonitors((prev) => [result.data!.monitor, ...prev.filter((item) => item.id !== result.data!.monitor.id)])
+      setSelectedMonitor(result.data.monitor)
+      setName("")
+      setDesc("")
+      setRaw("")
+      setTool("nmap")
+      setArgs("")
+      setHours("24")
+      setSev("low")
+      setState("paused")
+      setOpen(false)
+      setMsg(`Monitor created: ${result.data.monitor.name}`)
+    }
+  }
+
+  const updateStatus = async (item: Monitor, status: Exclude<Monitor["status"], "error">) => {
+    setError(null)
+    setMsg(null)
+    const result = await monitorsApi.update(item.id, { status })
+    if (result.error) {
+      setError(result.error)
+      return
+    }
+    if (result.data) {
+      setMonitors((prev) => prev.map((mon) => (mon.id === item.id ? result.data!.monitor : mon)))
+      setSelectedMonitor(result.data.monitor)
+      setMsg(`${result.data.monitor.name} is ${result.data.monitor.status}`)
+    }
+  }
+
+  const remove = async (item: Monitor) => {
+    if (!confirm(`Delete monitor "${item.name}"?`)) return
+    setError(null)
+    setMsg(null)
+    const result = await monitorsApi.delete(item.id)
+    if (result.error) {
+      setError(result.error)
+      return
+    }
+    if (result.data?.success) {
+      setMonitors((prev) => prev.filter((mon) => mon.id !== item.id))
+      setSelectedMonitor(null)
+      setRuns([])
+      setMsg(`Monitor deleted: ${item.name}`)
     }
   }
 
@@ -106,11 +219,11 @@ const Monitors: Component = () => {
 
   const formatSchedule = (monitor: Monitor) => {
     if (monitor.schedule.type === "interval") {
-      const hours = Math.floor((monitor.schedule.interval || 0) / (60 * 60 * 1000))
+      const hours = Math.floor((monitor.schedule.intervalMs ?? monitor.schedule.interval ?? 0) / (60 * 60 * 1000))
       if (hours >= 24) return `Every ${Math.floor(hours / 24)} day(s)`
       return `Every ${hours} hour(s)`
     }
-    return monitor.schedule.cron || "Custom"
+    return monitor.schedule.expression ?? monitor.schedule.cron ?? "Custom"
   }
 
   const formatRelativeTime = (timestamp: number) => {
@@ -244,7 +357,9 @@ const Monitors: Component = () => {
       <div class="flex items-center justify-between">
         <div>
           <h1 class="text-2xl font-bold text-gray-100">Monitors</h1>
-          <p class="text-gray-400 mt-1">Scheduled security scans and assessments</p>
+          <p class="text-gray-400 mt-1">
+            Build recurring checks for targets, tune schedule and tools, then run, pause, or disable each monitor and review run history and findings.
+          </p>
         </div>
         <div class="flex items-center gap-4">
           <Show when={runningMonitors().length > 0}>
@@ -252,13 +367,96 @@ const Monitors: Component = () => {
               {runningMonitors().length} running
             </span>
           </Show>
+          <button class="btn btn-primary" onClick={() => setOpen((value) => !value)}>
+            {open() ? "Close" : "New Monitor"}
+          </button>
           <span class="text-sm text-gray-400">{monitors().length} monitors</span>
         </div>
       </div>
 
+      <Show when={open()}>
+        <div class="card">
+          <div class="mb-4 flex items-start justify-between gap-4">
+            <div>
+              <div class="card-header mb-1">Create Monitor</div>
+              <div class="text-sm text-gray-400">
+                Paused monitors are saved without running. Active monitors start immediately, then repeat on the interval.
+              </div>
+            </div>
+            <button class="btn btn-secondary text-sm" onClick={() => setOpen(false)}>
+              Cancel
+            </button>
+          </div>
+          <div class="grid grid-cols-1 gap-3 lg:grid-cols-12">
+            <label class="space-y-1 lg:col-span-4">
+              <div class="text-xs text-gray-500">Name</div>
+              <input class="input w-full" value={name()} onInput={(e) => setName(e.currentTarget.value)} />
+            </label>
+            <label class="space-y-1 lg:col-span-4">
+              <div class="text-xs text-gray-500">Tool</div>
+              <select class="select w-full" value={tool()} onChange={(e) => setTool(e.currentTarget.value)}>
+                <option value="nmap">nmap</option>
+                <option value="nuclei">nuclei</option>
+                <option value="nikto">nikto</option>
+              </select>
+            </label>
+            <label class="space-y-1 lg:col-span-4">
+              <div class="text-xs text-gray-500">Every Hours</div>
+              <input class="input w-full" value={hours()} onInput={(e) => setHours(e.currentTarget.value)} inputmode="decimal" />
+            </label>
+            <label class="space-y-1 lg:col-span-6">
+              <div class="text-xs text-gray-500">Targets</div>
+              <textarea
+                class="input min-h-28 w-full"
+                value={raw()}
+                onInput={(e) => setRaw(e.currentTarget.value)}
+                placeholder="127.0.0.1&#10;https://example.com"
+              />
+            </label>
+            <div class="grid grid-cols-1 gap-3 lg:col-span-6">
+              <label class="space-y-1">
+                <div class="text-xs text-gray-500">Description</div>
+                <input class="input w-full" value={desc()} onInput={(e) => setDesc(e.currentTarget.value)} />
+              </label>
+              <label class="space-y-1">
+                <div class="text-xs text-gray-500">Tool Args</div>
+                <input class="input w-full" value={args()} onInput={(e) => setArgs(e.currentTarget.value)} placeholder="-sV --top-ports 100" />
+              </label>
+              <label class="space-y-1">
+                <div class="text-xs text-gray-500">Alert Severity</div>
+                <select class="select w-full" value={sev()} onChange={(e) => setSev(e.currentTarget.value)}>
+                  <option value="info">Info</option>
+                  <option value="low">Low</option>
+                  <option value="medium">Medium</option>
+                  <option value="high">High</option>
+                  <option value="critical">Critical</option>
+                </select>
+              </label>
+              <label class="space-y-1">
+                <div class="text-xs text-gray-500">Initial Status</div>
+                <select class="select w-full" value={state()} onChange={(e) => setState(e.currentTarget.value as Exclude<Monitor["status"], "error">)}>
+                  <option value="paused">Paused</option>
+                  <option value="active">Active</option>
+                </select>
+              </label>
+            </div>
+          </div>
+          <div class="mt-4 flex justify-end">
+            <button class="btn btn-primary" onClick={create} disabled={creating()}>
+              {creating() ? "Creating..." : "Create Monitor"}
+            </button>
+          </div>
+        </div>
+      </Show>
+
       <Show when={error()}>
         <div class="bg-red-900/50 border border-red-700 rounded-lg p-4 text-red-200">
           {error()}
+        </div>
+      </Show>
+      <Show when={msg()}>
+        <div class="rounded-lg border border-cyan-800 bg-cyan-950/50 p-4 text-cyan-200">
+          {msg()}
         </div>
       </Show>
 
@@ -271,6 +469,7 @@ const Monitors: Component = () => {
             data={monitors()}
             loading={loading()}
             emptyMessage="No monitors configured"
+            emptyState={<Empty onNew={() => setOpen(true)} />}
             onRowClick={(m) => {
               setSelectedMonitor(m)
               fetchRuns(m.id)
@@ -334,9 +533,11 @@ const Monitors: Component = () => {
               <div>
                 <div class="text-sm text-gray-400">Tools</div>
                 <div class="flex flex-wrap gap-1 mt-1">
-                  <For each={selectedMonitor()!.tools.filter((t) => t.enabled)}>
+                  <For each={selectedMonitor()!.tools.filter((t) => t.enabled !== false)}>
                     {(tool) => (
-                      <span class="badge bg-blue-900 text-blue-200">{tool.tool}</span>
+                      <span class="badge bg-blue-900 text-blue-200">
+                        {tool.args ? `${tool.tool} ${tool.args}` : tool.tool}
+                      </span>
                     )}
                   </For>
                 </div>
@@ -399,7 +600,7 @@ const Monitors: Component = () => {
               </div>
 
               {/* Actions */}
-              <div class="pt-4 border-t border-gray-700">
+              <div class="space-y-2 pt-4 border-t border-gray-700">
                 <button
                   onClick={() => triggerRun(selectedMonitor()!.id)}
                   disabled={
@@ -413,6 +614,24 @@ const Monitors: Component = () => {
                     ? "Running..."
                     : "Run Now"}
                 </button>
+                <div class="grid grid-cols-2 gap-2">
+                  <Show when={selectedMonitor()!.status !== "active"}>
+                    <button class="btn btn-secondary text-sm" onClick={() => updateStatus(selectedMonitor()!, "active")}>
+                      Resume
+                    </button>
+                  </Show>
+                  <Show when={selectedMonitor()!.status === "active"}>
+                    <button class="btn btn-secondary text-sm" onClick={() => updateStatus(selectedMonitor()!, "paused")}>
+                      Pause
+                    </button>
+                  </Show>
+                  <button class="btn btn-secondary text-sm" onClick={() => updateStatus(selectedMonitor()!, "disabled")}>
+                    Disable
+                  </button>
+                  <button class="btn btn-danger text-sm" onClick={() => remove(selectedMonitor()!)}>
+                    Delete
+                  </button>
+                </div>
               </div>
 
               <div class="text-xs text-gray-500 pt-2">
@@ -425,5 +644,25 @@ const Monitors: Component = () => {
     </div>
   )
 }
+
+const Empty: Component<{ onNew: () => void }> = (props) => (
+  <div class="mx-auto flex max-w-xl flex-col items-center gap-3 px-4 py-8">
+    <div class="text-base font-semibold text-gray-100">No monitors are configured</div>
+    <div class="text-sm leading-6 text-gray-400">
+      Create a scheduled monitor to scan approved targets repeatedly and track new or resolved findings across runs.
+    </div>
+    <div class="flex flex-wrap justify-center gap-2">
+      <button class="btn btn-primary text-sm" onClick={props.onNew}>
+        New Monitor
+      </button>
+      <A href="/security" class="btn btn-secondary text-sm">
+        Open CyxWatch
+      </A>
+      <A href="/scans" class="btn btn-secondary text-sm">
+        View Scans
+      </A>
+    </div>
+  </div>
+)
 
 export default Monitors

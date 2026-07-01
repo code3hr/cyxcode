@@ -263,13 +263,19 @@ export interface Monitor {
   targets: string[]
   tools: Array<{
     tool: string
-    enabled: boolean
+    enabled?: boolean
     config?: Record<string, unknown>
+    args?: string
+    timeout?: number
+    createFindings?: boolean
   }>
   schedule: {
     type: "interval" | "cron"
     interval?: number
     cron?: string
+    intervalMs?: number
+    expression?: string
+    timezone?: string
   }
   status: "active" | "paused" | "disabled" | "error"
   alerts: {
@@ -302,6 +308,32 @@ export interface MonitorRun {
   runNumber: number
 }
 
+export interface MonitorWrite {
+  name: string
+  description?: string
+  targets: string[]
+  tools: Array<{
+    tool: string
+    args?: string
+    timeout?: number
+    createFindings?: boolean
+  }>
+  schedule:
+    | {
+        type: "interval"
+        intervalMs: number
+        maxRuns?: number
+      }
+    | {
+        type: "cron"
+        expression: string
+        timezone?: string
+      }
+  alerts?: Monitor["alerts"]
+  status?: Exclude<Monitor["status"], "error">
+  tags?: string[]
+}
+
 export const monitorsApi = {
   list: (filters?: { sessionID?: string; status?: string }) => {
     const params = new URLSearchParams()
@@ -314,7 +346,24 @@ export const monitorsApi = {
     return request<{ monitors: Monitor[]; total: number }>(`/pentest/monitors${query}`)
   },
 
+  create: (data: MonitorWrite) =>
+    request<{ monitor: Monitor }>(`/pentest/monitors`, {
+      method: "POST",
+      body: JSON.stringify(data),
+    }),
+
   get: (id: string) => request<{ monitor: Monitor }>(`/pentest/monitors/${id}`),
+
+  update: (id: string, data: { status: Exclude<Monitor["status"], "error"> }) =>
+    request<{ monitor: Monitor }>(`/pentest/monitors/${id}`, {
+      method: "PATCH",
+      body: JSON.stringify(data),
+    }),
+
+  delete: (id: string) =>
+    request<{ success: boolean }>(`/pentest/monitors/${id}`, {
+      method: "DELETE",
+    }),
 
   triggerRun: (id: string) =>
     request<{ success: boolean; runId: string }>(`/pentest/monitors/${id}/run`, {

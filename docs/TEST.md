@@ -428,3 +428,17 @@ bun --version  # Should be 1.0+
 - [Bun Test Documentation](https://bun.sh/docs/cli/test)
 - [Bun Test API](https://bun.sh/docs/api/test)
 - [Jest-compatible Matchers](https://bun.sh/docs/test/matchers)
+
+## Latest Truth Test (2026-06-28)
+
+- Scope: production-style validation of the current Windows dist + web API/runtime on a clean temp project outside the repo.
+- Result: PASS for packaged init flow, command/skill discovery, watch telemetry, and shell pattern diagnosis.
+- Runtime checks run:
+  - `cyxcode init`, `debug skill`, `watch policy`, `watch policy --effective`, `watch recent` from the built Windows executable.
+  - `/path`, `/skill`, `/command`, `/agent`, `/cyxwatch/policy/effective` API endpoints via `cyxcode serve`.
+  - `PUT /cyxwatch/policy` (v2 rules schema) and `POST /session/:id/shell` to exercise pattern matching.
+- Confirmed that packaged assets are copied from `bin/default-skills` and `bin/commands` when using dist install/runtime behavior.
+- Confirmed `/command` includes expected project commands and internal commands; internal command surface includes `memory`, `knowledge`, and `ai-deps` in current run.
+- Confirmed shell error recovery path still appends `[CyxCode] Pattern matched: node-module-not-found (recovery)` and logs `shell.command` events after `/session/.../shell`.
+- Known gap: no user-facing runtime opt-out phrase for pattern matching; `CYXCODE_SHORT_CIRCUIT` only disables the short-circuit branch in prompt loop flow, not shell matcher execution itself.
+- Learn patterns / memory behavior were validated indirectly through discovered command surface and command execution path, but not yet through end-to-end learn-memory mutation scenarios.

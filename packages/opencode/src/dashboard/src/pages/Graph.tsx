@@ -25,6 +25,10 @@ type View = {
   act: string
 }
 
+type Scope = "local" | "global"
+type Labels = "all" | "focus" | "none"
+type Density = "tight" | "balanced" | "wide"
+
 const max = 180
 const scan = max * 3
 const kinds: GraphNode["kind"][] = ["wiki", "code", "symbol", "memory", "learned", "concept", "cyxwatch"]
@@ -44,6 +48,16 @@ const colors: Record<GraphNode["kind"], { fill: string; stroke: string; glow: st
   cyxwatch: { fill: "#991b1b", stroke: "#f87171", glow: "rgba(153,27,27,0.16)" },
 }
 
+const types = [
+  { id: "wiki", label: "Wiki" },
+  { id: "code", label: "Code" },
+  { id: "symbol", label: "Symbols" },
+  { id: "memory", label: "Memory" },
+  { id: "learned", label: "Learned" },
+  { id: "concept", label: "Concepts" },
+  { id: "cyxwatch", label: "Watch" },
+] satisfies Array<{ id: GraphNode["kind"]; label: string }>
+
 function has(node: GraphNode, q: string) {
   if (!q) return false
   const meta = node.meta ? JSON.stringify(node.meta) : ""
@@ -57,7 +71,7 @@ function has(node: GraphNode, q: string) {
   )
 }
 
-function layout(data: GraphData, sel: string, q: string, allow: Set<GraphNode["kind"]>, hop: number): View {
+function layout(data: GraphData, sel: string, q: string, allow: Set<GraphNode["kind"]>, hop: number, scope: Scope): View {
   const nodes = data.nodes.filter((node) => allow.has(node.kind))
   const map = new Map(nodes.map((node) => [node.id, node]))
   const low = q.toLowerCase()
@@ -99,14 +113,11 @@ function layout(data: GraphData, sel: string, q: string, allow: Set<GraphNode["k
     }
   }
 
-  const view = new Set<string>()
-  for (const id of dist.keys()) view.add(id)
-  for (const id of hit) {
-    if (map.has(id)) view.add(id)
-  }
+  const shown = scope === "global"
+    ? nodes.map((node) => node.id)
+    : Array.from(new Set([...dist.keys(), ...hit].filter((id) => map.has(id))))
 
-  const raw = Array.from(view)
-    .filter((id) => map.has(id))
+  const raw = shown
     .map((id) => {
       const node = map.get(id)!
       const step = dist.get(id) ?? hop + 1
@@ -126,6 +137,7 @@ function layout(data: GraphData, sel: string, q: string, allow: Set<GraphNode["k
     .sort((a, b) => {
       if (a.id === act) return -1
       if (b.id === act) return 1
+      if (scope === "global") return Number(b.hit) - Number(a.hit) || b.deg - a.deg || a.title.localeCompare(b.title)
       return a.hop - b.hop || Number(b.hit) - Number(a.hit) || b.deg - a.deg || a.title.localeCompare(b.title)
     })
     .slice(0, max)
@@ -152,6 +164,11 @@ const Graph: Component = () => {
   const [hop, setHop] = createSignal(2)
   const [fit, setFit] = createSignal(0)
   const [full, setFull] = createSignal(false)
+  const [scope, setScope] = createSignal<Scope>("local")
+  const [labels, setLabels] = createSignal<Labels>("all")
+  const [density, setDensity] = createSignal<Density>("balanced")
+  const [arrows, setArrows] = createSignal(true)
+  const [panel, setPanel] = createSignal(true)
 
   onCleanup(() => {
     token++
@@ -224,10 +241,24 @@ const Graph: Component = () => {
     if (!sel() || !ids.includes(sel())) setSel(ids[0]!)
   })
 
-  const view = createMemo(() => layout(data(), sel(), term().trim(), allow(), hop()))
+  const view = createMemo(() => layout(data(), sel(), term().trim(), allow(), hop(), scope()))
   const cur = createMemo(() => data().nodes.find((node) => node.id === view().act) ?? null)
   const outs = createMemo(() => data().edges.filter((edge) => edge.from === cur()?.id))
   const ins = createMemo(() => data().edges.filter((edge) => edge.to === cur()?.id))
+  const deg = createMemo(() => ins().length + outs().length)
+  const mix = createMemo(() =>
+    kinds
+      .map((kind) => ({ kind, total: view().nodes.filter((node) => node.kind === kind).length }))
+      .filter((item) => item.total > 0)
+  )
+  const links = createMemo(() => {
+    const out = new Map<string, number>()
+    for (const edge of view().edges) out.set(edge.type, (out.get(edge.type) ?? 0) + 1)
+    return Array.from(out.entries())
+      .map(([type, total]) => ({ type, total }))
+      .sort((a, b) => b.total - a.total || a.type.localeCompare(b.type))
+      .slice(0, 6)
+  })
 
   createEffect(() => {
     const id = sel()
@@ -262,149 +293,231 @@ const Graph: Component = () => {
 
   const href = (node: GraphNode | null) => {
     if (!node) return ""
-    if (node.kind === "wiki") return `/dashboard/wiki?id=${encodeURIComponent(node.id)}`
-    if (node.kind === "memory") return `/dashboard/memory?id=${encodeURIComponent(node.id)}`
-    if (node.kind === "code") return `/dashboard/codegraph?id=${encodeURIComponent(node.id)}`
-    if (node.kind === "cyxwatch") return "/dashboard/security"
-    if (node.kind === "symbol") {
-      const fileId = typeof node.meta?.fileId === "string" ? node.meta.fileId : ""
-      return fileId ? `/dashboard/codegraph?id=${encodeURIComponent(fileId)}` : ""
-    }
+    if (node.kind === "wiki") return `/wiki?id=${encodeURIComponent(node.id)}`
+    if (node.kind === "memory") return `/memory?id=${encodeURIComponent(node.id)}`
+    if (node.kind === "cyxwatch") return "/security"
     return ""
   }
 
+  const openLabel = (node: GraphNode) => {
+    if (node.kind === "wiki") return "Open wiki"
+    if (node.kind === "memory") return "Open memory"
+    if (node.kind === "cyxwatch") return "Open CyxWatch"
+    return "Open"
+  }
+
   return (
-    <div class="space-y-6">
-      <div class="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
-        <div>
+    <div class="flex h-full min-h-0 flex-col overflow-hidden bg-gray-900">
+      <div class="shrink-0 flex flex-col gap-3 px-4 py-3 lg:flex-row lg:items-end lg:justify-between">
+        <div class="min-w-0">
           <h1 class="text-2xl font-bold text-gray-100">Knowledge Graph</h1>
-          <p class="text-gray-400 mt-1">Wiki, code, memory, learned patterns, security signals, and semantic links</p>
+          <p class="mt-1 max-w-3xl text-sm text-gray-400">Wiki, code, memory, learned patterns, security signals, and semantic links</p>
         </div>
 
-        <div class="flex flex-wrap gap-3">
-          <div class="stat-card">
-            <div class="text-xs uppercase tracking-wide text-gray-500">Wiki</div>
-            <div class="text-lg font-semibold text-gray-100">{data().stats.wiki}</div>
-          </div>
-          <div class="stat-card">
-            <div class="text-xs uppercase tracking-wide text-gray-500">Code</div>
-            <div class="text-lg font-semibold text-gray-100">{data().stats.code}</div>
-          </div>
-          <div class="stat-card">
-            <div class="text-xs uppercase tracking-wide text-gray-500">Memory</div>
-            <div class="text-lg font-semibold text-gray-100">{data().stats.memory}</div>
-          </div>
-          <div class="stat-card">
-            <div class="text-xs uppercase tracking-wide text-gray-500">Facts</div>
-            <div class="text-lg font-semibold text-gray-100">{data().stats.facts}</div>
-          </div>
-          <div class="stat-card">
-            <div class="text-xs uppercase tracking-wide text-gray-500">Watch</div>
-            <div class="text-lg font-semibold text-gray-100">{data().stats.cyxwatch}</div>
-          </div>
-          <button onClick={() => void fetchGraph(true)} class="btn btn-primary" disabled={load()}>
+        <div class="flex flex-wrap items-center gap-2 rounded bg-gray-950/50 p-2">
+          <Top label="Wiki" value={data().stats.wiki} kind="wiki" />
+          <Top label="Code" value={data().stats.code} kind="code" />
+          <Top label="Memory" value={data().stats.memory} kind="memory" />
+          <Top label="Facts" value={data().stats.facts} kind="concept" />
+          <Top label="Watch" value={data().stats.cyxwatch} kind="cyxwatch" />
+          <button onClick={() => void fetchGraph(true)} class="btn btn-primary px-3 py-2 text-sm" disabled={load()}>
             Refresh
           </button>
         </div>
       </div>
 
       <Show when={err()}>
-        <div class="bg-red-900/50 border border-red-700 rounded p-4 text-red-200">{err()}</div>
+        <div class="rounded bg-red-900/50 p-4 text-red-200">{err()}</div>
       </Show>
 
-      <div class="grid grid-cols-1 xl:grid-cols-12 gap-6">
-        <div class="xl:col-span-3 card">
-          <div class="card-header">Filters</div>
-          <div class="space-y-4">
-            <input class="input w-full" type="text" placeholder="Search graph..." value={term()} onInput={(e) => setTerm(e.currentTarget.value)} />
-            <div class="flex flex-wrap gap-2">
-              <For each={kinds}>
-                {(kind) => (
-                  <button
-                    class={`badge cursor-pointer ${
-                      allow().has(kind) ? "bg-blue-900/40 text-blue-300" : "bg-gray-700 text-gray-400"
-                    }`}
-                    onClick={() => toggle(kind)}
-                  >
-                    {kind}
-                  </button>
-                )}
-              </For>
+      <div class="grid min-h-0 flex-1 grid-cols-1 xl:grid-cols-[18rem_minmax(0,1fr)]">
+        <div class="flex min-h-0 flex-col bg-gray-900 p-3">
+          <div class="mb-4 flex items-center justify-between gap-3">
+            <div>
+              <div class="text-sm font-semibold text-gray-100">Navigator</div>
+              <div class="text-xs text-gray-500">{visible().length.toLocaleString()} searchable nodes</div>
+            </div>
+            <button onClick={() => setFit((n) => n + 1)} class="rounded bg-gray-950 px-2.5 py-1.5 text-xs text-gray-300 hover:bg-gray-800" disabled={view().nodes.length === 0}>
+              Fit
+            </button>
+          </div>
+          <div class="flex min-h-0 flex-1 flex-col gap-3">
+            <input class="w-full rounded bg-gray-950 px-3 py-2 text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-cyan-500" type="text" placeholder="Search graph..." value={term()} onInput={(e) => setTerm(e.currentTarget.value)} />
+
+            <div class="grid shrink-0 grid-cols-3 overflow-hidden rounded bg-gray-950/60">
+              <Mini label="Visible" value={visible().length} />
+              <Mini label="Canvas" value={view().nodes.length} />
+              <Mini label="Links" value={view().edges.length} />
             </div>
 
-            <div class="space-y-2">
-              <div class="text-xs uppercase tracking-wide text-gray-500">Hop depth</div>
-              <div class="flex flex-wrap gap-2">
-                <For each={[1, 2, 3, 4]}>
-                  {(n) => (
-                    <button
-                      class={`badge cursor-pointer ${hop() === n ? "bg-blue-900/40 text-blue-300" : "bg-gray-700 text-gray-400"}`}
-                      onClick={() => setHop(n)}
-                    >
-                      {n} hop{n > 1 ? "s" : ""}
-                    </button>
-                  )}
-                </For>
+            <div class="shrink-0 pt-1">
+              <div class="mb-2 flex items-center justify-between text-[11px] uppercase tracking-wide text-gray-500">
+                <span>Results</span>
+                <span>{Math.min(visible().length, 60)} shown</span>
               </div>
             </div>
 
-            <div class="grid grid-cols-2 gap-3">
-              <div class="stat-card">
-                <div class="stat-label">Visible</div>
-                <div class="stat-value">{visible().length}</div>
-              </div>
-              <div class="stat-card">
-                <div class="stat-label">Edges</div>
-                <div class="stat-value">{view().edges.length}</div>
-              </div>
-            </div>
-
-            <div class="space-y-2 max-h-[60vh] overflow-y-auto pr-1">
+            <div class="min-h-0 flex-1 space-y-1.5 overflow-y-auto pr-1">
               <For each={visible().slice(0, 60)}>
                 {(node) => (
                   <button
                     onClick={() => pick(node.id)}
-                    class={`w-full text-left rounded border p-3 transition-colors ${
-                      view().act === node.id ? "bg-blue-900/30 border-blue-700" : "bg-gray-800 border-gray-700 hover:border-gray-600"
+                    class={`w-full rounded px-3 py-2 text-left transition-colors ${
+                      view().act === node.id ? "bg-cyan-950/50" : "bg-gray-950/40 hover:bg-gray-950/70"
                     }`}
                   >
-                    <div class="flex items-start justify-between gap-3">
+                    <div class="flex items-center justify-between gap-3">
                       <div class="min-w-0">
-                        <div class="font-medium text-gray-100 truncate">{node.title}</div>
+                        <div class="truncate text-sm font-medium text-gray-100">{node.title}</div>
                         <div class="text-xs text-gray-500 truncate">{node.path || node.id}</div>
                       </div>
                       <span class={`badge ${kindClass(node.kind)}`}>{node.kind}</span>
                     </div>
-                    <div class="mt-2 text-sm text-gray-400 max-h-12 overflow-hidden">{node.summary || "No summary"}</div>
                   </button>
                 )}
               </For>
             </div>
+
+            <div class="shrink-0 pt-2">
+              <div class="mb-2 text-[11px] uppercase tracking-wide text-gray-500">Graph options</div>
+              <div class="space-y-2">
+                <div class="flex flex-wrap gap-1.5">
+                  <For each={types}>
+                    {(item) => (
+                      <button
+                        class={`badge cursor-pointer ${
+                          allow().has(item.id) ? kindClass(item.id) : "bg-gray-950 text-gray-500"
+                        }`}
+                        onClick={() => toggle(item.id)}
+                      >
+                        {item.label}
+                      </button>
+                    )}
+                  </For>
+                </div>
+
+                <div class="grid grid-cols-2 gap-1.5">
+                  <For each={["local", "global"] as Scope[]}>
+                    {(item) => (
+                      <button
+                        class={`rounded px-2 py-1.5 text-xs ${
+                          scope() === item ? "bg-cyan-950/60 text-cyan-200" : "bg-gray-950 text-gray-400"
+                        }`}
+                        onClick={() => setScope(item)}
+                      >
+                        {item === "local" ? "Local" : "Global"}
+                      </button>
+                    )}
+                  </For>
+                </div>
+
+                <div class="grid grid-cols-3 gap-1.5">
+                  <For each={["all", "focus", "none"] as Labels[]}>
+                    {(item) => (
+                      <button
+                        class={`rounded px-2 py-1.5 text-xs ${
+                          labels() === item ? "bg-cyan-950/60 text-cyan-200" : "bg-gray-950 text-gray-400"
+                        }`}
+                        onClick={() => setLabels(item)}
+                      >
+                        {item === "all" ? "Labels" : item === "focus" ? "Focus" : "None"}
+                      </button>
+                    )}
+                  </For>
+                </div>
+
+                <div class="grid grid-cols-3 gap-1.5">
+                  <For each={["tight", "balanced", "wide"] as Density[]}>
+                    {(item) => (
+                      <button
+                        class={`rounded px-2 py-1.5 text-xs ${
+                          density() === item ? "bg-cyan-950/60 text-cyan-200" : "bg-gray-950 text-gray-400"
+                        }`}
+                        onClick={() => setDensity(item)}
+                      >
+                        {item === "tight" ? "Tight" : item === "balanced" ? "Mid" : "Wide"}
+                      </button>
+                    )}
+                  </For>
+                </div>
+
+                <div class="grid grid-cols-5 gap-1.5">
+                  <For each={[1, 2, 3, 4]}>
+                    {(n) => (
+                      <button
+                        class={`rounded px-2 py-1.5 text-xs ${hop() === n ? "bg-cyan-950/60 text-cyan-200" : "bg-gray-950 text-gray-400"}`}
+                        onClick={() => setHop(n)}
+                      >
+                        {n}
+                      </button>
+                    )}
+                  </For>
+                  <button
+                    class={`rounded px-2 py-1.5 text-xs ${
+                      arrows() ? "bg-cyan-950/60 text-cyan-200" : "bg-gray-950 text-gray-400"
+                    }`}
+                    onClick={() => setArrows((value) => !value)}
+                  >
+                    Arrows
+                  </button>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 
-        <div class="xl:col-span-6 card">
-          <div class="flex items-center justify-between mb-4">
-            <div>
-              <div class="card-header">Graph</div>
-              <div class="text-xs text-gray-500">Focused around {cur()?.title || "current node"}</div>
+        <div class="flex min-h-0 flex-col bg-gray-900 p-3">
+          <div class="mb-3 shrink-0 flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+            <div class="min-w-0">
+              <div class="text-sm font-semibold text-gray-100">Graph Surface</div>
+              <div class="truncate text-xs text-gray-500">{scope() === "local" ? "Local neighborhood" : "Global map"} around {cur()?.title || "current node"}</div>
             </div>
-            <div class="flex items-center gap-3">
-              <div class="text-xs text-gray-500">{view().nodes.length} canvas nodes</div>
-              <div class="text-xs text-gray-500">{hop()} hop radius</div>
-              <button class="btn btn-secondary text-xs" onClick={() => setFit((n) => n + 1)} disabled={view().nodes.length === 0}>
-                Fit
-              </button>
-              <button class="btn btn-secondary text-xs inline-flex items-center gap-2" onClick={toggleFull} disabled={view().nodes.length === 0}>
+            <div class="flex flex-wrap items-center gap-2">
+              <span class="rounded bg-gray-950 px-2 py-1 text-xs text-gray-400">{view().nodes.length} nodes</span>
+              <span class="rounded bg-gray-950 px-2 py-1 text-xs text-gray-400">{view().edges.length} links</span>
+              <span class="rounded bg-gray-950 px-2 py-1 text-xs text-gray-400">{deg()} degree</span>
+              <span class="rounded bg-gray-950 px-2 py-1 text-xs text-gray-400">{hop()} hops</span>
+              <button class="btn btn-secondary inline-flex items-center gap-2 px-3 py-2 text-xs" onClick={toggleFull} disabled={view().nodes.length === 0}>
                 <Icon path="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5" />
                 Fullscreen
               </button>
             </div>
           </div>
 
-          <div class="relative rounded border border-gray-700 bg-gray-900/80 overflow-hidden">
+          <div class="relative min-h-0 flex-1 overflow-hidden bg-gray-950">
             <Show when={!full()}>
-              <CyGraph view={view()} hop={hop()} fit={fit()} full={false} pick={pick} />
+              <CyGraph view={view()} hop={hop()} fit={fit()} full={false} labels={labels()} density={density()} arrows={arrows()} pick={pick} />
+              <div class="pointer-events-none absolute bottom-3 left-3 right-3 flex flex-wrap items-center justify-between gap-3 rounded bg-gray-950/80 px-3 py-2 backdrop-blur">
+                <div class="flex flex-wrap gap-3">
+                  <For each={mix()}>
+                    {(item) => (
+                      <div class="flex items-center gap-2 text-xs text-gray-300">
+                        <span class="h-2.5 w-2.5 rounded-full" style={{ "background-color": colors[item.kind].stroke }} />
+                        <span>{item.kind}</span>
+                        <span class="text-gray-500">{item.total}</span>
+                      </div>
+                    )}
+                  </For>
+                </div>
+                <div class="flex flex-wrap gap-2">
+                  <For each={links()}>
+                    {(item) => <span class="rounded bg-gray-800 px-2 py-1 text-xs text-gray-400">{item.type}: {item.total}</span>}
+                  </For>
+                </div>
+              </div>
+              <Show when={cur()}>
+                <NodePanel
+                  node={cur()!}
+                  href={href(cur())}
+                  label={openLabel(cur()!)}
+                  ins={ins()}
+                  outs={outs()}
+                  data={data()}
+                  expanded={panel()}
+                  setExpanded={setPanel}
+                  pick={pick}
+                />
+              </Show>
             </Show>
             <Show when={load() && data().nodes.length === 0}>
               <div class="absolute inset-0 grid place-items-center bg-gray-950/70 text-sm text-gray-300">Loading graph...</div>
@@ -415,36 +528,44 @@ const Graph: Component = () => {
           </div>
         </div>
 
-        <div class="xl:col-span-3 card">
-          <div class="card-header">Details</div>
+        <div class="hidden min-h-0 flex-col bg-gray-900/80 p-3">
+          <div class="mb-4 shrink-0 flex items-center justify-between gap-3">
+            <div>
+              <div class="text-sm font-semibold text-gray-100">Inspector</div>
+              <div class="text-xs text-gray-500">Selected node</div>
+            </div>
+            <Show when={cur()}>
+              <span class={`badge ${kindClass(cur()!.kind)}`}>{cur()!.kind}</span>
+            </Show>
+          </div>
 
           <Show when={cur()} fallback={<div class="text-sm text-gray-500">No node selected.</div>}>
-            <div class="space-y-4">
+            <div class="min-h-0 space-y-4 overflow-y-auto pr-1">
               <div>
-                <div class="text-xl font-semibold text-gray-100">{cur()!.title}</div>
+                <div class="text-lg font-semibold leading-6 text-gray-100">{cur()!.title}</div>
                 <div class="text-xs text-gray-500 mt-1">{cur()!.path || cur()!.id}</div>
               </div>
 
-              <div class="flex flex-wrap gap-2">
-                <span class={`badge ${kindClass(cur()!.kind)}`}>{cur()!.kind}</span>
-                <span class="badge bg-gray-700 text-gray-300">{ins().length} incoming</span>
-                <span class="badge bg-gray-700 text-gray-300">{outs().length} outgoing</span>
+              <div class="grid grid-cols-3 overflow-hidden rounded bg-gray-950/60">
+                <Mini label="In" value={ins().length} />
+                <Mini label="Out" value={outs().length} />
+                <Mini label="Degree" value={deg()} />
               </div>
 
               <Show when={href(cur())}>
-                <A class="btn btn-secondary text-xs inline-flex" href={href(cur())}>
+                <A class="btn btn-secondary inline-flex px-3 py-2 text-xs" href={href(cur())}>
                   Open in {cur()!.kind === "symbol" ? "code" : cur()!.kind}
                 </A>
               </Show>
 
-              <div>
-                <div class="text-sm text-gray-400 mb-1">Summary</div>
-                <div class="text-sm text-gray-300 leading-6">{cur()!.summary || "No summary available."}</div>
+              <div class="rounded bg-gray-950/50 p-3">
+                <div class="mb-1 text-xs uppercase tracking-wide text-gray-500">Summary</div>
+                <div class="text-sm leading-6 text-gray-300">{cur()!.summary || "No summary available."}</div>
               </div>
 
               <Show when={cur()!.tags && cur()!.tags!.length > 0}>
                 <div>
-                  <div class="text-sm text-gray-400 mb-2">Tags</div>
+                  <div class="text-xs uppercase tracking-wide text-gray-500 mb-2">Tags</div>
                   <div class="flex flex-wrap gap-2">
                     <For each={cur()!.tags}>
                       {(tag) => <span class="badge bg-gray-700 text-gray-300">{tag}</span>}
@@ -455,11 +576,11 @@ const Graph: Component = () => {
 
               <Show when={cur()!.meta && Object.keys(cur()!.meta!).length > 0}>
                 <div>
-                  <div class="text-sm text-gray-400 mb-2">Meta</div>
+                  <div class="text-xs uppercase tracking-wide text-gray-500 mb-2">Meta</div>
                   <div class="space-y-2">
                     <For each={Object.entries(cur()!.meta ?? {})}>
                       {([k, v]) => (
-                        <div class="rounded bg-gray-900 border border-gray-700 px-3 py-2 text-xs text-gray-300">
+                        <div class="rounded bg-gray-900 px-3 py-2 text-xs text-gray-300">
                           <span class="text-gray-500">{k}</span>: <span class="text-gray-200">{String(v)}</span>
                         </div>
                       )}
@@ -469,7 +590,7 @@ const Graph: Component = () => {
               </Show>
 
               <div>
-                <div class="text-sm text-gray-400 mb-2">Incoming</div>
+                <div class="text-xs uppercase tracking-wide text-gray-500 mb-2">Incoming</div>
                 <div class="flex flex-wrap gap-2">
                   <For each={ins().slice(0, 12)}>
                     {(edge) => {
@@ -485,7 +606,7 @@ const Graph: Component = () => {
               </div>
 
               <div>
-                <div class="text-sm text-gray-400 mb-2">Outgoing</div>
+                <div class="text-xs uppercase tracking-wide text-gray-500 mb-2">Outgoing</div>
                 <div class="flex flex-wrap gap-2">
                   <For each={outs().slice(0, 12)}>
                     {(edge) => {
@@ -506,7 +627,7 @@ const Graph: Component = () => {
 
       <Show when={full()}>
         <div class="fixed inset-0 z-50 flex flex-col bg-gray-950">
-          <div class="flex flex-wrap items-center justify-between gap-3 border-b border-gray-800 bg-gray-950/95 px-4 py-3">
+          <div class="flex flex-wrap items-center justify-between gap-3 bg-gray-950/95 px-4 py-3">
             <div class="min-w-0">
               <div class="text-sm font-semibold text-gray-100 truncate">Knowledge Graph</div>
               <div class="text-xs text-gray-500 truncate">
@@ -524,7 +645,25 @@ const Graph: Component = () => {
             </div>
           </div>
           <div class="relative min-h-0 flex-1">
-            <CyGraph view={view()} hop={hop()} fit={fit()} full={true} pick={pick} />
+            <CyGraph view={view()} hop={hop()} fit={fit()} full={true} labels={labels()} density={density()} arrows={arrows()} pick={pick} />
+            <div class="pointer-events-none absolute bottom-4 left-4 right-4 flex flex-wrap items-center justify-between gap-3 rounded bg-gray-950/80 px-3 py-2 backdrop-blur">
+              <div class="flex flex-wrap gap-3">
+                <For each={mix()}>
+                  {(item) => (
+                    <div class="flex items-center gap-2 text-xs text-gray-300">
+                      <span class="h-2.5 w-2.5 rounded-full" style={{ "background-color": colors[item.kind].stroke }} />
+                      <span>{item.kind}</span>
+                      <span class="text-gray-500">{item.total}</span>
+                    </div>
+                  )}
+                </For>
+              </div>
+              <div class="flex flex-wrap gap-2">
+                <For each={links()}>
+                  {(item) => <span class="rounded bg-gray-800 px-2 py-1 text-xs text-gray-400">{item.type}: {item.total}</span>}
+                </For>
+              </div>
+            </div>
             <Show when={load() && data().nodes.length === 0}>
               <div class="absolute inset-0 grid place-items-center bg-gray-950/70 text-sm text-gray-300">Loading graph...</div>
             </Show>
@@ -538,7 +677,16 @@ const Graph: Component = () => {
   )
 }
 
-function CyGraph(props: { view: View; hop: number; fit: number; full: boolean; pick: (id: string) => void }) {
+function CyGraph(props: {
+  view: View
+  hop: number
+  fit: number
+  full: boolean
+  labels: Labels
+  density: Density
+  arrows: boolean
+  pick: (id: string) => void
+}) {
   let el: HTMLDivElement | undefined
   let graph: cytoscape.Core | undefined
 
@@ -548,11 +696,12 @@ function CyGraph(props: { view: View; hop: number; fit: number; full: boolean; p
 
     const nodes = props.view.nodes.map((node) => {
       const c = colors[node.kind]
+      const show = props.labels === "all" || (props.labels === "focus" && (node.act || node.hit))
       return {
         group: "nodes" as const,
         data: {
           id: node.id,
-          label: node.hop > props.hop ? `${short(node.title)}*` : short(node.title),
+          label: show ? (node.hop > props.hop ? `${short(node.title)}*` : short(node.title)) : "",
           kind: node.kind,
           size: node.r * 2,
           fill: node.act ? c.stroke : node.hit ? "#3b82f6" : c.fill,
@@ -560,7 +709,7 @@ function CyGraph(props: { view: View; hop: number; fit: number; full: boolean; p
           glow: c.glow,
           act: node.act,
           hit: node.hit,
-          dim: !node.act && !node.hit && props.view.nodes.length > 120,
+          opacity: !node.act && !node.hit && props.view.nodes.length > 120 ? 0.58 : 1,
         },
         classes: [node.kind, node.act ? "act" : "", node.hit ? "hit" : ""].filter(Boolean).join(" "),
       }
@@ -577,9 +726,87 @@ function CyGraph(props: { view: View; hop: number; fit: number; full: boolean; p
         width: edge.on ? 2.2 : 1,
         color: edge.on ? "#60a5fa" : "#374151",
         opacity: edge.on ? 0.86 : props.view.nodes.length > 120 ? 0.12 : 0.34,
+        arrow: props.arrows ? "triangle" : "none",
       },
       classes: edge.on ? "on" : "",
     })) satisfies cytoscape.ElementDefinition[]
+
+    const spread = props.density === "tight" ? 0.78 : props.density === "wide" ? 1.3 : 1
+
+    const style = [
+      {
+        selector: "core",
+        style: {
+          "active-bg-color": "#1f2937",
+          "active-bg-opacity": 0.28,
+          "selection-box-color": "#60a5fa",
+          "selection-box-opacity": 0.12,
+        },
+      },
+      {
+        selector: "node",
+        style: {
+          "background-color": "data(fill)",
+          "border-color": "data(border)",
+          "border-width": 1.4,
+          color: "#d1d5db",
+          content: "data(label)",
+          "font-family": "Inter, ui-sans-serif, system-ui",
+          "font-size": 10,
+          height: "data(size)",
+          label: "data(label)",
+          "min-zoomed-font-size": 7,
+          opacity: "data(opacity)",
+          "overlay-color": "#60a5fa",
+          "overlay-opacity": 0,
+          "text-background-color": "#111827",
+          "text-background-opacity": 0.72,
+          "text-background-padding": 2,
+          "text-margin-y": 8,
+          "text-outline-color": "#111827",
+          "text-outline-width": 1.5,
+          width: "data(size)",
+        },
+      },
+      {
+        selector: "node.act",
+        style: {
+          "border-width": 3,
+          "font-size": 12,
+          height: 42,
+          opacity: 1,
+          "text-background-opacity": 0.9,
+          width: 42,
+          "z-index": 20,
+        },
+      },
+      {
+        selector: "node.hit",
+        style: {
+          "border-width": 2.4,
+          opacity: 1,
+          "z-index": 15,
+        },
+      },
+      {
+        selector: "edge",
+        style: {
+          "curve-style": "bezier",
+          "line-color": "data(color)",
+          opacity: "data(opacity)",
+          "target-arrow-color": "data(color)",
+          "target-arrow-shape": props.arrows ? "triangle" : "none",
+          "target-arrow-width": 4,
+          width: "data(width)",
+        },
+      },
+      {
+        selector: "edge.on",
+        style: {
+          "z-index": 10,
+        },
+      },
+    ] as unknown as any[]
 
     const cy = cytoscape({
       container: root,
@@ -588,98 +815,18 @@ function CyGraph(props: { view: View; hop: number; fit: number; full: boolean; p
       boxSelectionEnabled: false,
       maxZoom: 4,
       minZoom: 0.08,
-      wheelSensitivity: 0.18,
-      style: [
-        {
-          selector: "core",
-          style: {
-            "active-bg-color": "#1f2937",
-            "active-bg-opacity": 0.28,
-            "selection-box-color": "#60a5fa",
-            "selection-box-opacity": 0.12,
-          },
-        },
-        {
-          selector: "node",
-          style: {
-            "background-color": "data(fill)",
-            "border-color": "data(border)",
-            "border-width": 1.4,
-            color: "#d1d5db",
-            content: "data(label)",
-            "font-family": "Inter, ui-sans-serif, system-ui",
-            "font-size": 10,
-            height: "data(size)",
-            label: "data(label)",
-            "min-zoomed-font-size": 7,
-            opacity: "data(dim)",
-            "overlay-color": "#60a5fa",
-            "overlay-opacity": 0,
-            "text-background-color": "#111827",
-            "text-background-opacity": 0.72,
-            "text-background-padding": 2,
-            "text-margin-y": 8,
-            "text-outline-color": "#111827",
-            "text-outline-width": 1.5,
-            width: "data(size)",
-          },
-        },
-        {
-          selector: "node[dim]",
-          style: {
-            opacity: 0.62,
-          },
-        },
-        {
-          selector: "node.act",
-          style: {
-            "border-width": 3,
-            "font-size": 12,
-            height: 42,
-            opacity: 1,
-            "text-background-opacity": 0.9,
-            width: 42,
-            "z-index": 20,
-          },
-        },
-        {
-          selector: "node.hit",
-          style: {
-            "border-width": 2.4,
-            opacity: 1,
-            "z-index": 15,
-          },
-        },
-        {
-          selector: "edge",
-          style: {
-            "curve-style": "bezier",
-            "line-color": "data(color)",
-            opacity: "data(opacity)",
-            "target-arrow-color": "data(color)",
-            "target-arrow-shape": "triangle",
-            "target-arrow-width": 4,
-            width: "data(width)",
-          },
-        },
-        {
-          selector: "edge.on",
-          style: {
-            "z-index": 10,
-          },
-        },
-      ],
+      style,
       layout: {
         name: "cose",
         animate: false,
-        componentSpacing: 88,
+        componentSpacing: 88 * spread,
         edgeElasticity: 110,
         fit: true,
         gravity: 0.32,
-        idealEdgeLength: 92,
+        idealEdgeLength: 92 * spread,
         nestingFactor: 1.15,
         nodeOverlap: 18,
-        nodeRepulsion: 7600,
+        nodeRepulsion: 7600 * spread,
         numIter: props.view.nodes.length > 120 ? 180 : 260,
         padding: 36,
         randomize: true,
@@ -720,12 +867,134 @@ function CyGraph(props: { view: View; hop: number; fit: number; full: boolean; p
     })
   })
 
-  return <div ref={el} class={props.full ? "h-full w-full" : "h-[72vh] w-full"} role="img" aria-label="Knowledge graph" />
+  return <div ref={el} class="h-full min-h-0 w-full" role="img" aria-label="Knowledge graph" />
 }
 
 function short(text: string) {
   if (text.length <= 18) return text
   return `${text.slice(0, 17)}...`
+}
+
+const Top: Component<{ label: string; value: number; kind: GraphNode["kind"] }> = (props) => (
+  <div class="flex min-w-16 items-center gap-2 rounded bg-gray-900 px-3 py-2">
+    <span class="h-2.5 w-2.5 rounded-full" style={{ "background-color": colors[props.kind].stroke }} />
+    <div>
+      <div class="text-[11px] uppercase tracking-wide text-gray-500">{props.label}</div>
+      <div class="text-sm font-semibold text-gray-100">{props.value.toLocaleString()}</div>
+    </div>
+  </div>
+)
+
+const Mini: Component<{ label: string; value: number }> = (props) => (
+  <div class="bg-gray-950/40 px-3 py-2">
+    <div class="text-[11px] text-gray-500">{props.label}</div>
+    <div class="text-lg font-semibold text-gray-100">{props.value.toLocaleString()}</div>
+  </div>
+)
+
+const NodePanel: Component<{
+  node: GraphNode
+  href: string
+  label: string
+  ins: GraphEdge[]
+  outs: GraphEdge[]
+  data: GraphData
+  expanded: boolean
+  setExpanded: (value: boolean) => void
+  pick: (id: string) => void
+}> = (props) => {
+  const node = (id: string) => props.data.nodes.find((item) => item.id === id)
+
+  return (
+    <div class="pointer-events-auto absolute right-3 top-3 w-[min(24rem,calc(100%-1.5rem))] rounded bg-gray-950/90 p-3 shadow-xl backdrop-blur">
+      <div class="flex items-start justify-between gap-3">
+        <div class="min-w-0">
+          <div class="truncate text-sm font-semibold text-gray-100">{props.node.title}</div>
+          <div class="mt-0.5 truncate text-xs text-gray-500">{props.node.path || props.node.id}</div>
+        </div>
+        <div class="flex shrink-0 items-center gap-2">
+          <span class={`badge ${kindClass(props.node.kind)}`}>{props.node.kind}</span>
+          <button
+            class="rounded bg-gray-900 px-2 py-1 text-xs text-gray-300 hover:bg-gray-800"
+            onClick={() => props.setExpanded(!props.expanded)}
+          >
+            {props.expanded ? "Min" : "Max"}
+          </button>
+        </div>
+      </div>
+
+      <Show
+        when={props.expanded}
+        fallback={<div class="mt-2 line-clamp-2 text-xs leading-5 text-gray-300">{props.node.summary || "No summary available."}</div>}
+      >
+        <div class="mt-3 grid grid-cols-3 overflow-hidden rounded bg-gray-900/70">
+          <Mini label="In" value={props.ins.length} />
+          <Mini label="Out" value={props.outs.length} />
+          <Mini label="Degree" value={props.ins.length + props.outs.length} />
+        </div>
+
+        <div class="mt-3 rounded bg-gray-900/60 p-3">
+          <div class="mb-1 text-[11px] uppercase tracking-wide text-gray-500">Summary</div>
+          <div class="max-h-24 overflow-y-auto text-xs leading-5 text-gray-300">{props.node.summary || "No summary available."}</div>
+        </div>
+
+        <Show when={props.node.tags && props.node.tags.length > 0}>
+          <div class="mt-3">
+            <div class="mb-1.5 text-[11px] uppercase tracking-wide text-gray-500">Tags</div>
+            <div class="flex max-h-16 flex-wrap gap-1.5 overflow-y-auto">
+              <For each={props.node.tags}>
+                {(tag) => <span class="rounded bg-gray-800 px-2 py-0.5 text-xs text-gray-300">{tag}</span>}
+              </For>
+            </div>
+          </div>
+        </Show>
+
+        <div class="mt-3 grid grid-cols-2 gap-3">
+          <div class="min-w-0">
+            <div class="mb-1.5 text-[11px] uppercase tracking-wide text-gray-500">Incoming</div>
+            <div class="flex max-h-24 flex-wrap gap-1.5 overflow-y-auto">
+              <For each={props.ins.slice(0, 8)}>
+                {(edge) => {
+                  const item = node(edge.from)
+                  return (
+                    <button class="rounded bg-gray-800 px-2 py-0.5 text-xs text-gray-300 hover:bg-gray-700" onClick={() => item && props.pick(item.id)}>
+                      {short(item?.title || edge.from)}
+                    </button>
+                  )
+                }}
+              </For>
+            </div>
+          </div>
+          <div class="min-w-0">
+            <div class="mb-1.5 text-[11px] uppercase tracking-wide text-gray-500">Outgoing</div>
+            <div class="flex max-h-24 flex-wrap gap-1.5 overflow-y-auto">
+              <For each={props.outs.slice(0, 8)}>
+                {(edge) => {
+                  const item = node(edge.to)
+                  return (
+                    <button class="rounded bg-gray-800 px-2 py-0.5 text-xs text-gray-300 hover:bg-gray-700" onClick={() => item && props.pick(item.id)}>
+                      {short(item?.title || edge.to)}
+                    </button>
+                  )
+                }}
+              </For>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-3 flex items-center justify-between gap-2">
+          <Show when={props.href}>
+            <A class="rounded bg-cyan-700 px-3 py-1.5 text-xs font-medium text-white hover:bg-cyan-600" href={props.href}>
+              {props.label}
+            </A>
+          </Show>
+          <button class="rounded bg-gray-900 px-3 py-1.5 text-xs text-gray-300 hover:bg-gray-800" onClick={() => props.setExpanded(false)}>
+            Minimize
+          </button>
+        </div>
+      </Show>
+    </div>
+  )
 }
 
 function Icon(props: { path: string }) {

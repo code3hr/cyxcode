@@ -1,5 +1,5 @@
 import { Component, createSignal, onMount, onCleanup, lazy, Suspense, ParentProps } from "solid-js"
-import { Router, Route } from "@solidjs/router"
+import { Navigate, Router, Route } from "@solidjs/router"
 import { Layout } from "./components/layout/Layout"
 import { sseClient } from "./api/sse"
 
@@ -12,14 +12,13 @@ const Compliance = lazy(() => import("./pages/Compliance"))
 const Reports = lazy(() => import("./pages/Reports"))
 const Wiki = lazy(() => import("./pages/Wiki"))
 const Graph = lazy(() => import("./pages/Graph"))
-const Codegraph = lazy(() => import("./pages/Codegraph"))
 const Memory = lazy(() => import("./pages/Memory"))
 const Tokens = lazy(() => import("./pages/Tokens"))
 const Security = lazy(() => import("./pages/Security"))
 
 const Loading: Component = () => (
-  <div class="flex items-center justify-center h-64">
-    <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+  <div class="flex items-center justify-center h-64 text-sm text-gray-400">
+    <span class="animate-pulse">Loading dashboard...</span>
   </div>
 )
 
@@ -58,7 +57,7 @@ export const App: Component = () => {
       <Route path="/compliance/:framework" component={Compliance} />
       <Route path="/reports" component={Reports} />
       <Route path="/graph" component={Graph} />
-      <Route path="/codegraph" component={Codegraph} />
+      <Route path="/codegraph" component={() => <Navigate href="/graph" />} />
       <Route path="/memory" component={Memory} />
       <Route path="/wiki" component={Wiki} />
       <Route path="/tokens" component={Tokens} />

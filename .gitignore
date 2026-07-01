@@ -33,6 +33,7 @@ cve-lite-scan-*.json
 
 # Local dev files
 opencode-dev
+/WEB/
 logs/
 *.bun-build
 tsconfig.tsbuildinfo

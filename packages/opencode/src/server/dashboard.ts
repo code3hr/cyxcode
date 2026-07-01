@@ -16,6 +16,7 @@ import { VulnScanArtifacts } from "../pentest/vulnscan/artifacts"
 import { VulnScanService } from "../pentest/vulnscan/service"
 import { MonitorStorage } from "../pentest/monitoring/storage"
 import { Scheduler } from "../pentest/monitoring/scheduler"
+import { AlertConfig, MonitorStatus, MonitorToolConfig, Schedule } from "../pentest/monitoring/types"
 import { ComplianceMapper } from "../pentest/compliance/mapper"
 import { ComplianceScorer } from "../pentest/compliance/scorer"
 import { ComplianceFrameworks } from "../pentest/compliance/frameworks"
@@ -384,12 +385,61 @@ export function createDashboardRoutes(opts: Findings.StorageConfig = {}): Hono {
   app.get("/pentest/monitors", async (c) => {
     const query = c.req.query()
 
-    const filters: { sessionID?: string; status?: "active" | "paused" | "disabled" | "error" } = {}
+    const filters: { sessionID?: string; status?: MonitorStatus } = {}
     if (query.sessionID) filters.sessionID = query.sessionID
-    if (query.status) filters.status = query.status as any
+    if (query.status && MonitorStatus.safeParse(query.status).success) {
+      filters.status = query.status as MonitorStatus
+    }
 
     const monitors = await MonitorStorage.listMonitors(filters)
     return c.json({ monitors, total: monitors.length })
+  })
+
+  /**
+   * POST /pentest/monitors - Create scheduled monitor
+   */
+  app.post("/pentest/monitors", async (c) => {
+    const body = await c.req.json().catch(() => ({}))
+    const Schema = z.object({
+      name: z.string().min(1),
+      description: z.string().optional(),
+      sessionID: z.string().optional().default("dashboard"),
+      targets: z.array(z.string().min(1)).min(1),
+      tools: z.array(MonitorToolConfig).min(1),
+      schedule: Schedule,
+      alerts: AlertConfig.optional(),
+      status: z.enum(["active", "paused", "disabled"]).optional().default("active"),
+      tags: z.array(z.string()).optional(),
+    })
+
+    const parsed = Schema.safeParse(body)
+    if (!parsed.success) {
+      return c.json({ error: "Invalid monitor request", details: parsed.error.issues }, 400)
+    }
+
+    const monitor = await MonitorStorage.createMonitor({
+      name: parsed.data.name,
+      description: parsed.data.description,
+      sessionID: parsed.data.sessionID,
+      targets: parsed.data.targets,
+      tools: parsed.data.tools,
+      schedule: parsed.data.schedule,
+      status: parsed.data.status,
+      alerts: parsed.data.alerts ?? {
+        enabled: true,
+        minSeverity: "low",
+        newFindingsOnly: true,
+        channels: ["bus"],
+        cooldownMs: 300_000,
+      },
+      tags: parsed.data.tags,
+    })
+
+    if (monitor.status === "active") {
+      await Scheduler.scheduleMonitor(monitor).catch(() => {})
+    }
+
+    return c.json({ monitor: (await MonitorStorage.getMonitor(monitor.id)) ?? monitor }, 201)
   })
 
   /**
@@ -404,6 +454,55 @@ export function createDashboardRoutes(opts: Findings.StorageConfig = {}): Hono {
     }
 
     return c.json({ monitor })
+  })
+
+  /**
+   * PATCH /pentest/monitors/:id - Update monitor status
+   */
+  app.patch("/pentest/monitors/:id", async (c) => {
+    const id = c.req.param("id")
+    const body = await c.req.json().catch(() => ({}))
+    const Schema = z.object({
+      status: z.enum(["active", "paused", "disabled"]),
+    })
+
+    const parsed = Schema.safeParse(body)
+    if (!parsed.success) {
+      return c.json({ error: "Invalid monitor update", details: parsed.error.issues }, 400)
+    }
+
+    const monitor = await MonitorStorage.getMonitor(id)
+    if (!monitor) {
+      return c.json({ error: "Monitor not found" }, 404)
+    }
+
+    if (parsed.data.status === "active") {
+      await Scheduler.resumeMonitor(id).catch(() => MonitorStorage.updateMonitor(id, { status: "active" }))
+    } else if (parsed.data.status === "paused") {
+      await Scheduler.pauseMonitor(id).catch(() => MonitorStorage.updateMonitor(id, { status: "paused" }))
+    } else {
+      await Scheduler.cancelMonitor(id).catch(() => MonitorStorage.updateMonitor(id, { status: "disabled" }))
+    }
+
+    const updated = await MonitorStorage.getMonitor(id)
+    return c.json({ monitor: updated ?? monitor })
+  })
+
+  /**
+   * DELETE /pentest/monitors/:id - Delete monitor
+   */
+  app.delete("/pentest/monitors/:id", async (c) => {
+    const id = c.req.param("id")
+    const monitor = await MonitorStorage.getMonitor(id)
+
+    if (!monitor) {
+      return c.json({ error: "Monitor not found" }, 404)
+    }
+
+    await Scheduler.cancelMonitor(id).catch(() => MonitorStorage.updateMonitor(id, { status: "disabled" }))
+    const deleted = await MonitorStorage.deleteMonitor(id)
+
+    return c.json({ success: deleted })
   })
 
   /**
