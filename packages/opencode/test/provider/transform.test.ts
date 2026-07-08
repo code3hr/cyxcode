@@ -241,6 +241,22 @@ describe("ProviderTransform.options - gpt-5 textVerbosity", () => {
     expect(result.textVerbosity).toBeUndefined()
   })
 
+  test("Azure GPT-5.5 only sets reasoningSummary", () => {
+    const model = {
+      ...createGpt5Model("gpt-5.5"),
+      id: "azure/gpt-5.5",
+      providerID: "azure",
+      api: {
+        id: "gpt-5.5",
+        url: "https://azure.com",
+        npm: "@ai-sdk/azure",
+      },
+    }
+    const result = ProviderTransform.options({ model, sessionID, providerOptions: {} })
+    expect(result.reasoningSummary).toBe("auto")
+    expect(result.reasoningEffort).toBeUndefined()
+    expect(result.textVerbosity).toBeUndefined()
+  })
   test("openai-compatible gpt-5 models omit Responses-only reasoningSummary", () => {
     const model = {
       ...createGpt5Model("gpt-5.4"),

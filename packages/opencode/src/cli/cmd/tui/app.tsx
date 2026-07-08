@@ -123,7 +123,7 @@ export function tui(input: {
 
     const mode = await getTerminalBackgroundColor()
 
-    // Re-clear after getTerminalBackgroundColor() — setRawMode(false) restores
+    // Re-clear after getTerminalBackgroundColor(); setRawMode(false) restores
     // the original console mode which re-enables ENABLE_PROCESSED_INPUT.
     win32DisableProcessedInput()
 
@@ -361,6 +361,44 @@ function App(props: { onSnapshot?: () => Promise<string[]> }) {
   )
 
   const connected = useConnected()
+
+  async function update(target?: string) {
+    toast.show({
+      variant: "info",
+      message: target ? `Updating to v${target}...` : "Updating CyxCode...",
+      duration: 30000,
+    })
+
+    const result = await sdk.client.global.upgrade(target ? { target } : {}).catch((err) => ({
+      data: undefined,
+      error: err,
+    }))
+
+    if (result.error || !result.data?.success) {
+      const msg = result.data && !result.data.success
+        ? result.data.error
+        : result.error instanceof Error
+          ? result.error.message
+          : result.error
+            ? JSON.stringify(result.error)
+            : "Update failed"
+      toast.show({
+        variant: "error",
+        title: "Update Failed",
+        message: msg,
+        duration: 10000,
+      })
+      return false
+    }
+
+    await DialogAlert.show(
+      dialog,
+      "Update Complete",
+      `Successfully updated to CyxCode v${result.data.version}. Please restart the application.`,
+    )
+    return true
+  }
+
   command.register(() => [
     {
       title: "Show CyxCode resume state",
@@ -573,6 +611,19 @@ function App(props: { onSnapshot?: () => Promise<string[]> }) {
       },
       onSelect: () => {
         dialog.replace(() => <DialogStatus />)
+      },
+      category: "System",
+    },
+    {
+      title: "Update CyxCode",
+      value: "cyxcode.update",
+      slash: {
+        name: "update",
+        aliases: ["upgrade"],
+      },
+      onSelect: async (dialog) => {
+        dialog.clear()
+        if (await update()) exit()
       },
       category: "System",
     },
@@ -811,31 +862,7 @@ function App(props: { onSnapshot?: () => Promise<string[]> }) {
 
     if (choice !== true) return
 
-    toast.show({
-      variant: "info",
-      message: `Updating to v${version}...`,
-      duration: 30000,
-    })
-
-    const result = await sdk.client.global.upgrade({ target: version })
-
-    if (result.error || !result.data?.success) {
-      toast.show({
-        variant: "error",
-        title: "Update Failed",
-        message: "Update failed",
-        duration: 10000,
-      })
-      return
-    }
-
-    await DialogAlert.show(
-      dialog,
-      "Update Complete",
-      `Successfully updated to CyxCode v${result.data.version}. Please restart the application.`,
-    )
-
-    exit()
+    if (await update(version)) exit()
   })
 
   return (

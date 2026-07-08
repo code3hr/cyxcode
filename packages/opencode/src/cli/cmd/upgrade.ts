@@ -41,8 +41,9 @@ export const UpgradeCommand = {
         return
       }
     }
-    prompts.log.info("Using method: " + method)
-    const target = args.target ? args.target.replace(/^v/, "") : await Installation.latest()
+    const selected = method === "unknown" ? "curl" : method
+    prompts.log.info("Using method: " + selected)
+    const target = args.target ? args.target.replace(/^v/, "") : await Installation.latest(selected)
 
     if (Installation.VERSION === target) {
       prompts.log.warn(`cyxcode upgrade skipped: ${target} is already installed`)
@@ -53,12 +54,12 @@ export const UpgradeCommand = {
     prompts.log.info(`From ${Installation.VERSION} → ${target}`)
     const spinner = prompts.spinner()
     spinner.start("Upgrading...")
-    const err = await Installation.upgrade(method, target).catch((err) => err)
+    const err = await Installation.upgrade(selected, target).catch((err) => err)
     if (err) {
       spinner.stop("Upgrade failed", 1)
       if (err instanceof Installation.UpgradeFailedError) {
         // necessary because choco only allows install/upgrade in elevated terminals
-        if (method === "choco" && err.stderr.includes("not running from an elevated command shell")) {
+        if (selected === "choco" && err.stderr.includes("not running from an elevated command shell")) {
           prompts.log.error("Please run the terminal as Administrator and try again")
         } else {
           prompts.log.error(err.stderr)

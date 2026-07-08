@@ -95,7 +95,10 @@ describe("installation", () => {
     })
 
     test("reads scoop manifest versions", async () => {
-      const layer = testLayer(() => jsonResponse({ version: "2.3.4" }))
+      const layer = testLayer((req) => {
+        expect(req.url).toContain("/cyxcode.json")
+        return jsonResponse({ version: "2.3.4" })
+      })
 
       const result = await Effect.runPromise(
         Installation.Service.use((svc) => svc.latest("scoop")).pipe(Effect.provide(layer)),
@@ -104,7 +107,10 @@ describe("installation", () => {
     })
 
     test("reads chocolatey feed versions", async () => {
-      const layer = testLayer(() => jsonResponse({ d: { results: [{ Version: "3.4.5" }] } }))
+      const layer = testLayer((req) => {
+        expect(req.url).toContain("Id%20eq%20%27cyxcode%27")
+        return jsonResponse({ d: { results: [{ Version: "3.4.5" }] } })
+      })
 
       const result = await Effect.runPromise(
         Installation.Service.use((svc) => svc.latest("choco")).pipe(Effect.provide(layer)),
@@ -117,8 +123,8 @@ describe("installation", () => {
         () => jsonResponse({ versions: { stable: "2.0.0" } }),
         (cmd, args) => {
           // getBrewFormula: return core formula (no tap)
-          if (cmd === "brew" && args.includes("--formula") && args.includes("anomalyco/tap/opencode")) return ""
-          if (cmd === "brew" && args.includes("--formula") && args.includes("opencode")) return "opencode"
+          if (cmd === "brew" && args.includes("--formula") && args.includes("code3hr/tap/cyxcode")) return ""
+          if (cmd === "brew" && args.includes("--formula") && args.includes("cyxcode")) return "cyxcode"
           return ""
         },
       )
@@ -136,7 +142,7 @@ describe("installation", () => {
       const layer = testLayer(
         () => jsonResponse({}), // HTTP not used for tap formula
         (cmd, args) => {
-          if (cmd === "brew" && args.includes("anomalyco/tap/opencode") && args.includes("--formula")) return "opencode"
+          if (cmd === "brew" && args.includes("code3hr/tap/cyxcode") && args.includes("--formula")) return "cyxcode"
           if (cmd === "brew" && args.includes("--json=v2")) return brewInfoJson
           return ""
         },
@@ -146,6 +152,92 @@ describe("installation", () => {
         Installation.Service.use((svc) => svc.latest("brew")).pipe(Effect.provide(layer)),
       )
       expect(result).toBe("2.1.0")
+    })
+  })
+
+  describe("method", () => {
+    test("detects cyxcode package manager installs", async () => {
+      const layer = testLayer(
+        () => jsonResponse({}),
+        (cmd, args) => {
+          if (cmd === "choco" && args.includes("cyxcode")) return "cyxcode|1.0.0"
+          return ""
+        },
+      )
+
+      const result = await Effect.runPromise(
+        Installation.Service.use((svc) => svc.method()).pipe(Effect.provide(layer)),
+      )
+      expect(result).toBe("choco")
+    })
+
+    test("ignores upstream opencode package manager installs", async () => {
+      const layer = testLayer(
+        () => jsonResponse({}),
+        (cmd, args) => {
+          if (cmd === "brew" && args.includes("cyxcode")) return "opencode"
+          if (cmd === "scoop" && args.includes("cyxcode")) return "opencode"
+          if (cmd === "choco" && args.includes("cyxcode")) return "opencode|1.0.0"
+          return ""
+        },
+      )
+
+      const result = await Effect.runPromise(
+        Installation.Service.use((svc) => svc.method()).pipe(Effect.provide(layer)),
+      )
+      expect(result).toBe("unknown")
+    })
+  })
+
+  describe("upgrade", () => {
+    test("uses cyxcode for chocolatey upgrades", async () => {
+      const cmds = [] as string[]
+      const layer = testLayer(
+        () => jsonResponse({}),
+        (cmd, args) => {
+          cmds.push([cmd, ...args].join(" "))
+          return ""
+        },
+      )
+
+      await Effect.runPromise(
+        Installation.Service.use((svc) => svc.upgrade("choco", "1.2.3")).pipe(Effect.provide(layer)),
+      )
+      expect(cmds).toContain("choco upgrade cyxcode --version=1.2.3 -y")
+    })
+
+    test("uses cyxcode for scoop upgrades", async () => {
+      const cmds = [] as string[]
+      const layer = testLayer(
+        () => jsonResponse({}),
+        (cmd, args) => {
+          cmds.push([cmd, ...args].join(" "))
+          return ""
+        },
+      )
+
+      await Effect.runPromise(
+        Installation.Service.use((svc) => svc.upgrade("scoop", "1.2.3")).pipe(Effect.provide(layer)),
+      )
+      expect(cmds).toContain("scoop install cyxcode@1.2.3")
+    })
+
+    test("uses cyxcode for brew upgrades", async () => {
+      const cmds = [] as string[]
+      const layer = testLayer(
+        () => jsonResponse({}),
+        (cmd, args) => {
+          cmds.push([cmd, ...args].join(" "))
+          if (cmd === "brew" && args.includes("code3hr/tap/cyxcode")) return ""
+          if (cmd === "brew" && args.includes("cyxcode")) return "cyxcode"
+          return ""
+        },
+      )
+
+      await Effect.runPromise(
+        Installation.Service.use((svc) => svc.upgrade("brew", "1.2.3")).pipe(Effect.provide(layer)),
+      )
+      expect(cmds).toContain("brew upgrade cyxcode")
     })
   })
 })

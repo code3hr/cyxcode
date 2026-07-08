@@ -3,6 +3,8 @@ import {
   parseJwtClaims,
   extractAccountIdFromClaims,
   extractAccountId,
+  isAllowedCodexModel,
+  CodexAuthPlugin,
   type IdTokenClaims,
 } from "../../src/plugin/codex"
 
@@ -36,6 +38,55 @@ describe("plugin.codex", () => {
       expect(parseJwtClaims(`${header}.${invalidJson}.sig`)).toBeUndefined()
     })
   })
+
+  describe("isAllowedCodexModel", () => {
+    test("allows GPT-5.5", () => {
+      expect(isAllowedCodexModel("gpt-5.5")).toBe(true)
+    })
+
+    test("allows future GPT-5.x models", () => {
+      expect(isAllowedCodexModel("gpt-5.6")).toBe(true)
+      expect(isAllowedCodexModel("gpt-5.10")).toBe(true)
+    })
+
+    test("preserves explicit Codex model variants", () => {
+      expect(isAllowedCodexModel("gpt-5-codex")).toBe(true)
+      expect(isAllowedCodexModel("gpt-5.1-codex-max")).toBe(true)
+      expect(isAllowedCodexModel("gpt-5.2-codex")).toBe(true)
+      expect(isAllowedCodexModel("gpt-5.3-codex-spark")).toBe(true)
+    })
+
+    test("rejects older and unrelated models", () => {
+      expect(isAllowedCodexModel("gpt-5.1")).toBe(false)
+      expect(isAllowedCodexModel("gpt-5.5-preview")).toBe(false)
+      expect(isAllowedCodexModel("gpt-5.5-pro")).toBe(false)
+      expect(isAllowedCodexModel("gpt-6.0")).toBe(false)
+      expect(isAllowedCodexModel("claude-sonnet-4")).toBe(false)
+    })
+  })
+    test("overrides existing GPT-5.5 limits for Codex OAuth", async () => {
+      const hooks = await CodexAuthPlugin({} as any)
+      const provider = {
+        models: {
+          "gpt-5.5": {
+            id: "gpt-5.5",
+            providerID: "openai",
+            api: { id: "gpt-5.5", url: "https://api.openai.com", npm: "@ai-sdk/openai" },
+            name: "GPT-5.5",
+            capabilities: {},
+            cost: { input: 1, output: 1, cache: { read: 1, write: 1 } },
+            limit: { context: 128_000, output: 16_000 },
+            status: "active",
+            options: {},
+            headers: {},
+            variants: {},
+          },
+        },
+      }
+
+      await hooks.auth!.loader!(async () => ({ type: "oauth" }) as any, provider as any)
+      expect(provider.models["gpt-5.5"].limit as any).toEqual({ context: 400_000, input: 272_000, output: 128_000 })
+    })
 
   describe("extractAccountIdFromClaims", () => {
     test("extracts chatgpt_account_id from root", () => {
