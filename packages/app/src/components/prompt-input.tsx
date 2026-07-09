@@ -1469,7 +1469,7 @@ export const PromptInput: Component<PromptInputProps> = (props) => {
                       current={local.agent.current()?.name ?? ""}
                       onSelect={local.agent.set}
                       class="capitalize max-w-[160px] text-text-base"
-                      valueClass="truncate text-13-regular text-text-base"
+                      valueClass="truncate leading-5 text-13-regular text-text-base"
                       triggerStyle={control()}
                       triggerProps={{ "data-action": "prompt-agent" }}
                       variant="ghost"
@@ -1556,7 +1556,7 @@ export const PromptInput: Component<PromptInputProps> = (props) => {
                       label={(x) => (x === "default" ? language.t("common.default") : x)}
                       onSelect={(x) => local.model.variant.set(x === "default" ? undefined : x)}
                       class="capitalize max-w-[160px] text-text-base"
-                      valueClass="truncate text-13-regular text-text-base"
+                      valueClass="truncate leading-5 text-13-regular text-text-base"
                       triggerStyle={control()}
                       triggerProps={{ "data-action": "prompt-model-variant" }}
                       variant="ghost"

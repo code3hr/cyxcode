@@ -6,7 +6,7 @@ This file tracks selective upstream opencode updates for CyxCode. Use it to avoi
 
 - Audit date: 2026-07-09
 - CyxCode branch: `sync/mcp-oauth-upstream-2026-06-28`
-- CyxCode head after latest backport: `b1b02b09ae7a61d62eb485fa6456770e6e5d8b06`
+- CyxCode head after latest backport: `60546ff74e89`
 - Latest upstream release checked: `anomalyco/opencode v1.17.16`
 - Upstream release date: 2026-07-09
 - Upstream `dev` checked: `6b41ae910c51e72d3d70a4b7e7a75283c74c41db`
@@ -66,6 +66,8 @@ Potentially useful only if CyxCode actively ships or tests the desktop app surfa
 - [done] Legacy drafts route to session page (app compatibility `/new-session` compatibility route).
 - [done] `ae7d63272c` descender clipping in model list (partial): added `leading-5` to model item text in `packages/app/src/components/dialog-select-model.tsx`.
 - [blocked] Capped review patch loading (upstream depends on `@opencode-ai/ui` v2 `session-review` and `/vcs/diff` API).
+- [done] `5c860d4142` model variant display row: added `leading-5` to variant select value class in `packages/app/src/components/prompt-input.tsx`.
+- [done] `5cc3a51357` free model selector behavior already active: existing unpaid-model fallback opens `DialogSelectModelUnpaid`; v2-only upstream variant path intentionally skipped.
 
 Reason this is manual: these touch `packages/app` layout/session state and can conflict with CyxCode UI assumptions.
 
@@ -87,9 +89,7 @@ These are intentionally not backported unless a concrete CyxCode bug or release 
 - Nix node_modules hash churn.
 - Upstream release version sync commits.
 - Latest upstream `dev` delta after `v1.17.16`:
-  - `5c860d4142 feat(feat): align sub-agent task rows with v2 design`
   - `4f9207daac feat(app): restyle revert dock for v2`
-  - `5cc3a51357 feat(app): free model selector`
 - Upstream `v1.17.16` package manifest version sync.
 - Any change that replaces CyxCode-specific commands, branding, update flow, installer identity, skills, security tooling, or TUI behavior.
 
