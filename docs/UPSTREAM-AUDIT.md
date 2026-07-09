@@ -6,10 +6,10 @@ This file tracks selective upstream opencode updates for CyxCode. Use it to avoi
 
 - Audit date: 2026-07-09
 - CyxCode branch: `sync/mcp-oauth-upstream-2026-06-28`
-- CyxCode head before current audit: `43e2fa2242fdcfa87e259f82ed3d1a4ba2f82f37`
-- Latest upstream release checked: `anomalyco/opencode v1.17.15`
-- Upstream release date: 2026-07-07
-- Upstream `dev` checked: `fb1edc49180a3a2f69429f5dcca48fd96b41e2b7`
+- CyxCode head after latest backport: `b1b02b09ae7a61d62eb485fa6456770e6e5d8b06`
+- Latest upstream release checked: `anomalyco/opencode v1.17.16`
+- Upstream release date: 2026-07-09
+- Upstream `dev` checked: `e357c9021234763da54753d69cbc28908e071f8b`
 
 ## Audit Policy
 
@@ -32,6 +32,7 @@ Prefer the smallest backport that preserves CyxCode behavior. Do not wholesale m
 - Missing config directory handling from upstream `v1.17.15`, adapted to CyxCode's config behavior.
 - xAI/Grok cache hit rate improvement from upstream `ccb6b7c3ea`, adapted to CyxCode's `@ai-sdk/xai@2.0.51` patch.
 - Grok reasoning variants from upstream `1db5c2402c`, adapted to CyxCode's existing OpenRouter variant gate.
+- Upstream `v1.17.16` scoped release audit completed; no additional CyxCode-safe provider/core fixes remained after the xAI cache-key and Grok reasoning backports.
 
 ## Take Next
 
@@ -81,6 +82,7 @@ These are intentionally not backported unless a concrete CyxCode bug or release 
 - Generated file churn with no runtime behavior change.
 - Nix node_modules hash churn.
 - Upstream release version sync commits.
+- Upstream `v1.17.16` package manifest version sync.
 - Any change that replaces CyxCode-specific commands, branding, update flow, installer identity, skills, security tooling, or TUI behavior.
 
 ## Re-Audit Checklist
