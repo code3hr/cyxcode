@@ -127,6 +127,14 @@ export const useSessionCommands = (actions: SessionCommandContext) => {
   const agentCommand = withCategory(language.t("command.category.agent"))
   const permissionsCommand = withCategory(language.t("command.category.permissions"))
 
+  const closeTerminal = () => {
+    const id = terminal.active()
+    if (!id) return
+    const last = terminal.all().length === 1
+    terminal.close(id)
+    if (last) view().terminal.close()
+  }
+
   const isAutoAcceptActive = () => {
     const sessionID = params.id
     if (sessionID) return permission.isAutoAccepting(sessionID, sdk.directory)
@@ -318,6 +326,15 @@ export const useSessionCommands = (actions: SessionCommandContext) => {
         title: language.t("command.input.focus"),
         keybind: "ctrl+l",
         onSelect: focusInput,
+      }),
+      terminalCommand({
+        id: "terminal.close",
+        title: language.t("terminal.close"),
+        keybind: "mod+w",
+        hidden: true,
+        when: (event) =>
+          event.target instanceof Element && !!event.target.closest('[data-component="terminal"]'),
+        onSelect: closeTerminal,
       }),
       terminalCommand({
         id: "terminal.new",
