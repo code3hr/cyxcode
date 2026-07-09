@@ -331,6 +331,8 @@ export default function Page() {
   const terminal = useTerminal()
   const [searchParams, setSearchParams] = useSearchParams<{ prompt?: string }>()
   const { params, sessionKey, tabs, view } = useSessionLayout()
+  const reviewMode = () => view().review.mode() ?? "session"
+  const reviewFile = () => view().review.file()
 
   createEffect(() => {
     if (!untrack(() => prompt.ready())) return
@@ -535,7 +537,6 @@ export default function Page() {
   const [store, setStore] = createStore({
     messageId: undefined as string | undefined,
     mobileTab: "session" as "session" | "changes",
-    changes: "session" as "session" | "turn",
     newSessionWorktree: "main",
     deferRender: false,
   })
@@ -581,7 +582,7 @@ export default function Page() {
   }, desktopReviewOpen())
 
   const turnDiffs = createMemo(() => lastUserMessage()?.summary?.diffs ?? [])
-  const reviewDiffs = createMemo(() => (store.changes === "session" ? diffs() : turnDiffs()))
+  const reviewDiffs = createMemo(() => (reviewMode() === "session" ? diffs() : turnDiffs()))
 
   const newSessionWorktree = createMemo(() => {
     if (store.newSessionWorktree === "create") return "create"
@@ -775,7 +776,7 @@ export default function Page() {
       sessionKey,
       () => {
         setStore("messageId", undefined)
-        setStore("changes", "session")
+        view().review.setMode("session")
         setUi("pendingMessage", undefined)
       },
       { defer: true },
@@ -911,7 +912,6 @@ export default function Page() {
   const [tree, setTree] = createStore({
     reviewScroll: undefined as HTMLDivElement | undefined,
     pendingDiff: undefined as string | undefined,
-    activeDiff: undefined as string | undefined,
   })
 
   createEffect(
@@ -921,7 +921,6 @@ export default function Page() {
         setTree({
           reviewScroll: undefined,
           pendingDiff: undefined,
-          activeDiff: undefined,
         })
       },
       { defer: true },
@@ -961,11 +960,11 @@ export default function Page() {
     return (
       <Select
         options={changesOptionsList}
-        current={store.changes}
+        current={reviewMode()}
         label={(option) =>
           option === "session" ? language.t("ui.sessionReview.title") : language.t("ui.sessionReview.title.lastTurn")
         }
-        onSelect={(option) => option && setStore("changes", option)}
+        onSelect={(option) => option && view().review.setMode(option)}
         variant="ghost"
         size="small"
         valueClass="text-14-medium"
@@ -979,8 +978,15 @@ export default function Page() {
     </div>
   )
 
+  const activeReviewFile = () => {
+    const list = reviewDiffs()
+    const current = reviewFile()
+    if (current && list.some((item) => item.file === current)) return current
+    return list[0]?.file
+  }
+
   const reviewEmpty = (input: { loadingClass: string; emptyClass: string }) => {
-    if (store.changes === "turn") return emptyTurn()
+    if (reviewMode() === "turn") return emptyTurn()
 
     if (hasReview() && !diffsReady()) {
       return <div class={input.loadingClass}>{language.t("session.review.loadingChanges")}</div>
@@ -996,9 +1002,7 @@ export default function Page() {
             </div>
           </div>
           <Button size="large" disabled={gitMutation.isPending} onClick={initGit}>
-            {gitMutation.isPending
-              ? language.t("session.review.noVcs.createGit.actionLoading")
-              : language.t("session.review.noVcs.createGit.action")}
+            {gitMutation.isPending ? language.t("session.review.noVcs.createGit.actionLoading") : language.t("session.review.noVcs.createGit.action")}
           </Button>
         </div>
       )
@@ -1006,7 +1010,7 @@ export default function Page() {
 
     return (
       <div class={input.emptyClass}>
-        <div class="text-14-regular text-text-weak max-w-56">{language.t(reviewEmptyKey())}</div>
+        <div class="text-14-regular text-text-weak">{language.t(reviewEmptyKey())}</div>
       </div>
     )
   }
@@ -1027,7 +1031,7 @@ export default function Page() {
         diffStyle={input.diffStyle}
         onDiffStyleChange={input.onDiffStyleChange}
         onScrollRef={(el) => setTree("reviewScroll", el)}
-        focusedFile={tree.activeDiff}
+        focusedFile={activeReviewFile()}
         onLineComment={(comment) => addCommentToContext({ ...comment, origin: "review" })}
         onLineCommentUpdate={updateCommentInContext}
         onLineCommentDelete={removeCommentFromContext}
@@ -1103,7 +1107,8 @@ export default function Page() {
   const focusReviewDiff = (path: string) => {
     openReviewPanel()
     view().review.openPath(path)
-    setTree({ activeDiff: path, pendingDiff: path })
+    view().review.setFile(path)
+    setTree("pendingDiff", path)
   }
 
   createEffect(() => {
@@ -1855,7 +1860,7 @@ export default function Page() {
 
         <SessionSidePanel
           reviewPanel={reviewPanel}
-          activeDiff={tree.activeDiff}
+          activeDiff={activeReviewFile()}
           focusReviewDiff={focusReviewDiff}
           reviewSnap={ui.reviewSnap}
           size={size}

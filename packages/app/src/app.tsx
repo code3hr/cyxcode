@@ -8,9 +8,10 @@ import { Font } from "@cyxcode/ui/font"
 import { Splash } from "@cyxcode/ui/logo"
 import { ThemeProvider } from "@cyxcode/ui/theme"
 import { MetaProvider } from "@solidjs/meta"
-import { type BaseRouterProps, Navigate, Route, Router } from "@solidjs/router"
+import { type BaseRouterProps, Navigate, Route, Router, useSearchParams } from "@solidjs/router"
 import { QueryClient, QueryClientProvider } from "@tanstack/solid-query"
 import { type Duration, Effect } from "effect"
+import { base64Encode } from "@cyxcode/util/encode"
 import {
   type Component,
   createMemo,
@@ -59,6 +60,71 @@ const SessionRoute = () => (
 )
 
 const SessionIndexRoute = () => <Navigate href="session" />
+
+function isObject(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null && !Array.isArray(value)
+}
+
+function parseLegacyDraft(id?: string) {
+  if (!id) return
+  if (typeof localStorage === "undefined") return
+
+  const raw = localStorage.getItem("opencode.window.browser.dat:tabs")
+  if (!raw) return
+
+  const pick = (item: unknown) => {
+    if (!isObject(item)) return
+    if (item.id !== id && item.draftId !== id) return
+    if (typeof item.directory !== "string" || !item.directory) return
+    return {
+      directory: item.directory,
+      prompt: typeof item.prompt === "string" ? item.prompt : undefined,
+    }
+  }
+
+  try {
+    const parsed = JSON.parse(raw)
+    const direct = pick(parsed)
+    if (direct) return direct
+
+    const list = isObject(parsed)
+      ? [parsed.drafts, parsed.tabs, parsed.items].find((value): value is unknown[] => Array.isArray(value))
+      : Array.isArray(parsed)
+        ? parsed
+        : undefined
+    if (!list) return
+
+    for (const item of list) {
+      const draft = pick(item)
+      if (draft) return draft
+    }
+  } catch {}
+}
+
+function LegacySessionRoute() {
+  const [search] = useSearchParams<{
+    directory?: string
+    draftId?: string
+    prompt?: string
+  }>()
+
+  const path = () => {
+    if (search.directory) return `/${base64Encode(search.directory)}/session`
+    const draft = parseLegacyDraft(search.draftId)
+    if (!draft?.directory) return "/"
+    return `/${base64Encode(draft.directory)}/session`
+  }
+
+  const href = () => {
+    const draft = parseLegacyDraft(search.draftId)
+    const prompt = search.prompt ?? draft?.prompt
+    if (!prompt) return path()
+    const params = new URLSearchParams({ prompt })
+    return `${path()}?${params}`
+  }
+
+  return <Navigate href={href()} />
+}
 
 function UiI18nBridge(props: ParentProps) {
   const language = useLanguage()
@@ -297,6 +363,7 @@ export function AppInterface(props: {
                 root={(routerProps) => <RouterRoot appChildren={props.children}>{routerProps.children}</RouterRoot>}
               >
                 <Route path="/" component={HomeRoute} />
+                <Route path="/new-session" component={LegacySessionRoute} />
                 <Route path="/:dir" component={DirectoryLayout}>
                   <Route path="/" component={SessionIndexRoute} />
                   <Route path="/session/:id?" component={SessionRoute} />

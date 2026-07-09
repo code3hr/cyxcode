@@ -39,6 +39,8 @@ type SessionTabs = {
 type SessionView = {
   scroll: Record<string, SessionScroll>
   reviewOpen?: string[]
+  reviewMode?: ReviewChangeMode
+  reviewFile?: string
   pendingMessage?: string
   pendingMessageAt?: number
 }
@@ -52,6 +54,7 @@ type TabHandoff = {
 export type LocalProject = Partial<Project> & { worktree: string; expanded: boolean }
 
 export type ReviewDiffStyle = "unified" | "split"
+export type ReviewChangeMode = "session" | "turn"
 
 export function ensureSessionKey(key: string, touch: (key: string) => void, seed: (key: string) => void) {
   touch(key)
@@ -734,6 +737,14 @@ export const { use: useLayout, provider: LayoutProvider } = createSimpleContext(
       view(sessionKey: string | Accessor<string>) {
         const key = createSessionKeyReader(sessionKey, ensureKey)
         const s = createMemo(() => store.sessionView[key()] ?? { scroll: {} })
+        const reviewMode = createMemo(() => {
+          const mode = s().reviewMode
+          if (mode === "session" || mode === "turn") return mode
+        })
+        const reviewFile = createMemo(() => {
+          const file = s().reviewFile
+          if (typeof file === "string") return file
+        })
         const terminalOpened = createMemo(() => store.terminal?.opened ?? false)
         const reviewPanelOpened = createMemo(() => store.review?.panelOpened ?? true)
 
@@ -793,6 +804,32 @@ export const { use: useLayout, provider: LayoutProvider } = createSimpleContext(
             },
           },
           review: {
+            mode: reviewMode,
+            setMode(mode: ReviewChangeMode) {
+              const session = key()
+              const current = store.sessionView[session]
+              if (!current) {
+                setStore("sessionView", session, { scroll: {}, reviewMode: mode })
+                prune(session)
+                return
+              }
+              if (current.reviewMode === mode) return
+              setStore("sessionView", session, "reviewMode", mode)
+              prune(session)
+            },
+            file: reviewFile,
+            setFile(file: string) {
+              const session = key()
+              const current = store.sessionView[session]
+              if (!current) {
+                setStore("sessionView", session, { scroll: {}, reviewFile: file })
+                prune(session)
+                return
+              }
+              if (current.reviewFile === file) return
+              setStore("sessionView", session, "reviewFile", file)
+              prune(session)
+            },
             open: createMemo(() => s().reviewOpen ?? []),
             setOpen(open: string[]) {
               const session = key()

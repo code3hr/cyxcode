@@ -35,6 +35,7 @@ Prefer the smallest backport that preserves CyxCode behavior. Do not wholesale m
 - Settings theme selection behavior from upstream `ae259d87f0`, adapted to CyxCode's single settings UI.
 - Upstream `v1.17.16` scoped release audit completed; no additional CyxCode-safe provider/core fixes remained after the xAI cache-key and Grok reasoning backports.
 - Desktop review pane sizing from upstream `dd25d143c5`, adapted to CyxCode session layout.
+- Review state persistence per session from upstream `aa52d30d7f`, adapted to CyxCode session/review state.
 - Terminal shortcut priority from upstream `65fd2e5c91`, adapted to CyxCode command palette and shortcut settings visibility.
 - Show unread session state for pending questions from upstream `c5fe32fbb1`, adapted to CyxCode session list row state.
 
@@ -58,12 +59,12 @@ None currently marked as direct `take`.
 Potentially useful only if CyxCode actively ships or tests the desktop app surface:
 
 
-- Session tab titles persist during reload/loading.
+- [done] Session tab titles persist during reload/loading.
 - macOS titlebar and traffic light layout fixes.
 - Hidden review pane unmounting.
-- Review state persistence per session.
-- Legacy drafts route to session page.
-- Capped review patch loading.
+
+- [done] Legacy drafts route to session page (app compatibility `/new-session` compatibility route).
+- [blocked] Capped review patch loading (upstream depends on `@opencode-ai/ui` v2 `session-review` and `/vcs/diff` API).
 
 Reason this is manual: these touch `packages/app` layout/session state and can conflict with CyxCode UI assumptions.
 
