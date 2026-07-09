@@ -131,5 +131,3 @@ git diff --name-status <latest-upstream-tag>..upstream/dev -- packages/opencode 
 
 6. For any `take` or `manual adaptation`, add focused tests in `packages/opencode` and run package-local tests/typecheck only from package directories.
 
-
-
