@@ -61,7 +61,7 @@ Potentially useful only if CyxCode actively ships or tests the desktop app surfa
 
 - [done] Session tab titles persist during reload/loading.
 - macOS titlebar and traffic light layout fixes.
-- Hidden review pane unmounting.
+- [done] Hidden review pane unmounting.
 
 - [done] Legacy drafts route to session page (app compatibility `/new-session` compatibility route).
 - [blocked] Capped review patch loading (upstream depends on `@opencode-ai/ui` v2 `session-review` and `/vcs/diff` API).

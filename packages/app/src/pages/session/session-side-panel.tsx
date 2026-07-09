@@ -305,7 +305,7 @@ export function SessionSidePanel(props: {
 
                   <Show when={reviewTab()}>
                     <Tabs.Content value="review" class="flex flex-col h-full overflow-hidden contain-strict">
-                      <Show when={activeTab() === "review"}>{props.reviewPanel()}</Show>
+                      <Show when={reviewOpen() && activeTab() === "review"}>{props.reviewPanel()}</Show>
                     </Tabs.Content>
                   </Show>
 
