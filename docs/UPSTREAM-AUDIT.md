@@ -33,6 +33,7 @@ Prefer the smallest backport that preserves CyxCode behavior. Do not wholesale m
 - xAI/Grok cache hit rate improvement from upstream `ccb6b7c3ea`, adapted to CyxCode's `@ai-sdk/xai@2.0.51` patch.
 - Grok reasoning variants from upstream `1db5c2402c`, adapted to CyxCode's existing OpenRouter variant gate.
 - Upstream `v1.17.16` scoped release audit completed; no additional CyxCode-safe provider/core fixes remained after the xAI cache-key and Grok reasoning backports.
+- Desktop review pane sizing from upstream `dd25d143c5`, adapted to CyxCode session layout.
 
 ## Take Next
 
@@ -58,7 +59,7 @@ Potentially useful only if CyxCode actively ships or tests the desktop app surfa
 - Session tab titles persist during reload/loading.
 - Settings theme applies only after selection.
 - macOS titlebar and traffic light layout fixes.
-- Review pane sizing and hidden pane unmounting.
+- Hidden review pane unmounting.
 - Review state persistence per session.
 - Legacy drafts route to session page.
 - Capped review patch loading.

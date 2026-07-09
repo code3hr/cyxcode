@@ -10,6 +10,7 @@ import {
   createMemo,
   createEffect,
   createComputed,
+  createSignal,
   on,
   onMount,
   untrack,
@@ -51,6 +52,11 @@ import {
 import { MessageTimeline } from "@/pages/session/message-timeline"
 import { type DiffStyle, SessionReviewTab, type SessionReviewTabProps } from "@/pages/session/review-tab"
 import { useSessionLayout } from "@/pages/session/session-layout"
+import {
+  clampSessionPanelWidth,
+  SESSION_PANEL_WIDTH_MIN,
+  sessionPanelWidthMax,
+} from "@/pages/session/session-panel-width"
 import { syncSessionModel } from "@/pages/session/session-model-helpers"
 import { SessionSidePanel } from "@/pages/session/session-side-panel"
 import { TerminalPanel } from "@/pages/session/terminal-panel"
@@ -394,9 +400,30 @@ export default function Page() {
   const desktopReviewOpen = createMemo(() => isDesktop() && view().reviewPanel.opened())
   const desktopFileTreeOpen = createMemo(() => isDesktop() && layout.fileTree.opened())
   const desktopSidePanelOpen = createMemo(() => desktopReviewOpen() || desktopFileTreeOpen())
+  let panelRow: HTMLDivElement | undefined
+  const [panelRowWidth, setPanelRowWidth] = createSignal<number>()
+  createResizeObserver(
+    () => panelRow,
+    ({ width }) => setPanelRowWidth(width),
+  )
+  const sessionPanelMax = createMemo(() => {
+    const width = panelRowWidth()
+    if (width === undefined) return 1000
+    return sessionPanelWidthMax({
+      available: width,
+      split: layout.review.diffStyle() === "split",
+    })
+  })
+  const sessionPanelResizedWidth = createMemo(() =>
+    clampSessionPanelWidth({
+      width: layout.session.width(),
+      available: panelRowWidth(),
+      split: layout.review.diffStyle() === "split",
+    }),
+  )
   const sessionPanelWidth = createMemo(() => {
     if (!desktopSidePanelOpen()) return "100%"
-    if (desktopReviewOpen()) return `${layout.session.width()}px`
+    if (desktopReviewOpen()) return `${sessionPanelResizedWidth()}px`
     return `calc(100% - ${layout.fileTree.width()}px)`
   })
   const centered = createMemo(() => isDesktop() && !desktopReviewOpen())
@@ -1671,7 +1698,7 @@ export default function Page() {
   return (
     <div class="relative bg-background-base size-full overflow-hidden flex flex-col">
       <SessionHeader />
-      <div class="flex-1 min-h-0 flex flex-col md:flex-row">
+      <div ref={panelRow} class="flex-1 min-h-0 flex flex-col md:flex-row">
         <Show when={!isDesktop() && !!params.id}>
           <Tabs value={store.mobileTab} class="h-auto">
             <Tabs.List>
@@ -1814,9 +1841,9 @@ export default function Page() {
             <div onPointerDown={() => size.start()}>
               <ResizeHandle
                 direction="horizontal"
-                size={layout.session.width()}
-                min={450}
-                max={typeof window === "undefined" ? 1000 : window.innerWidth * 0.45}
+                size={sessionPanelResizedWidth()}
+                min={SESSION_PANEL_WIDTH_MIN}
+                max={sessionPanelMax()}
                 onResize={(width) => {
                   size.touch()
                   layout.session.resize(width)
