@@ -28,6 +28,8 @@ export namespace ProviderTransform {
       case "@ai-sdk/openai":
       case "@ai-sdk/azure":
         return "openai"
+      case "@ai-sdk/xai":
+        return "xai"
       case "@ai-sdk/amazon-bedrock":
         return "bedrock"
       case "@ai-sdk/anthropic":
@@ -753,7 +755,10 @@ export namespace ProviderTransform {
       }
     }
 
-    if (input.model.providerID === "openai" || input.providerOptions?.setCacheKey) {
+    if (
+      input.providerOptions?.setCacheKey !== false &&
+      (input.model.providerID === "openai" || input.model.api.npm === "@ai-sdk/xai" || input.providerOptions?.setCacheKey)
+    ) {
       result["promptCacheKey"] = input.sessionID
     }
 

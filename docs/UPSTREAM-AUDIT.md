@@ -30,6 +30,7 @@ Prefer the smallest backport that preserves CyxCode behavior. Do not wholesale m
 - CyxCode update/install identity fixes so `/update` and installer paths target `code3hr/cyxcode`, not upstream opencode.
 - Z.ai context overflow classification from upstream `v1.17.15`.
 - Missing config directory handling from upstream `v1.17.15`, adapted to CyxCode's config behavior.
+- xAI/Grok cache hit rate improvement from upstream `ccb6b7c3ea`, adapted to CyxCode's `@ai-sdk/xai@2.0.51` patch.
 
 ## Take Next
 
@@ -37,19 +38,14 @@ None currently marked as direct `take`.
 
 ## Manual Adaptation Candidates
 
-### xAI Cache Hit Rate
+### xAI Cache Hit Rate - Done
 
 - Upstream commit: `ccb6b7c3ea fix: improve xai cache hit rate (#35970)`
-- Upstream status: unreleased on `upstream/dev` at audit time.
-- Upstream files include:
-  - `packages/opencode/src/provider/transform.ts`
+- Completed: 2026-07-09
+- Adaptation: kept CyxCode on `@ai-sdk/xai@2.0.51` and extended the existing local patch instead of taking upstream's `@ai-sdk/xai@3.0.102` package bump.
+- Tests added:
   - `packages/opencode/test/provider/transform.test.ts`
-  - `packages/opencode/package.json`
-  - root `package.json`
-  - `bun.lock`
-  - `patches/@ai-sdk%2Fxai@3.0.102.patch`
-- Reason this is manual: upstream uses `@ai-sdk/xai@3.0.102`; CyxCode currently uses `@ai-sdk/xai@2.0.51`. The small transform change depends on SDK/patch behavior.
-- Recommendation: only backport if xAI/Grok cache hit rate matters now. Do it in a focused branch with provider transform tests and, if needed, a deliberate SDK bump.
+  - `packages/opencode/test/provider/xai-responses.test.ts`
 
 ### Desktop/App Bug Fixes
 

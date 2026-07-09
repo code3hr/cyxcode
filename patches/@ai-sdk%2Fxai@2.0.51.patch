@@ -1,73 +1,29 @@
-diff --git a/dist/index.mjs b/dist/index.mjs
---- a/dist/index.mjs
-+++ b/dist/index.mjs
-@@ -959,7 +959,7 @@
-   model: z4.string().nullish(),
-   object: z4.literal("response"),
-   output: z4.array(outputItemSchema),
--  usage: xaiResponsesUsageSchema,
-+  usage: xaiResponsesUsageSchema.nullish(),
-   status: z4.string()
- });
- var xaiResponsesChunkSchema = z4.union([
-\ No newline at end of file
-@@ -1143,6 +1143,18 @@
-   z4.object({
-     type: z4.literal("response.completed"),
-     response: xaiResponsesResponseSchema
-+  }),
-+  z4.object({
-+    type: z4.literal("response.function_call_arguments.delta"),
-+    item_id: z4.string(),
-+    output_index: z4.number(),
-+    delta: z4.string()
-+  }),
-+  z4.object({
-+    type: z4.literal("response.function_call_arguments.done"),
-+    item_id: z4.string(),
-+    output_index: z4.number(),
-+    arguments: z4.string()
-   })
- ]);
- 
-\ No newline at end of file
-@@ -1940,6 +1952,9 @@
-               if (response2.status) {
-                 finishReason = mapXaiResponsesFinishReason(response2.status);
-               }
-+              if (seenToolCalls.size > 0 && finishReason !== "tool-calls") {
-+                finishReason = "tool-calls";
-+              }
-               return;
-             }
-             if (event.type === "response.output_item.added" || event.type === "response.output_item.done") {
-\ No newline at end of file
-@@ -2024,7 +2039,7 @@
-                   }
-                 }
-               } else if (part.type === "function_call") {
--                if (!seenToolCalls.has(part.call_id)) {
-+                if (event.type === "response.output_item.done" && !seenToolCalls.has(part.call_id)) {
-                   seenToolCalls.add(part.call_id);
-                   controller.enqueue({
-                     type: "tool-input-start",
-\ No newline at end of file
+diff --git a/dist/index.d.mts b/dist/index.d.mts
+index f0043e7..0fa307a 100644
+--- a/dist/index.d.mts
++++ b/dist/index.d.mts
+@@ -70,2 +70,3 @@ declare const xaiResponsesProviderOptions: z.ZodObject<{
+     previousResponseId: z.ZodOptional<z.ZodString>;
++    promptCacheKey: z.ZodOptional<z.ZodString>;
+ }, z.core.$strip>;
+diff --git a/dist/index.d.ts b/dist/index.d.ts
+index f0043e7..0fa307a 100644
+--- a/dist/index.d.ts
++++ b/dist/index.d.ts
+@@ -70,2 +70,3 @@ declare const xaiResponsesProviderOptions: z.ZodObject<{
+     previousResponseId: z.ZodOptional<z.ZodString>;
++    promptCacheKey: z.ZodOptional<z.ZodString>;
+ }, z.core.$strip>;
 diff --git a/dist/index.js b/dist/index.js
+index 0cc2af9..9b50789 100644
 --- a/dist/index.js
 +++ b/dist/index.js
-@@ -964,7 +964,7 @@
-   model: import_v44.z.string().nullish(),
-   object: import_v44.z.literal("response"),
+@@ -966,3 +966,3 @@ var xaiResponsesResponseSchema = import_v44.z.object({
    output: import_v44.z.array(outputItemSchema),
 -  usage: xaiResponsesUsageSchema,
 +  usage: xaiResponsesUsageSchema.nullish(),
    status: import_v44.z.string()
- });
- var xaiResponsesChunkSchema = import_v44.z.union([
-\ No newline at end of file
-@@ -1148,6 +1148,18 @@
-   import_v44.z.object({
-     type: import_v44.z.literal("response.completed"),
+@@ -1150,2 +1150,14 @@ var xaiResponsesChunkSchema = import_v44.z.union([
      response: xaiResponsesResponseSchema
 +  }),
 +  import_v44.z.object({
@@ -82,27 +38,73 @@ diff --git a/dist/index.js b/dist/index.js
 +    output_index: import_v44.z.number(),
 +    arguments: import_v44.z.string()
    })
- ]);
- 
-\ No newline at end of file
-@@ -1935,6 +1947,9 @@
-               if (response2.status) {
-                 finishReason = mapXaiResponsesFinishReason(response2.status);
+@@ -1187,3 +1199,4 @@ var xaiResponsesProviderOptions = import_v45.z.object({
+    */
+-  previousResponseId: import_v45.z.string().optional()
++  previousResponseId: import_v45.z.string().optional(),
++  promptCacheKey: import_v45.z.string().optional()
+ });
+@@ -1667,2 +1680,5 @@ var XaiResponsesLanguageModel = class {
+         previous_response_id: options.previousResponseId
++      },
++      ...options.promptCacheKey != null && {
++        prompt_cache_key: options.promptCacheKey
+       }
+@@ -1937,2 +1953,5 @@ var XaiResponsesLanguageModel = class {
                }
 +              if (seenToolCalls.size > 0 && finishReason !== "tool-calls") {
 +                finishReason = "tool-calls";
 +              }
                return;
-             }
-             if (event.type === "response.output_item.added" || event.type === "response.output_item.done") {
-\ No newline at end of file
-@@ -2019,7 +2034,7 @@
-                   }
-                 }
+@@ -2021,3 +2040,3 @@ var XaiResponsesLanguageModel = class {
                } else if (part.type === "function_call") {
 -                if (!seenToolCalls.has(part.call_id)) {
 +                if (event.type === "response.output_item.done" && !seenToolCalls.has(part.call_id)) {
                    seenToolCalls.add(part.call_id);
-                   controller.enqueue({
-                     type: "tool-input-start",
-\ No newline at end of file
+diff --git a/dist/index.mjs b/dist/index.mjs
+index 72ffc7f..36e6797 100644
+--- a/dist/index.mjs
++++ b/dist/index.mjs
+@@ -961,3 +961,3 @@ var xaiResponsesResponseSchema = z4.object({
+   output: z4.array(outputItemSchema),
+-  usage: xaiResponsesUsageSchema,
++  usage: xaiResponsesUsageSchema.nullish(),
+   status: z4.string()
+@@ -1145,2 +1145,14 @@ var xaiResponsesChunkSchema = z4.union([
+     response: xaiResponsesResponseSchema
++  }),
++  z4.object({
++    type: z4.literal("response.function_call_arguments.delta"),
++    item_id: z4.string(),
++    output_index: z4.number(),
++    delta: z4.string()
++  }),
++  z4.object({
++    type: z4.literal("response.function_call_arguments.done"),
++    item_id: z4.string(),
++    output_index: z4.number(),
++    arguments: z4.string()
+   })
+@@ -1182,3 +1194,4 @@ var xaiResponsesProviderOptions = z5.object({
+    */
+-  previousResponseId: z5.string().optional()
++  previousResponseId: z5.string().optional(),
++  promptCacheKey: z5.string().optional()
+ });
+@@ -1672,2 +1685,5 @@ var XaiResponsesLanguageModel = class {
+         previous_response_id: options.previousResponseId
++      },
++      ...options.promptCacheKey != null && {
++        prompt_cache_key: options.promptCacheKey
+       }
+@@ -1942,2 +1958,5 @@ var XaiResponsesLanguageModel = class {
+               }
++              if (seenToolCalls.size > 0 && finishReason !== "tool-calls") {
++                finishReason = "tool-calls";
++              }
+               return;
+@@ -2026,3 +2045,3 @@ var XaiResponsesLanguageModel = class {
+               } else if (part.type === "function_call") {
+-                if (!seenToolCalls.has(part.call_id)) {
++                if (event.type === "response.output_item.done" && !seenToolCalls.has(part.call_id)) {
+                   seenToolCalls.add(part.call_id);
