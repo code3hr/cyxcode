@@ -36,6 +36,7 @@ Prefer the smallest backport that preserves CyxCode behavior. Do not wholesale m
 - Upstream `v1.17.16` scoped release audit completed; no additional CyxCode-safe provider/core fixes remained after the xAI cache-key and Grok reasoning backports.
 - Desktop review pane sizing from upstream `dd25d143c5`, adapted to CyxCode session layout.
 - Terminal shortcut priority from upstream `65fd2e5c91`, adapted to CyxCode command palette and shortcut settings visibility.
+- Show unread session state for pending questions from upstream `c5fe32fbb1`, adapted to CyxCode session list row state.
 
 ## Take Next
 
@@ -56,7 +57,7 @@ None currently marked as direct `take`.
 
 Potentially useful only if CyxCode actively ships or tests the desktop app surface:
 
-- Unread state on tabs with pending questions.
+
 - Session tab titles persist during reload/loading.
 - macOS titlebar and traffic light layout fixes.
 - Hidden review pane unmounting.

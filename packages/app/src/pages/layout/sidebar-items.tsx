@@ -16,7 +16,7 @@ import { getAvatarColors, type LocalProject, useLayout } from "@/context/layout"
 import { useNotification } from "@/context/notification"
 import { usePermission } from "@/context/permission"
 import { messageAgentColor } from "@/utils/agent"
-import { sessionPermissionRequest } from "../session/composer/session-request-tree"
+import { sessionPermissionRequest, sessionQuestionRequest } from "../session/composer/session-request-tree"
 import { hasProjectPermissions } from "./helpers"
 
 const CYXCODE_PROJECT_ID = "4b0ea68d7af9a6031a7ffda7ad66e0cb83315750"
@@ -93,6 +93,7 @@ const SessionRow = (props: {
   isWorking: Accessor<boolean>
   hasPermissions: Accessor<boolean>
   hasError: Accessor<boolean>
+  unread: Accessor<boolean>
   unseenCount: Accessor<number>
   setHoverSession: (id: string | undefined) => void
   clearHoverProjectSoon: () => void
@@ -129,7 +130,7 @@ const SessionRow = (props: {
         <Match when={props.hasError()}>
           <div class="size-1.5 rounded-full bg-text-diff-delete-base" />
         </Match>
-        <Match when={props.unseenCount() > 0}>
+        <Match when={props.unread()}>
           <div class="size-1.5 rounded-full bg-text-interactive-base" />
         </Match>
       </Switch>
@@ -206,8 +207,12 @@ export const SessionItem = (props: SessionItemProps): JSX.Element => {
   const permission = usePermission()
   const globalSync = useGlobalSync()
   const unseenCount = createMemo(() => notification.session.unseenCount(props.session.id))
-  const hasError = createMemo(() => notification.session.unseenHasError(props.session.id))
   const [sessionStore] = globalSync.child(props.session.directory)
+  const hasQuestions = createMemo(() => {
+    return !!sessionQuestionRequest(sessionStore.session, sessionStore.question, props.session.id)
+  })
+  const unread = createMemo(() => hasQuestions() || unseenCount() > 0)
+  const hasError = createMemo(() => notification.session.unseenHasError(props.session.id))
   const hasPermissions = createMemo(() => {
     return !!sessionPermissionRequest(sessionStore.session, sessionStore.permission, props.session.id, (item) => {
       return !permission.autoResponds(item, props.session.directory)
@@ -295,6 +300,7 @@ export const SessionItem = (props: SessionItemProps): JSX.Element => {
       isWorking={isWorking}
       hasPermissions={hasPermissions}
       hasError={hasError}
+      unread={unread}
       unseenCount={unseenCount}
       setHoverSession={props.setHoverSession}
       clearHoverProjectSoon={props.clearHoverProjectSoon}
