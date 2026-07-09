@@ -2,8 +2,9 @@
 
 *We automate the AI that automates us.*
 
-**Website:** [code3hr.github.io/cyxcode](https://code3hr.github.io/cyxcode/)`r`n`r`n**Sponsor:** [github.com/sponsors/CYXWIZ-Lab](https://github.com/sponsors/CYXWIZ-Lab)
+**Website:** [code3hr.github.io/cyxcode](https://code3hr.github.io/cyxcode/)
 
+**Sponsor:** [github.com/sponsors/CYXWIZ-Lab](https://github.com/sponsors/CYXWIZ-Lab)
 [![CyxCode Terminal UI](packages/web/src/assets/lander/screenshot-cyxcode.png)](https://github.com/code3hr/cyxcode)
 
 136 built-in error patterns. Community packs and learned patterns extend coverage.
