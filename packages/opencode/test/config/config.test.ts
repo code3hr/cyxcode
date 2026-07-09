@@ -735,6 +735,26 @@ test("does not try to install dependencies in read-only CYXCODE_CONFIG_DIR", asy
   }
 })
 
+test("handles missing CYXCODE_CONFIG_DIR", async () => {
+  await using tmp = await tmpdir()
+  const cfg = path.join(tmp.path, "missing-config")
+  const prev = process.env.CYXCODE_CONFIG_DIR
+  process.env.CYXCODE_CONFIG_DIR = cfg
+
+  try {
+    await Instance.provide({
+      directory: tmp.path,
+      fn: async () => {
+        await Config.get()
+        await Config.waitForDependencies()
+      },
+    })
+  } finally {
+    if (prev === undefined) delete process.env.CYXCODE_CONFIG_DIR
+    else process.env.CYXCODE_CONFIG_DIR = prev
+  }
+})
+
 test("skips dependency install in empty writable CYXCODE_CONFIG_DIR", async () => {
   await using tmp = await tmpdir<string>({
     init: async (dir) => {

@@ -153,6 +153,9 @@ export namespace Config {
         }
       }
 
+      const exists = await Filesystem.exists(dir)
+      if (!exists) continue
+
       deps.push(
         iife(async () => {
           const shouldInstall = await needsInstall(dir)

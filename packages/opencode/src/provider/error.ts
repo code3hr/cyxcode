@@ -11,6 +11,7 @@ export namespace ProviderError {
     /input is too long for requested model/i, // Amazon Bedrock
     /exceeds the context window/i, // OpenAI (Completions + Responses API message text)
     /input token count.*exceeds the maximum/i, // Google (Gemini)
+    /tokens in request more than max tokens allowed/i, // Z.ai
     /maximum prompt length is \d+/i, // xAI (Grok)
     /reduce the length of the messages/i, // Groq
     /maximum context length is \d+ tokens/i, // OpenRouter, DeepSeek, vLLM
