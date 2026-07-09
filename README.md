@@ -2,7 +2,7 @@
 
 *We automate the AI that automates us.*
 
-Website: [code3hr.github.io/cyxcode](https://code3hr.github.io/cyxcode/)`r`n`r`nSponsor the project: [github.com/sponsors/CYXWIZ-Lab](https://github.com/sponsors/CYXWIZ-Lab)
+**Website:** [code3hr.github.io/cyxcode](https://code3hr.github.io/cyxcode/)`r`n**Sponsor:** [github.com/sponsors/CYXWIZ-Lab](https://github.com/sponsors/CYXWIZ-Lab)
 
 [![CyxCode Terminal UI](packages/web/src/assets/lander/screenshot-cyxcode.png)](https://github.com/code3hr/cyxcode)
 
