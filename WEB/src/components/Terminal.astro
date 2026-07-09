@@ -1,0 +1,176 @@
+---
+// Animated terminal: cycles the real CyxCode flow.
+// Scene 1: miss → AI handles → captured for learning
+// Scene 2: same error → pattern hit → 0 tokens
+// Plus a live "tokens saved" counter that ticks up.
+---
+
+<article class="hero-terminal panel reveal">
+  <div class="terminal-bar">
+    <div class="terminal-dots" aria-hidden="true">
+      <span></span><span></span><span></span>
+    </div>
+    <span class="terminal-title">cyxcode — pattern runtime</span>
+    <span class="terminal-title" style="opacity:0.5">●</span>
+  </div>
+
+  <div class="terminal-body" id="term-body" aria-live="polite">
+    <span class="term-cursor"></span>
+  </div>
+
+  <div class="terminal-counter">
+    <span class="counter-pill">
+      <span class="num" id="pattern-count">136</span>
+      patterns active
+    </span>
+    <span class="counter-pill">
+      tokens saved
+      <span class="num" id="tokens-saved">0</span>
+    </span>
+  </div>
+</article>
+
+<script is:inline>
+  (() => {
+    const body = document.getElementById("term-body")
+    const savedEl = document.getElementById("tokens-saved")
+    if (!body || !savedEl) return
+
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    const wait = (ms) => new Promise((r) => setTimeout(r, reduce ? ms / 4 : ms))
+
+    // Each frame: { t: text class, s: text, pause after, type? }
+    const scenes = [
+      [
+        { t: "prompt", s: "$ " },
+        { t: "cmd", s: "!python3 -c 'import flask'", type: true },
+        { t: "br", s: "" },
+        { t: "out", s: "ModuleNotFoundError: No module named 'flask'" },
+        { t: "br", s: "" },
+        { t: "miss", s: "→ pattern miss: captured for learning", pause: 700 },
+        { t: "ai", s: "→ AI handling once · ~1,200 tokens", pause: 700 },
+        { t: "hit", s: "✓ fix: pip install flask", pause: 900 },
+        { t: "ai", s: "→ pattern generated · pending review", pause: 600 },
+        { t: "br", s: "" },
+        { t: "out", s: "$ /learn-patterns  → approved", pause: 500 },
+      ],
+      [
+        { t: "prompt", s: "$ " },
+        { t: "cmd", s: "!python3 -c 'import flask'", type: true },
+        { t: "br", s: "" },
+        { t: "out", s: "ModuleNotFoundError: No module named 'flask'" },
+        { t: "br", s: "" },
+        { t: "hit", s: "✓ pattern hit: reused from learned registry", pause: 700 },
+        { t: "hit", s: "✓ fix applied in <1s · 0 tokens", pause: 900 },
+        { t: "br", s: "" },
+        { t: "out", s: "$ # that error never costs again", pause: 1200 },
+      ],
+    ]
+
+    const clear = () => {
+      body.innerHTML = ""
+      const cur = document.createElement("span")
+      cur.className = "term-cursor"
+      body.appendChild(cur)
+    }
+
+    const frame = (cls, text) => {
+      const el = document.createElement("span")
+      el.className = `term-line term-${cls}`
+      el.textContent = text
+      body.insertBefore(el, body.lastElementChild)
+    }
+
+    const br = () => {
+      const el = document.createElement("br")
+      body.insertBefore(el, body.lastElementChild)
+    }
+
+    const typeOut = (cls, text) =>
+      new Promise((resolve) => {
+        const el = document.createElement("span")
+        el.className = `term-line term-${cls}`
+        body.insertBefore(el, body.lastElementChild)
+        let i = 0
+        const tick = () => {
+          if (i <= text.length) {
+            el.textContent = text.slice(0, i)
+            i++
+            body.scrollTop = body.scrollHeight
+            setTimeout(tick, reduce ? 8 : 32)
+          } else {
+            resolve()
+          }
+        }
+        tick()
+      })
+
+    // token counter eases up toward a target
+    let saved = 0
+    let target = 0
+    let raf
+    const animateSaved = (to) => {
+      target = to
+      cancelAnimationFrame(raf)
+      const step = () => {
+        const diff = target - saved
+        if (Math.abs(diff) < 1) {
+          saved = target
+          savedEl.textContent = saved.toLocaleString()
+          return
+        }
+        saved += diff * 0.12
+        savedEl.textContent = Math.round(saved).toLocaleString()
+        raf = requestAnimationFrame(step)
+      }
+      step()
+    }
+
+    let totalSaved = 0
+
+    const playScene = async (scene) => {
+      clear()
+      await wait(250)
+      for (const f of scene) {
+        if (f.s === "" && f.t === "br") {
+          br()
+          continue
+        }
+        if (f.type) {
+          // prompt is the previous frame; type the command portion
+          await typeOut(f.t, f.s)
+        } else {
+          frame(f.t, f.s)
+        }
+        body.scrollTop = body.scrollHeight
+        await wait(f.pause ?? 250)
+      }
+    }
+
+    const loop = async () => {
+      // eslint-disable-next-line no-constant-condition
+      while (true) {
+        await playScene(scenes[0])
+        await wait(800)
+        await playScene(scenes[1])
+        totalSaved += 1200
+        animateSaved(totalSaved)
+        await wait(2200)
+      }
+    }
+
+    // Only run when terminal is visible to save cycles
+    if (reduce) {
+      // Static fallback: render scene 2 result only
+      frame("prompt", "$ ")
+      frame("cmd", "!python3 -c 'import flask'")
+      br()
+      frame("hit", "✓ pattern hit: 0 tokens")
+      br()
+      frame("out", "$ # that error never costs again")
+      savedEl.textContent = "1,200"
+    } else {
+      loop()
+    }
+  })()
+</script>

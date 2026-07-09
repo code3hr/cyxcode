@@ -1,0 +1,215 @@
+---
+import BaseLayout from "../components/BaseLayout.astro"
+import InstallCommand from "../components/InstallCommand.astro"
+import SectionHeading from "../components/SectionHeading.astro"
+import { docs, releases, repo } from "../data/site"
+
+const primary = "curl -fsSL https://raw.githubusercontent.com/code3hr/cyxcode/HEAD/install | bash"
+const latest = "3.0.3"
+const release = `${releases}/tag/v${latest}`
+const pinned = `curl -fsSL https://raw.githubusercontent.com/code3hr/cyxcode/HEAD/install | bash -s -- --version ${latest}`
+---
+
+<BaseLayout
+  title="Install"
+  description="Install CyxCode — prebuilt binary, version pinning, and the /update upgrade path."
+  path="/install"
+>
+  <section class="page-hero reveal">
+    <p class="eyebrow">Get started</p>
+    <h1>Install CyxCode</h1>
+    <p class="lead">
+      Grab a prebuilt binary for Linux, macOS, or Windows (via WSL / Git Bash). The installer drops the
+      <code>cyxcode</code> binary into <code>~/.opencode/bin</code> and adds it to your <code>PATH</code>.
+    </p>
+  </section>
+
+  <section class="content-band">
+    <div class="install-stack">
+      <article class="install-step install-primary reveal">
+        <p class="panel-title">1 · Primary install</p>
+        <InstallCommand command={primary} />
+        <p class="hint">Latest release. Works on Linux, macOS, and Windows under WSL / Git Bash.</p>
+      </article>
+
+      <article class="install-step reveal">
+        <p class="panel-title">2 · Pin the latest release</p>
+        <InstallCommand command={pinned} />
+        <p class="hint">
+          Latest GitHub release: <a class="text-link" href={release} target="_blank" rel="noreferrer noopener">v{latest}</a>.
+          Useful for stable automation and reproducible environments.
+        </p>
+      </article>
+
+      <article class="install-step reveal">
+        <p class="panel-title">3 · Upgrade in place</p>
+        <p>Already running CyxCode? Use <code>/update</code> inside the runtime — it checks the latest GitHub release and runs the installer for you.</p>
+        <div class="inline-cmd">
+          <code>/update</code>
+          <span class="hint" style="margin:0">runs inside CyxCode</span>
+        </div>
+        <p class="hint" style="margin-top:0.75rem">
+          <strong>Note for v2.2.x, v2.3.0, v2.3.1 installs:</strong> those builds had a broken upgrade URL. Run the primary install once to land on v2.3.2+ — auto-upgrades work from then on.
+        </p>
+      </article>
+    </div>
+  </section>
+
+  <section class="content-band">
+    <SectionHeading kicker="From source" title="Prefer to build it yourself?" />
+    <article class="source-card reveal">
+      <div class="term-block mono">
+        <pre><code><span class="t-prompt">$ </span>git clone https://github.com/code3hr/cyxcode.git
+<span class="t-prompt">$ </span>cd cyxcode
+<span class="t-prompt">$ </span>bun install
+<span class="t-prompt">$ </span>export ANTHROPIC_API_KEY=sk-ant-...   <span class="t-out"># or OPENAI_API_KEY</span>
+<span class="t-prompt">$ </span>bun run dev</code></pre>
+      </div>
+      <p class="hint" style="margin-top:1rem">For CPUs without AVX2, see <a class="text-link" href={`${docs}/PERFORMANCE.md`} target="_blank" rel="noreferrer noopener">the performance docs</a>.</p>
+    </article>
+  </section>
+
+  <section class="content-band">
+    <SectionHeading kicker="First run" title="Initialize your project" />
+    <div class="init-grid">
+      <article class="init-card reveal">
+        <h3><code>/cyxinit</code></h3>
+        <p>Run inside CyxCode to scaffold <code>.cyxcode/</code> with slash commands, <code>memory/</code>, <code>patterns/</code>, <code>codegraph/</code>, config, and gitignore entries.</p>
+      </article>
+      <article class="init-card reveal">
+        <h3><code>cyxcode init</code></h3>
+        <p>Same result from your shell, outside the TUI. Project type detection runs automatically.</p>
+      </article>
+      <article class="init-card reveal">
+        <h3>Releases</h3>
+        <p>Latest binaries live at <a class="text-link" href={release} target="_blank" rel="noreferrer noopener">github.com/code3hr/cyxcode/releases/tag/v{latest}</a>.</p>
+      </article>
+    </div>
+  </section>
+
+  <section class="content-band">
+    <div class="panel panel--accent closing-cta reveal">
+      <div>
+        <h2>Ready to stop repeating costs?</h2>
+        <p>One install, and every solved error becomes a free one.</p>
+      </div>
+      <a class="btn cta" href={repo} target="_blank" rel="noreferrer noopener">View on GitHub →</a>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .page-hero {
+    max-width: 56ch;
+    margin-bottom: 1rem;
+  }
+  .page-hero .lead {
+    font-size: 1.125rem;
+    line-height: 1.7;
+    color: var(--muted);
+  }
+  .install-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+  .install-primary {
+    padding: 1.5rem;
+    margin-bottom: 0.5rem;
+  }
+  .install-step {
+    padding: 1.5rem 0;
+  }
+  .install-step + .install-step {
+    border-top: 1px solid var(--line-soft);
+  }
+  .install-step p:not(.panel-title),
+  .source-card p,
+  .init-card p {
+    color: var(--muted);
+    line-height: 1.7;
+  }
+  .panel-title {
+    margin-bottom: 0.75rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--amber);
+  }
+  .hint {
+    margin-top: 0.75rem;
+    font-size: 0.8125rem;
+    color: var(--faint);
+  }
+  .source-card {
+    padding: 1.25rem;
+    border-radius: 14px;
+    background: rgba(4, 8, 16, 0.28);
+  }
+  .inline-cmd {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-top: 0.75rem;
+  }
+  .inline-cmd code {
+    font-family: "JetBrains Mono", monospace;
+    color: var(--mint);
+    background: rgba(36, 209, 163, 0.1);
+    padding: 0.25em 0.6em;
+    border-radius: 6px;
+  }
+  code {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 0.88em;
+    color: var(--mint);
+  }
+  .term-block pre {
+    margin: 0;
+    padding: 1.25rem;
+    background: rgba(4, 8, 16, 0.72);
+    border: 1px solid rgba(146, 166, 207, 0.12);
+    border-radius: 12px;
+    overflow-x: auto;
+    font-size: 0.85rem;
+    line-height: 1.8;
+  }
+  .term-block code {
+    color: #d7e2f7;
+    background: none;
+    padding: 0;
+  }
+  .t-prompt { color: var(--mint); }
+  .t-out { color: var(--faint); }
+  .init-grid {
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: repeat(3, 1fr);
+  }
+  .init-card {
+    padding: 1.25rem 0 0;
+    border-top: 1px solid var(--line-soft);
+  }
+  .init-card h3 {
+    margin-bottom: 0.625rem;
+  }
+  .closing-cta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem;
+    padding: 2.5rem;
+  }
+  .closing-cta p { color: var(--muted); }
+  @media (max-width: 768px) {
+    .install-primary {
+      padding: 1.25rem;
+    }
+    .init-grid {
+      grid-template-columns: 1fr;
+    }
+    .closing-cta { padding: 1.75rem; }
+  }
+</style>

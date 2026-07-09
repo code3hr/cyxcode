@@ -1,0 +1,443 @@
+---
+import BaseLayout from "../components/BaseLayout.astro"
+import Terminal from "../components/Terminal.astro"
+import InstallCommand from "../components/InstallCommand.astro"
+import { docs, route } from "../data/site"
+import demo from "../../Cyxcode.mp4"
+
+const primary = "curl -fsSL https://raw.githubusercontent.com/code3hr/cyxcode/HEAD/install | bash"
+
+const proof = ["Terminal", "Desktop", "IDE", "GitHub", "Local models", "Provider keys"]
+
+const problems = [
+  {
+    title: "Context resets every session",
+    desc: "Most agents keep asking the same project questions because decisions, fixes, and conventions are not carried forward.",
+  },
+  {
+    title: "Failures burn model turns",
+    desc: "Known errors still get sent through expensive reasoning loops instead of being recognized locally with a reviewed fix.",
+  },
+  {
+    title: "Automation gets hard to trust",
+    desc: "When edits, commands, and permissions are not visible, teams slow the agent down to keep the repo safe.",
+  },
+]
+
+const features = [
+  { title: "Works inside your repo", desc: "Ask questions, edit files, run commands, and keep context close to the work." },
+  { title: "Learns the project", desc: "Memory and recall preserve decisions, fixes, and conventions across sessions." },
+  { title: "Fast on repeated failures", desc: "Known errors can be diagnosed before a model call, with fixes ready in under a second." },
+  { title: "Choose your model", desc: "Use CyxCode Zen, your own provider keys, local models, Copilot, or ChatGPT accounts." },
+  { title: "Guarded automation", desc: "Permissions, CyxWatch, and audit trails keep agent actions visible and controlled." },
+  { title: "Improves over time", desc: "Corrections, learned patterns, and behavior versioning make repeated work reusable." },
+]
+
+const stats = [
+  { value: "136+", label: "built-in recovery patterns" },
+  { value: "75+", label: "supported model providers" },
+  { value: "4", label: "ways to work: terminal, desktop, IDE, GitHub" },
+]
+---
+
+<BaseLayout
+  title="CyxCode"
+  description="CyxCode is a terminal-native AI coding agent for real project work: explore code, plan changes, run commands, remember context, and turn repeated failures into reusable fixes."
+>
+  <section class="hero">
+    <div class="hero-inner">
+      <p class="kicker">Terminal-native AI coding agent</p>
+      <h1>AI coding work should compound inside your repo.</h1>
+      <p class="lead">
+        CyxCode helps you inspect code, plan changes, edit files, run commands, and remember what matters.
+        Solved failures become reusable workflow instead of repeated model spend.
+      </p>
+
+      <div class="hero-cta">
+        <a class="btn cta" href={route("/install")}>Install CyxCode</a>
+        <a class="btn ghost" href={route("/features")}>See features</a>
+      </div>
+
+      <div class="hero-install">
+        <InstallCommand command={primary} />
+        <span class="hero-install-hint">Linux / macOS / Windows (WSL)</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="proof reveal" aria-label="CyxCode works across these surfaces">
+    <p>Works with</p>
+    <div>
+      {proof.map((item) => <span>{item}</span>)}
+    </div>
+  </section>
+
+  <section class="demo reveal" aria-labelledby="demo-title">
+    <div class="demo-head">
+      <p class="kicker">See it in action</p>
+      <h2 id="demo-title">CyxCode working through a real session.</h2>
+    </div>
+    <video class="demo-video" src={demo} controls playsinline preload="metadata">
+      <a href={demo}>See it in action</a>
+    </video>
+  </section>
+
+  <section class="narrative reveal">
+    <div class="narrative-copy">
+      <p class="kicker">The problem</p>
+      <h2>Coding agents are powerful, but real projects expose the gaps.</h2>
+      <p>
+        The work is not just generating code. It is remembering decisions, recognizing repeated failures,
+        using the right tools, and making automation visible enough to trust.
+      </p>
+    </div>
+    <div class="problem-list">
+      {problems.map((item) => (
+        <article>
+          <h3>{item.title}</h3>
+          <p>{item.desc}</p>
+        </article>
+      ))}
+    </div>
+  </section>
+
+  <section class="stats reveal">
+    <div class="stats-head">
+      <p class="kicker">The CyxCode approach</p>
+      <h2>Make solved work reusable.</h2>
+    </div>
+    <div class="stat-grid">
+      {stats.map((s) => (
+        <div class="stat">
+          <span class="stat-value">{s.value}</span>
+          <span class="stat-label">{s.label}</span>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <section class="terminal-section reveal">
+    <div class="terminal-copy">
+      <p class="kicker">Workflow</p>
+      <h2>Inspect, edit, run, remember, repeat.</h2>
+      <p>
+        CyxCode stays close to your terminal and repository, with memory, permissions, and recovery patterns
+        designed for the loop engineers already use every day.
+      </p>
+    </div>
+    <div class="terminal-wrap">
+      <Terminal />
+    </div>
+  </section>
+
+  <section class="features">
+    <div class="features-head reveal">
+      <p class="kicker">Capabilities</p>
+      <h2>A practical agent for codebases that do not fit in one prompt.</h2>
+    </div>
+    <div class="feature-grid">
+      {
+        features.map((f) => (
+          <a class="feature-card reveal" href={route("/features")}>
+            <h3>{f.title}</h3>
+            <p set:html={f.desc} />
+          </a>
+        ))
+      }
+    </div>
+  </section>
+
+  <section class="routes reveal">
+    <a href={route("/about")} class="route">About <span>-></span></a>
+    <a href={route("/features")} class="route">Features <span>-></span></a>
+    <a href={route("/cyxwatch")} class="route">CyxWatch <span>-></span></a>
+    <a href={route("/install")} class="route">Install <span>-></span></a>
+    <a href={docs} target="_blank" rel="noreferrer noopener" class="route">Docs -></a>
+  </section>
+</BaseLayout>
+
+<style>
+  .hero {
+    display: flex;
+    justify-content: center;
+    padding: 4.5rem 0 1.5rem;
+  }
+  .hero-inner {
+    max-width: 58rem;
+    text-align: center;
+  }
+  .kicker {
+    font-size: 0.8125rem;
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--mint);
+    margin-bottom: 1.5rem;
+  }
+  .hero h1 {
+    font-size: clamp(2.7rem, 1.45rem + 4.7vw, 5rem);
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    line-height: 1.02;
+    margin-bottom: 1.5rem;
+  }
+  .lead {
+    font-size: 1.1875rem;
+    font-weight: 300;
+    line-height: 1.65;
+    color: var(--muted);
+    max-width: 46rem;
+    margin: 0 auto 2rem;
+  }
+  .hero-cta {
+    display: flex;
+    justify-content: center;
+    gap: 0.75rem;
+    margin-bottom: 2.5rem;
+  }
+  .hero-install {
+    max-width: 34rem;
+    margin: 0 auto;
+  }
+  .hero-install-hint {
+    display: block;
+    margin-top: 0.625rem;
+    font-size: 0.75rem;
+    color: var(--faint);
+  }
+
+  .proof {
+    display: grid;
+    justify-items: center;
+    gap: 1rem;
+    text-align: center;
+    padding: 1.5rem 0;
+    border-top: 1px solid var(--line-soft);
+    border-bottom: 1px solid var(--line-soft);
+  }
+  .proof p {
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--faint);
+  }
+  .proof div {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.75rem 1.5rem;
+  }
+  .proof span {
+    font-size: 0.95rem;
+    color: var(--muted);
+  }
+
+  .demo {
+    max-width: 76rem;
+    margin: 0 auto;
+  }
+  .demo-head {
+    text-align: center;
+    max-width: 42rem;
+    margin: 0 auto 1.75rem;
+  }
+  .demo-head h2 {
+    font-size: clamp(1.75rem, 1.35rem + 1.8vw, 2.625rem);
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    line-height: 1.12;
+  }
+  .demo-video {
+    display: block;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    border-radius: 14px;
+    background: rgba(5, 10, 20, 0.82);
+    box-shadow: 0 28px 90px rgba(0, 0, 0, 0.28);
+    object-fit: contain;
+  }
+
+  .narrative,
+  .terminal-section {
+    display: grid;
+    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+    gap: 4rem;
+    align-items: start;
+  }
+  .narrative-copy h2,
+  .stats-head h2,
+  .terminal-copy h2,
+  .features-head h2 {
+    font-size: clamp(2rem, 1.4rem + 2vw, 3rem);
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+  }
+  .narrative-copy p:not(.kicker),
+  .terminal-copy p:not(.kicker) {
+    margin-top: 1rem;
+    color: var(--muted);
+    line-height: 1.75;
+    font-size: 1.05rem;
+  }
+  .problem-list {
+    display: grid;
+    gap: 1.5rem;
+  }
+  .problem-list article {
+    padding-top: 1.25rem;
+    border-top: 1px solid var(--line-soft);
+  }
+  .problem-list h3 {
+    margin-bottom: 0.5rem;
+    font-size: 1.15rem;
+  }
+  .problem-list p {
+    color: var(--muted);
+    line-height: 1.7;
+  }
+
+  .stats {
+    display: grid;
+    grid-template-columns: minmax(0, 0.75fr) minmax(0, 1.25fr);
+    gap: 3rem;
+    align-items: center;
+    padding: 4rem 0;
+    border-top: 1px solid var(--line-soft);
+    border-bottom: 1px solid var(--line-soft);
+  }
+  .stats-head .kicker {
+    margin-bottom: 1rem;
+  }
+  .stat-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2rem;
+  }
+  .stat {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  .stat-value {
+    font-size: clamp(2.5rem, 2rem + 2vw, 3.5rem);
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    color: var(--mint);
+    line-height: 1;
+  }
+  .stat-label {
+    font-size: 0.875rem;
+    color: var(--muted);
+    font-weight: 300;
+  }
+
+  .terminal-section {
+    grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+    align-items: center;
+  }
+  .terminal-wrap {
+    min-width: 0;
+  }
+
+  .features-head {
+    margin-bottom: 3rem;
+    max-width: 48rem;
+  }
+  .feature-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0;
+    border-top: 1px solid var(--line-soft);
+  }
+  .feature-card {
+    display: flex;
+    flex-direction: column;
+    gap: 0.65rem;
+    padding: 1.5rem 1.5rem 1.5rem 0;
+    border-bottom: 1px solid var(--line-soft);
+    transition: transform 0.2s;
+  }
+  .feature-card:hover {
+    transform: translateX(4px);
+  }
+  .feature-card h3 {
+    font-size: 1.0625rem;
+    font-weight: 600;
+  }
+  .feature-card p {
+    font-size: 0.9375rem;
+    font-weight: 300;
+    color: var(--muted);
+    line-height: 1.55;
+  }
+
+  .routes {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 2.5rem;
+    margin-top: 6rem;
+    padding-top: 3rem;
+    border-top: 1px solid var(--line-soft);
+  }
+  .route {
+    font-size: 1rem;
+    font-weight: 500;
+    color: var(--text);
+    transition: color 0.2s;
+  }
+  .route span {
+    color: var(--mint);
+    margin-left: 0.25rem;
+    transition: transform 0.2s;
+    display: inline-block;
+  }
+  .route:hover {
+    color: var(--mint);
+  }
+  .route:hover span {
+    transform: translateX(3px);
+  }
+
+  @media (max-width: 900px) {
+    .narrative,
+    .stats,
+    .terminal-section {
+      grid-template-columns: 1fr;
+      gap: 2rem;
+    }
+    .feature-grid {
+      grid-template-columns: 1fr;
+    }
+    .stat-grid {
+      gap: 1.5rem;
+    }
+  }
+  @media (max-width: 640px) {
+    .hero {
+      padding: 2.5rem 0 1rem;
+    }
+    .hero-cta {
+      flex-direction: column;
+      align-items: stretch;
+    }
+    .proof {
+      grid-template-columns: 1fr;
+      gap: 0.75rem;
+    }
+    .stat-grid {
+      grid-template-columns: 1fr;
+      gap: 2rem;
+    }
+    .routes {
+      flex-direction: column;
+      align-items: center;
+      gap: 1.25rem;
+    }
+    .demo-video {
+      border-radius: 10px;
+    }
+  }
+</style>

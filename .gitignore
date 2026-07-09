@@ -32,8 +32,11 @@ cve-lite-scan-*.json
 .opencode/history/
 
 # Local dev files
+/WEB/.astro/
+/WEB/.astro-*/
+/WEB/.astro-vite-cache/
+/WEB/*.log
 opencode-dev
-/WEB/
 logs/
 *.bun-build
 tsconfig.tsbuildinfo

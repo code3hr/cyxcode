@@ -1,0 +1,221 @@
+---
+import BaseLayout from "../components/BaseLayout.astro"
+import SectionHeading from "../components/SectionHeading.astro"
+import InstallCommand from "../components/InstallCommand.astro"
+import { docs, opencode, opencodeDocs, repo, sponsor } from "../data/site"
+
+const primary = "curl -fsSL https://raw.githubusercontent.com/code3hr/cyxcode/HEAD/install | bash"
+
+const pillars = [
+  {
+    title: "A coding agent where engineers already work",
+    body: "CyxCode runs close to your terminal, repository, commands, tests, and logs. It is built for the loop developers repeat all day: inspect, plan, edit, run, review, and continue.",
+  },
+  {
+    title: "Memory instead of cold starts",
+    body: "Project memory, semantic recall, and behavior versioning help CyxCode reuse decisions and fixes from earlier sessions instead of rediscovering them from scratch.",
+  },
+  {
+    title: "Deterministic help before model spend",
+    body: "When a known failure appears, CyxCode can match it with local patterns before another model call. When it misses, the handled error can become a reviewed pattern for next time.",
+  },
+  {
+    title: "Choice without lock-in",
+    body: "Use CyxCode Zen, your own provider keys, local models, GitHub Copilot, ChatGPT Plus/Pro, or other supported providers. The workflow stays yours.",
+  },
+]
+---
+
+<BaseLayout
+  title="About"
+  description="CyxCode is a terminal-native AI coding agent for real codebases. It helps developers explore, edit, run, remember, and improve repeated workflows over time."
+  path="/about"
+>
+  <section class="page-hero reveal">
+    <p class="eyebrow">About CyxCode</p>
+    <h1>An AI coding agent that compounds project knowledge.</h1>
+    <p class="lead">
+      CyxCode is an open source developer tool for teams and builders who want an agent that works inside real repositories, remembers useful context, and turns repeated debugging work into reusable behavior.
+    </p>
+  </section>
+
+  <section class="about-grid">
+    <article class="about-card reveal">
+      <p class="panel-title">What it is</p>
+      <h2>Terminal-native, repo-aware, and model-flexible.</h2>
+      <p>
+        CyxCode can inspect code, explain unfamiliar systems, plan changes, edit files, run commands, use language-server context, and keep multiple sessions moving. You can use it from terminal, desktop, IDE, and GitHub workflows.
+      </p>
+    </article>
+
+    <article class="about-card reveal">
+      <p class="panel-title">Why it exists</p>
+      <h2>AI should not keep paying for the same discovery.</h2>
+      <p>
+        Most coding agents are powerful, but they often repeat the same context gathering and error diagnosis. CyxCode adds memory, recall, learned recovery patterns, and auditability so solved work can keep paying forward.
+      </p>
+    </article>
+  </section>
+
+  <section class="content-band">
+    <div class="upstream-note reveal">
+      <p class="panel-title">Upstream lineage</p>
+      <h2>Forked from opencode, shaped for CyxCode workflows.</h2>
+      <p>
+        CyxCode is a fork of <a class="text-link" href={opencode} target="_blank" rel="noreferrer noopener">opencode</a>.
+        CyxCode docs and releases cover the CyxCode-specific experience, while upstream settings and reference material can also be found in the
+        <a class="text-link" href={opencodeDocs} target="_blank" rel="noreferrer noopener">opencode docs</a>.
+      </p>
+    </div>
+  </section>
+
+  <section class="content-band">
+    <SectionHeading
+      kicker="Principles"
+      title="Built for the boring parts of serious engineering"
+      subtitle="The goal is not a flashier chat box. The goal is a coding environment where the agent can act, remember, and improve without hiding what it is doing."
+      align="center"
+    />
+    <div class="principle-grid">
+      {pillars.map((item) => (
+        <article class="principle reveal">
+          <h3>{item.title}</h3>
+          <p>{item.body}</p>
+        </article>
+      ))}
+    </div>
+  </section>
+
+  <section class="content-band">
+    <div class="story reveal">
+      <p class="panel-title">How it feels in use</p>
+      <ol>
+        <li>Ask CyxCode to understand a part of the project or plan a change.</li>
+        <li>Let it edit files, run commands, and use tools under permissions you control.</li>
+        <li>Save important project knowledge as memory instead of repeating it every session.</li>
+        <li>Approve learned recovery patterns when repeated failures are worth making deterministic.</li>
+      </ol>
+    </div>
+  </section>
+
+  <section class="content-band">
+    <div class="panel panel--accent closing-cta reveal">
+      <div>
+        <h2>Start with one repo.</h2>
+        <p>Install CyxCode, run it where you already work, and let the project context build from there.</p>
+      </div>
+      <div class="cta-stack">
+        <InstallCommand command={primary} />
+        <div class="cta-links">
+          <a class="text-link" href={docs} target="_blank" rel="noreferrer noopener">Docs</a>
+          <a class="text-link" href={repo} target="_blank" rel="noreferrer noopener">GitHub</a>
+          <a class="text-link" href={sponsor} target="_blank" rel="noreferrer noopener">Sponsor</a>
+        </div>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .page-hero {
+    max-width: 62ch;
+    margin-bottom: 1rem;
+  }
+  .page-hero .lead {
+    font-size: 1.125rem;
+    line-height: 1.7;
+    color: var(--muted);
+  }
+  .about-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 2rem;
+  }
+  .about-card {
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--line-soft);
+  }
+  .about-card h2 {
+    margin-bottom: 1rem;
+  }
+  .about-card p:not(.panel-title),
+  .story li,
+  .principle p {
+    color: var(--muted);
+    line-height: 1.7;
+  }
+  .story {
+    padding: 1.75rem 0 0;
+    border-top: 1px solid var(--line-soft);
+  }
+  .upstream-note {
+    padding: 1.5rem;
+    border-radius: 14px;
+    background: rgba(4, 8, 16, 0.28);
+  }
+  .upstream-note p:not(.panel-title) {
+    color: var(--muted);
+    line-height: 1.7;
+    max-width: 72ch;
+  }
+  .principle-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 1.25rem;
+  }
+  .principle {
+    padding-top: 1.25rem;
+    border-top: 1px solid var(--line-soft);
+  }
+  .principle h3 {
+    margin-bottom: 0.75rem;
+    font-size: 1.05rem;
+    line-height: 1.25;
+  }
+  .story ol {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 1rem;
+    margin: 0;
+    padding-left: 1.25rem;
+  }
+  .story li::marker {
+    color: var(--mint);
+    font-weight: 700;
+  }
+  .closing-cta {
+    display: grid;
+    grid-template-columns: 1fr minmax(18rem, 32rem);
+    gap: 2rem;
+    align-items: center;
+    padding: 2rem;
+  }
+  .closing-cta p {
+    color: var(--muted);
+  }
+  .cta-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+  .cta-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+  @media (max-width: 900px) {
+    .about-grid,
+    .closing-cta,
+    .principle-grid {
+      grid-template-columns: 1fr;
+    }
+    .story ol {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+  @media (max-width: 640px) {
+    .story ol {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

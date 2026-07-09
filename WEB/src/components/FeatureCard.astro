@@ -1,0 +1,31 @@
+---
+interface Props {
+  icon?: string
+  title: string
+  accent?: "mint" | "amber" | "violet"
+}
+const { icon, title, accent = "mint" } = Astro.props
+const accentVar =
+  accent === "amber"
+    ? "var(--amber)"
+    : accent === "violet"
+      ? "var(--violet)"
+      : "var(--mint)"
+const accentSoft =
+  accent === "amber" ? "var(--amber-soft)" : accent === "violet" ? "var(--violet-soft)" : "var(--mint-soft)"
+---
+
+<article class="feature reveal">
+  {
+    icon && (
+      <div
+        class="feature-icon"
+        style={`color:${accentVar};background:${accentSoft};border-color:${accentVar}33`}
+      >
+        {icon}
+      </div>
+    )
+  }
+  <h3>{title}</h3>
+  <slot />
+</article>

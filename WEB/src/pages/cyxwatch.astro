@@ -1,0 +1,172 @@
+---
+import BaseLayout from "../components/BaseLayout.astro"
+import SectionHeading from "../components/SectionHeading.astro"
+import { doc, route } from "../data/site"
+
+const watchDoc = "https://github.com/code3hr/cyxcode/blob/dev/docs/security_layer.md"
+const fwDoc = doc("cyxwatch_memory_firewall.md")
+const policyDoc = doc("USAGE.md")
+---
+
+<BaseLayout
+  title="CyxWatch"
+  description="CyxWatch is CyxCode's runtime observability and security layer — telemetry, a memory firewall, a policy engine, and automatic secret redaction."
+  path="/cyxwatch"
+>
+  <section class="page-hero reveal">
+    <p class="eyebrow">Runtime security layer</p>
+    <h1>CyxWatch sees everything the agent does.</h1>
+    <p class="lead">
+      Every prompt turn, shell command, and file read/write is tracked locally. Risky operations get flagged,
+      policy decisions get enforced before execution, and secrets are scrubbed from storage automatically —
+      so you keep control while the agent works.
+    </p>
+    <div class="hero-actions">
+      <a class="btn cta" href={route("/install")}>Install CyxCode</a>
+      <a class="btn ghost" href={watchDoc} target="_blank" rel="noreferrer noopener">Implementation doc ↗</a>
+    </div>
+  </section>
+
+  <!-- What it tracks -->
+  <section class="content-band">
+    <SectionHeading kicker="Observability" title="Local telemetry, no network" />
+    <div class="feature-grid">
+      <article class="feature reveal">
+        <h3>Prompt turns</h3>
+        <p>Correlated by session and message, so every model call is traceable back to its context.</p>
+      </article>
+      <article class="feature reveal">
+        <h3>Shell commands</h3>
+        <p>What ran, when, and against what — with risk flags for destructive strings and sensitive paths.</p>
+      </article>
+      <article class="feature reveal">
+        <h3>File reads &amp; writes</h3>
+        <p>Filesystem touchpoints logged, including writes checked against policy before they land on disk.</p>
+      </article>
+      <article class="feature reveal">
+        <h3>Risk flags</h3>
+        <p>Automatic detection of sensitive paths and risky shell patterns before anything executes.</p>
+      </article>
+    </div>
+  </section>
+
+  <!-- Memory firewall -->
+  <section class="content-band">
+    <SectionHeading
+      kicker="Memory firewall"
+      title="Secrets never leak into long-term state"
+      subtitle="CyxWatch guards the boundary between what the agent sees and what gets persisted to memory."
+    />
+    <div class="flow-cards">
+      <article class="feature reveal">
+        <h3>Intercept</h3>
+        <p>Memory writes pass through a firewall layer that scans for API keys, JWTs, passwords, and tokens.</p>
+      </article>
+      <div class="flow-arrow reveal">→</div>
+      <article class="feature reveal">
+        <h3>Redact</h3>
+        <p>Matches are scrubbed automatically before storage. The audit log is stripped of secrets too.</p>
+      </article>
+      <div class="flow-arrow reveal">→</div>
+      <article class="feature reveal">
+        <h3>Persist</h3>
+        <p>Only sanitized context reaches <code>.cyxcode/memory/</code> — recall, dream, and graph stay clean.</p>
+      </article>
+    </div>
+    <p class="doc-link reveal">
+      <a class="text-link" href={fwDoc} target="_blank" rel="noreferrer noopener">Read the memory firewall design ↗</a>
+    </p>
+  </section>
+
+  <!-- Policy engine -->
+  <section class="content-band">
+    <SectionHeading kicker="Policy engine" title="Decisions enforced before execution" />
+    <div class="table-wrap reveal">
+      <table>
+        <thead>
+          <tr><th>Decision</th><th>What happens</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><strong>auto-approve</strong></td><td>Matching operation runs with no prompt.</td></tr>
+          <tr><td><strong>require-approval</strong></td><td>Normal permission prompt is shown.</td></tr>
+          <tr><td><strong>block</strong></td><td>Tool call stops before it executes. Hard blocks also guard low-level wrappers — destructive process-wrapper commands are caught pre-spawn, filesystem writes pre-write.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- CLI -->
+  <section class="content-band">
+    <SectionHeading kicker="Surface" title="Inspect from the CLI or dashboard" />
+    <article class="panel reveal term-block">
+      <pre><code><span class="t-prompt">$ </span>cyxcode watch recent          <span class="t-out"># recent telemetry</span>
+<span class="t-prompt">$ </span>cyxcode watch report          <span class="t-out"># observability report</span>
+<span class="t-prompt">$ </span>cyxcode watch alerts          <span class="t-out"># alert history</span>
+<span class="t-prompt">$ </span>cyxcode watch policy          <span class="t-out"># saved project policy rules</span>
+<span class="t-prompt">$ </span>cyxcode watch policy --effective  <span class="t-out"># include defaults</span>
+<span class="t-prompt">$ </span>cyxcode watch report --json --period 30d</code></pre>
+    </article>
+    <p class="doc-link reveal" style="margin-top:1rem">
+      Or open the dashboard at <code>/dashboard/security</code> when running <code>cyxcode web</code>.
+      <a class="text-link" href={policyDoc} target="_blank" rel="noreferrer noopener" style="margin-left:0.5rem">Full usage guide ↗</a>
+    </p>
+  </section>
+
+  <section class="content-band">
+    <div class="panel panel--accent closing-cta reveal">
+      <div>
+        <h2>Keep the agent on a leash.</h2>
+        <p>CyxWatch ships with CyxCode. No extra install, no external service.</p>
+      </div>
+      <a class="btn cta" href={route("/install")}>Install CyxCode →</a>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .page-hero { max-width: 56ch; margin-bottom: 1rem; }
+  .page-hero .lead { font-size: 1.125rem; line-height: 1.7; color: var(--muted); }
+  .hero-actions { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-top: 1.5rem; }
+  .flow-cards {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr auto 1fr;
+    gap: 0.75rem;
+    align-items: stretch;
+  }
+  .flow-arrow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--mint);
+    font-size: 1.5rem;
+  }
+  .doc-link { margin-top: 1rem; }
+  code {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 0.88em;
+    color: var(--mint);
+    background: rgba(36, 209, 163, 0.1);
+    padding: 0.1em 0.4em;
+    border-radius: 4px;
+  }
+  .term-block pre {
+    margin: 0;
+    padding: 1.25rem;
+    background: rgba(4, 8, 16, 0.6);
+    overflow-x: auto;
+    font-size: 0.85rem;
+    line-height: 1.9;
+  }
+  .t-prompt { color: var(--mint); }
+  .t-out { color: var(--faint); }
+  .closing-cta {
+    display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between;
+    gap: 1.5rem; padding: 2.5rem;
+  }
+  .closing-cta p { color: var(--muted); }
+  @media (max-width: 900px) {
+    .flow-cards { grid-template-columns: 1fr; }
+    .flow-arrow { transform: rotate(90deg); }
+  }
+  @media (max-width: 768px) { .closing-cta { padding: 1.75rem; } }
+</style>

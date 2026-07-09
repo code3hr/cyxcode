@@ -1,0 +1,57 @@
+---
+import Logo from "./cyxcode-logo.astro"
+import { docs, repo, route } from "../data/site"
+
+interface Props {
+  path?: string
+}
+const { path = "/" } = Astro.props
+
+const links = [
+  { href: "/about", label: "About" },
+  { href: "/features", label: "Features" },
+  { href: "/cyxwatch", label: "CyxWatch" },
+  { href: "/install", label: "Install" },
+  { href: "/faq", label: "FAQ" },
+  { href: "/sponsor", label: "Sponsor" },
+]
+---
+
+<header class="site-header">
+  <div class="wrap site-header__inner">
+    <a href={route()} class="site-brand" aria-label="CyxCode home">
+      <Logo class="site-logo" />
+    </a>
+
+    <nav aria-label="Primary" class="desktop-nav">
+      {links.map((l) => <a href={route(l.href)} aria-current={l.href === path ? "page" : undefined}>{l.label}</a>)}
+      <a href={docs} target="_blank" rel="noreferrer noopener">Docs</a>
+      <a href={repo} target="_blank" rel="noreferrer noopener" class="nav-gh">GitHub ↗</a>
+    </nav>
+
+    <a class="btn cta nav-cta" href={route("/install")}>Install</a>
+
+    <details class="mobile-nav">
+      <summary>Menu</summary>
+      <nav aria-label="Mobile">
+        {links.map((l) => <a href={route(l.href)}>{l.label}</a>)}
+        <a href={docs} target="_blank" rel="noreferrer noopener">Docs</a>
+        <a href={repo} target="_blank" rel="noreferrer noopener">GitHub ↗</a>
+      </nav>
+    </details>
+  </div>
+</header>
+
+<style>
+  .nav-gh {
+    color: var(--muted) !important;
+  }
+  .nav-cta {
+    margin-left: 0.5rem;
+  }
+  @media (max-width: 768px) {
+    .nav-cta {
+      display: none;
+    }
+  }
+</style>

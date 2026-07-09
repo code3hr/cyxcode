@@ -1,0 +1,118 @@
+---
+import BaseLayout from "../components/BaseLayout.astro"
+import SectionHeading from "../components/SectionHeading.astro"
+const sponsorUrl = "https://github.com/sponsors/CYXWIZ-Lab"
+---
+
+<BaseLayout
+  title="Sponsor"
+  description="CyxCode is independent and open source. Sponsorship funds the build, the pattern library, and the roadmap."
+  path="/sponsor"
+>
+  <section class="page-hero reveal">
+    <p class="eyebrow">Support the project</p>
+    <h1>Sponsor CyxCode.</h1>
+    <p class="lead">
+      CyxCode is an independent, open-source fork built by a small team. Sponsorship keeps development
+      steady, the pattern library growing, and the roadmap honest.
+    </p>
+    <div class="hero-actions">
+      <a class="btn cta" href={sponsorUrl} target="_blank" rel="noreferrer noopener">Become a sponsor →</a>
+      <a class="btn ghost" href="https://github.com/code3hr/cyxcode" target="_blank" rel="noreferrer noopener">Star on GitHub</a>
+    </div>
+  </section>
+
+  <section class="content-band">
+    <SectionHeading kicker="Where it goes" title="What sponsorship funds" />
+    <div class="feature-grid">
+      <article class="feature reveal">
+        <h3>Pattern library</h3>
+        <p>Curation, testing, and community pack infrastructure for the 136+ built-in patterns and learned additions.</p>
+      </article>
+      <article class="feature reveal">
+        <h3>Core development</h3>
+        <p>Continuous work on shell mode, memory, recall, dream consolidation, and behavior versioning.</p>
+      </article>
+      <article class="feature reveal">
+        <h3>Infra & releases</h3>
+        <p>Build pipelines, signed binaries across platforms, and the release tooling behind <code>/update</code>.</p>
+      </article>
+      <article class="feature reveal">
+        <h3>Documentation</h3>
+        <p>Docs, guides, and examples that make deterministic recovery approachable for new users.</p>
+      </article>
+      <article class="feature reveal">
+        <h3>Community</h3>
+        <p>Issue triage, pull request review, and the contributor onboarding that keeps the fork healthy.</p>
+      </article>
+      <article class="feature reveal">
+        <h3>Long-term direction</h3>
+        <p>The roadmap — semantic recall depth, behavior versioning maturity, and beyond.</p>
+      </article>
+    </div>
+  </section>
+
+  <section class="content-band">
+    <SectionHeading kicker="Why it matters" title="Independent by design" />
+    <article class="panel reveal">
+      <p style="line-height:1.8;color:var(--muted)">
+        CyxCode is a fork of <a class="text-link" href="https://opencode.ai" target="_blank" rel="noreferrer noopener">OpenCode</a>
+        with a specific thesis: <strong style="color:var(--text)">known errors should never cost tokens twice</strong>.
+        That idea needs deeper integration than a plugin allows — tool-aware routing, shell metadata, and a learned
+        pattern layer that owns its own control plane.
+      </p>
+      <p style="margin-top:1rem;line-height:1.8;color:var(--muted)">
+        Sponsorship is the difference between a side project and a tool you can rely on. Every sponsor makes the
+        next release sooner and the next pattern more likely to be there when you hit it.
+      </p>
+    </article>
+  </section>
+
+  <section class="content-band">
+    <div class="panel panel--accent closing-cta reveal">
+      <div>
+        <h2>Back the build.</h2>
+        <p>Help CyxCode catch the next error before the LLM ever sees it.</p>
+      </div>
+      <a class="btn cta" href={sponsorUrl} target="_blank" rel="noreferrer noopener">Sponsor on GitHub →</a>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .page-hero {
+    max-width: 58ch;
+    margin-bottom: 2rem;
+  }
+  .page-hero .lead {
+    font-size: 1.125rem;
+    line-height: 1.7;
+    color: var(--muted);
+  }
+  .hero-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-top: 1.5rem;
+  }
+  code {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 0.88em;
+    color: var(--mint);
+    background: rgba(36, 209, 163, 0.1);
+    padding: 0.1em 0.4em;
+    border-radius: 4px;
+  }
+  .closing-cta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem;
+    padding: 2.5rem;
+  }
+  .closing-cta p { color: var(--muted); }
+  @media (max-width: 768px) {
+    .closing-cta { padding: 1.75rem; }
+  }
+</style>

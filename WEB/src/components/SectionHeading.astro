@@ -1,0 +1,28 @@
+---
+interface Props {
+  kicker?: string
+  title: string
+  subtitle?: string
+  align?: "left" | "center"
+}
+const { kicker, title, subtitle, align = "left" } = Astro.props
+---
+
+<div class={`section-heading reveal ${align === "center" ? "section-heading--center" : ""}`}>
+  {kicker && <span class="kicker">{kicker}</span>}
+  <h2 class="section-title">{title}</h2>
+  {subtitle && <p class="section-subtitle">{subtitle}</p>}
+</div>
+
+<style>
+  .section-heading {
+    max-width: 60ch;
+  }
+  .section-heading--center {
+    margin-inline: auto;
+    text-align: center;
+  }
+  .section-heading--center .section-subtitle {
+    margin-inline: auto;
+  }
+</style>

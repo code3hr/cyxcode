@@ -1,0 +1,56 @@
+---
+import Logo from "./cyxcode-logo.astro"
+import { docs, opencode, opencodeDocs, repo, releases, sponsor, route } from "../data/site"
+const year = new Date().getFullYear()
+---
+
+<footer class="site-footer">
+  <div class="wrap site-footer__inner">
+    <div class="footer-brand">
+      <a href={route()} aria-label="CyxCode home"><Logo /></a>
+      <p class="footer-tag">Terminal-native AI coding agent for real project work: explore, edit, run, remember, and improve with every session.</p>
+    </div>
+
+    <div class="footer-links">
+      <div class="footer-col">
+        <h4>Product</h4>
+        <a href={route("/about")}>About</a>
+        <a href={route("/features")}>Features</a>
+        <a href={route("/cyxwatch")}>CyxWatch</a>
+        <a href={route("/install")}>Install</a>
+        <a href={route("/faq")}>FAQ</a>
+      </div>
+      <div class="footer-col">
+        <h4>Resources</h4>
+        <a href={docs} target="_blank" rel="noreferrer noopener">Documentation</a>
+        <a href={releases} target="_blank" rel="noreferrer noopener">Releases</a>
+        <a href={sponsor} target="_blank" rel="noreferrer noopener">Sponsor</a>
+      </div>
+      <div class="footer-col">
+        <h4>Project</h4>
+        <a href={repo} target="_blank" rel="noreferrer noopener">GitHub</a>
+        <a href={`${repo}/blob/dev/LICENSE`} target="_blank" rel="noreferrer noopener">License</a>
+      </div>
+    </div>
+  </div>
+  <div class="wrap">
+    <p class="footer-copy">
+      &copy; {year} CyxWiz Lab. CyxCode is a CyxWiz Lab project, forked from
+      <a href={opencode} target="_blank" rel="noreferrer noopener">opencode</a>.
+      For upstream settings and reference material, see the
+      <a href={opencodeDocs} target="_blank" rel="noreferrer noopener">opencode docs</a>.
+    </p>
+  </div>
+</footer>
+
+<style>
+  .footer-copy {
+    @apply pb-8 text-xs;
+    color: var(--faint);
+  }
+  .footer-copy a {
+    color: var(--text);
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+  }
+</style>

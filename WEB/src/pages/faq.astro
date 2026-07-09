@@ -1,0 +1,213 @@
+---
+import BaseLayout from "../components/BaseLayout.astro"
+import { doc } from "../data/site"
+
+const faqDoc = doc("FAQ.md")
+const usageDoc = doc("USAGE.md")
+
+const groups = [
+  {
+    title: "Problem & value",
+    items: [
+      {
+        q: "Aren't these one-time errors? Missing Python, etc.",
+        a: "One-time setup errors aren't the point. The real ROI is <strong>recurring errors across projects and context resets</strong> — git conflicts, TypeScript/ESLint failures, Docker crashes, build errors that keep coming back. Every time a model's context resets, it forgets how to fix that ESLint rule. CyxCode remembers.",
+      },
+      {
+        q: "Memory tools I've tried just fill context with irrelevant tokens.",
+        a: "Most memory implementations dump everything in. CyxCode is built differently: small indexed files (1–5 lines), tag-based relevance matching, a hard ~500–2000 token cap per session, and access tracking that prunes unused memories after 30 days. The dream system also processes patterns and memories offline on startup — no runtime tokens.",
+      },
+    ],
+  },
+  {
+    title: "Fork vs plugin",
+    items: [
+      {
+        q: "Why not a plugin? Will you maintain all OpenCode changes forever?",
+        a: "Plugins extend OpenCode; CyxCode changes the runtime, memory, governance, and product boundary. The short-circuit needs control-flow ownership to stop a known error before another LLM call. Shell mode is core behavior. Pattern learning needs message and tool internals. Recall, memory, and dream are persistent state systems. CyxWatch needs enforcement near shared process/filesystem/network wrappers so library calls can't bypass policy. When a feature <em>can</em> be a plugin, it should be — but these boundaries can't.",
+      },
+      {
+        q: "What about a pre-process wrapper instead of a fork?",
+        a: "A wrapper can intercept input but can't stop the LLM from being called after a tool returns an error, can't reach shell-mode's direct execution path, and can't reliably control recall, compaction, or the context assembled inside the app before a model call. It's the right shape for some things, not for these.",
+      },
+      {
+        q: "Why not contribute upstream?",
+        a: "We'd be open to it. But pattern-first interception, zero-token shell mode, and an auto-learning system are architectural changes to how the tool processes commands — not bug fixes. We're not going to push architecture upstream they didn't ask for.",
+      },
+    ],
+  },
+  {
+    title: "Maintenance & sustainability",
+    items: [
+      {
+        q: "Maintaining an OSS fork is hard. What's the longevity plan?",
+        a: "Internal directory structure stays <code>opencode</code> intentionally so <code>git pull upstream</code> works without merge hell — only the CLI, TUI, config, and docs are rebranded. We maintain the CyxCode runtime surface (<code>packages/opencode/src/cyxcode/</code>), its tests, and docs. We don't rewrite upstream. The fork surface is intentionally small: we add, we don't rewrite.",
+      },
+      {
+        q: "What if I run everything in Docker and block the agent from my base machine?",
+        a: "Patterns match error strings, not execution contexts. If your Docker workflow produces <code>npm ERR! 404</code>, CyxCode matches it the same way and suggests a fix — you run it inside your container. Your sandbox controls what actually executes.",
+      },
+    ],
+  },
+  {
+    title: "Testing & quality",
+    items: [
+      {
+        q: "Where are the tests?",
+        a: "Under <code>packages/opencode/test/cyxcode/</code>. Run them with <code>cd packages/opencode && bun test test/cyxcode/</code>. The suite covers routing, pattern matching, capture extraction, learned-pattern generation, memory lookup, dream consolidation, and path handling. The pentest module alone has 232+ passing tests.",
+      },
+      {
+        q: "Is it production quality?",
+        a: "Moving that direction. The core pattern matching and learning system is tested, and integration with OpenCode's bash tool is verified via debug mode (<code>CYXCODE_DEBUG=true</code>). A few regex-escaping edge cases remain skipped.",
+      },
+    ],
+  },
+]
+---
+
+<BaseLayout
+  title="FAQ"
+  description="Honest answers about CyxCode — why it's a fork, how it's maintained, how it's tested, and what the technical approach is."
+  path="/faq"
+>
+  <section class="page-hero reveal">
+    <p class="eyebrow">FAQ</p>
+    <h1>Honest answers.</h1>
+    <p class="lead">
+      The real questions — why a fork, how it stays maintained, and whether it's tested — with the real answers.
+      Pulled from the community FAQ and kept up to date in the repo.
+    </p>
+  </section>
+
+  <div class="faq-layout">
+    <!-- TOC -->
+    <aside class="faq-toc reveal">
+      {groups.map((g) => (
+        <a href={`#${g.title.toLowerCase().replace(/[& ]+/g, "-").replace(/[^a-z0-9-]/g, "")}`}>{g.title}</a>
+      ))}
+      <a href={faqDoc} target="_blank" rel="noreferrer noopener" class="toc-external">Full FAQ on GitHub ↗</a>
+    </aside>
+
+    <!-- Answers -->
+    <div class="faq-content">
+      {
+        groups.map((g) => (
+          <section id={g.title.toLowerCase().replace(/[& ]+/g, "-").replace(/[^a-z0-9-]/g, "")} class="faq-group reveal">
+            <h2>{g.title}</h2>
+            {g.items.map((item) => (
+              <details class="faq-item">
+                <summary>{item.q}</summary>
+                <p set:html={item.a} />
+              </details>
+            ))}
+          </section>
+        ))
+      }
+    </div>
+  </div>
+
+  <section class="content-band">
+    <div class="panel panel--accent closing-cta reveal">
+      <div>
+        <h2>Still have questions?</h2>
+        <p>The full FAQ lives in the repo, and the usage guide covers every command.</p>
+      </div>
+      <div class="closing-actions">
+        <a class="btn cta" href={faqDoc} target="_blank" rel="noreferrer noopener">Full FAQ ↗</a>
+        <a class="btn ghost" href={usageDoc} target="_blank" rel="noreferrer noopener">Usage guide ↗</a>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .page-hero { max-width: 56ch; margin-bottom: 2.5rem; }
+  .page-hero .lead { font-size: 1.125rem; line-height: 1.7; color: var(--muted); }
+
+  .faq-layout {
+    display: grid;
+    grid-template-columns: 200px 1fr;
+    gap: 3rem;
+    align-items: start;
+  }
+  .faq-toc {
+    position: sticky;
+    top: 6rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+  }
+  .faq-toc a {
+    font-size: 0.875rem;
+    color: var(--muted);
+    transition: color 0.2s;
+  }
+  .faq-toc a:hover { color: var(--mint); }
+  .toc-external { margin-top: 0.5rem; color: var(--mint) !important; }
+
+  .faq-content { display: flex; flex-direction: column; gap: 3rem; }
+  .faq-group h2 { margin-bottom: 1.25rem; }
+
+  .faq-item {
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    background: rgba(13, 21, 37, 0.5);
+    margin-bottom: 0.75rem;
+    overflow: hidden;
+    transition: border-color 0.2s;
+  }
+  .faq-item[open] { border-color: rgba(36, 209, 163, 0.35); }
+  .faq-item summary {
+    padding: 1.1rem 1.4rem;
+    font-weight: 600;
+    cursor: pointer;
+    list-style: none;
+    position: relative;
+    padding-right: 3rem;
+  }
+  .faq-item summary::-webkit-details-marker { display: none; }
+  .faq-item summary::after {
+    content: "+";
+    position: absolute;
+    right: 1.4rem;
+    color: var(--mint);
+    font-size: 1.3rem;
+    font-weight: 400;
+    transition: transform 0.2s;
+  }
+  .faq-item[open] summary::after { content: "−"; }
+  .faq-item p {
+    padding: 0 1.4rem 1.25rem;
+    color: var(--muted);
+    line-height: 1.75;
+  }
+  .faq-item p strong { color: var(--text); }
+  code {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 0.88em;
+    color: var(--mint);
+    background: rgba(36, 209, 163, 0.1);
+    padding: 0.1em 0.4em;
+    border-radius: 4px;
+  }
+  .closing-cta {
+    display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between;
+    gap: 1.5rem; padding: 2.5rem;
+  }
+  .closing-cta p { color: var(--muted); }
+  .closing-actions { display: flex; gap: 0.75rem; flex-shrink: 0; }
+
+  @media (max-width: 900px) {
+    .faq-layout { grid-template-columns: 1fr; gap: 1.5rem; }
+    .faq-toc {
+      position: static;
+      flex-direction: row;
+      flex-wrap: wrap;
+      gap: 1rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid var(--line-soft);
+    }
+    .toc-external { margin: 0; }
+  }
+  @media (max-width: 768px) { .closing-cta { padding: 1.75rem; } }
+</style>

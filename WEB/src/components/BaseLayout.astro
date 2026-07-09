@@ -1,0 +1,103 @@
+---
+import "../styles/globals.css"
+import Header from "./Header.astro"
+import Footer from "./Footer.astro"
+import { route } from "../data/site"
+
+interface Props {
+  title: string
+  description?: string
+  path?: string
+  ogTitle?: string
+}
+
+const {
+  title,
+  description = "CyxCode is a terminal-native AI coding agent for real project work: explore code, plan changes, run commands, remember context, and turn repeated failures into reusable fixes.",
+  path = "/",
+  ogTitle,
+} = Astro.props
+
+const site = "CyxCode"
+const fullTitle = title === site ? title : `${title} - ${site}`
+---
+
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    <meta name="theme-color" content="#04070f" />
+    <link rel="icon" href={route("/favicon.svg")} type="image/svg+xml" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+
+    <meta property="og:title" content={ogTitle ?? fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={ogTitle ?? fullTitle} />
+    <meta name="twitter:description" content={description} />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to main content</a>
+    <Header path={path} />
+
+    <main class="wrap site-main" id="main">
+      <slot />
+    </main>
+
+    <Footer />
+
+    <script is:inline>
+      // Copy-to-clipboard
+      const copyBtns = document.querySelectorAll("[data-copy]")
+      copyBtns.forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const v = btn.getAttribute("data-copy")
+          if (!v) return
+          navigator.clipboard.writeText(v).then(() => {
+            const orig = btn.textContent
+            btn.textContent = "Copied"
+            btn.classList.add("copied")
+            setTimeout(() => {
+              btn.textContent = orig
+              btn.classList.remove("copied")
+            }, 1200)
+          })
+        })
+      })
+
+      // Close mobile nav on link click
+      const mobileNav = document.querySelector(".mobile-nav")
+      mobileNav?.addEventListener("click", (e) => {
+        if (e.target instanceof HTMLAnchorElement) mobileNav.removeAttribute("open")
+      })
+
+      // Scroll reveal
+      const revealEls = document.querySelectorAll(".reveal")
+      if ("IntersectionObserver" in window) {
+        const io = new IntersectionObserver(
+          (entries) => {
+            entries.forEach((entry) => {
+              if (entry.isIntersecting) {
+                entry.target.classList.add("is-visible")
+                io.unobserve(entry.target)
+              }
+            })
+          },
+          { threshold: 0.12, rootMargin: "0px 0px -40px 0px" }
+        )
+        revealEls.forEach((el) => io.observe(el))
+      } else {
+        revealEls.forEach((el) => el.classList.add("is-visible"))
+      }
+    </script>
+  </body>
+</html>
