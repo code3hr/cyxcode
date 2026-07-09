@@ -15,6 +15,10 @@ let backgroundColor: string | undefined
 
 export function setBackgroundColor(color: string) {
   backgroundColor = color
+  BrowserWindow.getAllWindows().forEach((win) => {
+    win.setBackgroundColor(color)
+    if (process.platform === "darwin") win.invalidateShadow()
+  })
 }
 
 export function getBackgroundColor(): string | undefined {
@@ -44,6 +48,8 @@ function overlay(theme: Partial<TitlebarTheme> = {}) {
 }
 
 export function setTitlebar(win: BrowserWindow, theme: Partial<TitlebarTheme> = {}) {
+  if (process.platform === "darwin") nativeTheme.themeSource = theme.scheme ?? theme.mode ?? "system"
+
   if (process.platform !== "win32") return
   win.setTitleBarOverlay(overlay(theme))
 }
@@ -72,7 +78,7 @@ export function createMainWindow(globals: Globals) {
     ...(process.platform === "darwin"
       ? {
           titleBarStyle: "hidden" as const,
-          trafficLightPosition: { x: 12, y: 14 },
+          trafficLightPosition: { x: 14, y: 14 },
         }
       : {}),
     ...(process.platform === "win32"

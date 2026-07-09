@@ -13,6 +13,7 @@ export type WslConfig = { enabled: boolean }
 export type LinuxDisplayBackend = "wayland" | "auto"
 export type TitlebarTheme = {
   mode: "light" | "dark"
+  scheme?: "system" | "light" | "dark"
 }
 
 export type ElectronAPI = {

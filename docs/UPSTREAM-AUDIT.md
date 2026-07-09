@@ -60,7 +60,7 @@ Potentially useful only if CyxCode actively ships or tests the desktop app surfa
 
 
 - [done] Session tab titles persist during reload/loading.
-- macOS titlebar and traffic light layout fixes.
+- [done] macOS titlebar and traffic light layout fixes.
 - [done] Hidden review pane unmounting.
 
 - [done] Legacy drafts route to session page (app compatibility `/new-session` compatibility route).
