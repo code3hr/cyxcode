@@ -65,6 +65,7 @@ Potentially useful only if CyxCode actively ships or tests the desktop app surfa
 
 - [done] Legacy drafts route to session page (app compatibility `/new-session` compatibility route).
 - [blocked] Capped review patch loading (upstream depends on `@opencode-ai/ui` v2 `session-review` and `/vcs/diff` API).
+- [done] `ae7d63272c` descender clipping in model list (partial): added `leading-5` to model item text in `packages/app/src/components/dialog-select-model.tsx`.
 
 Reason this is manual: these touch `packages/app` layout/session state and can conflict with CyxCode UI assumptions.
 
@@ -86,7 +87,6 @@ These are intentionally not backported unless a concrete CyxCode bug or release 
 - Nix node_modules hash churn.
 - Upstream release version sync commits.
 - Latest upstream `dev` delta after `v1.17.16`:
-  - `ae7d63272c feat(app): fix descender clipping`
   - `5c860d4142 feat(feat): align sub-agent task rows with v2 design`
   - `4f9207daac feat(app): restyle revert dock for v2`
   - `5cc3a51357 feat(app): free model selector`
