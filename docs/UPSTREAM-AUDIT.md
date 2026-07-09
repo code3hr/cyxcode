@@ -9,7 +9,7 @@ This file tracks selective upstream opencode updates for CyxCode. Use it to avoi
 - CyxCode head after latest backport: `b1b02b09ae7a61d62eb485fa6456770e6e5d8b06`
 - Latest upstream release checked: `anomalyco/opencode v1.17.16`
 - Upstream release date: 2026-07-09
-- Upstream `dev` checked: `e357c9021234763da54753d69cbc28908e071f8b`
+- Upstream `dev` checked: `6b41ae910c51e72d3d70a4b7e7a75283c74c41db`
 
 ## Audit Policy
 
@@ -41,7 +41,7 @@ Prefer the smallest backport that preserves CyxCode behavior. Do not wholesale m
 
 ## Take Next
 
-None currently marked as direct `take`.
+- None currently marked as direct `take`; post-`v1.17.16` upstream changes in this repo are primarily app/UI v2 refactors.
 
 ## Manual Adaptation Candidates
 
@@ -85,6 +85,11 @@ These are intentionally not backported unless a concrete CyxCode bug or release 
 - Generated file churn with no runtime behavior change.
 - Nix node_modules hash churn.
 - Upstream release version sync commits.
+- Latest upstream `dev` delta after `v1.17.16`:
+  - `ae7d63272c feat(app): fix descender clipping`
+  - `5c860d4142 feat(feat): align sub-agent task rows with v2 design`
+  - `4f9207daac feat(app): restyle revert dock for v2`
+  - `5cc3a51357 feat(app): free model selector`
 - Upstream `v1.17.16` package manifest version sync.
 - Any change that replaces CyxCode-specific commands, branding, update flow, installer identity, skills, security tooling, or TUI behavior.
 
@@ -125,3 +130,6 @@ git diff --name-status <latest-upstream-tag>..upstream/dev -- packages/opencode 
 5. For each candidate, classify as `take`, `manual adaptation`, or `skip for now` before editing code.
 
 6. For any `take` or `manual adaptation`, add focused tests in `packages/opencode` and run package-local tests/typecheck only from package directories.
+
+
+
