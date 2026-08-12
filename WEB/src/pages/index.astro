@@ -25,12 +25,12 @@ const problems = [
 ]
 
 const features = [
-  { title: "Works inside your repo", desc: "Ask questions, edit files, run commands, and keep context close to the work." },
-  { title: "Learns the project", desc: "Memory and recall preserve decisions, fixes, and conventions across sessions." },
-  { title: "Fast on repeated failures", desc: "Known errors can be diagnosed before a model call, with fixes ready in under a second." },
-  { title: "Choose your model", desc: "Use CyxCode Zen, your own provider keys, local models, Copilot, or ChatGPT accounts." },
-  { title: "Guarded automation", desc: "Permissions, CyxWatch, and audit trails keep agent actions visible and controlled." },
-  { title: "Improves over time", desc: "Corrections, learned patterns, and behavior versioning make repeated work reusable." },
+  { title: "Works inside your repo", desc: "Ask questions, edit files, run commands, and keep context close to the work.", href: "/features#workspace" },
+  { title: "Learns the project", desc: "Memory, wiki notes, graphs, and recall preserve useful context across sessions.", href: "/knowledge" },
+  { title: "Fast on repeated failures", desc: "Known errors can be diagnosed before a model call, with fixes ready in under a second.", href: "/features#learning" },
+  { title: "Choose your model", desc: "Use CyxCode Zen, your own provider keys, local models, Copilot, or ChatGPT accounts.", href: "/features#integrations" },
+  { title: "Guarded automation", desc: "Permissions, CyxWatch, and audit trails keep agent actions visible and controlled.", href: "/cyxwatch" },
+  { title: "Improves over time", desc: "Corrections, learned patterns, and behavior versioning make repeated work reusable.", href: "/features#learning" },
 ]
 
 const stats = [
@@ -138,7 +138,7 @@ const stats = [
     <div class="feature-grid">
       {
         features.map((f) => (
-          <a class="feature-card reveal" href={route("/features")}>
+          <a class="feature-card reveal" href={route(f.href)}>
             <h3>{f.title}</h3>
             <p set:html={f.desc} />
           </a>
@@ -150,6 +150,7 @@ const stats = [
   <section class="routes reveal">
     <a href={route("/about")} class="route">About <span>-></span></a>
     <a href={route("/features")} class="route">Features <span>-></span></a>
+    <a href={route("/knowledge")} class="route">Knowledge <span>-></span></a>
     <a href={route("/cyxwatch")} class="route">CyxWatch <span>-></span></a>
     <a href={route("/install")} class="route">Install <span>-></span></a>
     <a href={docs} target="_blank" rel="noreferrer noopener" class="route">Docs -></a>
