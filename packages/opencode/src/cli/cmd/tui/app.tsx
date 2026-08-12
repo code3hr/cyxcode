@@ -369,7 +369,7 @@ function App(props: { onSnapshot?: () => Promise<string[]> }) {
       duration: 30000,
     })
 
-    const result = await sdk.client.global.upgrade(target ? { target } : {}).catch((err) => ({
+    const result = await sdk.client.global.upgrade({ target }).catch((err) => ({
       data: undefined,
       error: err,
     }))
