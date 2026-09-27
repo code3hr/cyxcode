@@ -359,6 +359,75 @@ describe("session.message-v2.toModelMessage", () => {
     ])
   })
 
+  test.each([
+    ["anthropic.claude-sonnet-4-5-v1:0", "image/png", false],
+    ["amazon.nova-pro-v1:0", "image/png", false],
+    ["meta.llama4-scout-17b-instruct-v1:0", "image/png", false],
+    ["meta.llama-4-maverick-v1:0", "image/png", false],
+    ["deepseek.r1-v1:0", "image/png", true],
+    ["deepseek.r1-v1:0", "application/pdf", false],
+  ])("hoists Bedrock tool media only when needed for %s and %s", (id, mime, hoist) => {
+    const input: MessageV2.WithParts[] = [
+      {
+        info: assistantInfo("m-assistant", "m-user"),
+        parts: [
+          {
+            ...basePart("m-assistant", "a1"),
+            type: "tool",
+            callID: "call-1",
+            tool: "bash",
+            state: {
+              status: "completed",
+              input: { cmd: "ls" },
+              output: "ok",
+              title: "Bash",
+              metadata: {},
+              time: { start: 0, end: 1 },
+              attachments: [
+                {
+                  ...basePart("m-assistant", "file-1"),
+                  type: "file",
+                  mime,
+                  filename: "image.png",
+                  url: `data:${mime};base64,Zm9v`,
+                },
+              ],
+            },
+          },
+        ] as MessageV2.Part[],
+      },
+    ]
+    const result = MessageV2.toModelMessages(input, {
+      ...model,
+      api: { ...model.api, id, npm: "@ai-sdk/amazon-bedrock" },
+    })
+
+    expect(result.find((item) => item.role === "tool")).toMatchObject({
+      content: [
+        {
+          output: hoist
+            ? { type: "text", value: "ok" }
+            : {
+                type: "content",
+                value: [
+                  { type: "text", text: "ok" },
+                  { type: "media", mediaType: mime, data: "Zm9v" },
+                ],
+              },
+        },
+      ],
+    })
+    expect(result.filter((item) => item.role === "user")).toHaveLength(hoist ? 1 : 0)
+    if (hoist) {
+      expect(result.find((item) => item.role === "user")).toMatchObject({
+        content: [
+          { type: "text", text: "Attached image(s) from tool result:" },
+          { type: "file", mediaType: mime },
+        ],
+      })
+    }
+  })
+
   test("omits provider metadata when assistant model differs", () => {
     const userID = "m-user"
     const assistantID = "m-assistant"

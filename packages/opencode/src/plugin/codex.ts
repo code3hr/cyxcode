@@ -27,6 +27,8 @@ const ALLOWED_MODELS = new Set([
   "gpt-5.4",
   "gpt-5.4-mini",
   "gpt-5.5",
+  "gpt-6-sol",
+  "gpt-6-luna",
 ])
 const DISALLOWED_MODELS = new Set(["gpt-5.5-pro"])
 

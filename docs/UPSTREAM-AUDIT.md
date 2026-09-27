@@ -2,14 +2,40 @@
 
 This file tracks selective upstream opencode updates for CyxCode. Use it to avoid broad merges that overwrite CyxCode-specific branding, commands, update flow, TUI behavior, skills, or security tooling.
 
-## Current Baseline
+## Current Pickup (2026-09-28)
+
+- CyxCode branch: `sync/mcp-oauth-upstream-2026-06-28` at `42676876b6` before this pickup.
+- Latest published upstream release: [`v1.18.32`](https://github.com/anomalyco/opencode/releases/tag/v1.18.32), published 2026-09-21, commit `545f51d26c`.
+- Upstream `dev` snapshot: `b471c2b4495747353af768fbf2e0790c9d820ce2` (2026-09-26).
+- The release delta since `v1.17.16` spans 195 commits touching `packages/opencode` and 743 files across the audited package paths. This pickup reviews selected core fixes; it is not a full release-by-release audit.
+- Local upstream release tag alias: `upstream-v1.18.32`. Fetch upstream tags under distinct names because CyxCode owns some of the same tag names.
+
+### Backported in this batch
+
+- `c10134729d` (`take`, adapted): Bedrock tool images stay in tool results for Claude, Nova, and Llama 4; other Bedrock images move to a user message. CyxCode's existing message conversion also preserves PDF handling. No SDK or package bump.
+- `9b0dd36cda` (`take`, adapted): malformed model price fields count as zero instead of breaking session cost calculation. Existing CyxCode token accounting is preserved.
+- `3a35b45db8` (`take`, adapted from unreleased `dev`): allow `gpt-6-sol` and `gpt-6-luna` in CyxCode's existing Codex OAuth allowlist. CyxCode's model names, authorization flow, and other allowlist rules remain in place.
+- `82d4c89031` (`take`, adapted from unreleased `dev`): redact credentials in `cyxcode debug config` output without changing the resolved config used by providers.
+- Validation: package-local session, Codex, and debug-config tests pass; `bun typecheck` passes. The debug-config test covers the redaction function; a CLI process test has not been run.
+
+### Review next
+
+- `ac1758c0e6` (`manual adaptation`): preserve Bedrock DeepSeek and ARN model IDs. The CyxCode provider has its own region-prefix path; add focused provider tests before changing it.
+- `95daf90670` (`manual adaptation`): ACP session options and reasoning boundaries. Upstream changes several ACP modules and tests, so compare with CyxCode's ACP behavior first.
+- `610df0b566` (`manual adaptation`, unreleased): Gemini thinking defaults. Compare with CyxCode's provider transforms and SDK versions.
+- `69c172e8a7` (`manual adaptation`): SSE reader cancellation. Upstream changes `packages/core` and provider code; check whether CyxCode's versions have the same failure path.
+- `b471c2b449` (`skip for now`, unreleased): MCP browser launcher exit handling depends on `packages/opencode/src/mcp/browser.ts`, which this fork does not have.
+- Broad app v2, TUI, release version, generated file, and dependency churn remains excluded by the audit policy below.
+
+## Previous Baseline (2026-07-09)
 
 - Audit date: 2026-07-09
 - CyxCode branch: `sync/mcp-oauth-upstream-2026-06-28`
-- CyxCode head after latest backport: `60546ff74e89`
+- CyxCode head after latest backport: `92fc9667f0`
 - Latest upstream release checked: `anomalyco/opencode v1.17.16`
 - Upstream release date: 2026-07-09
 - Upstream `dev` checked: `6b41ae910c51e72d3d70a4b7e7a75283c74c41db`
+- Latest upstream `dev` snapshot: `518772c2ba7d52f7d1e79bca2837ce96241a282d`
 
 ## Audit Policy
 
@@ -90,6 +116,8 @@ These are intentionally not backported unless a concrete CyxCode bug or release 
 - Upstream release version sync commits.
 - Latest upstream `dev` delta after `v1.17.16`:
   - `4f9207daac feat(app): restyle revert dock for v2`
+  - `3b18c64782 chore: generate` (generated drawer shim)
+  - `c6c599b872 feat(app): refactor help button and add tabs info popup persistence` (help button redesign + `@corvu/drawer` dependency bump)
 - Upstream `v1.17.16` package manifest version sync.
 - Any change that replaces CyxCode-specific commands, branding, update flow, installer identity, skills, security tooling, or TUI behavior.
 

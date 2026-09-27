@@ -49,6 +49,11 @@ describe("plugin.codex", () => {
       expect(isAllowedCodexModel("gpt-5.10")).toBe(true)
     })
 
+    test("allows supported GPT-6 Codex models", () => {
+      expect(isAllowedCodexModel("gpt-6-sol")).toBe(true)
+      expect(isAllowedCodexModel("gpt-6-luna")).toBe(true)
+    })
+
     test("preserves explicit Codex model variants", () => {
       expect(isAllowedCodexModel("gpt-5-codex")).toBe(true)
       expect(isAllowedCodexModel("gpt-5.1-codex-max")).toBe(true)
