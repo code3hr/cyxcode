@@ -16,6 +16,7 @@
 - [What is CyxCode?](#what-is-cyxcode)
 - [Install](#install)
 - [Quick Start](#quick-start)
+- [Providers and Free Models](#providers-and-free-models)
 - [Two Modes](#two-modes)
 - [Pattern Learning](#pattern-learning)
 - [Project Memory](#project-memory)
@@ -82,6 +83,20 @@ bun run dev
 ```
 
 For CPUs without AVX2, see [AVX2 Note](docs/PERFORMANCE.md#avx2-note).
+
+### Providers and Free Models
+
+Run `/connect` in CyxCode to connect a provider, then `/models` to select a model. You can also manage connections from the terminal with `cyxcode providers login` and `cyxcode providers list`.
+
+**OpenCode Zen requires your own API key in CyxCode.** Its anonymous free tier can reject requests with:
+
+> OpenCode's free tier can only be used from within OpenCode.
+
+CyxCode is a fork of OpenCode, but access to OpenCode's hosted model service is controlled by that service. CyxCode no longer automatically connects to Zen using the anonymous `public` key. Without a Zen API key, its models—including Big Pickle—do not appear as available choices in `/models`. If no provider is connected, CyxCode prompts you to connect one.
+
+To connect Zen, obtain a key from [OpenCode Zen](https://opencode.ai/zen), run `/connect`, and select OpenCode Zen. An API key makes the provider available in CyxCode; access to individual models, including free models, still depends on the service's rules. Authenticated access to Zen's free models from CyxCode has not yet been verified. See the [Zen documentation](https://opencode.ai/docs/zen/) for account and pricing details.
+
+Free models remain supported through other configured providers that permit access, subject to their usage limits. You can also configure local models through an OpenAI-compatible endpoint such as [Ollama](https://opencode.ai/docs/providers/#ollama), using your own hardware. CyxCode's local pattern matching continues to work without a model API call.
 
 ### Project Setup
 
