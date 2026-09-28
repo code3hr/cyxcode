@@ -606,46 +606,14 @@ export namespace ACP {
       const sessionId = params.sessionId
 
       try {
-        const model = await defaultModel(this.config, directory)
-
         // Store ACP session state
-        await this.sessionManager.load(sessionId, params.cwd, params.mcpServers, model)
+        await this.sessionManager.load(sessionId, params.cwd, params.mcpServers)
 
         log.info("load_session", { sessionId, mcpServers: params.mcpServers.length })
 
-        const result = await this.loadSessionMode({
-          cwd: directory,
-          mcpServers: params.mcpServers,
-          sessionId,
-        })
-
         // Replay session history
-        const messages = await this.sdk.session
-          .messages(
-            {
-              sessionID: sessionId,
-              directory,
-            },
-            { throwOnError: true },
-          )
-          .then((x) => x.data)
-          .catch((err) => {
-            log.error("unexpected error when fetching message", { error: err })
-            return undefined
-          })
-
-        const lastUser = messages?.findLast((m) => m.info.role === "user")?.info
-        if (lastUser?.role === "user") {
-          result.models.currentModelId = `${lastUser.model.providerID}/${lastUser.model.modelID}`
-          this.sessionManager.setModel(sessionId, {
-            providerID: ProviderID.make(lastUser.model.providerID),
-            modelID: ModelID.make(lastUser.model.modelID),
-          })
-          if (result.modes?.availableModes.some((m) => m.id === lastUser.agent)) {
-            result.modes.currentModeId = lastUser.agent
-            this.sessionManager.setMode(sessionId, lastUser.agent)
-          }
-        }
+        const messages = await this.history(sessionId, directory)
+        const result = await this.loadSessionMode(params, messages)
 
         for (const msg of messages ?? []) {
           log.debug("replay message", msg)
@@ -716,8 +684,6 @@ export namespace ACP {
       const mcpServers = params.mcpServers ?? []
 
       try {
-        const model = await defaultModel(this.config, directory)
-
         const forked = await this.sdk.session
           .fork(
             {
@@ -733,29 +699,12 @@ export namespace ACP {
         }
 
         const sessionId = forked.id
-        await this.sessionManager.load(sessionId, directory, mcpServers, model)
+        await this.sessionManager.load(sessionId, directory, mcpServers)
 
         log.info("fork_session", { sessionId, mcpServers: mcpServers.length })
 
-        const mode = await this.loadSessionMode({
-          cwd: directory,
-          mcpServers,
-          sessionId,
-        })
-
-        const messages = await this.sdk.session
-          .messages(
-            {
-              sessionID: sessionId,
-              directory,
-            },
-            { throwOnError: true },
-          )
-          .then((x) => x.data)
-          .catch((err) => {
-            log.error("unexpected error when fetching message", { error: err })
-            return undefined
-          })
+        const messages = await this.history(sessionId, directory)
+        const mode = await this.loadSessionMode({ cwd: directory, mcpServers, sessionId }, messages)
 
         for (const msg of messages ?? []) {
           log.debug("replay message", msg)
@@ -782,16 +731,12 @@ export namespace ACP {
       const mcpServers = params.mcpServers ?? []
 
       try {
-        const model = await defaultModel(this.config, directory)
-        await this.sessionManager.load(sessionId, directory, mcpServers, model)
+        await this.sessionManager.load(sessionId, directory, mcpServers)
 
         log.info("resume_session", { sessionId, mcpServers: mcpServers.length })
 
-        const result = await this.loadSessionMode({
-          cwd: directory,
-          mcpServers,
-          sessionId,
-        })
+        const messages = await this.history(sessionId, directory)
+        const result = await this.loadSessionMode({ cwd: directory, mcpServers, sessionId }, messages)
 
         await sendUsageUpdate(this.connection, this.sdk, sessionId, directory)
 
@@ -805,6 +750,16 @@ export namespace ACP {
         }
         throw e
       }
+    }
+
+    private async history(session: string, directory: string) {
+      return this.sdk.session
+        .messages({ sessionID: session, directory }, { throwOnError: true })
+        .then((x) => x.data ?? [])
+        .catch((err) => {
+          log.error("unexpected error when fetching message", { error: err })
+          return []
+        })
     }
 
     private async processMessage(message: SessionMessageResponse) {
@@ -1131,36 +1086,53 @@ export namespace ACP {
     private async resolveModeState(
       directory: string,
       sessionId: string,
+      preferred?: string,
     ): Promise<{ availableModes: ModeOption[]; currentModeId?: string }> {
       const availableModes = await this.loadAvailableModes(directory)
+      const current = [this.sessionManager.get(sessionId).modeId, preferred].find((id) =>
+        availableModes.some((mode) => mode.id === id),
+      )
       const currentModeId =
-        this.sessionManager.get(sessionId).modeId ||
+        availableModes.find((mode) => mode.id === current)?.id ||
         (await (async () => {
           if (!availableModes.length) return undefined
           const defaultAgentName = await AgentModule.defaultAgent()
           const resolvedModeId =
             availableModes.find((mode) => mode.name === defaultAgentName)?.id ?? availableModes[0].id
-          this.sessionManager.setMode(sessionId, resolvedModeId)
           return resolvedModeId
         })())
 
+      if (currentModeId) this.sessionManager.setMode(sessionId, currentModeId)
       return { availableModes, currentModeId }
     }
 
-    private async loadSessionMode(params: LoadSessionRequest) {
+    private async loadSessionMode(params: LoadSessionRequest, history: SessionMessageResponse[] = []) {
       const directory = params.cwd
-      const model = await defaultModel(this.config, directory)
       const sessionId = params.sessionId
 
       const providers = await this.sdk.config.providers({ directory }).then((x) => x.data!.providers)
+      const last = history.findLast((message) => message.info.role === "user")?.info
+      const user = last?.role === "user" ? last : undefined
+      const current = this.sessionManager.getModel(sessionId)
+      const saved = [current, user?.model].find(
+        (model) =>
+          model && providers.some((provider) => provider.id === model.providerID && provider.models[model.modelID]),
+      )
+      const model = saved
+        ? { providerID: ProviderID.make(saved.providerID), modelID: ModelID.make(saved.modelID) }
+        : await defaultModel(this.config, directory)
+      this.sessionManager.setModel(sessionId, model)
       const entries = sortProvidersByName(providers)
       const availableVariants = modelVariantsFromProviders(entries, model)
-      const currentVariant = this.sessionManager.getVariant(sessionId)
-      if (currentVariant && !availableVariants.includes(currentVariant)) {
-        this.sessionManager.setVariant(sessionId, undefined)
-      }
+      const variant = saved
+        ? saved === current
+          ? this.sessionManager.getVariant(sessionId)
+          : user?.variant
+        : undefined
+      const currentVariant = variant && availableVariants.includes(variant) ? variant : undefined
+      this.sessionManager.setVariant(sessionId, currentVariant)
       const availableModels = buildAvailableModels(entries, { includeVariants: true })
-      const modeState = await this.resolveModeState(directory, sessionId)
+      const modeState = await this.resolveModeState(directory, sessionId, user?.agent)
       const currentModeId = modeState.currentModeId
       const modes = currentModeId
         ? {

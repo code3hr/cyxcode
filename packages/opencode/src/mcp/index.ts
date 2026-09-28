@@ -985,8 +985,8 @@ export namespace MCP {
 
     try {
       const subprocess = await open(authorizationUrl)
-      // The open package spawns a detached process and returns immediately.
-      // We need to listen for errors which fire asynchronously:
+      // Browser launchers can fail before or after open() returns.
+      // Watch both asynchronous failures and an already-completed process:
       // - "error" event: command not found (ENOENT)
       // - "exit" with non-zero code: command exists but failed (e.g., no display)
       await new Promise<void>((resolve, reject) => {
@@ -996,12 +996,13 @@ export namespace MCP {
           clearTimeout(timeout)
           reject(error)
         })
-        subprocess.on("exit", (code) => {
-          if (code !== null && code !== 0) {
-            clearTimeout(timeout)
-            reject(new Error(`Browser open failed with exit code ${code}`))
-          }
-        })
+        const exit = (code: number | null) => {
+          if (code === null || code === 0) return
+          clearTimeout(timeout)
+          reject(new Error(`Browser open failed with exit code ${code}`))
+        }
+        subprocess.on("exit", exit)
+        exit(subprocess.exitCode)
       })
     } catch (error) {
       // Browser opening failed (e.g., in remote/headless sessions like SSH, devcontainers)

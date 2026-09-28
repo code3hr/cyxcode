@@ -74,7 +74,8 @@ export namespace Provider {
           const id = setTimeout(() => {
             const err = new Error("SSE read timed out")
             ctl.abort(err)
-            void reader.cancel(err)
+            // Preserve the timeout error if cancellation also fails after aborting.
+            reader.cancel(err).catch(() => {})
             reject(err)
           }, ms)
 
@@ -315,6 +316,8 @@ export namespace Provider {
         autoload: true,
         options: providerOptions,
         async getModel(sdk: any, modelID: string, options?: Record<string, any>) {
+          if (modelID.startsWith("arn:")) return sdk.languageModel(modelID)
+
           // Skip region prefixing if model already has a cross-region inference profile prefix
           // Models from models.dev may already include prefixes like us., eu., global., etc.
           const crossRegionPrefixes = ["global.", "us.", "eu.", "jp.", "apac.", "au."]
@@ -339,7 +342,7 @@ export namespace Provider {
                 "nova-premier",
                 "nova-2",
                 "claude",
-                "deepseek",
+                "deepseek.r1",
               ].some((m) => modelID.includes(m))
               const isGovCloud = region.startsWith("us-gov")
               if (modelRequiresPrefix && !isGovCloud) {

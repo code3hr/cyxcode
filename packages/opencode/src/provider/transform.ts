@@ -334,6 +334,36 @@ export namespace ProviderTransform {
   const WIDELY_SUPPORTED_EFFORTS = ["low", "medium", "high"]
   const OPENAI_EFFORTS = ["none", "minimal", ...WIDELY_SUPPORTED_EFFORTS, "xhigh"]
 
+  const legacy = /gemini-(?:(?:flash|pro)-)?[12](?:[.-]|$)/i
+  const budget = /gemini-2[.-]5(?:[.-]|$)/i
+
+  function levels(api: string): string[] {
+    const id = api.toLowerCase()
+    if (id.includes("gemma")) return ["minimal", "high"]
+    if (legacy.test(id)) return ["low", "high"]
+    if (id.includes("flash-image")) return ["minimal", "high"]
+    if (id.includes("pro-image")) return ["high"]
+    if (id.includes("flash")) return ["minimal", "low", "medium", "high"]
+    return ["low", "medium", "high"]
+  }
+
+  function thinking(id: string) {
+    if (budget.test(id)) {
+      return {
+        high: { thinkingConfig: { includeThoughts: true, thinkingBudget: 16000 } },
+        max: {
+          thinkingConfig: {
+            includeThoughts: true,
+            thinkingBudget: /pro/i.test(id) && !/flash/i.test(id) ? 32768 : 24576,
+          },
+        },
+      }
+    }
+    return Object.fromEntries(
+      levels(id).map((effort) => [effort, { thinkingConfig: { includeThoughts: true, thinkingLevel: effort } }]),
+    )
+  }
+
   export function variants(model: Provider.Model): Record<string, Record<string, any>> {
     if (!model.capabilities.reasoning) return {}
 
@@ -370,7 +400,7 @@ export namespace ProviderTransform {
       case "@openrouter/ai-sdk-provider":
         if (
           !model.id.includes("gpt") &&
-          !model.id.includes("gemini-3") &&
+          !(model.api.id.toLowerCase().includes("gemini") && !legacy.test(model.api.id)) &&
           !model.id.includes("claude") &&
           !id.includes("grok")
         )
@@ -408,25 +438,10 @@ export namespace ProviderTransform {
             },
           }
         }
-        if (model.id.includes("google")) {
-          if (id.includes("2.5")) {
-            return {
-              high: {
-                thinkingConfig: {
-                  includeThoughts: true,
-                  thinkingBudget: 16000,
-                },
-              },
-              max: {
-                thinkingConfig: {
-                  includeThoughts: true,
-                  thinkingBudget: 24576,
-                },
-              },
-            }
-          }
+        if (model.api.id.includes("google")) {
+          if (budget.test(model.api.id)) return thinking(model.api.id)
           return Object.fromEntries(
-            ["low", "high"].map((effort) => [
+            levels(model.api.id).map((effort) => [
               effort,
               {
                 includeThoughts: true,
@@ -610,38 +625,7 @@ export namespace ProviderTransform {
       // https://v5.ai-sdk.dev/providers/ai-sdk-providers/google-vertex
       case "@ai-sdk/google":
         // https://v5.ai-sdk.dev/providers/ai-sdk-providers/google-generative-ai
-        if (id.includes("2.5")) {
-          return {
-            high: {
-              thinkingConfig: {
-                includeThoughts: true,
-                thinkingBudget: 16000,
-              },
-            },
-            max: {
-              thinkingConfig: {
-                includeThoughts: true,
-                thinkingBudget: 24576,
-              },
-            },
-          }
-        }
-        let levels = ["low", "high"]
-        if (id.includes("3.1")) {
-          levels = ["low", "medium", "high"]
-        }
-
-        return Object.fromEntries(
-          levels.map((effort) => [
-            effort,
-            {
-              thinkingConfig: {
-                includeThoughts: true,
-                thinkingLevel: effort,
-              },
-            },
-          ]),
-        )
+        return thinking(model.api.id)
 
       case "@ai-sdk/mistral":
         // https://v5.ai-sdk.dev/providers/ai-sdk-providers/mistral
@@ -697,22 +681,7 @@ export namespace ProviderTransform {
             },
           }
         }
-        if (model.api.id.includes("gemini") && id.includes("2.5")) {
-          return {
-            high: {
-              thinkingConfig: {
-                includeThoughts: true,
-                thinkingBudget: 16000,
-              },
-            },
-            max: {
-              thinkingConfig: {
-                includeThoughts: true,
-                thinkingBudget: 24576,
-              },
-            },
-          }
-        }
+        if (budget.test(model.api.id)) return thinking(model.api.id)
         if (model.api.id.includes("gpt") || /\bo[1-9]/.test(model.api.id)) {
           return Object.fromEntries(WIDELY_SUPPORTED_EFFORTS.map((effort) => [effort, { reasoningEffort: effort }]))
         }
@@ -741,7 +710,7 @@ export namespace ProviderTransform {
       result["usage"] = {
         include: true,
       }
-      if (input.model.api.id.includes("gemini-3")) {
+      if (input.model.api.id.toLowerCase().includes("gemini") && !legacy.test(input.model.api.id)) {
         result["reasoning"] = { effort: "high" }
       }
     }
@@ -762,7 +731,9 @@ export namespace ProviderTransform {
 
     if (
       input.providerOptions?.setCacheKey !== false &&
-      (input.model.providerID === "openai" || input.model.api.npm === "@ai-sdk/xai" || input.providerOptions?.setCacheKey)
+      (input.model.providerID === "openai" ||
+        input.model.api.npm === "@ai-sdk/xai" ||
+        input.providerOptions?.setCacheKey)
     ) {
       result["promptCacheKey"] = input.sessionID
     }
@@ -772,7 +743,7 @@ export namespace ProviderTransform {
         result["thinkingConfig"] = {
           includeThoughts: true,
         }
-        if (input.model.api.id.includes("gemini-3")) {
+        if (!legacy.test(input.model.api.id)) {
           result["thinkingConfig"]["thinkingLevel"] = "high"
         }
       }
@@ -822,13 +793,13 @@ export namespace ProviderTransform {
         }
       }
 
-      // Only set textVerbosity for non-chat gpt-5.x models
-      // Chat models (e.g. gpt-5.2-chat-latest) only support "medium" verbosity
+      // Default verbosity only for SDKs that support it, preserving the Azure exclusion.
       if (
         input.model.api.id.includes("gpt-5.") &&
         !input.model.api.id.includes("codex") &&
         !input.model.api.id.includes("-chat") &&
-        input.model.providerID !== "azure"
+        input.model.providerID !== "azure" &&
+        (input.model.api.npm === "@ai-sdk/openai" || input.model.api.npm === "@ai-sdk/amazon-bedrock/mantle")
       ) {
         result["textVerbosity"] = "low"
       }
@@ -870,10 +841,9 @@ export namespace ProviderTransform {
       }
       return { store: false }
     }
-    if (model.providerID === "google") {
-      // gemini-3 uses thinkingLevel, gemini-2.5 uses thinkingBudget
-      if (model.api.id.includes("gemini-3")) {
-        return { thinkingConfig: { thinkingLevel: "minimal" } }
+    if (model.api.npm === "@ai-sdk/google" || model.api.npm === "@ai-sdk/google-vertex") {
+      if (!legacy.test(model.api.id)) {
+        return { thinkingConfig: { thinkingLevel: levels(model.api.id)[0] } }
       }
       return { thinkingConfig: { thinkingBudget: 0 } }
     }
@@ -982,9 +952,7 @@ export namespace ProviderTransform {
 
     for (const key of ["$defs", "definitions"]) {
       if (isRecord(value[key])) {
-        result[key] = Object.fromEntries(
-          Object.entries(value[key]).map(([name, val]) => [name, sanitizeOpenAI(val)]),
-        )
+        result[key] = Object.fromEntries(Object.entries(value[key]).map(([name, val]) => [name, sanitizeOpenAI(val)]))
       }
     }
 

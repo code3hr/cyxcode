@@ -307,6 +307,23 @@ describe("ProviderTransform.options - gpt-5 textVerbosity", () => {
     expect(result.reasoningEffort).toBeUndefined()
     expect(result.textVerbosity).toBeUndefined()
   })
+  test.each([
+    { provider: "custom", npm: "@ai-sdk/openai-compatible", expected: undefined },
+    { provider: "openai", npm: "@ai-sdk/openai-compatible", expected: undefined },
+    { provider: "azure-custom", npm: "@ai-sdk/azure", expected: undefined },
+    { provider: "custom-openai", npm: "@ai-sdk/openai", expected: "low" },
+    { provider: "azure", npm: "@ai-sdk/openai", expected: undefined },
+    { provider: "bedrock", npm: "@ai-sdk/amazon-bedrock/mantle", expected: "low" },
+  ])("gates default textVerbosity for $provider using $npm", (row) => {
+    const model = {
+      ...createGpt5Model("gpt-5.5"),
+      providerID: ProviderID.make(row.provider),
+      api: { id: "gpt-5.5", url: "https://example.invalid", npm: row.npm },
+    }
+    const result = ProviderTransform.options({ model, sessionID, providerOptions: {} })
+    expect(result.textVerbosity).toBe(row.expected)
+  })
+
   test("openai-compatible gpt-5 models omit Responses-only reasoningSummary", () => {
     const model = {
       ...createGpt5Model("gpt-5.4"),
@@ -321,6 +338,7 @@ describe("ProviderTransform.options - gpt-5 textVerbosity", () => {
     const result = ProviderTransform.options({ model, sessionID, providerOptions: {} })
     expect(result.reasoningEffort).toBe("medium")
     expect(result.reasoningSummary).toBeUndefined()
+    expect(result.textVerbosity).toBeUndefined()
   })
 })
 
@@ -2839,7 +2857,7 @@ describe("ProviderTransform.variants", () => {
       expect(result.max).toEqual({
         thinkingConfig: {
           includeThoughts: true,
-          thinkingBudget: 24576,
+          thinkingBudget: 32768,
         },
       })
     })
@@ -3029,7 +3047,7 @@ describe("ProviderTransform.variants", () => {
       expect(result.max).toEqual({
         thinkingConfig: {
           includeThoughts: true,
-          thinkingBudget: 24576,
+          thinkingBudget: 32768,
         },
       })
     })

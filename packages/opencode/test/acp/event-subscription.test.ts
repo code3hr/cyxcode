@@ -1,7 +1,13 @@
 import { describe, expect, test } from "bun:test"
 import { ACP } from "../../src/acp/agent"
 import type { AgentSideConnection } from "@agentclientprotocol/sdk"
-import type { Event, EventMessagePartUpdated, ToolStatePending, ToolStateRunning } from "@cyxcode/sdk/v2"
+import type {
+  Event,
+  EventMessagePartUpdated,
+  SessionMessageResponse,
+  ToolStatePending,
+  ToolStateRunning,
+} from "@cyxcode/sdk/v2"
 import { Instance } from "../../src/project/instance"
 import { tmpdir } from "../fixture/fixture"
 
@@ -117,7 +123,7 @@ function createEventStream() {
   return { controller: { push, close } satisfies EventController, stream }
 }
 
-function createFakeAgent() {
+function createFakeAgent(history: SessionMessageResponse[] = []) {
   const updates = new Map<string, string[]>()
   const chunks = new Map<string, string>()
   const sessionUpdates: SessionUpdateParams[] = []
@@ -177,8 +183,9 @@ function createFakeAgent() {
         }
       },
       messages: async () => {
-        return { data: [] }
+        return { data: history }
       },
+      fork: async () => ({ data: { id: "ses_fork", time: { created: Date.now() } } }),
       message: async (params?: any) => {
         // Return a message with parts that can be looked up by partID
         return {
@@ -212,6 +219,11 @@ function createFakeAgent() {
                 name: "opencode",
                 models: {
                   "big-pickle": { id: "big-pickle", name: "big-pickle" },
+                  "reasoning-model": {
+                    id: "reasoning-model",
+                    name: "Reasoning model",
+                    variants: { low: {}, high: {} },
+                  },
                 },
               },
             ],
@@ -228,6 +240,7 @@ function createFakeAgent() {
               description: "build",
               mode: "agent",
             },
+            { name: "plan", description: "plan", mode: "agent" },
           ],
         }
       },
@@ -256,6 +269,117 @@ function createFakeAgent() {
 
   return { agent, controller, calls, updates, chunks, sessionUpdates, stop, sdk, connection }
 }
+
+describe("acp.agent session restoration", () => {
+  const message = (variant = "high", model = "reasoning-model", agent = "plan"): SessionMessageResponse => ({
+    info: {
+      id: "msg_saved",
+      sessionID: "ses_1",
+      role: "user",
+      time: { created: Date.now() },
+      agent,
+      model: { providerID: "opencode", modelID: model },
+      variant,
+    },
+    parts: [],
+  })
+
+  test.each(["load", "resume", "fork"])("%s restores model, variant and mode from history", async (action) => {
+    await using tmp = await tmpdir()
+    await Instance.provide({
+      directory: tmp.path,
+      fn: async () => {
+        const fixture = createFakeAgent([message()])
+        try {
+          const params = { sessionId: "ses_1", cwd: tmp.path, mcpServers: [] }
+          const result = await (action === "load"
+            ? fixture.agent.loadSession(params)
+            : action === "fork"
+              ? fixture.agent.unstable_forkSession(params)
+              : fixture.agent.unstable_resumeSession(params))
+          expect(result.models?.currentModelId).toBe("opencode/reasoning-model/high")
+          expect(result.modes?.currentModeId).toBe("plan")
+          expect(result._meta).toEqual({
+            opencode: {
+              modelId: "opencode/reasoning-model",
+              variant: "high",
+              availableVariants: ["low", "high"],
+            },
+          })
+        } finally {
+          fixture.stop()
+        }
+      },
+    })
+  })
+
+  test.each(["unknown", "default"])("drops unavailable %s variant from metadata and model ID", async (variant) => {
+    await using tmp = await tmpdir()
+    await Instance.provide({
+      directory: tmp.path,
+      fn: async () => {
+        const fixture = createFakeAgent([message(variant)])
+        try {
+          const result = await fixture.agent.loadSession({ sessionId: "ses_1", cwd: tmp.path, mcpServers: [] })
+          expect(result.models.currentModelId).toBe("opencode/reasoning-model")
+          expect(result._meta.opencode.variant).toBeNull()
+        } finally {
+          fixture.stop()
+        }
+      },
+    })
+  })
+
+  test("falls back when the historical model and mode are unavailable", async () => {
+    await using tmp = await tmpdir()
+    await Instance.provide({
+      directory: tmp.path,
+      fn: async () => {
+        const fixture = createFakeAgent([message("high", "removed", "removed")])
+        try {
+          const result = await fixture.agent.loadSession({ sessionId: "ses_1", cwd: tmp.path, mcpServers: [] })
+          expect(result.models.currentModelId).toBe("opencode/big-pickle")
+          expect(result.modes?.currentModeId).toBe("build")
+          expect(result._meta.opencode.variant).toBeNull()
+          expect(result._meta.opencode.availableVariants).toEqual([])
+        } finally {
+          fixture.stop()
+        }
+      },
+    })
+  })
+
+  test("retains live choices and explicit variant clearing across reload and resume", async () => {
+    await using tmp = await tmpdir()
+    await Instance.provide({
+      directory: tmp.path,
+      fn: async () => {
+        const fixture = createFakeAgent([message()])
+        try {
+          const params = { sessionId: "ses_1", cwd: tmp.path, mcpServers: [] }
+          await fixture.agent.loadSession(params)
+          await fixture.agent.unstable_setSessionModel({
+            sessionId: params.sessionId,
+            modelId: "opencode/reasoning-model/low",
+          })
+          await fixture.agent.setSessionMode({ sessionId: params.sessionId, modeId: "build" })
+          const resumed = await fixture.agent.unstable_resumeSession(params)
+          expect(resumed.models?.currentModelId).toBe("opencode/reasoning-model/low")
+          expect(resumed.modes?.currentModeId).toBe("build")
+          await fixture.agent.unstable_setSessionModel({
+            sessionId: params.sessionId,
+            modelId: "opencode/reasoning-model",
+          })
+          const loaded = await fixture.agent.loadSession(params)
+          expect(loaded.models.currentModelId).toBe("opencode/reasoning-model")
+          expect(loaded._meta.opencode.variant).toBeNull()
+        } finally {
+          fixture.stop()
+        }
+      },
+    })
+  })
+})
 
 describe("acp.agent event subscription", () => {
   test("routes message.part.delta by the event sessionID (no cross-session pollution)", async () => {

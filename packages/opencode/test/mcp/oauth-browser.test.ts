@@ -4,19 +4,22 @@ import { EventEmitter } from "events"
 // Track open() calls and control failure behavior
 let openShouldFail = false
 let openCalledWith: string | undefined
+let code: number | null = null
+let launch = Promise.withResolvers<void>()
 
 mock.module("open", () => ({
   default: async (url: string) => {
     openCalledWith = url
 
     // Return a mock subprocess that emits an error if openShouldFail is true
-    const subprocess = new EventEmitter()
+    const subprocess = Object.assign(new EventEmitter(), { exitCode: code })
     if (openShouldFail) {
       // Emit error asynchronously like a real subprocess would
       setTimeout(() => {
         subprocess.emit("error", new Error("spawn xdg-open ENOENT"))
       }, 10)
     }
+    launch.resolve()
     return subprocess
   },
 }))
@@ -95,6 +98,8 @@ mock.module("@modelcontextprotocol/sdk/client/auth.js", () => ({
 beforeEach(() => {
   openShouldFail = false
   openCalledWith = undefined
+  code = null
+  launch = Promise.withResolvers<void>()
   transportCalls.length = 0
 })
 
@@ -105,7 +110,7 @@ const { McpOAuthCallback } = await import("../../src/mcp/oauth-callback")
 const { Instance } = await import("../../src/project/instance")
 const { tmpdir } = await import("../fixture/fixture")
 
-test("BrowserOpenFailed event is published when open() throws", async () => {
+test.each(["error", "completed"])("BrowserOpenFailed is published for launcher failure: %s", async (mode) => {
   await using tmp = await tmpdir({
     init: async (dir) => {
       await Bun.write(
@@ -126,7 +131,8 @@ test("BrowserOpenFailed event is published when open() throws", async () => {
   await Instance.provide({
     directory: tmp.path,
     fn: async () => {
-      openShouldFail = true
+      openShouldFail = mode === "error"
+      code = mode === "completed" ? 7 : null
 
       const events: Array<{ mcpName: string; url: string }> = []
       const unsubscribe = Bus.subscribe(MCP.BrowserOpenFailed, (evt) => {
@@ -138,8 +144,9 @@ test("BrowserOpenFailed event is published when open() throws", async () => {
       // don't show up as unhandled between tests.
       const authPromise = MCP.authenticate("test-oauth-server").catch(() => undefined)
 
-      // Config.get() can be slow in tests, so give it plenty of time.
-      await new Promise((resolve) => setTimeout(resolve, 2_000))
+      // Wait for the launcher to return before allowing its failure window to finish.
+      await launch.promise
+      await Bun.sleep(750)
 
       // Stop the callback server and cancel any pending auth
       await McpOAuthCallback.stop()
@@ -156,7 +163,10 @@ test("BrowserOpenFailed event is published when open() throws", async () => {
   })
 })
 
-test("BrowserOpenFailed event is NOT published when open() succeeds", async () => {
+test.each([
+  { state: "running", code: null },
+  { state: "completed", code: 0 },
+])("BrowserOpenFailed is not published for a successful $state launcher", async (row) => {
   await using tmp = await tmpdir({
     init: async (dir) => {
       await Bun.write(
@@ -178,6 +188,7 @@ test("BrowserOpenFailed event is NOT published when open() succeeds", async () =
     directory: tmp.path,
     fn: async () => {
       openShouldFail = false
+      code = row.code
 
       const events: Array<{ mcpName: string; url: string }> = []
       const unsubscribe = Bus.subscribe(MCP.BrowserOpenFailed, (evt) => {
@@ -187,8 +198,8 @@ test("BrowserOpenFailed event is NOT published when open() succeeds", async () =
       // Run authenticate with a timeout to avoid waiting forever for the callback
       const authPromise = MCP.authenticate("test-oauth-server-2").catch(() => undefined)
 
-      // Config.get() can be slow in tests; also covers the ~500ms open() error-detection window.
-      await new Promise((resolve) => setTimeout(resolve, 2_000))
+      await launch.promise
+      await Bun.sleep(750)
 
       // Stop the callback server and cancel any pending auth
       await McpOAuthCallback.stop()

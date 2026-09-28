@@ -2,7 +2,7 @@ import { test, expect, describe } from "bun:test"
 import path from "path"
 import { unlink } from "fs/promises"
 
-import { ProviderID } from "../../src/provider/schema"
+import { ModelID, ProviderID } from "../../src/provider/schema"
 import { tmpdir } from "../fixture/fixture"
 import { Instance } from "../../src/project/instance"
 import { Provider } from "../../src/provider/provider"
@@ -381,6 +381,53 @@ test("Bedrock: model without prefix in US region should get us. prefix added", a
       expect(providers[ProviderID.amazonBedrock]).toBeDefined()
       // Non-prefixed model should still be registered
       expect(providers[ProviderID.amazonBedrock].models["anthropic.claude-opus-4-5-20251101-v1:0"]).toBeDefined()
+    },
+  })
+})
+
+test.each([
+  ...["global", "us", "eu", "jp", "apac", "au"].map((prefix) => ({
+    region: "us-east-1",
+    id: `${prefix}.anthropic.claude-opus-4-5-20251101-v1:0`,
+    expected: `${prefix}.anthropic.claude-opus-4-5-20251101-v1:0`,
+  })),
+  {
+    region: "us-east-1",
+    id: "arn:aws:bedrock:us-east-1:123456789012:inference-profile/us.deepseek.r1-v1:0",
+    expected: "arn:aws:bedrock:us-east-1:123456789012:inference-profile/us.deepseek.r1-v1:0",
+  },
+  {
+    region: "eu-west-1",
+    id: "arn:aws:bedrock:eu-west-1:123456789012:application-inference-profile/claude-profile",
+    expected: "arn:aws:bedrock:eu-west-1:123456789012:application-inference-profile/claude-profile",
+  },
+  { region: "us-east-1", id: "deepseek.v3.2", expected: "deepseek.v3.2" },
+  { region: "us-east-1", id: "deepseek.r1-v1:0", expected: "us.deepseek.r1-v1:0" },
+  { region: "us-gov-west-1", id: "deepseek.r1-v1:0", expected: "deepseek.r1-v1:0" },
+  {
+    region: "us-east-1",
+    id: "anthropic.claude-opus-4-5-20251101-v1:0",
+    expected: "us.anthropic.claude-opus-4-5-20251101-v1:0",
+  },
+  { region: "us-east-1", id: "amazon.nova-pro-v1:0", expected: "us.amazon.nova-pro-v1:0" },
+  { region: "us-east-1", id: "cohere.command-r-plus-v1:0", expected: "cohere.command-r-plus-v1:0" },
+])("Bedrock: resolves $id in $region through the SDK", async (row) => {
+  await using tmp = await tmpdir({
+    config: {
+      provider: {
+        "amazon-bedrock": {
+          options: { profile: "default", region: row.region },
+          models: { test: { id: row.id, name: "Test" } },
+        },
+      },
+    },
+  })
+  await Instance.provide({
+    directory: tmp.path,
+    fn: async () => {
+      const model = await Provider.getModel(ProviderID.amazonBedrock, ModelID.make("test"))
+      const language = await Provider.getLanguage(model)
+      expect(language.modelId).toBe(row.expected)
     },
   })
 })

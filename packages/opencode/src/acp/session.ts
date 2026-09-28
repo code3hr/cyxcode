@@ -59,14 +59,16 @@ export class ACPSessionManager {
       )
       .then((x) => x.data!)
 
-    const resolvedModel = model
-
+    const previous = this.sessions.get(sessionId)
+    const current = previous?.cwd === cwd ? previous : undefined
     const state: ACPSessionState = {
       id: sessionId,
       cwd,
       mcpServers,
       createdAt: new Date(session.time.created),
-      model: resolvedModel,
+      model: current?.model ?? model,
+      variant: current?.variant,
+      modeId: current?.modeId,
     }
     log.info("loading_session", { state })
 

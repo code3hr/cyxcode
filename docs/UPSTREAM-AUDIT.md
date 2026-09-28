@@ -12,19 +12,30 @@ This file tracks selective upstream opencode updates for CyxCode. Use it to avoi
 
 ### Backported in this batch
 
+- Committed as `e731b14d03` and pushed to `origin/sync/mcp-oauth-upstream-2026-06-28`.
 - `c10134729d` (`take`, adapted): Bedrock tool images stay in tool results for Claude, Nova, and Llama 4; other Bedrock images move to a user message. CyxCode's existing message conversion also preserves PDF handling. No SDK or package bump.
 - `9b0dd36cda` (`take`, adapted): malformed model price fields count as zero instead of breaking session cost calculation. Existing CyxCode token accounting is preserved.
 - `3a35b45db8` (`take`, adapted from unreleased `dev`): allow `gpt-6-sol` and `gpt-6-luna` in CyxCode's existing Codex OAuth allowlist. CyxCode's model names, authorization flow, and other allowlist rules remain in place.
 - `82d4c89031` (`take`, adapted from unreleased `dev`): redact credentials in `cyxcode debug config` output without changing the resolved config used by providers.
 - Validation: package-local session, Codex, and debug-config tests pass; `bun typecheck` passes. The debug-config test covers the redaction function; a CLI process test has not been run.
 
-### Review next
+### Provider, MCP, and ACP follow-up
 
-- `ac1758c0e6` (`manual adaptation`): preserve Bedrock DeepSeek and ARN model IDs. The CyxCode provider has its own region-prefix path; add focused provider tests before changing it.
-- `95daf90670` (`manual adaptation`): ACP session options and reasoning boundaries. Upstream changes several ACP modules and tests, so compare with CyxCode's ACP behavior first.
-- `610df0b566` (`manual adaptation`, unreleased): Gemini thinking defaults. Compare with CyxCode's provider transforms and SDK versions.
-- `69c172e8a7` (`manual adaptation`): SSE reader cancellation. Upstream changes `packages/core` and provider code; check whether CyxCode's versions have the same failure path.
-- `b471c2b449` (`skip for now`, unreleased): MCP browser launcher exit handling depends on `packages/opencode/src/mcp/browser.ts`, which this fork does not have.
+- Status: backported in the 2026-09-28 follow-up batch on this branch.
+- `ac1758c0e6` (`take`, adapted): preserve ARN model IDs and restrict automatic DeepSeek US prefixes to R1. Tests construct the actual bundled SDK through CyxCode's provider loader, covering aliases, existing prefixes, GovCloud, Claude, Nova, and Cohere.
+- `69c172e8a7` (`take`, adapted): handle a rejected SSE reader cancellation while preserving the original timeout error. The regression exercises the existing fetch wrapper and bundled SDK. CyxWatch network-boundary coverage also passes.
+- `3a4c253969` (`take`, adapted): inject default GPT-5 text verbosity only for supporting SDKs. Keep CyxCode's existing Azure exclusion and verify custom provider IDs and OpenAI-compatible SDKs.
+- `b471c2b449` (`manual adaptation`, unreleased): inspect an already-completed browser launcher's exit code inside CyxCode's existing MCP OAuth path. Keep callback registration, the authorization-URL callback, and `BrowserOpenFailed` event behavior. No upstream browser module or Effect refactor is imported.
+- Validation: 34 Bedrock/SSE tests, 140 provider-transform tests, 6 OAuth browser tests, and the existing CyxWatch provider boundary test pass (181 total). Package-local type checking and formatting checks pass. New regression cases reproduced the bugs before the fixes.
+
+- `610df0b566` (`manual adaptation`, unreleased): select Gemini reasoning defaults and variants using API IDs, including aliases and future model families. Preserve legacy Gemini defaults, use 32768 for Gemini 2.5 Pro's maximum budget, and share supported levels with small requests. Keep CyxCode's OpenRouter gate for other model families, Gateway option shapes, and SAP integration. The pinned Google SDK already supports these thinking levels; no dependency bump is needed.
+- `95daf90670` (`partial manual adaptation`): restore the last user message's model, reasoning variant, and mode on load, resume, and fork. Validate historical selections against available providers and agents; keep live choices across reload/resume within the same connection and directory. Preserve CyxCode's existing variant metadata and base-model selection behavior, including explicit variant clearing.
+- Combined validation: 234 tests pass across ACP interface/events/restoration, Gemini reasoning, provider transforms, Bedrock/SSE, and MCP browser handling. The existing CyxWatch provider boundary test also passes. ACP restoration tests exercise the real agent and session manager with the existing SDK/connection test doubles; they are not an external-client end-to-end test.
+
+### Review next and exclusions
+
+- `95daf90670` (remaining scope deferred): CyxCode's session schema lacks upstream's durable session `agent`/`model` fields, and its ACP agent does not implement the newer config-option flow. Unsent selections therefore remain connection-local; cross-connection restoration uses message history. The pinned ACP SDK's `ContentChunk` also lacks the `messageId` field required for upstream's reasoning-boundary fix. Plan schema/protocol compatibility separately before importing those portions.
+- `95ebf50ace` (`skip for now`): upstream adds `/v1` to Cognitive Services base URLs for its newer SDK. CyxCode's pinned `@ai-sdk/azure@2.0.91` already appends `/v1` internally; importing that change would produce `/openai/v1/v1/...` for default URLs.
 - Broad app v2, TUI, release version, generated file, and dependency churn remains excluded by the audit policy below.
 
 ## Previous Baseline (2026-07-09)
@@ -67,7 +78,7 @@ Prefer the smallest backport that preserves CyxCode behavior. Do not wholesale m
 
 ## Take Next
 
-- None currently marked as direct `take`; post-`v1.17.16` upstream changes in this repo are primarily app/UI v2 refactors.
+- The provider/MCP/Gemini and compatible ACP follow-up is recorded above. Review the remaining release delta in small batches; ACP persistence/protocol changes require a separate compatibility plan.
 
 ## Manual Adaptation Candidates
 
@@ -83,7 +94,6 @@ Prefer the smallest backport that preserves CyxCode behavior. Do not wholesale m
 ### Desktop/App Bug Fixes
 
 Potentially useful only if CyxCode actively ships or tests the desktop app surface:
-
 
 - [done] Session tab titles persist during reload/loading.
 - [done] macOS titlebar and traffic light layout fixes.
@@ -123,16 +133,17 @@ These are intentionally not backported unless a concrete CyxCode bug or release 
 
 ## Re-Audit Checklist
 
-1. Fetch upstream branches and tags:
+1. Fetch upstream `dev` without importing conflicting CyxCode tag names:
 
 ```powershell
-git fetch upstream dev --tags
+git fetch --no-tags upstream dev
 ```
 
-If tag conflicts appear because CyxCode and opencode share tag names, verify the needed upstream tag with:
+Verify the needed upstream release tag and fetch it under a distinct local name:
 
 ```powershell
 git ls-remote --tags --refs upstream vX.Y.Z
+git fetch --no-tags upstream refs/tags/vX.Y.Z:refs/tags/upstream-vX.Y.Z
 ```
 
 2. Check latest upstream release:
@@ -144,18 +155,17 @@ gh release list --repo anomalyco/opencode --limit 10
 3. Compare latest released opencode delta:
 
 ```powershell
-git log --oneline <previous-upstream-tag>..<latest-upstream-tag> -- packages/opencode packages/llm packages/app packages/desktop packages/stats packages/tui
-git diff --name-status <previous-upstream-tag>..<latest-upstream-tag> -- packages/opencode packages/llm packages/app packages/desktop packages/stats packages/tui
+git log --oneline <previous-upstream-ref>..<latest-upstream-ref> -- packages/opencode packages/llm packages/app packages/desktop packages/stats packages/tui
+git diff --name-status <previous-upstream-ref>..<latest-upstream-ref> -- packages/opencode packages/llm packages/app packages/desktop packages/stats packages/tui
 ```
 
 4. Compare unreleased upstream `dev` after latest release:
 
 ```powershell
-git log --oneline <latest-upstream-tag>..upstream/dev -- packages/opencode packages/llm packages/app packages/desktop packages/stats packages/tui
-git diff --name-status <latest-upstream-tag>..upstream/dev -- packages/opencode packages/llm packages/app packages/desktop packages/stats packages/tui
+git log --oneline <latest-upstream-ref>..upstream/dev -- packages/opencode packages/llm packages/app packages/desktop packages/stats packages/tui
+git diff --name-status <latest-upstream-ref>..upstream/dev -- packages/opencode packages/llm packages/app packages/desktop packages/stats packages/tui
 ```
 
 5. For each candidate, classify as `take`, `manual adaptation`, or `skip for now` before editing code.
 
 6. For any `take` or `manual adaptation`, add focused tests in `packages/opencode` and run package-local tests/typecheck only from package directories.
-
