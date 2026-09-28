@@ -223,6 +223,7 @@ function createFakeAgent(history: SessionMessageResponse[] = []) {
                     id: "reasoning-model",
                     name: "Reasoning model",
                     variants: { low: {}, high: {} },
+                    limit: { context: 1000 },
                   },
                 },
               },
@@ -271,6 +272,45 @@ function createFakeAgent(history: SessionMessageResponse[] = []) {
 }
 
 describe("acp.agent session restoration", () => {
+  test("context usage includes cache writes", async () => {
+    await using tmp = await tmpdir()
+    await Instance.provide({
+      directory: tmp.path,
+      fn: async () => {
+        const fixture = createFakeAgent([
+          {
+            info: {
+              id: "msg_assistant",
+              sessionID: "ses_1",
+              role: "assistant",
+              parentID: "msg_user",
+              time: { created: Date.now() },
+              modelID: "reasoning-model",
+              providerID: "opencode",
+              mode: "build",
+              agent: "build",
+              path: { cwd: tmp.path, root: tmp.path },
+              cost: 0.25,
+              tokens: { input: 100, output: 10, reasoning: 5, cache: { read: 200, write: 300 } },
+            },
+            parts: [],
+          },
+        ])
+        try {
+          await fixture.agent.unstable_resumeSession({ sessionId: "ses_1", cwd: tmp.path, mcpServers: [] })
+          expect(fixture.sessionUpdates.find((item) => item.update.sessionUpdate === "usage_update")?.update).toEqual({
+            sessionUpdate: "usage_update",
+            used: 600,
+            size: 1000,
+            cost: { amount: 0.25, currency: "USD" },
+          })
+        } finally {
+          fixture.stop()
+        }
+      },
+    })
+  })
+
   const message = (variant = "high", model = "reasoning-model", agent = "plan"): SessionMessageResponse => ({
     info: {
       id: "msg_saved",

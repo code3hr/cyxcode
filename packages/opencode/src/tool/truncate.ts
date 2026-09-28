@@ -1,11 +1,10 @@
 import { NodePath } from "@effect/platform-node"
-import { Cause, Duration, Effect, Layer, Schedule, ServiceMap } from "effect"
+import { Cause, Duration, Effect, Layer, Option, Schedule, ServiceMap } from "effect"
 import path from "path"
 import type { Agent } from "../agent/agent"
 import { makeRunPromise } from "@/effect/run-service"
 import { AppFileSystem } from "@/filesystem"
 import { evaluate } from "@/permission/evaluate"
-import { Identifier } from "../id/id"
 import { Log } from "../util/log"
 import { ToolID } from "./schema"
 import { TRUNCATION_DIR } from "./truncation-dir"
@@ -49,14 +48,17 @@ export namespace Truncate {
       const fs = yield* AppFileSystem.Service
 
       const cleanup = Effect.fn("Truncate.cleanup")(function* () {
-        const cutoff = Identifier.timestamp(Identifier.create("tool", false, Date.now() - Duration.toMillis(RETENTION)))
+        const cutoff = Date.now() - Duration.toMillis(RETENTION)
         const entries = yield* fs.readDirectory(TRUNCATION_DIR).pipe(
           Effect.map((all) => all.filter((name) => name.startsWith("tool_"))),
           Effect.catch(() => Effect.succeed([])),
         )
         for (const entry of entries) {
-          if (Identifier.timestamp(entry) >= cutoff) continue
-          yield* fs.remove(path.join(TRUNCATION_DIR, entry)).pipe(Effect.catch(() => Effect.void))
+          const file = path.join(TRUNCATION_DIR, entry)
+          const info = yield* fs.stat(file).pipe(Effect.catch(() => Effect.succeed(undefined)))
+          const mtime = info && Option.getOrUndefined(info.mtime)
+          if (!mtime || mtime.getTime() >= cutoff) continue
+          yield* fs.remove(file).pipe(Effect.catch(() => Effect.void))
         }
       })
 

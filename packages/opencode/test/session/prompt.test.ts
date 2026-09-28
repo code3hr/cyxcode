@@ -128,6 +128,10 @@ describe("session.prompt special characters", () => {
     await serial(async () => {
       await using tmp = await tmpdir({
         git: true,
+        config: {
+          agent: { build: { model: "openai/gpt-5.2" } },
+          provider: { openai: { options: { apiKey: "test" } } },
+        },
         init: async (dir) => {
           await Bun.write(path.join(dir, "file#name.txt"), "special content\n")
         },

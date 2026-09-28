@@ -1008,9 +1008,7 @@ export namespace SessionPrompt {
               metadata: val.metadata,
               status: "running",
               input: args,
-              time: {
-                start: Date.now(),
-              },
+              time: match.state.time,
             },
           })
         }

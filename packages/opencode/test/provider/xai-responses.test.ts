@@ -1,7 +1,7 @@
 import { createXai } from "@ai-sdk/xai"
 import { expect, test } from "bun:test"
 
-test("xAI Responses sends promptCacheKey as prompt_cache_key", async () => {
+test("xAI Responses sends promptCacheKey and disables storage", async () => {
   let body: Record<string, unknown> | undefined
   const fetcher = Object.assign(
     async (_input: Parameters<typeof fetch>[0], init?: RequestInit) => {
@@ -19,10 +19,13 @@ test("xAI Responses sends promptCacheKey as prompt_cache_key", async () => {
     { preconnect: fetch.preconnect },
   )
 
-  await createXai({ apiKey: "test", fetch: fetcher }).responses("grok-4").doGenerate({
-    prompt: [{ role: "user", content: [{ type: "text", text: "Hello" }] }],
-    providerOptions: { xai: { promptCacheKey: "session-123" } },
-  })
+  await createXai({ apiKey: "test", fetch: fetcher })
+    .responses("grok-4")
+    .doGenerate({
+      prompt: [{ role: "user", content: [{ type: "text", text: "Hello" }] }],
+      providerOptions: { xai: { promptCacheKey: "session-123", store: false } },
+    })
 
   expect(body?.prompt_cache_key).toBe("session-123")
+  expect(body?.store).toBe(false)
 })

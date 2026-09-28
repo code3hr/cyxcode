@@ -107,6 +107,7 @@ describe("tool.apply_patch freeform", () => {
         // Verify permission metadata includes files array for UI rendering
         const permissionCall = calls[0]
         expect(permissionCall.metadata.files).toHaveLength(3)
+        expect(permissionCall.metadata.files.every((file) => !("movePath" in file))).toBe(true)
         expect(permissionCall.metadata.files.map((f) => f.type).sort()).toEqual(["add", "delete", "update"])
 
         const addFile = permissionCall.metadata.files.find((f) => f.type === "add")

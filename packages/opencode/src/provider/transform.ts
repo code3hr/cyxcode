@@ -62,6 +62,11 @@ export namespace ProviderTransform {
           }
           if (!Array.isArray(msg.content)) return msg
           const filtered = msg.content.filter((part) => {
+            if (part.type === "reasoning" && model.api.npm === "@ai-sdk/amazon-bedrock") {
+              // The pinned Bedrock SDK can only replay signed or redacted reasoning.
+              const metadata = part.providerOptions?.[model.providerID] ?? part.providerOptions?.bedrock
+              return metadata?.signature != null || metadata?.redactedData != null
+            }
             if (part.type === "text" || part.type === "reasoning") {
               return part.text !== ""
             }
@@ -91,8 +96,9 @@ export namespace ProviderTransform {
     }
     if (
       model.providerID === "mistral" ||
-      model.api.id.toLowerCase().includes("mistral") ||
-      model.api.id.toLocaleLowerCase().includes("devstral")
+      ["mistral", "devstral", "codestral", "pixtral", "mixtral"].some((family) =>
+        model.api.id.toLowerCase().includes(family),
+      )
     ) {
       const result: ModelMessage[] = []
       for (let i = 0; i < msgs.length; i++) {
@@ -701,7 +707,8 @@ export namespace ProviderTransform {
     if (
       input.model.providerID === "openai" ||
       input.model.api.npm === "@ai-sdk/openai" ||
-      input.model.api.npm === "@ai-sdk/github-copilot"
+      input.model.api.npm === "@ai-sdk/github-copilot" ||
+      input.model.api.npm === "@ai-sdk/xai"
     ) {
       result["store"] = false
     }
@@ -831,7 +838,8 @@ export namespace ProviderTransform {
     if (
       model.providerID === "openai" ||
       model.api.npm === "@ai-sdk/openai" ||
-      model.api.npm === "@ai-sdk/github-copilot"
+      model.api.npm === "@ai-sdk/github-copilot" ||
+      model.api.npm === "@ai-sdk/xai"
     ) {
       if (model.api.id.includes("gpt-5")) {
         if (model.api.id.includes("5.")) {

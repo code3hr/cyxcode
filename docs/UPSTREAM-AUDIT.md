@@ -2,7 +2,7 @@
 
 This file tracks selective upstream opencode updates for CyxCode. Use it to avoid broad merges that overwrite CyxCode-specific branding, commands, update flow, TUI behavior, skills, or security tooling.
 
-## Current Pickup (2026-09-28)
+## Current Pickup (2026-09-29)
 
 - CyxCode branch: `sync/mcp-oauth-upstream-2026-06-28` at `42676876b6` before this pickup.
 - Latest published upstream release: [`v1.18.32`](https://github.com/anomalyco/opencode/releases/tag/v1.18.32), published 2026-09-21, commit `545f51d26c`.
@@ -38,9 +38,28 @@ This file tracks selective upstream opencode updates for CyxCode. Use it to avoi
 - Removed the inherited public-key autoload. Hosted Zen now requires configured credentials; missing keys and the `public` placeholder do not count as a connection. Explicit custom endpoints remain supported.
 - The existing TUI skips unavailable saved models and opens the provider connection dialog when no model is available. The connection indicator now uses available providers, and the Zen setup prompt points to the actual [OpenCode Zen service](https://opencode.ai/docs/zen/) while retaining CyxCode application naming.
 - Validation: 82 provider tests pass, including 10 new Zen access regressions; package-local type checking passes. No paid model request was made. Using a model still requires an account or configured local endpoint with access to that model.
-- Reopened the development TUI with the user's existing OpenAI OAuth credentials; the visible model selection is GPT-5.5 through OpenAI. A live inference request has not been tested.
+- Reopened the development TUI with the user's existing OpenAI OAuth credentials; the visible model selection is GPT-5.5 through OpenAI.
+- On 2026-09-29, a minimal live GPT-5.5 request using the rebuilt Windows executable failed with `Token refresh failed: 401`. The saved OpenAI connection requires reauthentication through `/connect` or `cyxcode providers login`; successful live inference remains unverified. This is separate from the Zen free-tier restriction.
+
+### Tool and provider follow-up (2026-09-29)
+
+- Status: seven additional upstream fixes adapted against the pinned release above. The overall release audit remains partial.
+- `765ae641d7` (`take`): preserve a running tool's original start time when its metadata changes.
+- `9f38562237` (`take`): include cache-write tokens in ACP context usage, matching CyxCode's existing prompt token accounting.
+- `517ee736b3` (`manual adaptation`): discard unsigned Bedrock reasoning before replay while retaining signed and redacted blocks. Use the pinned SDK's `redactedData` field; upstream's newer `redactedContent` field is unsupported here.
+- `49d997aec3` (`take`, adapted): disable xAI response storage for normal and small requests, retaining the existing prompt-cache-key patch. The bundled SDK request test verifies both fields.
+- `3033afba51` (`take`, adapted): normalize Mistral-family tool IDs for Codestral, Pixtral, and Mixtral as well as Mistral and Devstral, including models exposed through aliases.
+- `d468201952` (`manual adaptation`): expire truncated tool output using filesystem modification time. Current opaque tool IDs cannot safely be decoded as timestamps. Keep CyxCode's existing Effect filesystem service and retention interval.
+- `f7da00f35e` (`take`): omit absent `movePath` properties from patch permission metadata while preserving move destinations.
+- Validation: 214 tests pass across provider transforms, xAI SDK requests, ACP events, truncation, patching, and session prompts; package-local `bun typecheck` passes. The existing file-attachment test now explicitly configures a test provider instead of relying on anonymous Zen access. Tool start-time preservation has source review and existing prompt coverage, without a dedicated streaming integration test.
+- Built and installed Windows version `3.0.4-upstream.20260929` locally, including app, dashboard, commands, and default skills. The build's version smoke test passed and the installed executable's SHA-256 matches the build output. Backed up the previous installation before copying. This does not publish a release or change package versions.
 
 ### Review next and exclusions
+
+- `c3be6c4965` (`manual adaptation`, deferred): configurable MCP callback ports require coordinated config, listener, and OAuth changes. CyxCode currently uses a fixed callback port; importing only the debug-command change would not provide working support.
+- `e63996919b` (`skip for now`): the grep symlink fix targets upstream's replacement search implementation. CyxCode retains the existing absolute-path ripgrep handling, so the upstream path reconstruction change does not map to this implementation.
+- `7c2199d84a` (`manual adaptation`, deferred): GitLab reasoning variants depend on newer reasoning metadata and SDK option handling; review those together before importing.
+- Remaining core review priorities include retry limits/network errors, stream/header timeouts, child-session CLI permissions, and model/provider changes tied to newer SDKs. These have not been declared complete.
 
 - `95daf90670` (remaining scope deferred): CyxCode's session schema lacks upstream's durable session `agent`/`model` fields, and its ACP agent does not implement the newer config-option flow. Unsent selections therefore remain connection-local; cross-connection restoration uses message history. The pinned ACP SDK's `ContentChunk` also lacks the `messageId` field required for upstream's reasoning-boundary fix. Plan schema/protocol compatibility separately before importing those portions.
 - `95ebf50ace` (`skip for now`): upstream adds `/v1` to Cognitive Services base URLs for its newer SDK. CyxCode's pinned `@ai-sdk/azure@2.0.91` already appends `/v1` internally; importing that change would produce `/openai/v1/v1/...` for default URLs.

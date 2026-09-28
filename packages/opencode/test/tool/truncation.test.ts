@@ -3,6 +3,7 @@ import { NodeFileSystem } from "@effect/platform-node"
 import { Effect, FileSystem, Layer } from "effect"
 import { Truncate, Truncate as TruncateSvc } from "../../src/tool/truncate"
 import { Identifier } from "../../src/id/id"
+import { ToolID } from "../../src/tool/schema"
 import { Process } from "../../src/util/process"
 import { Filesystem } from "../../src/util/filesystem"
 import path from "path"
@@ -146,11 +147,13 @@ describe("Truncate", () => {
 
         yield* fs.makeDirectory(Truncate.DIR, { recursive: true })
 
-        const old = path.join(Truncate.DIR, Identifier.create("tool", false, Date.now() - 10 * DAY_MS))
-        const recent = path.join(Truncate.DIR, Identifier.create("tool", false, Date.now() - 3 * DAY_MS))
+        const old = path.join(Truncate.DIR, ToolID.ascending())
+        const recent = path.join(Truncate.DIR, Identifier.create("tool", false, Date.now() - 10 * DAY_MS))
 
         yield* writeFileStringScoped(old, "old content")
         yield* writeFileStringScoped(recent, "recent content")
+        const date = new Date(Date.now() - 10 * DAY_MS)
+        yield* fs.utimes(old, date, date)
         yield* TruncateSvc.Service.use((s) => s.cleanup())
 
         expect(yield* fs.exists(old)).toBe(false)

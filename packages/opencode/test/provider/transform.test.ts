@@ -1,6 +1,7 @@
 import { describe, expect, test } from "bun:test"
 import { ProviderTransform } from "../../src/provider/transform"
 import { ModelID, ProviderID } from "../../src/provider/schema"
+import type { ModelMessage } from "ai"
 
 const OUTPUT_TOKEN_MAX = 32000
 
@@ -46,6 +47,16 @@ describe("ProviderTransform.options - setCacheKey", () => {
       providerOptions: { setCacheKey: true },
     })
     expect(result.promptCacheKey).toBe(sessionID)
+  })
+
+  test("xAI disables response storage for normal and small requests", () => {
+    const model = {
+      ...mockModel,
+      providerID: "custom-xai",
+      api: { id: "grok-4", npm: "@ai-sdk/xai", url: "https://api.x.ai" },
+    }
+    expect(ProviderTransform.options({ model, sessionID }).store).toBe(false)
+    expect(ProviderTransform.smallOptions(model).store).toBe(false)
   })
 
   test("should not set promptCacheKey when providerOptions.setCacheKey is false", () => {
@@ -1401,6 +1412,59 @@ describe("ProviderTransform.message - anthropic empty content filtering", () => 
     options: {},
     headers: {},
   } as any
+
+  test.each(["bedrock", "custom-bedrock"])("Bedrock replays signed and redacted reasoning from %s", (key) => {
+    const model = {
+      ...anthropicModel,
+      providerID: "custom-bedrock",
+      api: { id: "anthropic.claude-sonnet", npm: "@ai-sdk/amazon-bedrock", url: "https://example.com" },
+    }
+    const messages: ModelMessage[] = [
+      { role: "user", content: "hello" },
+      { role: "assistant", content: [{ type: "reasoning", text: "unsigned" }] },
+      {
+        role: "assistant",
+        content: [
+          { type: "reasoning", text: "signed", providerOptions: { [key]: { signature: "signature" } } },
+          { type: "reasoning", text: "", providerOptions: { [key]: { redactedData: "encoded" } } },
+          { type: "reasoning", text: "unsupported", providerOptions: { [key]: { redactedContent: "encoded" } } },
+        ],
+      },
+    ]
+    const result = ProviderTransform.message(messages, model, {})
+    expect(result).toHaveLength(2)
+    expect(result[1].content).toEqual([
+      { type: "reasoning", text: "signed", providerOptions: { bedrock: { signature: "signature" } } },
+      { type: "reasoning", text: "", providerOptions: { bedrock: { redactedData: "encoded" } } },
+    ])
+    expect(result[1].providerOptions?.bedrock).toEqual({ cachePoint: { type: "default" } })
+  })
+
+  test.each(["mistral", "devstral", "codestral", "pixtral", "mixtral"])(
+    "normalizes %s tool IDs through aliases",
+    (family) => {
+      const model = {
+        ...anthropicModel,
+        id: "alias",
+        providerID: "custom",
+        api: { id: `vendor/${family}-latest`, npm: "@ai-sdk/openai-compatible", url: "https://example.com" },
+      }
+      const messages: ModelMessage[] = [
+        { role: "assistant", content: [{ type: "tool-call", toolCallId: "call_a-12", toolName: "test", input: {} }] },
+        {
+          role: "tool",
+          content: [
+            { type: "tool-result", toolCallId: "call_a-12", toolName: "test", output: { type: "text", value: "ok" } },
+          ],
+        },
+      ]
+      const result = ProviderTransform.message(messages, model, {})
+      expect(result[0].content).toEqual([{ type: "tool-call", toolCallId: "calla1200", toolName: "test", input: {} }])
+      expect(result[1].content).toEqual([
+        { type: "tool-result", toolCallId: "calla1200", toolName: "test", output: { type: "text", value: "ok" } },
+      ])
+    },
+  )
 
   test("filters out messages with empty string content", () => {
     const msgs = [
