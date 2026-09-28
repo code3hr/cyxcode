@@ -32,6 +32,14 @@ This file tracks selective upstream opencode updates for CyxCode. Use it to avoi
 - `95daf90670` (`partial manual adaptation`): restore the last user message's model, reasoning variant, and mode on load, resume, and fork. Validate historical selections against available providers and agents; keep live choices across reload/resume within the same connection and directory. Preserve CyxCode's existing variant metadata and base-model selection behavior, including explicit variant clearing.
 - Combined validation: 234 tests pass across ACP interface/events/restoration, Gemini reasoning, provider transforms, Bedrock/SSE, and MCP browser handling. The existing CyxWatch provider boundary test also passes. ACP restoration tests exercise the real agent and session manager with the existing SDK/connection test doubles; they are not an external-client end-to-end test.
 
+### CyxCode Zen access correction
+
+- Runtime verification exposed `OpenCode's free tier can only be used from within OpenCode` when selecting Big Pickle through anonymous OpenCode Zen access.
+- Removed the inherited public-key autoload. Hosted Zen now requires configured credentials; missing keys and the `public` placeholder do not count as a connection. Explicit custom endpoints remain supported.
+- The existing TUI skips unavailable saved models and opens the provider connection dialog when no model is available. The connection indicator now uses available providers, and the Zen setup prompt points to the actual [OpenCode Zen service](https://opencode.ai/docs/zen/) while retaining CyxCode application naming.
+- Validation: 82 provider tests pass, including 10 new Zen access regressions; package-local type checking passes. No paid model request was made. Using a model still requires an account or configured local endpoint with access to that model.
+- Reopened the development TUI with the user's existing OpenAI OAuth credentials; the visible model selection is GPT-5.5 through OpenAI. A live inference request has not been tested.
+
 ### Review next and exclusions
 
 - `95daf90670` (remaining scope deferred): CyxCode's session schema lacks upstream's durable session `agent`/`model` fields, and its ACP agent does not implement the newer config-option flow. Unsent selections therefore remain connection-local; cross-connection restoration uses message history. The pinned ACP SDK's `ContentChunk` also lacks the `messageId` field required for upstream's reasoning-boundary fix. Plan schema/protocol compatibility separately before importing those portions.
