@@ -148,6 +148,13 @@ This file tracks selective upstream opencode updates for CyxCode. Use it to avoi
 - `b6478dcebf` (`skip`, superseded), `5a8ee27254` (`no default change needed`; prompt adaptation deferred): upstream first sets Meta effort to `xhigh`, then removes that default. CyxCode has no Meta-specific forced effort default to remove. The separate Muse system-prompt rewrite needs review against CyxCode's prompt selection and security instructions; it was not imported.
 - Rechecked `3a4c253969` and `ac1758c0e6`: their verbosity guard and Bedrock ID fixes are already adapted above. OpenAI pro modes (`e434ce01d3`) and broader Codex model filtering (`500c46ec79`) retain their prior deferred classifications. This review does not complete the full release audit.
 
+### Interleaved reasoning fields (2026-09-29)
+
+- `a1ab489e61` (`manual adaptation`, completed): accept boolean, string, and field-object interleaved metadata in the shared catalog/config schema. Normalize strings to field objects in both provider construction paths, widen the provider field schema, and preserve catalog settings when config only overrides unrelated model properties. Explicit `false` and `true` retain precedence.
+- Retain CyxCode's existing outgoing history transformation and provider SDK versions. Verified actual serialized OpenAI-compatible requests for `reasoning`, `reasoning_content`, `reasoning_details`, `reasoning_text`, and a custom field, including concatenated reasoning, text, tool calls/results, metadata preservation, and unchanged input history. Incoming response parsing remains the installed SDK's responsibility; this change does not claim arbitrary response-field support.
+- Regenerated the JavaScript SDK with its required build script and retained only the three affected type declarations, removing unrelated generator churn. README documents string/object syntax, catalog inheritance, and the outgoing-only scope.
+- Validation: 247 tests pass (91 provider/configuration tests, including 19 focused additions, plus 156 transform tests). Core and SDK package type checks pass. No live model inference or new executable build in this batch; installed `.4` predates this change.
+
 ### Review next and exclusions
 
 - `e63996919b` (`skip for now`): the grep symlink fix targets upstream's replacement search implementation. CyxCode retains the existing absolute-path ripgrep handling, so the upstream path reconstruction change does not map to this implementation.

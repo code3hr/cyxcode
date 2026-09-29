@@ -133,6 +133,18 @@ A catalog refresh can expose newly listed models; it does not grant account acce
 
 **Live Muse inference has not yet been verified in CyxCode.** Test a short response first; a successful listing or connection alone does not verify generation or multi-step tool use.
 
+### Custom Provider Reasoning History
+
+For an OpenAI-compatible provider that expects reasoning history in a specific message field, set `interleaved` on the model in `opencode.json`. For example, under `provider.custom.models.my-model`:
+
+```json
+{
+  "interleaved": "reasoning_text"
+}
+```
+
+The equivalent object form is `{ "interleaved": { "field": "reasoning_text" } }`. Existing fields such as `reasoning_content` and custom field names are supported. Use the field required by your provider. Omitting this setting preserves the catalog value; `false` disables CyxCode's field remapping. This controls outgoing history replay and does not add support for parsing new fields in provider responses.
+
 ### MCP OAuth Callback Ports
 
 For a remote MCP server, set `oauth.callbackPort` in your `opencode.json` when the default port **19876** is occupied or your OAuth application requires a different port:
