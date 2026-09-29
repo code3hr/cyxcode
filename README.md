@@ -94,7 +94,16 @@ Run `/connect` in CyxCode to connect a provider, then `/models` to select a mode
 
 CyxCode is a fork of OpenCode, but access to OpenCode's hosted model service is controlled by that service. CyxCode no longer automatically connects to Zen using the anonymous `public` key. Without a Zen API key, its models—including Big Pickle—do not appear as available choices in `/models`. If no provider is connected, CyxCode prompts you to connect one.
 
-To connect Zen, obtain a key from [OpenCode Zen](https://opencode.ai/zen), run `/connect`, and select OpenCode Zen. An API key makes the provider available in CyxCode; access to individual models, including free models, still depends on the service's rules. Authenticated access to Zen's free models from CyxCode has not yet been verified. See the [Zen documentation](https://opencode.ai/docs/zen/) for account and pricing details.
+CyxCode previously relied on anonymous Zen access. That access used to work, but our latest request was rejected by OpenCode's servers with the message above. Forking the client does not automatically grant access to the hosted free tier.
+
+To connect Zen and check whether its free models are available to your account:
+
+1. Sign in to [OpenCode Zen](https://opencode.ai/zen) and obtain your own API key. Review its account and billing requirements before proceeding.
+2. In CyxCode, run `/connect`, select **OpenCode Zen**, and enter the key in the connection prompt.
+3. Run `/models` and select a model currently listed as free by Zen.
+4. Send a short message to verify access. A model appearing in the list does not guarantee the service will accept the request.
+
+An API key makes the provider available in CyxCode; access to individual models, including free models, still depends on the service's rules. **Authenticated access to Zen's free models from CyxCode has not yet been verified.** If the service still rejects the request, use another connected provider or a local model. See the [Zen documentation](https://opencode.ai/docs/zen/) for current model availability, account requirements, and pricing.
 
 Free models remain supported through other configured providers that permit access, subject to their usage limits. You can also configure local models through an OpenAI-compatible endpoint such as [Ollama](https://opencode.ai/docs/providers/#ollama), using your own hardware. CyxCode's local pattern matching continues to work without a model API call.
 

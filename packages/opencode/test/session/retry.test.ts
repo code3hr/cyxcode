@@ -23,8 +23,26 @@ function wrap(message: unknown): ReturnType<NamedError["toObject"]> {
 describe("session.retry.delay", () => {
   test("caps delay at 30 seconds when headers missing", () => {
     const error = apiError()
-    const delays = Array.from({ length: 10 }, (_, index) => SessionRetry.delay(index + 1, error))
+    const delays = Array.from({ length: 10 }, (_, index) => SessionRetry.delay(index + 1, error, 0))
     expect(delays).toStrictEqual([2000, 4000, 8000, 16000, 30000, 30000, 30000, 30000, 30000, 30000])
+  })
+
+  test("adds bounded jitter to exponential delays", () => {
+    expect(SessionRetry.delay(1, apiError(), 0)).toBe(2000)
+    expect(SessionRetry.delay(1, apiError(), 1)).toBe(2500)
+    expect(SessionRetry.delay(4, apiError(), 1)).toBe(20000)
+    expect(SessionRetry.delay(5, apiError(), 1)).toBe(30000)
+    expect(SessionRetry.delay(40, apiError({}), 1)).toBe(SessionRetry.RETRY_MAX_DELAY)
+  })
+
+  test.each(["Infinity", "-1", "invalid"])("ignores invalid retry-after-ms %s", (value) => {
+    expect(SessionRetry.delay(1, apiError({ "retry-after-ms": value }), 0)).toBe(2000)
+  })
+
+  test("caps large retry hints and preserves zero without jitter", () => {
+    expect(SessionRetry.delay(1, apiError({ "retry-after-ms": "3000000000" }))).toBe(SessionRetry.RETRY_MAX_DELAY)
+    expect(SessionRetry.delay(1, apiError({ "retry-after": "3000000" }))).toBe(SessionRetry.RETRY_MAX_DELAY)
+    expect(SessionRetry.delay(1, apiError({ "retry-after-ms": "0" }), 1)).toBe(0)
   })
 
   test("prefers retry-after-ms when shorter than exponential", () => {
@@ -47,18 +65,18 @@ describe("session.retry.delay", () => {
 
   test("ignores invalid retry hints", () => {
     const error = apiError({ "retry-after": "not-a-number" })
-    expect(SessionRetry.delay(1, error)).toBe(2000)
+    expect(SessionRetry.delay(1, error, 0)).toBe(2000)
   })
 
   test("ignores malformed date retry hints", () => {
     const error = apiError({ "retry-after": "Invalid Date String" })
-    expect(SessionRetry.delay(1, error)).toBe(2000)
+    expect(SessionRetry.delay(1, error, 0)).toBe(2000)
   })
 
   test("ignores past date retry hints", () => {
     const pastDate = new Date(Date.now() - 5000).toUTCString()
     const error = apiError({ "retry-after": pastDate })
-    expect(SessionRetry.delay(1, error)).toBe(2000)
+    expect(SessionRetry.delay(1, error, 0)).toBe(2000)
   })
 
   test("uses retry-after values even when exceeding 10 minutes with headers", () => {
@@ -90,7 +108,64 @@ describe("session.retry.delay", () => {
   })
 })
 
+describe("session.retry.sleep", () => {
+  test("rejects immediately when already aborted", async () => {
+    await expect(SessionRetry.sleep(60_000, AbortSignal.abort())).rejects.toMatchObject({ name: "AbortError" })
+  })
+
+  test("rejects when cancelled during a wait", async () => {
+    const controller = new AbortController()
+    const waiting = SessionRetry.sleep(60_000, controller.signal)
+    controller.abort()
+    await expect(waiting).rejects.toMatchObject({ name: "AbortError" })
+  })
+})
+
 describe("session.retry.retryable", () => {
+  test.each([
+    "network_error",
+    "network-error",
+    "Network Error",
+    "fetch failed",
+    "ECONNREFUSED",
+    "SSE read timed out",
+    "Provider is currently at capacity",
+    "Please try again later",
+    "rate_limit_exceeded",
+  ])("retries transient errors: %s", (message) => {
+    expect(SessionRetry.retryable(wrap(message))).toBe(message)
+    expect(SessionRetry.retryable(new MessageV2.APIError({ message, isRetryable: false }).toObject())).toBe(message)
+  })
+
+  test.each([
+    "Invalid API key",
+    "Unauthorized",
+    "Unknown model",
+    "Token refresh failed: 401",
+    "model-5030 is invalid",
+    "OpenCode's free tier can only be used from within OpenCode.",
+    "CyxWatch blocked operation: private or local network target",
+  ])("does not retry permanent errors: %s", (message) => {
+    expect(SessionRetry.retryable(wrap(message))).toBeUndefined()
+    expect(SessionRetry.retryable(new MessageV2.APIError({ message, isRetryable: false }).toObject())).toBeUndefined()
+  })
+
+  test("retries server failures and capacity errors in response bodies", () => {
+    expect(
+      SessionRetry.retryable(
+        new MessageV2.APIError({ message: "boom", statusCode: 503, isRetryable: false }).toObject(),
+      ),
+    ).toBe("boom")
+    expect(
+      SessionRetry.retryable(
+        new MessageV2.APIError({
+          message: "boom",
+          isRetryable: false,
+          responseBody: '{"error":"temporarily at capacity"}',
+        }).toObject(),
+      ),
+    ).toBe("boom")
+  })
   test("maps too_many_requests json messages", () => {
     const error = wrap(JSON.stringify({ type: "error", error: { type: "too_many_requests" } }))
     expect(SessionRetry.retryable(error)).toBe("Too Many Requests")
@@ -101,9 +176,9 @@ describe("session.retry.retryable", () => {
     expect(SessionRetry.retryable(error)).toBe("Provider is overloaded")
   })
 
-  test("handles json messages without code", () => {
+  test("does not retry arbitrary JSON errors", () => {
     const error = wrap(JSON.stringify({ error: { message: "no_kv_space" } }))
-    expect(SessionRetry.retryable(error)).toBe(`{"error":{"message":"no_kv_space"}}`)
+    expect(SessionRetry.retryable(error)).toBeUndefined()
   })
 
   test("does not throw on numeric error codes", () => {
