@@ -1,70 +1,50 @@
-# ACP (Agent Client Protocol) Implementation
+# CyxCode ACP (Agent Client Protocol)
 
-This directory contains a clean, protocol-compliant implementation of the [Agent Client Protocol](https://agentclientprotocol.com/) for opencode.
+CyxCode uses `@agentclientprotocol/sdk` to serve ACP over standard input/output:
+
+```sh
+cyxcode acp
+```
+
+Connect a model provider through CyxCode's `/connect` before starting an editor session. ACP's `authenticate` handler is not implemented; clients with terminal authentication support can launch CyxCode's advertised login command.
 
 ## Architecture
 
-The implementation follows a clean separation of concerns:
+- `agent.ts`: ACP requests, history replay, event streaming, permission requests, and prompt dispatch through the CyxCode SDK.
+- `session.ts`: connection-local session state, working directories, MCP configuration, model, variant, and mode selections.
+- `selection.ts`: shared model parsing, available choices, variant metadata, and ACP configuration options.
+- `types.ts`: internal session/configuration contracts.
+- `../cli/cmd/acp.ts`: backend startup and JSON-RPC transport using the official ACP SDK.
 
-### Core Components
+## Session Configuration
 
-- **`agent.ts`** - Implements the `Agent` interface from `@agentclientprotocol/sdk`
-  - Handles initialization and capability negotiation
-  - Manages session lifecycle (`session/new`, `session/load`)
-  - Processes prompts and returns responses
-  - Properly implements ACP protocol v1
+New, loaded, resumed, and forked sessions return `configOptions` alongside the existing `models`, `modes`, and variant metadata. Clients can send `session/set_config_option` with:
 
-- **`client.ts`** - Implements the `Client` interface for client-side capabilities
-  - File operations (`readTextFile`, `writeTextFile`)
-  - Permission requests (auto-approves for now)
-  - Terminal support (stub implementation)
+| `configId` | Value                              | Behavior                                                                                         |
+| ---------- | ---------------------------------- | ------------------------------------------------------------------------------------------------ |
+| `model`    | An advertised `provider/model` ID  | Reselecting the same model preserves a valid effort; changing models resets the effort override. |
+| `mode`     | An advertised agent ID             | Selects a visible primary agent, such as `build` or `plan`.                                      |
+| `effort`   | An advertised variant or `default` | Available only for models with variants. `default` clears the explicit override.                 |
 
-- **`session.ts`** - Session state management
-  - Creates and tracks ACP sessions
-  - Maps ACP sessions to internal opencode sessions
-  - Maintains working directory context
-  - Handles MCP server configurations
+The setter returns the complete option list and sends a `config_option_update` notification. Invalid option IDs or values return an invalid-params protocol error without changing selections.
 
-- **`server.ts`** - ACP server startup and lifecycle
-  - Sets up JSON-RPC over stdio using the official library
-  - Manages graceful shutdown on SIGTERM/SIGINT
-  - Provides Instance context for the agent
+Existing `session/set_model` and `session/set_mode` requests remain supported and also publish option updates. Legacy model IDs can include a reasoning variant suffix. Selecting a base model through the legacy model setter continues to clear the explicit variant, preserving existing CyxCode behavior. Exact model IDs containing slashes take precedence over interpreting a suffix as a variant.
 
-- **`types.ts`** - Type definitions for internal use
+Loading, resuming, and forking restore available selections from the last user message. Live selections, including explicit effort clearing, survive reload/resume within the same connection and working directory. Selections made without sending a prompt are **not persisted across connections**; durable session model/agent fields remain pending upstream work.
 
-## Usage
+## Events and Permissions
 
-### Command Line
+CyxCode streams message and reasoning chunks, tool progress, usage, and available commands through session updates. Events are routed to their owning session. Tool permission requests are forwarded to the client, and its response is sent to CyxCode's existing permission system.
 
-```bash
-# Start the ACP server in the current directory
-opencode acp
+ACP excludes the question tool by default. Enable it only for clients that support interactive question prompts:
 
-# Start in a specific directory
-opencode acp --cwd /path/to/project
+```sh
+CYXCODE_ENABLE_QUESTION_TOOL=1 cyxcode acp
 ```
 
-### Question Tool Opt-In
+## Editor Configuration
 
-ACP excludes `QuestionTool` by default.
-
-```bash
-OPENCODE_ENABLE_QUESTION_TOOL=1 opencode acp
-```
-
-Enable this only for ACP clients that support interactive question prompts.
-
-### Programmatic
-
-```typescript
-import { ACPServer } from "./acp/server"
-
-await ACPServer.start()
-```
-
-### Integration with Zed
-
-Add to your Zed configuration (`~/.config/zed/settings.json`):
+For an editor that accepts an ACP executable, use `cyxcode` with argument `acp`. For example, a Zed agent-server entry is:
 
 ```json
 {
@@ -77,98 +57,26 @@ Add to your Zed configuration (`~/.config/zed/settings.json`):
 }
 ```
 
-## Protocol Compliance
+Editor support determines whether configuration options or legacy selectors are displayed. This batch was verified with paired ACP SDK connections, not a live external editor.
 
-This implementation follows the ACP specification v1:
+## Remaining Compatibility Work
 
-✅ **Initialization**
-
-- Proper `initialize` request/response with protocol version negotiation
-- Capability advertisement (`agentCapabilities`)
-- Authentication support (stub)
-
-✅ **Session Management**
-
-- `session/new` - Create new conversation sessions
-- `session/load` - Resume existing sessions (basic support)
-- Working directory context (`cwd`)
-- MCP server configuration support
-
-✅ **Prompting**
-
-- `session/prompt` - Process user messages
-- Content block handling (text, resources)
-- Response with stop reasons
-
-✅ **Client Capabilities**
-
-- File read/write operations
-- Permission requests
-- Terminal support (stub for future)
-
-## Current Limitations
-
-### Not Yet Implemented
-
-1. **Streaming Responses** - Currently returns complete responses instead of streaming via `session/update` notifications
-2. **Tool Call Reporting** - Doesn't report tool execution progress
-3. **Session Modes** - No mode switching support yet
-4. **Authentication** - No actual auth implementation
-5. **Terminal Support** - Placeholder only
-6. **Session Persistence** - `session/load` doesn't restore actual conversation history
-
-### Future Enhancements
-
-- **Real-time Streaming**: Implement `session/update` notifications for progressive responses
-- **Tool Call Visibility**: Report tool executions as they happen
-- **Session Persistence**: Save and restore full conversation history
-- **Mode Support**: Implement different operational modes (ask, code, etc.)
-- **Enhanced Permissions**: More sophisticated permission handling
-- **Terminal Integration**: Full terminal support via opencode's bash tool
+- Persist unsent selections across ACP connections using durable session fields.
+- Coordinate an SDK/protocol update for reasoning-part message boundaries; the pinned SDK's `ContentChunk` does not expose upstream's `messageId` field.
+- Implement ACP authentication if in-protocol login is needed.
 
 ## Testing
 
-```bash
-# Run ACP tests
-bun test test/acp.test.ts
+Run from `packages/opencode`:
 
-# Test manually with stdio
-echo '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":1}}' | opencode acp
+```sh
+bun test test/acp
+bun typecheck
 ```
 
-## Design Decisions
-
-### Why the Official Library?
-
-We use `@agentclientprotocol/sdk` instead of implementing JSON-RPC ourselves because:
-
-- Ensures protocol compliance
-- Handles edge cases and future protocol versions
-- Reduces maintenance burden
-- Works with other ACP clients automatically
-
-### Clean Architecture
-
-Each component has a single responsibility:
-
-- **Agent** = Protocol interface
-- **Client** = Client-side operations
-- **Session** = State management
-- **Server** = Lifecycle and I/O
-
-This makes the codebase maintainable and testable.
-
-### Mapping to OpenCode
-
-ACP sessions map cleanly to opencode's internal session model:
-
-- ACP `session/new` → creates internal Session
-- ACP `session/prompt` → uses SessionPrompt.prompt()
-- Working directory context preserved per-session
-- Tool execution uses existing ToolRegistry
+Tests cover history restoration, model/mode/effort changes, invalid selections, prompt dispatch, concurrent session events, permissions, and SDK JSON-RPC request/notification handling. Backend fixtures are synthetic; these tests do not call live models.
 
 ## References
 
-- [ACP Specification](https://agentclientprotocol.com/)
-- [TypeScript Library](https://github.com/agentclientprotocol/typescript-sdk)
-- [Protocol Examples](https://github.com/agentclientprotocol/typescript-sdk/tree/main/src/examples)
+- [ACP specification](https://agentclientprotocol.com/)
+- [ACP TypeScript SDK](https://github.com/agentclientprotocol/typescript-sdk)

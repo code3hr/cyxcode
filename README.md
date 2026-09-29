@@ -19,6 +19,7 @@
 - [Providers and Free Models](#providers-and-free-models)
   - [Testing Other Models, Including Muse](#testing-other-models-including-muse)
 - [Two Modes](#two-modes)
+- [ACP Editor Integration](#acp-editor-integration)
 - [Pattern Learning](#pattern-learning)
 - [Project Memory](#project-memory)
 - [Semantic Recall](#semantic-recall)
@@ -153,6 +154,14 @@ For a remote MCP server, set `oauth.callbackPort` in your `opencode.json` when t
 Run `cyxcode mcp auth example` to authorize, or `cyxcode mcp debug example` to inspect OAuth discovery. Both use the configured port. If you use a pre-registered OAuth client, register the matching redirect URL: `http://127.0.0.1:24567/mcp/oauth/callback`.
 
 Ports must be integers from **1 to 65535**. The listener binds only to `127.0.0.1`; different MCP servers can use different ports concurrently. If another process owns the port, stop that process or choose another port and update the registered redirect URL. Changing ports may require running `cyxcode mcp auth example` again to register a new OAuth client.
+
+### ACP Editor Integration
+
+Start `cyxcode acp` from an editor that supports Agent Client Protocol. Connect your model provider through CyxCode's `/connect` first.
+
+ACP clients that support configuration options can select **Model**, **Session Mode**, and **Effort**. Effort appears only for models with reasoning variants; **Default** clears the explicit effort override. Selecting the same model keeps your effort choice, while switching models resets it. Older model/mode selectors remain supported.
+
+Loading, resuming, or forking a session restores supported selections from its message history. Unsent selections survive reload/resume within the same ACP connection, but are not yet persisted across connections. See the [ACP implementation guide](packages/opencode/src/acp/README.md) for protocol details.
 
 ### Project Setup
 

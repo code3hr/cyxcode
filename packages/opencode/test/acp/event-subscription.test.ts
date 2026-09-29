@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test"
 import { ACP } from "../../src/acp/agent"
-import type { AgentSideConnection } from "@agentclientprotocol/sdk"
+import { AgentSideConnection, ClientSideConnection, ndJsonStream } from "@agentclientprotocol/sdk"
 import type {
   Event,
   EventMessagePartUpdated,
@@ -123,7 +123,7 @@ function createEventStream() {
   return { controller: { push, close } satisfies EventController, stream }
 }
 
-function createFakeAgent(history: SessionMessageResponse[] = []) {
+function createFakeAgent(history: SessionMessageResponse[] = [], remote?: AgentSideConnection) {
   const updates = new Map<string, string[]>()
   const chunks = new Map<string, string>()
   const sessionUpdates: SessionUpdateParams[] = []
@@ -133,29 +133,32 @@ function createFakeAgent(history: SessionMessageResponse[] = []) {
     updates.set(sessionId, list)
   }
 
-  const connection = {
-    async sessionUpdate(params: SessionUpdateParams) {
-      sessionUpdates.push(params)
-      const update = params.update
-      const type = update?.sessionUpdate ?? "unknown"
-      record(params.sessionId, type)
-      if (update?.sessionUpdate === "agent_message_chunk") {
-        const content = update.content
-        if (content?.type !== "text") return
-        if (typeof content.text !== "string") return
-        chunks.set(params.sessionId, (chunks.get(params.sessionId) ?? "") + content.text)
-      }
-    },
-    async requestPermission(_params: RequestPermissionParams): Promise<RequestPermissionResult> {
-      return { outcome: { outcome: "selected", optionId: "once" } } as RequestPermissionResult
-    },
-  } as unknown as AgentSideConnection
+  const connection =
+    remote ??
+    ({
+      async sessionUpdate(params: SessionUpdateParams) {
+        sessionUpdates.push(params)
+        const update = params.update
+        const type = update?.sessionUpdate ?? "unknown"
+        record(params.sessionId, type)
+        if (update?.sessionUpdate === "agent_message_chunk") {
+          const content = update.content
+          if (content?.type !== "text") return
+          if (typeof content.text !== "string") return
+          chunks.set(params.sessionId, (chunks.get(params.sessionId) ?? "") + content.text)
+        }
+      },
+      async requestPermission(_params: RequestPermissionParams): Promise<RequestPermissionResult> {
+        return { outcome: { outcome: "selected", optionId: "once" } } as RequestPermissionResult
+      },
+    } as unknown as AgentSideConnection)
 
   const { controller, stream } = createEventStream()
   const calls = {
     eventSubscribe: 0,
     sessionCreate: 0,
   }
+  const prompts: Array<{ model: { providerID: string; modelID: string }; variant?: string; agent?: string }> = []
 
   const sdk = {
     global: {
@@ -165,6 +168,10 @@ function createFakeAgent(history: SessionMessageResponse[] = []) {
       },
     },
     session: {
+      prompt: async (params: (typeof prompts)[number]) => {
+        prompts.push(params)
+        return { data: undefined }
+      },
       create: async (_params?: any) => {
         calls.sessionCreate++
         return {
@@ -268,7 +275,7 @@ function createFakeAgent(history: SessionMessageResponse[] = []) {
     ;(agent as any).eventAbort.abort()
   }
 
-  return { agent, controller, calls, updates, chunks, sessionUpdates, stop, sdk, connection }
+  return { agent, controller, calls, updates, chunks, sessionUpdates, stop, sdk, connection, prompts }
 }
 
 describe("acp.agent session restoration", () => {
@@ -339,6 +346,11 @@ describe("acp.agent session restoration", () => {
               : fixture.agent.unstable_resumeSession(params))
           expect(result.models?.currentModelId).toBe("opencode/reasoning-model/high")
           expect(result.modes?.currentModeId).toBe("plan")
+          expect(result.configOptions?.map((option) => [option.id, option.currentValue])).toEqual([
+            ["model", "opencode/reasoning-model"],
+            ["effort", "high"],
+            ["mode", "plan"],
+          ])
           expect(result._meta).toEqual({
             opencode: {
               modelId: "opencode/reasoning-model",
@@ -415,6 +427,163 @@ describe("acp.agent session restoration", () => {
           expect(loaded._meta.opencode.variant).toBeNull()
         } finally {
           fixture.stop()
+        }
+      },
+    })
+  })
+})
+
+describe("acp.agent configuration options", () => {
+  test("model and effort changes preserve explicit defaults and synchronize legacy selectors", async () => {
+    await using tmp = await tmpdir()
+    await Instance.provide({
+      directory: tmp.path,
+      fn: async () => {
+        const fixture = createFakeAgent()
+        try {
+          const created = await fixture.agent.newSession({ cwd: tmp.path, mcpServers: [] })
+          const sessionId = created.sessionId
+          expect(created.configOptions.map((option) => option.id)).toEqual(["model", "mode"])
+          const select = (configId: string, value: string) =>
+            fixture.agent.setSessionConfigOption({ sessionId, configId, value })
+          const selected = await select("model", "opencode/reasoning-model")
+          expect(selected.configOptions.find((option) => option.id === "effort")).toMatchObject({
+            currentValue: "default",
+          })
+          await select("effort", "high")
+          await expect(select("effort", "unsupported")).rejects.toMatchObject({ code: -32602 })
+          await expect(
+            fixture.agent.unstable_setSessionModel({ sessionId, modelId: "opencode/removed" }),
+          ).rejects.toMatchObject({ code: -32602 })
+          const repeated = await select("model", "opencode/reasoning-model")
+          expect(repeated.configOptions.find((option) => option.id === "effort")?.currentValue).toBe("high")
+          await select("effort", "default")
+          await select("mode", "plan")
+          const loaded = await fixture.agent.loadSession({ sessionId, cwd: tmp.path, mcpServers: [] })
+          expect(loaded.models.currentModelId).toBe("opencode/reasoning-model")
+          expect(loaded._meta.opencode.variant).toBeNull()
+          expect(loaded.modes?.currentModeId).toBe("plan")
+          expect(loaded.configOptions.find((option) => option.id === "effort")?.currentValue).toBe("default")
+          await fixture.agent.prompt({ sessionId, prompt: [{ type: "text", text: "Check the selected options" }] })
+          expect(fixture.prompts.at(-1)).toMatchObject({
+            model: { providerID: "opencode", modelID: "reasoning-model" },
+            agent: "plan",
+            variant: undefined,
+          })
+          const other = await fixture.agent.newSession({ cwd: tmp.path, mcpServers: [] })
+          expect(other.configOptions.map((option) => [option.id, option.currentValue])).toEqual([
+            ["model", "opencode/big-pickle"],
+            ["mode", "build"],
+          ])
+
+          await fixture.agent.unstable_setSessionModel({ sessionId, modelId: "opencode/reasoning-model/low" })
+          expect(fixture.sessionUpdates.at(-1)?.update).toMatchObject({
+            sessionUpdate: "config_option_update",
+            configOptions: expect.arrayContaining([expect.objectContaining({ id: "effort", currentValue: "low" })]),
+          })
+          await fixture.agent.setSessionMode({ sessionId, modeId: "build" })
+          expect(fixture.sessionUpdates.at(-1)?.update).toMatchObject({
+            sessionUpdate: "config_option_update",
+            configOptions: expect.arrayContaining([expect.objectContaining({ id: "mode", currentValue: "build" })]),
+          })
+          const plain = await select("model", "opencode/big-pickle")
+          expect(plain.configOptions.some((option) => option.id === "effort")).toBe(false)
+        } finally {
+          fixture.stop()
+        }
+      },
+    })
+  })
+
+  test.each([
+    ["unknown", "value"],
+    ["model", "missing/model"],
+    ["model", "opencode/removed"],
+    ["effort", "unsupported"],
+    ["effort", "default"],
+    ["mode", "removed"],
+  ])("invalid option %s=%s leaves session state unchanged", async (configId, value) => {
+    await using tmp = await tmpdir()
+    await Instance.provide({
+      directory: tmp.path,
+      fn: async () => {
+        const fixture = createFakeAgent()
+        try {
+          const created = await fixture.agent.newSession({ cwd: tmp.path, mcpServers: [] })
+          await expect(
+            fixture.agent.setSessionConfigOption({ sessionId: created.sessionId, configId, value }),
+          ).rejects.toMatchObject({ code: -32602 })
+          const loaded = await fixture.agent.loadSession({
+            sessionId: created.sessionId,
+            cwd: tmp.path,
+            mcpServers: [],
+          })
+          expect(loaded.configOptions).toEqual(created.configOptions)
+          expect(fixture.sessionUpdates.some((item) => item.update.sessionUpdate === "config_option_update")).toBe(
+            false,
+          )
+        } finally {
+          fixture.stop()
+        }
+      },
+    })
+  })
+
+  test("SDK routes configuration requests and notifications over JSON-RPC", async () => {
+    await using tmp = await tmpdir()
+    await Instance.provide({
+      directory: tmp.path,
+      fn: async () => {
+        const input = Promise.withResolvers<TransformStreamDefaultController<Uint8Array>>()
+        const output = Promise.withResolvers<TransformStreamDefaultController<Uint8Array>>()
+        const left = new TransformStream<Uint8Array, Uint8Array>({ start: input.resolve })
+        const right = new TransformStream<Uint8Array, Uint8Array>({ start: output.resolve })
+        const updates: SessionUpdateParams[] = []
+        const commands = Promise.withResolvers<void>()
+        let fixture: ReturnType<typeof createFakeAgent> | undefined
+        const backend = new AgentSideConnection(
+          (connection) => {
+            fixture = createFakeAgent([], connection)
+            return fixture.agent
+          },
+          ndJsonStream(left.writable, right.readable),
+        )
+        const client = new ClientSideConnection(
+          () => ({
+            async requestPermission() {
+              return { outcome: { outcome: "cancelled" as const } }
+            },
+            async sessionUpdate(update) {
+              updates.push(update)
+              if (update.update.sessionUpdate === "available_commands_update") commands.resolve()
+            },
+          }),
+          ndJsonStream(right.writable, left.readable),
+        )
+        try {
+          expect((await client.initialize({ protocolVersion: 1 })).agentInfo?.name).toBe("CyxCode")
+          const created = await client.newSession({ cwd: tmp.path, mcpServers: [] })
+          await commands.promise
+          const selected = await client.setSessionConfigOption({
+            sessionId: created.sessionId,
+            configId: "model",
+            value: "opencode/reasoning-model",
+          })
+          expect(selected.configOptions.find((option) => option.id === "effort")?.currentValue).toBe("default")
+          const changed = await client.setSessionConfigOption({
+            sessionId: created.sessionId,
+            configId: "effort",
+            value: "high",
+          })
+          expect(updates.at(-1)?.update).toEqual({
+            sessionUpdate: "config_option_update",
+            configOptions: changed.configOptions,
+          })
+        } finally {
+          fixture?.stop()
+          ;(await input.promise).terminate()
+          ;(await output.promise).terminate()
+          await Promise.all([client.closed, backend.closed])
         }
       },
     })

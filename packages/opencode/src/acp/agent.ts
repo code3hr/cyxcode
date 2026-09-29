@@ -21,6 +21,8 @@ import {
   type Role,
   type SessionInfo,
   type SetSessionModelRequest,
+  type SetSessionConfigOptionRequest,
+  type SetSessionConfigOptionResponse,
   type SetSessionModeRequest,
   type SetSessionModeResponse,
   type ToolCallContent,
@@ -33,6 +35,7 @@ import { pathToFileURL } from "url"
 import { Filesystem } from "../util/filesystem"
 import { Hash } from "../util/hash"
 import { ACPSessionManager } from "./session"
+import { Selection } from "./selection"
 import type { ACPConfig } from "./types"
 import { Provider } from "../provider/provider"
 import { ModelID, ProviderID } from "../provider/schema"
@@ -47,9 +50,6 @@ import type { AssistantMessage, Event, OpencodeClient, SessionMessageResponse, T
 import { applyPatch } from "diff"
 
 type ModeOption = { id: string; name: string; description?: string }
-type ModelOption = { modelId: string; name: string }
-
-const DEFAULT_VARIANT_VALUE = "default"
 
 export namespace ACP {
   const log = Log.create({ service: "acp-agent" })
@@ -588,6 +588,7 @@ export namespace ACP {
           sessionId,
           models: load.models,
           modes: load.modes,
+          configOptions: load.configOptions,
           _meta: load._meta,
         }
       } catch (e) {
@@ -1122,8 +1123,8 @@ export namespace ACP {
         ? { providerID: ProviderID.make(saved.providerID), modelID: ModelID.make(saved.modelID) }
         : await defaultModel(this.config, directory)
       this.sessionManager.setModel(sessionId, model)
-      const entries = sortProvidersByName(providers)
-      const availableVariants = modelVariantsFromProviders(entries, model)
+      const entries = Selection.sort(providers)
+      const availableVariants = Selection.variants(entries, model)
       const variant = saved
         ? saved === current
           ? this.sessionManager.getVariant(sessionId)
@@ -1131,7 +1132,7 @@ export namespace ACP {
         : undefined
       const currentVariant = variant && availableVariants.includes(variant) ? variant : undefined
       this.sessionManager.setVariant(sessionId, currentVariant)
-      const availableModels = buildAvailableModels(entries, { includeVariants: true })
+      const availableModels = Selection.models(entries, true)
       const modeState = await this.resolveModeState(directory, sessionId, user?.agent)
       const currentModeId = modeState.currentModeId
       const modes = currentModeId
@@ -1214,11 +1215,18 @@ export namespace ACP {
       return {
         sessionId,
         models: {
-          currentModelId: formatModelIdWithVariant(model, currentVariant, availableVariants, true),
+          currentModelId: Selection.format(model, currentVariant, availableVariants, true),
           availableModels,
         },
         modes,
-        _meta: buildVariantMeta({
+        configOptions: Selection.options({
+          providers,
+          model,
+          variant: currentVariant,
+          modes: modeState.availableModes,
+          mode: currentModeId,
+        }),
+        _meta: Selection.metadata({
           model,
           variant: this.sessionManager.getVariant(sessionId),
           availableVariants,
@@ -1226,21 +1234,87 @@ export namespace ACP {
       }
     }
 
+    private async choices(id: string): Promise<Selection.Input> {
+      const session = this.sessionManager.get(id)
+      const [providers, modes] = await Promise.all([
+        this.sdk.config.providers({ directory: session.cwd }, { throwOnError: true }).then((x) => x.data!.providers),
+        this.loadAvailableModes(session.cwd),
+      ])
+      return {
+        providers,
+        modes,
+        model: session.model ?? (await defaultModel(this.config, session.cwd)),
+        variant: session.variant,
+        mode: session.modeId,
+      }
+    }
+
+    private async publish(id: string, choices: Selection.Input) {
+      const session = this.sessionManager.get(id)
+      const options = Selection.options({
+        ...choices,
+        model: session.model ?? choices.model,
+        variant: session.variant,
+        mode: session.modeId,
+      })
+      await this.connection
+        .sessionUpdate({ sessionId: id, update: { sessionUpdate: "config_option_update", configOptions: options } })
+        .catch((error) => log.error("failed to send config options", { sessionId: id, error }))
+      return options
+    }
+
+    async setSessionConfigOption(params: SetSessionConfigOptionRequest): Promise<SetSessionConfigOptionResponse> {
+      const session = this.sessionManager.get(params.sessionId)
+      const choices = await this.choices(session.id)
+      const option = Selection.options(choices).find((option) => option.id === params.configId)
+      if (!option?.options.some((option) => "value" in option && option.value === params.value)) {
+        throw RequestError.invalidParams(`Invalid ${params.configId} option: ${params.value}`)
+      }
+
+      switch (params.configId) {
+        case "model": {
+          const selected = Selection.parse(params.value, choices.providers)
+          const same =
+            selected.model.providerID === choices.model.providerID && selected.model.modelID === choices.model.modelID
+          const variant =
+            same && choices.variant && Selection.variants(choices.providers, selected.model).includes(choices.variant)
+              ? choices.variant
+              : undefined
+          this.sessionManager.setModel(session.id, selected.model)
+          this.sessionManager.setVariant(session.id, variant)
+          break
+        }
+        case "mode":
+          this.sessionManager.setMode(session.id, params.value)
+          break
+        case "effort":
+          this.sessionManager.setVariant(session.id, params.value === "default" ? undefined : params.value)
+          break
+      }
+      return { configOptions: await this.publish(session.id, choices) }
+    }
+
     async unstable_setSessionModel(params: SetSessionModelRequest) {
       const session = this.sessionManager.get(params.sessionId)
-      const providers = await this.sdk.config
-        .providers({ directory: session.cwd }, { throwOnError: true })
-        .then((x) => x.data!.providers)
+      const choices = await this.choices(session.id)
 
-      const selection = parseModelSelection(params.modelId, providers)
+      const selection = Selection.parse(params.modelId, choices.providers)
+      if (
+        !choices.providers.some(
+          (provider) =>
+            provider.id === selection.model.providerID && Object.hasOwn(provider.models, selection.model.modelID),
+        )
+      ) {
+        throw RequestError.invalidParams(`Model not found: ${params.modelId}`)
+      }
       this.sessionManager.setModel(session.id, selection.model)
       this.sessionManager.setVariant(session.id, selection.variant)
 
-      const entries = sortProvidersByName(providers)
-      const availableVariants = modelVariantsFromProviders(entries, selection.model)
+      const availableVariants = Selection.variants(choices.providers, selection.model)
+      await this.publish(session.id, choices)
 
       return {
-        _meta: buildVariantMeta({
+        _meta: Selection.metadata({
           model: selection.model,
           variant: selection.variant,
           availableVariants,
@@ -1250,11 +1324,12 @@ export namespace ACP {
 
     async setSessionMode(params: SetSessionModeRequest): Promise<SetSessionModeResponse | void> {
       const session = this.sessionManager.get(params.sessionId)
-      const availableModes = await this.loadAvailableModes(session.cwd)
-      if (!availableModes.some((mode) => mode.id === params.modeId)) {
-        throw new Error(`Agent not found: ${params.modeId}`)
+      const choices = await this.choices(session.id)
+      if (!choices.modes.some((mode) => mode.id === params.modeId)) {
+        throw RequestError.invalidParams(`Agent not found: ${params.modeId}`)
       }
       this.sessionManager.setMode(params.sessionId, params.modeId)
+      await this.publish(session.id, choices)
     }
 
     async prompt(params: PromptRequest) {
@@ -1607,109 +1682,5 @@ export namespace ACP {
       return undefined
     }
     return result
-  }
-
-  function sortProvidersByName<T extends { name: string }>(providers: T[]): T[] {
-    return [...providers].sort((a, b) => {
-      const nameA = a.name.toLowerCase()
-      const nameB = b.name.toLowerCase()
-      if (nameA < nameB) return -1
-      if (nameA > nameB) return 1
-      return 0
-    })
-  }
-
-  function modelVariantsFromProviders(
-    providers: Array<{ id: string; models: Record<string, { variants?: Record<string, any> }> }>,
-    model: { providerID: ProviderID; modelID: ModelID },
-  ): string[] {
-    const provider = providers.find((entry) => entry.id === model.providerID)
-    if (!provider) return []
-    const modelInfo = provider.models[model.modelID]
-    if (!modelInfo?.variants) return []
-    return Object.keys(modelInfo.variants)
-  }
-
-  function buildAvailableModels(
-    providers: Array<{ id: string; name: string; models: Record<string, any> }>,
-    options: { includeVariants?: boolean } = {},
-  ): ModelOption[] {
-    const includeVariants = options.includeVariants ?? false
-    return providers.flatMap((provider) => {
-      const unsorted: Array<{ id: string; name: string; variants?: Record<string, any> }> = Object.values(
-        provider.models,
-      )
-      const models = Provider.sort(unsorted)
-      return models.flatMap((model) => {
-        const base: ModelOption = {
-          modelId: `${provider.id}/${model.id}`,
-          name: `${provider.name}/${model.name}`,
-        }
-        if (!includeVariants || !model.variants) return [base]
-        const variants = Object.keys(model.variants).filter((variant) => variant !== DEFAULT_VARIANT_VALUE)
-        const variantOptions = variants.map((variant) => ({
-          modelId: `${provider.id}/${model.id}/${variant}`,
-          name: `${provider.name}/${model.name} (${variant})`,
-        }))
-        return [base, ...variantOptions]
-      })
-    })
-  }
-
-  function formatModelIdWithVariant(
-    model: { providerID: ProviderID; modelID: ModelID },
-    variant: string | undefined,
-    availableVariants: string[],
-    includeVariant: boolean,
-  ) {
-    const base = `${model.providerID}/${model.modelID}`
-    if (!includeVariant || !variant || !availableVariants.includes(variant)) return base
-    return `${base}/${variant}`
-  }
-
-  function buildVariantMeta(input: {
-    model: { providerID: ProviderID; modelID: ModelID }
-    variant?: string
-    availableVariants: string[]
-  }) {
-    return {
-      opencode: {
-        modelId: `${input.model.providerID}/${input.model.modelID}`,
-        variant: input.variant ?? null,
-        availableVariants: input.availableVariants,
-      },
-    }
-  }
-
-  function parseModelSelection(
-    modelId: string,
-    providers: Array<{ id: string; models: Record<string, { variants?: Record<string, any> }> }>,
-  ): { model: { providerID: ProviderID; modelID: ModelID }; variant?: string } {
-    const parsed = Provider.parseModel(modelId)
-    const provider = providers.find((p) => p.id === parsed.providerID)
-    if (!provider) {
-      return { model: parsed, variant: undefined }
-    }
-
-    // Check if modelID exists directly
-    if (provider.models[parsed.modelID]) {
-      return { model: parsed, variant: undefined }
-    }
-
-    // Try to extract variant from end of modelID (e.g., "claude-sonnet-4/high" -> model: "claude-sonnet-4", variant: "high")
-    const segments = parsed.modelID.split("/")
-    if (segments.length > 1) {
-      const candidateVariant = segments[segments.length - 1]
-      const baseModelId = segments.slice(0, -1).join("/")
-      const baseModelInfo = provider.models[baseModelId]
-      if (baseModelInfo?.variants && candidateVariant in baseModelInfo.variants) {
-        return {
-          model: { providerID: parsed.providerID, modelID: ModelID.make(baseModelId) },
-          variant: candidateVariant,
-        }
-      }
-    }
-
-    return { model: parsed, variant: undefined }
   }
 }
