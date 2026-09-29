@@ -300,11 +300,17 @@ export namespace ProviderTransform {
     return msgs
   }
 
+  const sampling = [
+    /gemini-2[.-]5(?:[.-]|$)/,
+    /gemini-3-(?:flash|pro)(?:[.-]|$)/,
+    /gemini-3[.-]1(?:[.-]|$)/,
+    /gemini-3[.-]5-flash(?!-lite)(?:[.-]|$)/,
+  ]
+
   export function temperature(model: Provider.Model) {
-    const id = model.id.toLowerCase()
-    if (id.includes("qwen")) return 0.55
+    const id = model.api.id.toLowerCase()
     if (id.includes("claude")) return undefined
-    if (id.includes("gemini")) return 1.0
+    if (id.includes("gemini")) return sampling.some((pattern) => pattern.test(id)) ? 1.0 : undefined
     if (id.includes("glm-4.6")) return 1.0
     if (id.includes("glm-4.7")) return 1.0
     if (id.includes("minimax-m2")) return 1.0
@@ -319,21 +325,27 @@ export namespace ProviderTransform {
   }
 
   export function topP(model: Provider.Model) {
-    const id = model.id.toLowerCase()
-    if (id.includes("qwen")) return 1
-    if (["minimax-m2", "gemini", "kimi-k2.5", "kimi-k2p5", "kimi-k2-5"].some((s) => id.includes(s))) {
+    const id = model.api.id.toLowerCase()
+    if (id.includes("gemini")) return sampling.some((pattern) => pattern.test(id)) ? 0.95 : undefined
+    if (["minimax-m2", "kimi-k2.5", "kimi-k2p5", "kimi-k2-5"].some((s) => id.includes(s))) {
+      return 0.95
+    }
+    if (
+      ["deepseek-v4-flash-0731", "deepseek-v4-flash:0731"].some((name) => id.includes(name)) ||
+      (id.includes("deepseek-v4-flash") && (model.providerID === "deepseek" || model.providerID.startsWith("opencode")))
+    ) {
       return 0.95
     }
     return undefined
   }
 
   export function topK(model: Provider.Model) {
-    const id = model.id.toLowerCase()
+    const id = model.api.id.toLowerCase()
     if (id.includes("minimax-m2")) {
       if (["m2.", "m25", "m21"].some((s) => id.includes(s))) return 40
       return 20
     }
-    if (id.includes("gemini")) return 64
+    if (id.includes("gemini")) return sampling.some((pattern) => pattern.test(id)) ? 64 : undefined
     return undefined
   }
 

@@ -425,7 +425,11 @@ export namespace Provider {
       return {
         autoload: true,
         vars(_options: Record<string, any>) {
-          const endpoint = location === "global" ? "aiplatform.googleapis.com" : `${location}-aiplatform.googleapis.com`
+          const endpoint = iife(() => {
+            if (location === "global") return "aiplatform.googleapis.com"
+            if (location === "eu" || location === "us") return `aiplatform.${location}.rep.googleapis.com`
+            return `${location}-aiplatform.googleapis.com`
+          })
           return {
             ...(project && { GOOGLE_VERTEX_PROJECT: project }),
             GOOGLE_VERTEX_LOCATION: location,
