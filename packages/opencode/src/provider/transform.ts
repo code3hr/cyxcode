@@ -389,6 +389,22 @@ export namespace ProviderTransform {
   export function variants(model: Provider.Model): Record<string, Record<string, any>> {
     if (!model.capabilities.reasoning) return {}
 
+    if (
+      model.api.id.toLowerCase().includes("minimax-m3") &&
+      ["@ai-sdk/anthropic", "@ai-sdk/openai-compatible"].includes(model.api.npm)
+    ) {
+      if (model.api.npm === "@ai-sdk/openai-compatible" && ["nvidia", "lilac"].includes(model.providerID)) {
+        return {
+          none: { chat_template_kwargs: { thinking_mode: "disabled" } },
+          thinking: { chat_template_kwargs: { thinking_mode: "enabled" } },
+        }
+      }
+      return {
+        none: { thinking: { type: "disabled" } },
+        thinking: { thinking: { type: "adaptive" } },
+      }
+    }
+
     const id = model.id.toLowerCase()
     const isAnthropicAdaptive = ["opus-4-6", "opus-4.6", "sonnet-4-6", "sonnet-4.6"].some((v) =>
       model.api.id.includes(v),
@@ -773,8 +789,15 @@ export namespace ProviderTransform {
       }
     }
 
-    // Enable thinking by default for kimi-k2.5/k2p5 models using anthropic SDK
     const modelId = input.model.api.id.toLowerCase()
+    if (
+      modelId.includes("minimax-m3") &&
+      input.model.api.npm === "@ai-sdk/anthropic" &&
+      input.model.capabilities.reasoning
+    ) {
+      result["thinking"] = { type: "adaptive" }
+    }
+    // Enable thinking by default for kimi-k2.5/k2p5 models using anthropic SDK
     if (
       (input.model.api.npm === "@ai-sdk/anthropic" || input.model.api.npm === "@ai-sdk/google-vertex/anthropic") &&
       (modelId.includes("k2p5") || modelId.includes("kimi-k2.5") || modelId.includes("kimi-k2p5"))

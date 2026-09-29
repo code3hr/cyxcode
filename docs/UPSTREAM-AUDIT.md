@@ -78,7 +78,7 @@ This file tracks selective upstream opencode updates for CyxCode. Use it to avoi
 - `5d953482ab` (`take`): scope DeepSeek V4 Flash top-p defaults to the dated `0731` models or the direct DeepSeek/OpenCode provider IDs. Other gateways keep their defaults for undated models. These are service identifiers, not application branding changes.
 - `361a71ffad` (`manual adaptation`): route Google Vertex `us` and `eu` multi-regions through `aiplatform.<location>.rep.googleapis.com` in the existing URL-variable loader. Preserve global/regional endpoints and explicit proxy URLs; no SDK or dependency change.
 - Validation: 189 focused tests pass, including 32 sampling cases, six actual bundled Vertex SDK requests with captured URLs, fixture responses, and a local test credential, existing provider transforms, proxy/OpenAI-compatible behavior, and the CyxWatch network boundary. Package-local `bun typecheck` and formatting checks pass. No live cloud request was made.
-- This batch updates source only. The installed `3.0.4-upstream.20260929` executable still reflects the earlier tool/provider batch; retry, timeout, and sampling/Vertex changes require a new build before local runtime testing.
+- Initially source-only; now included in the Windows rebuild recorded below, together with retry and timeout changes.
 
 ### Provider options and Copilot follow-up (2026-09-29)
 
@@ -87,7 +87,7 @@ This file tracks selective upstream opencode updates for CyxCode. Use it to avoi
 - `542ba88602` (`partial manual adaptation`): select cache keys by the bundled SDK for OpenAI, Azure, xAI, Cerebras, and DeepInfra. Add the Cerebras/DeepInfra option namespaces needed for custom provider names. Preserve existing Venice/OpenRouter compatibility defaults, and honor `setCacheKey: false` for those services and Zen without dropping Zen's encrypted reasoning metadata.
 - The remaining cache changes are deferred: the pinned Mistral SDK does not serialize upstream's new cache-key option; broader namespace additions, Venice SDK routing, and Anthropic automatic caching need their own compatibility checks. Existing per-message caching and Gateway caching behavior are preserved.
 - Validation: 167 regression tests pass across provider transforms, actual bundled SDK cache-key requests, xAI Responses, and Copilot headers; package-local type checking passes. Request fixtures use synthetic credentials and captured HTTP responses, with no live inference request.
-- Source-only update; the installed executable still needs rebuilding with this and the preceding batches.
+- Initially source-only; now included in the Windows rebuild recorded below.
 
 ### Config-only loaders and Cerebras limits (2026-09-29)
 
@@ -96,7 +96,17 @@ This file tracks selective upstream opencode updates for CyxCode. Use it to avoi
 - `e49772a8b4` (`manual adaptation`, completed): omit the generic output-token limit for the Cerebras SDK when the final plugin-adjusted options contain `max_completion_tokens`. Keep the existing LLM request boundary and plugin contract; no new plugin or SDK migration. Preserve generic limits for other SDKs and Cerebras requests without an explicit completion limit.
 - Validation: 167 tests pass: 20 focused loader/cache-key/Cerebras cases, 134 existing provider/Bedrock/GitLab/Vertex/Zen cases, and 13 LLM cases. Cerebras tests exercise real LLM streams through the bundled SDK and a local server, including model, agent, variant, and plugin settings. Package-local type checking passes.
 - Repaired the older LLM test fixture's missing local-network policy: bind its server to loopback and explicitly allow only that server's host/port in each temporary instance. The initial run timed out at the network boundary; all 13 tests pass with the scoped fixture policy. Production CyxWatch enforcement is unchanged, and its provider-boundary regression passes.
-- Source-only update; the installed executable still needs rebuilding with the recent batches. No live cloud request was made.
+- Initially source-only; now included in the Windows rebuild recorded below. No live cloud request was made.
+
+### MiniMax compatibility and Windows rebuild (2026-09-29)
+
+- `50eee1f5a4` (`manual adaptation`, completed with prerequisite behavior): add MiniMax M3 `none`/`thinking` variants using API IDs, including aliases. Use `chat_template_kwargs.thinking_mode` for NVIDIA/Lilac's OpenAI-compatible transport and native `thinking` options for Anthropic and other OpenAI-compatible transports. Enable adaptive thinking by default for reasoning-capable MiniMax M3 models using Anthropic, whose service defaults thinking off.
+- Keep older MiniMax handling and the reasoning-capability gate. Restrict NVIDIA/Lilac template options to the OpenAI-compatible SDK because the pinned Anthropic SDK would discard them. That SDK also omits disabled thinking from the wire; the `none` variant therefore relies on the MiniMax Anthropic endpoint's default-off behavior, without a live service verification.
+- Validation: 161 provider tests pass and package-local type checking passes. Five bundled-SDK request tests exercise default, disabled, and enabled thinking through custom aliases, NVIDIA, and Lilac. No dependency changes.
+- Built and installed `3.0.4-upstream.20260929.2` for Windows x64 with app, dashboard, commands, and default skills. This includes every completed batch above. Used the tracked model catalog as build input and restored both generated snapshot files byte-for-byte afterward; dependency installation and release publishing were disabled.
+- Compiled CLI validation: an isolated `cyxcode run` against a temporary loopback model server returned `cyxcode-smoke-ok`. Both requests retained `max_completion_tokens: 1234` and omitted the conflicting generic `max_tokens`. The fixture used isolated config/data directories, a synthetic key, and a CyxWatch rule scoped to the temporary server. This is a local runtime check, not live cloud-provider verification.
+- Installed version check passes. Executable SHA-256: `0291CD36CC4546A96BE80AFEB685DB1C3E9F9B54731E336A7E15BCDAE877A690`. Previous installation backup: `C:\Users\chick\AppData\Local\Temp\cyxcode-install-backup-20e2fbb76d754d28bb3cf721d4b6ef30\bin`.
+- Build diagnostics remain in the unchanged UI: invalid `:selected` CSS selector warning, large JavaScript chunks, and an outdated Browserslist database. Both web asset builds and executable compilation completed. The prior OpenAI OAuth refresh failure still requires user reauthentication; authenticated Zen free-model access remains unverified.
 
 ### Review next and exclusions
 
@@ -109,7 +119,8 @@ This file tracks selective upstream opencode updates for CyxCode. Use it to avoi
 - Remaining core review priorities include model/provider changes tied to newer SDKs and the compatibility work described here for ACP and MCP. The full release audit has not been declared complete.
 - Config-only custom loader registration and `e49772a8b4` Cerebras completion limits are completed in the batch above.
 - `561afb401a`, `a9a6fad0fa` (`skip for now`): Copilot PDF discovery and summarized adaptive thinking target upstream's dynamic model discovery/native Anthropic path. CyxCode's current loader uses the existing Copilot SDK path; review discovery and endpoint selection together before enabling these capabilities.
-- `e434ce01d3`, `8571a922db`, `2b2aacc939`, `50eee1f5a4` (`manual adaptation`, pending): OpenAI pro modes, Merge Gateway reasoning metadata, modern Claude thinking, and MiniMax M3 variants have prerequisites absent from CyxCode's current model schema or variant handling. Review supported SDK request shapes before importing each behavior.
+- `e434ce01d3`, `8571a922db` (`manual adaptation`, pending): OpenAI pro modes and Merge Gateway reasoning metadata have prerequisites absent from CyxCode's current model schema or variant handling. Review supported SDK request shapes before importing each behavior.
+- `2b2aacc939` (`manual adaptation`, deferred): modern Claude adaptive thinking requires coordinated SDK support. Both pinned Anthropic and Bedrock SDKs limit effort to `low`/`medium`/`high`/`max`, so upstream's `xhigh` is rejected, and their thinking schemas do not forward `display: summarized`. Keep the existing Claude behavior until the SDK and reasoning-replay changes can be validated together. MiniMax M3 is completed above.
 
 - `95daf90670` (remaining scope deferred): CyxCode's session schema lacks upstream's durable session `agent`/`model` fields, and its ACP agent does not implement the newer config-option flow. Unsent selections therefore remain connection-local; cross-connection restoration uses message history. The pinned ACP SDK's `ContentChunk` also lacks the `messageId` field required for upstream's reasoning-boundary fix. Plan schema/protocol compatibility separately before importing those portions.
 - `95ebf50ace` (`skip for now`): upstream adds `/v1` to Cognitive Services base URLs for its newer SDK. CyxCode's pinned `@ai-sdk/azure@2.0.91` already appends `/v1` internally; importing that change would produce `/openai/v1/v1/...` for default URLs.
