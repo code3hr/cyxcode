@@ -2149,6 +2149,12 @@ export class Session2 extends HeyApiClient {
       directory?: string
       workspace?: string
       title?: string
+      agent?: string
+      model?: {
+        id: string
+        providerID: string
+        variant?: string
+      }
       time?: {
         archived?: number
       }
@@ -2164,6 +2170,8 @@ export class Session2 extends HeyApiClient {
             { in: "query", key: "directory" },
             { in: "query", key: "workspace" },
             { in: "body", key: "title" },
+            { in: "body", key: "agent" },
+            { in: "body", key: "model" },
             { in: "body", key: "time" },
           ],
         },

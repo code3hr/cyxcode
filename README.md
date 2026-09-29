@@ -161,7 +161,7 @@ Start `cyxcode acp` from an editor that supports Agent Client Protocol. Connect 
 
 ACP clients that support configuration options can select **Model**, **Session Mode**, and **Effort**. Effort appears only for models with reasoning variants; **Default** clears the explicit effort override. Selecting the same model keeps your effort choice, while switching models resets it. Older model/mode selectors remain supported.
 
-Loading, resuming, or forking a session restores supported selections from its message history. Unsent selections survive reload/resume within the same ACP connection, but are not yet persisted across connections. See the [ACP implementation guide](packages/opencode/src/acp/README.md) for protocol details.
+Model, mode, and effort selections are saved immediately, including choices made before sending a prompt. Loading, resuming, or forking restores saved choices after checking that they are still available; older sessions fall back to message history. Sending a prompt updates the saved choices to match the model and agent actually used. See the [ACP implementation guide](packages/opencode/src/acp/README.md) for protocol details.
 
 ### Project Setup
 

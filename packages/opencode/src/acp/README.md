@@ -30,7 +30,11 @@ The setter returns the complete option list and sends a `config_option_update` n
 
 Existing `session/set_model` and `session/set_mode` requests remain supported and also publish option updates. Legacy model IDs can include a reasoning variant suffix. Selecting a base model through the legacy model setter continues to clear the explicit variant, preserving existing CyxCode behavior. Exact model IDs containing slashes take precedence over interpreting a suffix as a variant.
 
-Loading, resuming, and forking restore available selections from the last user message. Live selections, including explicit effort clearing, survive reload/resume within the same connection and working directory. Selections made without sending a prompt are **not persisted across connections**; durable session model/agent fields remain pending upstream work.
+Explicit selections are saved to the session before the setter acknowledges success. Model and variant are stored together, so clearing effort survives reconnects. A failed save leaves the live selection unchanged and does not publish a success update.
+
+Loading and resuming retain valid live choices in the same connection, then use saved session choices. Unavailable models or modes fall back to message history and configured defaults. Older sessions continue to use message history. Forks inherit saved selections, and prompts update the durable model/agent fields to reflect the actual request, including prompts sent outside ACP.
+
+An additive database migration introduces optional session `agent` and `model` fields. It preserves existing sessions and runs through CyxCode's normal migration mechanism.
 
 ## Events and Permissions
 
@@ -61,7 +65,6 @@ Editor support determines whether configuration options or legacy selectors are 
 
 ## Remaining Compatibility Work
 
-- Persist unsent selections across ACP connections using durable session fields.
 - Coordinate an SDK/protocol update for reasoning-part message boundaries; the pinned SDK's `ContentChunk` does not expose upstream's `messageId` field.
 - Implement ACP authentication if in-protocol login is needed.
 
@@ -74,7 +77,7 @@ bun test test/acp
 bun typecheck
 ```
 
-Tests cover history restoration, model/mode/effort changes, invalid selections, prompt dispatch, concurrent session events, permissions, and SDK JSON-RPC request/notification handling. Backend fixtures are synthetic; these tests do not call live models.
+Tests cover history restoration, model/mode/effort changes, invalid selections, prompt dispatch, concurrent session events, permissions, and SDK JSON-RPC request/notification handling. Persistence tests use the real SDK, session API, and isolated SQLite database, including reopening the database, forking, clearing effort, and failed writes. A migration test upgrades the previous schema with an existing session. No tests call live models.
 
 ## References
 

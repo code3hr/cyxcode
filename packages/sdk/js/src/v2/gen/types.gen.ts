@@ -1173,6 +1173,12 @@ export type Session = {
     archived?: number
   }
   permission?: PermissionRuleset
+  agent?: string
+  model?: {
+    id: string
+    providerID: string
+    variant?: string
+  }
   revert?: {
     messageID: string
     partID?: string
@@ -2159,6 +2165,12 @@ export type GlobalSession = {
     archived?: number
   }
   permission?: PermissionRuleset
+  agent?: string
+  model?: {
+    id: string
+    providerID: string
+    variant?: string
+  }
   revert?: {
     messageID: string
     partID?: string
@@ -4135,6 +4147,12 @@ export type SessionGetResponse = SessionGetResponses[keyof SessionGetResponses]
 export type SessionUpdateData = {
   body?: {
     title?: string
+    agent?: string
+    model?: {
+      id: string
+      providerID: string
+      variant?: string
+    }
     time?: {
       archived?: number
     }

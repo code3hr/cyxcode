@@ -76,6 +76,8 @@ export namespace Session {
       share,
       revert,
       permission: row.permission ?? undefined,
+      agent: row.agent ?? undefined,
+      model: row.model ?? undefined,
       time: {
         created: row.time_created,
         updated: row.time_updated,
@@ -102,6 +104,8 @@ export namespace Session {
       summary_diffs: info.summary?.diffs,
       revert: info.revert ?? null,
       permission: info.permission,
+      agent: info.agent,
+      model: info.model,
       time_created: info.time.created,
       time_updated: info.time.updated,
       time_compacting: info.time.compacting,
@@ -149,6 +153,10 @@ export namespace Session {
         archived: z.number().optional(),
       }),
       permission: Permission.Ruleset.optional(),
+      agent: z.string().min(1).optional(),
+      model: z
+        .object({ id: z.string().min(1), providerID: z.string().min(1), variant: z.string().optional() })
+        .optional(),
       revert: z
         .object({
           messageID: MessageID.zod,
@@ -249,6 +257,8 @@ export namespace Session {
         directory: Instance.directory,
         workspaceID: original.workspaceID,
         title,
+        agent: original.agent,
+        model: original.model,
       })
       const msgs = await messages({ sessionID: input.sessionID })
       const idMap = new Map<string, MessageID>()
@@ -301,6 +311,8 @@ export namespace Session {
     workspaceID?: WorkspaceID
     directory: string
     permission?: Permission.Ruleset
+    agent?: Info["agent"]
+    model?: Info["model"]
   }) {
     const result: Info = {
       id: SessionID.descending(input.id),
@@ -312,6 +324,8 @@ export namespace Session {
       parentID: input.parentID,
       title: input.title ?? createDefaultTitle(!!input.parentID),
       permission: input.permission,
+      agent: input.agent,
+      model: input.model,
       time: {
         created: Date.now(),
         updated: Date.now(),
@@ -377,6 +391,24 @@ export namespace Session {
       Database.effect(() => Bus.publish(Event.Updated, { info }))
     })
   })
+
+  export const select = fn(
+    z.object({ sessionID: SessionID.zod, agent: Info.shape.agent, model: Info.shape.model }),
+    async (input) => {
+      return Database.use((db) => {
+        const row = db
+          .update(SessionTable)
+          .set({ agent: input.agent, model: input.model, time_updated: Date.now() })
+          .where(eq(SessionTable.id, input.sessionID))
+          .returning()
+          .get()
+        if (!row) throw new NotFoundError({ message: `Session not found: ${input.sessionID}` })
+        const info = fromRow(row)
+        Database.effect(() => Bus.publish(Event.Updated, { info }))
+        return info
+      })
+    },
+  )
 
   export const setTitle = fn(
     z.object({

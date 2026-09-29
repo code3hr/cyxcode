@@ -186,7 +186,15 @@ export namespace SessionPrompt {
         await CyxWatch.turn({ text, sessionID: input.sessionID })
         const message = await createUserMessage(input)
         CyxWatch.set({ messageID: message.info.id })
-        await Session.touch(input.sessionID)
+        await Session.select({
+          sessionID: input.sessionID,
+          agent: message.info.agent,
+          model: {
+            id: message.info.model.modelID,
+            providerID: message.info.model.providerID,
+            variant: message.info.variant,
+          },
+        })
 
         // this is backwards compatibility for allowing `tools` to be specified when
         // prompting

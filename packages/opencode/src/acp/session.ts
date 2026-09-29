@@ -2,6 +2,7 @@ import { RequestError, type McpServer } from "@agentclientprotocol/sdk"
 import type { ACPSessionState } from "./types"
 import { Log } from "@/util/log"
 import type { OpencodeClient } from "@cyxcode/sdk/v2"
+import { ModelID, ProviderID } from "../provider/schema"
 
 const log = Log.create({ service: "acp-session-manager" })
 
@@ -66,9 +67,13 @@ export class ACPSessionManager {
       cwd,
       mcpServers,
       createdAt: new Date(session.time.created),
-      model: current?.model ?? model,
-      variant: current?.variant,
-      modeId: current?.modeId,
+      model:
+        current?.model ??
+        (session.model
+          ? { providerID: ProviderID.make(session.model.providerID), modelID: ModelID.make(session.model.id) }
+          : model),
+      variant: current?.model ? current.variant : session.model?.variant,
+      modeId: current?.modeId ?? session.agent,
     }
     log.info("loading_session", { state })
 
@@ -82,6 +87,25 @@ export class ACPSessionManager {
       log.error("session not found", { sessionId })
       throw RequestError.invalidParams(JSON.stringify({ error: `Session not found: ${sessionId}` }))
     }
+    return session
+  }
+
+  async select(
+    id: string,
+    input: { model: NonNullable<ACPSessionState["model"]>; variant?: string } | { modeId: string },
+  ) {
+    const session = this.get(id)
+    await this.sdk.session.update(
+      {
+        sessionID: id,
+        directory: session.cwd,
+        ...("modeId" in input
+          ? { agent: input.modeId }
+          : { model: { id: input.model.modelID, providerID: input.model.providerID, variant: input.variant } }),
+      },
+      { throwOnError: true },
+    )
+    Object.assign(session, "modeId" in input ? input : { model: input.model, variant: input.variant })
     return session
   }
 

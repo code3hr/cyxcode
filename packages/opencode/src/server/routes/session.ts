@@ -270,6 +270,8 @@ export const SessionRoutes = lazy(() =>
         "json",
         z.object({
           title: z.string().optional(),
+          agent: Session.Info.shape.agent,
+          model: Session.Info.shape.model,
           time: z
             .object({
               archived: z.number().optional(),
@@ -282,6 +284,9 @@ export const SessionRoutes = lazy(() =>
         const updates = c.req.valid("json")
 
         let session = await Session.get(sessionID)
+        if (updates.agent !== undefined || updates.model !== undefined) {
+          session = await Session.select({ sessionID, agent: updates.agent, model: updates.model })
+        }
         if (updates.title !== undefined) {
           session = await Session.setTitle({ sessionID, title: updates.title })
         }

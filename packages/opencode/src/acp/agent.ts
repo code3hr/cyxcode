@@ -1280,15 +1280,17 @@ export namespace ACP {
             same && choices.variant && Selection.variants(choices.providers, selected.model).includes(choices.variant)
               ? choices.variant
               : undefined
-          this.sessionManager.setModel(session.id, selected.model)
-          this.sessionManager.setVariant(session.id, variant)
+          await this.sessionManager.select(session.id, { model: selected.model, variant })
           break
         }
         case "mode":
-          this.sessionManager.setMode(session.id, params.value)
+          await this.sessionManager.select(session.id, { modeId: params.value })
           break
         case "effort":
-          this.sessionManager.setVariant(session.id, params.value === "default" ? undefined : params.value)
+          await this.sessionManager.select(session.id, {
+            model: choices.model,
+            variant: params.value === "default" ? undefined : params.value,
+          })
           break
       }
       return { configOptions: await this.publish(session.id, choices) }
@@ -1307,8 +1309,7 @@ export namespace ACP {
       ) {
         throw RequestError.invalidParams(`Model not found: ${params.modelId}`)
       }
-      this.sessionManager.setModel(session.id, selection.model)
-      this.sessionManager.setVariant(session.id, selection.variant)
+      await this.sessionManager.select(session.id, { model: selection.model, variant: selection.variant })
 
       const availableVariants = Selection.variants(choices.providers, selection.model)
       await this.publish(session.id, choices)
@@ -1328,7 +1329,7 @@ export namespace ACP {
       if (!choices.modes.some((mode) => mode.id === params.modeId)) {
         throw RequestError.invalidParams(`Agent not found: ${params.modeId}`)
       }
-      this.sessionManager.setMode(params.sessionId, params.modeId)
+      await this.sessionManager.select(session.id, { modeId: params.modeId })
       await this.publish(session.id, choices)
     }
 

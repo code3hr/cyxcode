@@ -5,6 +5,7 @@ import type {
   Event,
   EventMessagePartUpdated,
   SessionMessageResponse,
+  Session,
   ToolStatePending,
   ToolStateRunning,
 } from "@cyxcode/sdk/v2"
@@ -123,7 +124,11 @@ function createEventStream() {
   return { controller: { push, close } satisfies EventController, stream }
 }
 
-function createFakeAgent(history: SessionMessageResponse[] = [], remote?: AgentSideConnection) {
+function createFakeAgent(
+  history: SessionMessageResponse[] = [],
+  remote?: AgentSideConnection,
+  saved?: Pick<Session, "model" | "agent">,
+) {
   const updates = new Map<string, string[]>()
   const chunks = new Map<string, string>()
   const sessionUpdates: SessionUpdateParams[] = []
@@ -168,6 +173,7 @@ function createFakeAgent(history: SessionMessageResponse[] = [], remote?: AgentS
       },
     },
     session: {
+      update: async () => ({ data: {} }),
       prompt: async (params: (typeof prompts)[number]) => {
         prompts.push(params)
         return { data: undefined }
@@ -186,6 +192,7 @@ function createFakeAgent(history: SessionMessageResponse[] = [], remote?: AgentS
           data: {
             id: "ses_1",
             time: { created: new Date().toISOString() },
+            ...saved,
           },
         }
       },
@@ -358,6 +365,89 @@ describe("acp.agent session restoration", () => {
               availableVariants: ["low", "high"],
             },
           })
+        } finally {
+          fixture.stop()
+        }
+      },
+    })
+  })
+
+  test.each(["load", "resume", "fork"])(
+    "%s prefers durable choices, including explicit default effort",
+    async (action) => {
+      await using tmp = await tmpdir()
+      await Instance.provide({
+        directory: tmp.path,
+        fn: async () => {
+          const fixture = createFakeAgent([message()], undefined, {
+            model: { id: "reasoning-model", providerID: "opencode" },
+            agent: "build",
+          })
+          try {
+            const params = { sessionId: "ses_1", cwd: tmp.path, mcpServers: [] }
+            const result = await (action === "load"
+              ? fixture.agent.loadSession(params)
+              : action === "fork"
+                ? fixture.agent.unstable_forkSession(params)
+                : fixture.agent.unstable_resumeSession(params))
+            expect(result.models?.currentModelId).toBe("opencode/reasoning-model")
+            expect(result.modes?.currentModeId).toBe("build")
+            expect(result.configOptions?.find((option) => option.id === "effort")?.currentValue).toBe("default")
+          } finally {
+            fixture.stop()
+          }
+        },
+      })
+    },
+  )
+
+  test("unavailable durable choices fall back to valid message history", async () => {
+    await using tmp = await tmpdir()
+    await Instance.provide({
+      directory: tmp.path,
+      fn: async () => {
+        const fixture = createFakeAgent([message()], undefined, {
+          model: { id: "removed", providerID: "opencode", variant: "low" },
+          agent: "removed",
+        })
+        try {
+          const result = await fixture.agent.loadSession({ sessionId: "ses_1", cwd: tmp.path, mcpServers: [] })
+          expect(result.models.currentModelId).toBe("opencode/reasoning-model/high")
+          expect(result.modes?.currentModeId).toBe("plan")
+        } finally {
+          fixture.stop()
+        }
+      },
+    })
+  })
+
+  test("failed durable writes do not change options or publish success notifications", async () => {
+    await using tmp = await tmpdir()
+    await Instance.provide({
+      directory: tmp.path,
+      fn: async () => {
+        const fixture = createFakeAgent()
+        try {
+          const session = await fixture.agent.newSession({ cwd: tmp.path, mcpServers: [] })
+          fixture.sdk.session.update = async () => {
+            throw new Error("Storage unavailable")
+          }
+          await expect(
+            fixture.agent.setSessionConfigOption({
+              sessionId: session.sessionId,
+              configId: "model",
+              value: "opencode/reasoning-model",
+            }),
+          ).rejects.toThrow("Storage unavailable")
+          const restored = await fixture.agent.loadSession({
+            sessionId: session.sessionId,
+            cwd: tmp.path,
+            mcpServers: [],
+          })
+          expect(restored.configOptions).toEqual(session.configOptions)
+          expect(fixture.sessionUpdates.some((item) => item.update.sessionUpdate === "config_option_update")).toBe(
+            false,
+          )
         } finally {
           fixture.stop()
         }
