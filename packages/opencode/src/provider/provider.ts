@@ -50,6 +50,7 @@ import {
 import { fromNodeProviderChain } from "@aws-sdk/credential-providers"
 import { GoogleAuth } from "google-auth-library"
 import { ProviderTransform } from "./transform"
+import { ProviderError } from "./error"
 import { Installation } from "../installation"
 import { ModelID, ProviderID } from "./schema"
 
@@ -1229,18 +1230,22 @@ export namespace Provider {
       if (existing) return existing
 
       const customFetch = options["fetch"] ?? Http.fetch
-      const chunkTimeout = options["chunkTimeout"]
+      const chunkTimeout = options["chunkTimeout"] ?? (options["timeout"] === false ? false : 300_000)
+      const header = options["headerTimeout"] ?? (options["timeout"] === false ? false : 300_000)
       delete options["chunkTimeout"]
+      delete options["headerTimeout"]
 
       options["fetch"] = async (input: any, init?: BunFetchRequestInit) => {
         // Preserve custom fetch if it exists, wrap it with timeout logic
         const fetchFn = customFetch ?? fetch
         const opts = init ?? {}
         const chunkAbortCtl = typeof chunkTimeout === "number" && chunkTimeout > 0 ? new AbortController() : undefined
+        const pending = typeof header === "number" && header > 0 ? new AbortController() : undefined
         const signals: AbortSignal[] = []
 
         if (opts.signal) signals.push(opts.signal)
         if (chunkAbortCtl) signals.push(chunkAbortCtl.signal)
+        if (pending) signals.push(pending.signal)
         if (options["timeout"] !== undefined && options["timeout"] !== null && options["timeout"] !== false)
           signals.push(AbortSignal.timeout(options["timeout"]))
 
@@ -1265,14 +1270,21 @@ export namespace Provider {
           }
         }
 
-        const res = await fetchFn(input, {
-          ...opts,
-          // @ts-ignore see here: https://github.com/oven-sh/bun/issues/16682
-          timeout: false,
-        })
+        const timer = pending
+          ? setTimeout(() => pending.abort(new ProviderError.HeaderTimeoutError(header)), header)
+          : undefined
+        try {
+          const res = await fetchFn(input, {
+            ...opts,
+            // @ts-ignore see here: https://github.com/oven-sh/bun/issues/16682
+            timeout: false,
+          })
 
-        if (!chunkAbortCtl) return res
-        return wrapSSE(res, chunkTimeout, chunkAbortCtl)
+          if (!chunkAbortCtl) return res
+          return wrapSSE(res, chunkTimeout, chunkAbortCtl)
+        } finally {
+          clearTimeout(timer)
+        }
       }
 
       const bundledFn = BUNDLED_PROVIDERS[model.api.npm]

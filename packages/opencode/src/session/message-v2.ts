@@ -897,6 +897,8 @@ export namespace MessageV2 {
 
   export function fromError(e: unknown, ctx: { providerID: ProviderID }): NonNullable<Assistant["error"]> {
     switch (true) {
+      case e instanceof ProviderError.HeaderTimeoutError:
+        return new MessageV2.APIError({ message: e.message, isRetryable: true }, { cause: e }).toObject()
       case e instanceof DOMException && e.name === "AbortError":
         return new MessageV2.AbortedError(
           { message: e.message },

@@ -1585,14 +1585,18 @@ export type ProviderConfig = {
      */
     setCacheKey?: boolean
     /**
-     * Timeout in milliseconds for requests to this provider. Default is 300000 (5 minutes). Set to false to disable timeout.
+     * Total request timeout in milliseconds. Set to false to disable default timers; explicit headerTimeout and chunkTimeout values still apply.
      */
     timeout?: number | false
     /**
-     * Timeout in milliseconds between streamed SSE chunks for this provider. If no chunk arrives within this window, the request is aborted.
+     * Timeout in milliseconds waiting for response headers. Default is 300000 (5 minutes). Set to false to disable.
      */
-    chunkTimeout?: number
-    [key: string]: unknown | string | boolean | number | false | number | undefined
+    headerTimeout?: number | false
+    /**
+     * Timeout in milliseconds between streamed SSE chunks. Default is 300000 (5 minutes). Set to false to disable. Each arriving chunk resets the timer.
+     */
+    chunkTimeout?: number | false
+    [key: string]: unknown | string | boolean | number | false | number | false | number | false | undefined
   }
 }
 
