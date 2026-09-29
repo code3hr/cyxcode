@@ -30,6 +30,10 @@ export namespace ProviderTransform {
         return "openai"
       case "@ai-sdk/xai":
         return "xai"
+      case "@ai-sdk/cerebras":
+        return "cerebras"
+      case "@ai-sdk/deepinfra":
+        return "deepinfra"
       case "@ai-sdk/amazon-bedrock":
         return "bedrock"
       case "@ai-sdk/anthropic":
@@ -427,7 +431,7 @@ export namespace ProviderTransform {
         return Object.fromEntries(efforts.map((effort) => [effort, { reasoning: { effort } }]))
 
       case "@ai-sdk/gateway":
-        if (model.id.includes("anthropic")) {
+        if (model.api.id.includes("anthropic")) {
           if (isAnthropicAdaptive) {
             return Object.fromEntries(
               adaptiveEfforts.map((effort) => [
@@ -748,13 +752,14 @@ export namespace ProviderTransform {
       }
     }
 
-    if (
-      input.providerOptions?.setCacheKey !== false &&
-      (input.model.providerID === "openai" ||
-        input.model.api.npm === "@ai-sdk/xai" ||
-        input.providerOptions?.setCacheKey)
-    ) {
-      result["promptCacheKey"] = input.sessionID
+    if (input.providerOptions?.setCacheKey !== false) {
+      const key = iife(() => {
+        if (["@ai-sdk/deepinfra", "@ai-sdk/cerebras"].includes(input.model.api.npm)) return "prompt_cache_key"
+        if (["@ai-sdk/openai", "@ai-sdk/azure", "@ai-sdk/xai"].includes(input.model.api.npm)) return "promptCacheKey"
+        if (input.model.providerID === "openrouter") return "prompt_cache_key"
+        if (input.model.providerID === "venice" || input.providerOptions?.setCacheKey === true) return "promptCacheKey"
+      })
+      if (key) result[key] = input.sessionID
     }
 
     if (input.model.api.npm === "@ai-sdk/google" || input.model.api.npm === "@ai-sdk/google-vertex") {
@@ -824,19 +829,12 @@ export namespace ProviderTransform {
       }
 
       if (input.model.providerID.startsWith("opencode")) {
-        result["promptCacheKey"] = input.sessionID
+        if (input.providerOptions?.setCacheKey !== false) result["promptCacheKey"] = input.sessionID
         result["include"] = ["reasoning.encrypted_content"]
         result["reasoningSummary"] = "auto"
       }
     }
 
-    if (input.model.providerID === "venice") {
-      result["promptCacheKey"] = input.sessionID
-    }
-
-    if (input.model.providerID === "openrouter") {
-      result["prompt_cache_key"] = input.sessionID
-    }
     if (input.model.api.npm === "@ai-sdk/gateway") {
       result["gateway"] = {
         caching: "auto",

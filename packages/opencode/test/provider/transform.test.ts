@@ -163,6 +163,25 @@ describe("ProviderTransform.options - setCacheKey", () => {
     })
     expect(result.store).toBe(false)
   })
+
+  test("provider naming alone does not opt an unrelated SDK into OpenAI cache keys", () => {
+    const model = { ...mockModel, providerID: "openai" }
+    expect(ProviderTransform.options({ model, sessionID }).promptCacheKey).toBeUndefined()
+  })
+
+  test.each(["opencode", "opencode-go", "venice", "openrouter"])(
+    "cache opt-out survives service-specific defaults: %s",
+    (providerID) => {
+      const model = { ...mockModel, providerID, api: { ...mockModel.api, id: "gpt-5.4" } }
+      const result = ProviderTransform.options({ model, sessionID, providerOptions: { setCacheKey: false } })
+      expect(result.promptCacheKey).toBeUndefined()
+      expect(result.prompt_cache_key).toBeUndefined()
+      if (providerID.startsWith("opencode")) {
+        expect(result.include).toEqual(["reasoning.encrypted_content"])
+        expect(result.reasoningSummary).toBe("auto")
+      }
+    },
+  )
 })
 
 describe("ProviderTransform.options - google thinkingConfig gating", () => {
@@ -2225,6 +2244,28 @@ describe("ProviderTransform.variants", () => {
     })
     const result = ProviderTransform.variants(model)
     expect(result).toEqual({})
+  })
+
+  test.each(["anthropic/claude-sonnet-4-6", "anthropic/claude-sonnet-4-5"])(
+    "Gateway Anthropic aliases retain thinking options: %s",
+    (id) => {
+      const model = createMockModel({
+        id: "alias",
+        api: { id, npm: "@ai-sdk/gateway", url: "https://example.invalid" },
+      })
+      const variants = ProviderTransform.variants(model)
+      expect(variants.high.thinking.type).toBe(id.endsWith("4-6") ? "adaptive" : "enabled")
+      expect(variants.high.reasoningEffort).toBeUndefined()
+      expect(ProviderTransform.providerOptions(model, variants.high)).toEqual({ anthropic: variants.high })
+    },
+  )
+
+  test("Gateway ignores a misleading Anthropic display ID", () => {
+    const model = createMockModel({
+      id: "anthropic/alias",
+      api: { id: "openai/gpt-5", npm: "@ai-sdk/gateway", url: "https://example.invalid" },
+    })
+    expect(ProviderTransform.variants(model).high).toEqual({ reasoningEffort: "high" })
   })
 
   test("deepseek returns empty object", () => {
