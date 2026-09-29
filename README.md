@@ -17,6 +17,7 @@
 - [Install](#install)
 - [Quick Start](#quick-start)
 - [Providers and Free Models](#providers-and-free-models)
+  - [Testing Other Models, Including Muse](#testing-other-models-including-muse)
 - [Two Modes](#two-modes)
 - [Pattern Learning](#pattern-learning)
 - [Project Memory](#project-memory)
@@ -106,6 +107,30 @@ To connect Zen and check whether its free models are available to your account:
 An API key makes the provider available in CyxCode; access to individual models, including free models, still depends on the service's rules. **Authenticated access to Zen's free models from CyxCode has not yet been verified.** If the service still rejects the request, use another connected provider or a local model. See the [Zen documentation](https://opencode.ai/docs/zen/) for current model availability, account requirements, and pricing.
 
 Free models remain supported through other configured providers that permit access, subject to their usage limits. You can also configure local models through an OpenAI-compatible endpoint such as [Ollama](https://opencode.ai/docs/providers/#ollama), using your own hardware. CyxCode's local pattern matching continues to work without a model API call.
+
+#### Testing Other Models, Including Muse
+
+Connect the provider that hosts the model, then select it with `/models`. Hosted providers may require credentials and charge for usage; connecting one provider does not grant access to another.
+
+For **Meta Muse Spark through OpenRouter**:
+
+1. Obtain an OpenRouter API key and check the model's availability and pricing on the [Muse Spark 1.3 page](https://openrouter.ai/meta/muse-spark-1.3).
+2. In CyxCode, run `/connect`, select **OpenRouter**, and enter your key in the connection prompt.
+3. Run `/models` and search for **Muse**. The OpenRouter model ID is `meta/muse-spark-1.3`.
+4. If the model is missing, refresh the catalog from a terminal, then restart CyxCode:
+
+   ```sh
+   cyxcode models --refresh
+   ```
+
+5. Select the model and send: `Reply with "Muse connected." Do not use tools or modify files.`
+6. Once that succeeds, test a read-only task such as: `Read README.md and summarize this project. Do not edit files.`
+
+A catalog refresh can expose newly listed models; it does not grant account access. If Muse is still absent, a custom provider/model entry is needed.
+
+**Direct Meta access** is another option: configure a provider with the `@ai-sdk/openai` adapter, base URL `https://api.meta.ai/v1`, and model ID `muse-spark-1.3`, then connect it using a Meta Model API key. Meta's [coding-agent setup guide](https://dev.meta.ai/docs/coding-agents) provides the configuration, including reasoning options and model limits. API use is [usage-billed](https://dev.meta.ai/docs/muse-code/auth); Muse is not automatically free in CyxCode.
+
+**Live Muse inference has not yet been verified in CyxCode.** Test a short response first; a successful listing or connection alone does not verify generation or multi-step tool use.
 
 ### Project Setup
 
