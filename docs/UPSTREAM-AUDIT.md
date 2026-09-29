@@ -130,6 +130,14 @@ This file tracks selective upstream opencode updates for CyxCode. Use it to avoi
 - Validation: 53 tests pass in isolated suites: 37 ACP/migration tests, 8 prompt tests, 3 session-event tests, and 5 session API tests. Persistence uses the real SDK/API/SQLite path, closes and reopens the database, checks fork inheritance, clears effort, rejects malformed writes, and verifies failed saves preserve local state. Core and SDK package type checks pass. A combined run encountered cross-suite `test/test` provider errors and Windows cleanup locking; the affected suites pass in fresh processes. No live model requests or external editor verification.
 - Rebuilt Windows x64 `3.0.4-upstream.20260929.3`, including the MCP callback-port and both ACP batches, with app/dashboard/commands/default skills and all 10 migrations. Used the tracked model catalog and restored generated snapshot files afterward. The compiled version check and isolated local generation test pass (`cyxcode-smoke-ok`, two requests, Cerebras completion limit preserved). Executable SHA-256: `682F11A1B417474D0708036B4766B66888C952A892E6015312EF92A97B1E2996`. Build output is under `packages/opencode/dist/cyxcode-windows-x64/bin`; the previously recorded UI CSS/Browserslist/chunk warnings remain. No release was published.
 
+### ACP reasoning boundaries and SDK compatibility (2026-09-29)
+
+- Installed and launched the verified Windows build `3.0.4-upstream.20260929.3` from the preceding batch. Its installed SHA-256 matches the recorded build hash; the previous installation was backed up. The source changes below are newer than that executable.
+- `95daf90670` (`manual adaptation`, remaining reasoning-boundary scope completed): update only `@agentclientprotocol/sdk` from `0.14.1` to upstream's pinned `0.21.0`. Live text and replayed text/attachments identify their owning message; reasoning identifies its individual part. Convert internal IDs to deterministic UUID v5 values at the ACP boundary to meet the SDK's documented UUID contract, preserving CyxCode's stored identifiers. The optional `messageId` field remains experimental and editor support varies.
+- Adapt SDK-stabilized session list/resume handler names while retaining the same wire methods. Keep CyxCode's model/mode/effort options as text selectors and reject the SDK's newly supported boolean values for those options. Handle delayed command-notification rejection on disconnected clients.
+- Validation: all 39 ACP tests and package-local type checking pass. Paired SDK JSON-RPC connections verify initialization/branding, configuration notifications, stable list/resume routing, history replay, and separate reasoning boundaries with repeated deltas. UUID expectations were independently calculated using Python's standard UUID v5 implementation. Existing persistence, permission, and session-isolation tests pass. No external editor or live inference verification.
+- Dependency scope: Bun also re-resolved the app's existing floating `ghostty-web#main` dependency during installation. Restored its original lockfile entry and local cached dependency; no terminal dependency update is included. A frozen reinstall rejected that pre-existing floating Git reference, so a full frozen workspace installation was not verified.
+
 ### Review next and exclusions
 
 - `e63996919b` (`skip for now`): the grep symlink fix targets upstream's replacement search implementation. CyxCode retains the existing absolute-path ripgrep handling, so the upstream path reconstruction change does not map to this implementation.
@@ -143,7 +151,7 @@ This file tracks selective upstream opencode updates for CyxCode. Use it to avoi
 - `e434ce01d3`, `8571a922db` (`manual adaptation`, pending): OpenAI pro modes and Merge Gateway reasoning metadata have prerequisites absent from CyxCode's current model schema or variant handling. Review supported SDK request shapes before importing each behavior.
 - `2b2aacc939` (`manual adaptation`, deferred): modern Claude adaptive thinking requires coordinated SDK support. Both pinned Anthropic and Bedrock SDKs limit effort to `low`/`medium`/`high`/`max`, so upstream's `xhigh` is rejected, and their thinking schemas do not forward `display: summarized`. Keep the existing Claude behavior until the SDK and reasoning-replay changes can be validated together. MiniMax M3 is completed above.
 
-- `95daf90670` (remaining scope deferred): configuration options and durable selections are completed above. The pinned ACP SDK's `ContentChunk` still lacks the `messageId` field required for upstream's reasoning-boundary fix. Coordinate that SDK/protocol change before importing the remaining behavior.
+- `95daf90670` (`manual adaptation`, completed): configuration options, durable selections, and reasoning boundaries are completed in the batches above.
 - `95ebf50ace` (`skip for now`): upstream adds `/v1` to Cognitive Services base URLs for its newer SDK. CyxCode's pinned `@ai-sdk/azure@2.0.91` already appends `/v1` internally; importing that change would produce `/openai/v1/v1/...` for default URLs.
 - Broad app v2, TUI, release version, generated file, and dependency churn remains excluded by the audit policy below.
 
@@ -187,7 +195,7 @@ Prefer the smallest backport that preserves CyxCode behavior. Do not wholesale m
 
 ## Take Next
 
-- The provider/MCP/Gemini and compatible ACP follow-up is recorded above. Review the remaining release delta in small batches; ACP persistence/protocol changes require a separate compatibility plan.
+- The provider/MCP/Gemini and ACP follow-up is recorded above. Review the remaining release delta in small batches, starting with the provider/SDK compatibility candidates.
 
 ## Manual Adaptation Candidates
 

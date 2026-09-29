@@ -13,6 +13,7 @@ Connect a model provider through CyxCode's `/connect` before starting an editor 
 - `agent.ts`: ACP requests, history replay, event streaming, permission requests, and prompt dispatch through the CyxCode SDK.
 - `session.ts`: connection-local session state, working directories, MCP configuration, model, variant, and mode selections.
 - `selection.ts`: shared model parsing, available choices, variant metadata, and ACP configuration options.
+- `message.ts`: stable UUIDs for ACP message boundaries, derived from existing CyxCode message and reasoning-part IDs.
 - `types.ts`: internal session/configuration contracts.
 - `../cli/cmd/acp.ts`: backend startup and JSON-RPC transport using the official ACP SDK.
 
@@ -40,6 +41,8 @@ An additive database migration introduces optional session `agent` and `model` f
 
 CyxCode streams message and reasoning chunks, tool progress, usage, and available commands through session updates. Events are routed to their owning session. Tool permission requests are forwarded to the client, and its response is sent to CyxCode's existing permission system.
 
+ACP SDK `0.21.0` supports the optional, experimental `messageId` field. Text and attachments use the owning message's identity; each reasoning part has its own identity. UUID v5 conversion happens only at the ACP boundary, keeping internal IDs unchanged and making streaming and replay consistent across reconnects. Editors must support this field to display the boundaries. Session list and resume handlers use the SDK's stable method names; their wire methods remain `session/list` and `session/resume`.
+
 ACP excludes the question tool by default. Enable it only for clients that support interactive question prompts:
 
 ```sh
@@ -65,7 +68,6 @@ Editor support determines whether configuration options or legacy selectors are 
 
 ## Remaining Compatibility Work
 
-- Coordinate an SDK/protocol update for reasoning-part message boundaries; the pinned SDK's `ContentChunk` does not expose upstream's `messageId` field.
 - Implement ACP authentication if in-protocol login is needed.
 
 ## Testing

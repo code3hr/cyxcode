@@ -174,6 +174,7 @@ function createFakeAgent(
     },
     session: {
       update: async () => ({ data: {} }),
+      list: async () => ({ data: [] }),
       prompt: async (params: (typeof prompts)[number]) => {
         prompts.push(params)
         return { data: undefined }
@@ -201,6 +202,8 @@ function createFakeAgent(
       },
       fork: async () => ({ data: { id: "ses_fork", time: { created: Date.now() } } }),
       message: async (params?: any) => {
+        const stored = history.find((message) => message.info.id === params?.messageID)
+        if (stored) return { data: stored }
         // Return a message with parts that can be looked up by partID
         return {
           data: {
@@ -311,7 +314,7 @@ describe("acp.agent session restoration", () => {
           },
         ])
         try {
-          await fixture.agent.unstable_resumeSession({ sessionId: "ses_1", cwd: tmp.path, mcpServers: [] })
+          await fixture.agent.resumeSession({ sessionId: "ses_1", cwd: tmp.path, mcpServers: [] })
           expect(fixture.sessionUpdates.find((item) => item.update.sessionUpdate === "usage_update")?.update).toEqual({
             sessionUpdate: "usage_update",
             used: 600,
@@ -350,7 +353,7 @@ describe("acp.agent session restoration", () => {
             ? fixture.agent.loadSession(params)
             : action === "fork"
               ? fixture.agent.unstable_forkSession(params)
-              : fixture.agent.unstable_resumeSession(params))
+              : fixture.agent.resumeSession(params))
           expect(result.models?.currentModelId).toBe("opencode/reasoning-model/high")
           expect(result.modes?.currentModeId).toBe("plan")
           expect(result.configOptions?.map((option) => [option.id, option.currentValue])).toEqual([
@@ -389,7 +392,7 @@ describe("acp.agent session restoration", () => {
               ? fixture.agent.loadSession(params)
               : action === "fork"
                 ? fixture.agent.unstable_forkSession(params)
-                : fixture.agent.unstable_resumeSession(params))
+                : fixture.agent.resumeSession(params))
             expect(result.models?.currentModelId).toBe("opencode/reasoning-model")
             expect(result.modes?.currentModeId).toBe("build")
             expect(result.configOptions?.find((option) => option.id === "effort")?.currentValue).toBe("default")
@@ -505,7 +508,7 @@ describe("acp.agent session restoration", () => {
             modelId: "opencode/reasoning-model/low",
           })
           await fixture.agent.setSessionMode({ sessionId: params.sessionId, modeId: "build" })
-          const resumed = await fixture.agent.unstable_resumeSession(params)
+          const resumed = await fixture.agent.resumeSession(params)
           expect(resumed.models?.currentModelId).toBe("opencode/reasoning-model/low")
           expect(resumed.modes?.currentModeId).toBe("build")
           await fixture.agent.unstable_setSessionModel({
@@ -592,6 +595,9 @@ describe("acp.agent configuration options", () => {
     ["effort", "unsupported"],
     ["effort", "default"],
     ["mode", "removed"],
+    ["model", true],
+    ["mode", false],
+    ["effort", true],
   ])("invalid option %s=%s leaves session state unchanged", async (configId, value) => {
     await using tmp = await tmpdir()
     await Instance.provide({
@@ -601,7 +607,11 @@ describe("acp.agent configuration options", () => {
         try {
           const created = await fixture.agent.newSession({ cwd: tmp.path, mcpServers: [] })
           await expect(
-            fixture.agent.setSessionConfigOption({ sessionId: created.sessionId, configId, value }),
+            fixture.agent.setSessionConfigOption({
+              sessionId: created.sessionId,
+              configId,
+              ...(typeof value === "boolean" ? { type: "boolean", value } : { value }),
+            }),
           ).rejects.toMatchObject({ code: -32602 })
           const loaded = await fixture.agent.loadSession({
             sessionId: created.sessionId,
@@ -619,7 +629,7 @@ describe("acp.agent configuration options", () => {
     })
   })
 
-  test("SDK routes configuration requests and notifications over JSON-RPC", async () => {
+  test("SDK routes configuration, session methods and message boundaries over JSON-RPC", async () => {
     await using tmp = await tmpdir()
     await Instance.provide({
       directory: tmp.path,
@@ -630,10 +640,40 @@ describe("acp.agent configuration options", () => {
         const right = new TransformStream<Uint8Array, Uint8Array>({ start: output.resolve })
         const updates: SessionUpdateParams[] = []
         const commands = Promise.withResolvers<void>()
+        const streamed = Promise.withResolvers<void>()
+        const history: SessionMessageResponse[] = [
+          {
+            info: {
+              id: "msg_assistant",
+              sessionID: "ses_1",
+              role: "assistant",
+              parentID: "msg_user",
+              time: { created: Date.now() },
+              modelID: "reasoning-model",
+              providerID: "opencode",
+              mode: "build",
+              agent: "build",
+              path: { cwd: tmp.path, root: tmp.path },
+              cost: 0,
+              tokens: { input: 0, output: 0, reasoning: 0, cache: { read: 0, write: 0 } },
+            },
+            parts: [
+              ...["first", "second"].map((id) => ({
+                id,
+                sessionID: "ses_1",
+                messageID: "msg_assistant",
+                type: "reasoning" as const,
+                text: id,
+                time: { start: 1, end: 2 },
+              })),
+              { id: "answer", sessionID: "ses_1", messageID: "msg_assistant", type: "text", text: "Answer" },
+            ],
+          },
+        ]
         let fixture: ReturnType<typeof createFakeAgent> | undefined
         const backend = new AgentSideConnection(
           (connection) => {
-            fixture = createFakeAgent([], connection)
+            fixture = createFakeAgent(history, connection)
             return fixture.agent
           },
           ndJsonStream(left.writable, right.readable),
@@ -646,6 +686,12 @@ describe("acp.agent configuration options", () => {
             async sessionUpdate(update) {
               updates.push(update)
               if (update.update.sessionUpdate === "available_commands_update") commands.resolve()
+              if (
+                update.update.sessionUpdate === "agent_message_chunk" &&
+                update.update.content.type === "text" &&
+                update.update.content.text === "streamed"
+              )
+                streamed.resolve()
             },
           }),
           ndJsonStream(right.writable, left.readable),
@@ -669,6 +715,71 @@ describe("acp.agent configuration options", () => {
             sessionUpdate: "config_option_update",
             configOptions: changed.configOptions,
           })
+          expect(await client.listSessions({ cwd: tmp.path })).toEqual({ sessions: [] })
+          const params = { sessionId: created.sessionId, cwd: tmp.path, mcpServers: [] }
+          expect((await client.resumeSession(params)).configOptions).toEqual(changed.configOptions)
+          const chunks = () =>
+            updates.flatMap(({ update }) =>
+              update.sessionUpdate === "agent_thought_chunk" || update.sessionUpdate === "agent_message_chunk"
+                ? [{ type: update.sessionUpdate, id: update.messageId, content: update.content }]
+                : [],
+            )
+          expect(chunks()).toEqual([])
+          await client.loadSession(params)
+          expect(chunks()).toEqual([
+            {
+              type: "agent_thought_chunk",
+              id: "82c62636-f8ea-5309-9d33-be0641965e07",
+              content: { type: "text", text: "first" },
+            },
+            {
+              type: "agent_thought_chunk",
+              id: "eab4c211-3f55-5bc2-91e4-f9214677dcdd",
+              content: { type: "text", text: "second" },
+            },
+            {
+              type: "agent_message_chunk",
+              id: "70f5eaa3-3cba-564e-9f8c-c22390765b6b",
+              content: { type: "text", text: "Answer" },
+            },
+          ])
+          for (const [partID, delta] of [
+            ["first", "one"],
+            ["first", " continued"],
+            ["second", "two"],
+            ["answer", "streamed"],
+          ]) {
+            fixture!.controller.push({
+              directory: tmp.path,
+              payload: {
+                type: "message.part.delta",
+                properties: { sessionID: created.sessionId, messageID: "msg_assistant", partID, field: "text", delta },
+              },
+            })
+          }
+          await streamed.promise
+          expect(chunks().slice(3)).toEqual([
+            {
+              type: "agent_thought_chunk",
+              id: "82c62636-f8ea-5309-9d33-be0641965e07",
+              content: { type: "text", text: "one" },
+            },
+            {
+              type: "agent_thought_chunk",
+              id: "82c62636-f8ea-5309-9d33-be0641965e07",
+              content: { type: "text", text: " continued" },
+            },
+            {
+              type: "agent_thought_chunk",
+              id: "eab4c211-3f55-5bc2-91e4-f9214677dcdd",
+              content: { type: "text", text: "two" },
+            },
+            {
+              type: "agent_message_chunk",
+              id: "70f5eaa3-3cba-564e-9f8c-c22390765b6b",
+              content: { type: "text", text: "streamed" },
+            },
+          ])
         } finally {
           fixture?.stop()
           ;(await input.promise).terminate()

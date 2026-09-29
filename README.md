@@ -163,6 +163,8 @@ ACP clients that support configuration options can select **Model**, **Session M
 
 Model, mode, and effort selections are saved immediately, including choices made before sending a prompt. Loading, resuming, or forking restores saved choices after checking that they are still available; older sessions fall back to message history. Sending a prompt updates the saved choices to match the model and agent actually used. See the [ACP implementation guide](packages/opencode/src/acp/README.md) for protocol details.
 
+ACP output includes stable message identifiers during streaming and history replay. Compatible editors can use these identifiers to keep separate reasoning blocks from being merged together.
+
 ### Project Setup
 
 Run `/cyxinit` inside CyxCode to initialize your project:

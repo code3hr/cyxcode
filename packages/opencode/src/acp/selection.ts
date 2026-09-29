@@ -74,7 +74,7 @@ export namespace Selection {
     return { model }
   }
 
-  export function options(input: Input): SessionConfigOption[] {
+  export function options(input: Input): Extract<SessionConfigOption, { type: "select" }>[] {
     const efforts = variants(input.providers, input.model)
     return [
       {

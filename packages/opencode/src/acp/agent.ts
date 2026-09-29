@@ -36,6 +36,7 @@ import { Filesystem } from "../util/filesystem"
 import { Hash } from "../util/hash"
 import { ACPSessionManager } from "./session"
 import { Selection } from "./selection"
+import { Message } from "./message"
 import type { ACPConfig } from "./types"
 import { Provider } from "../provider/provider"
 import { ModelID, ProviderID } from "../provider/schema"
@@ -484,6 +485,7 @@ export namespace ACP {
                 sessionId,
                 update: {
                   sessionUpdate: "agent_message_chunk",
+                  messageId: Message.id(props.messageID),
                   content: {
                     type: "text",
                     text: props.delta,
@@ -502,6 +504,7 @@ export namespace ACP {
                 sessionId,
                 update: {
                   sessionUpdate: "agent_thought_chunk",
+                  messageId: Message.id(props.partID),
                   content: {
                     type: "text",
                     text: props.delta,
@@ -635,7 +638,7 @@ export namespace ACP {
       }
     }
 
-    async unstable_listSessions(params: ListSessionsRequest): Promise<ListSessionsResponse> {
+    async listSessions(params: ListSessionsRequest): Promise<ListSessionsResponse> {
       try {
         const cursor = params.cursor ? Number(params.cursor) : undefined
         const limit = 100
@@ -726,7 +729,7 @@ export namespace ACP {
       }
     }
 
-    async unstable_resumeSession(params: ResumeSessionRequest): Promise<ResumeSessionResponse> {
+    async resumeSession(params: ResumeSessionRequest): Promise<ResumeSessionResponse> {
       const directory = params.cwd
       const sessionId = params.sessionId
       const mcpServers = params.mcpServers ?? []
@@ -926,6 +929,7 @@ export namespace ACP {
                 sessionId,
                 update: {
                   sessionUpdate: message.info.role === "user" ? "user_message_chunk" : "agent_message_chunk",
+                  messageId: Message.id(message.info.id),
                   content: {
                     type: "text",
                     text: part.text,
@@ -957,6 +961,7 @@ export namespace ACP {
                 sessionId,
                 update: {
                   sessionUpdate: messageChunk,
+                  messageId: Message.id(message.info.id),
                   content: { type: "resource_link", uri: url, name: filename, mimeType: mime },
                 },
               })
@@ -978,6 +983,7 @@ export namespace ACP {
                   sessionId,
                   update: {
                     sessionUpdate: messageChunk,
+                    messageId: Message.id(message.info.id),
                     content: {
                       type: "image",
                       mimeType: effectiveMime,
@@ -1006,6 +1012,7 @@ export namespace ACP {
                   sessionId,
                   update: {
                     sessionUpdate: messageChunk,
+                    messageId: Message.id(message.info.id),
                     content: { type: "resource", resource },
                   },
                 })
@@ -1022,6 +1029,7 @@ export namespace ACP {
                 sessionId,
                 update: {
                   sessionUpdate: "agent_thought_chunk",
+                  messageId: Message.id(part.id),
                   content: {
                     type: "text",
                     text: part.text,
@@ -1203,13 +1211,15 @@ export namespace ACP {
       )
 
       setTimeout(() => {
-        this.connection.sessionUpdate({
-          sessionId,
-          update: {
-            sessionUpdate: "available_commands_update",
-            availableCommands,
-          },
-        })
+        this.connection
+          .sessionUpdate({
+            sessionId,
+            update: {
+              sessionUpdate: "available_commands_update",
+              availableCommands,
+            },
+          })
+          .catch((error) => log.error("failed to send available commands", { sessionId, error }))
       }, 0)
 
       return {
@@ -1267,7 +1277,10 @@ export namespace ACP {
       const session = this.sessionManager.get(params.sessionId)
       const choices = await this.choices(session.id)
       const option = Selection.options(choices).find((option) => option.id === params.configId)
-      if (!option?.options.some((option) => "value" in option && option.value === params.value)) {
+      if (
+        typeof params.value !== "string" ||
+        !option?.options.some((option) => "value" in option && option.value === params.value)
+      ) {
         throw RequestError.invalidParams(`Invalid ${params.configId} option: ${params.value}`)
       }
 
