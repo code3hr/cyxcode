@@ -167,6 +167,7 @@ export namespace Provider {
       return {
         autoload: false,
         async getModel(sdk: any, modelID: string, _options?: Record<string, any>) {
+          if (sdk.responses === undefined) return sdk.languageModel(modelID)
           return sdk.responses(modelID)
         },
         options: {},
@@ -176,6 +177,7 @@ export namespace Provider {
       return {
         autoload: false,
         async getModel(sdk: any, modelID: string, _options?: Record<string, any>) {
+          if (sdk.responses === undefined) return sdk.languageModel(modelID)
           return sdk.responses(modelID)
         },
         options: {},
@@ -1080,7 +1082,7 @@ export namespace Provider {
         continue
       }
       const result = await fn(data)
-      if (result && (result.autoload || providers[providerID])) {
+      if (result && (result.autoload || providers[providerID] || config.provider?.[providerID])) {
         if (result.getModel) modelLoaders[providerID] = result.getModel
         if (result.vars) varsLoaders[providerID] = result.vars
         if (result.discoverModels) discoveryLoaders[providerID] = result.discoverModels

@@ -4,6 +4,7 @@ import { tool, type ModelMessage } from "ai"
 import z from "zod"
 import { LLM } from "../../src/session/llm"
 import { Global } from "../../src/global"
+import { CyxWatch } from "../../src/cyxcode/watch"
 import { Instance } from "../../src/project/instance"
 import { Provider } from "../../src/provider/provider"
 import { ProviderTransform } from "../../src/provider/transform"
@@ -158,6 +159,7 @@ function waitRequest(pathname: string, response: Response) {
 
 beforeAll(() => {
   state.server = Bun.serve({
+    hostname: "127.0.0.1",
     port: 0,
     async fetch(req) {
       const next = state.queue.shift()
@@ -185,6 +187,14 @@ beforeEach(() => {
 afterAll(() => {
   state.server?.stop()
 })
+
+async function allow() {
+  if (!state.server) throw new Error("Server not initialized")
+  await CyxWatch.savePolicy({
+    version: 2,
+    rules: [{ permission: ["webfetch"], host: [state.server.url.host], decision: "allow" }],
+  })
+}
 
 function createChatStream(text: string) {
   const payload =
@@ -295,6 +305,7 @@ describe("session.llm.stream", () => {
 
     await Instance.provide({
       directory: tmp.path,
+      init: allow,
       fn: async () => {
         const resolved = await Provider.getModel(ProviderID.make(providerID), ModelID.make(model.id))
         const sessionID = SessionID.make("session-test-1")
@@ -396,6 +407,7 @@ describe("session.llm.stream", () => {
 
     await Instance.provide({
       directory: tmp.path,
+      init: allow,
       fn: async () => {
         const resolved = await Provider.getModel(ProviderID.make(providerID), ModelID.make(model.id))
         const sessionID = SessionID.make("session-test-tools")
@@ -514,6 +526,7 @@ describe("session.llm.stream", () => {
 
     await Instance.provide({
       directory: tmp.path,
+      init: allow,
       fn: async () => {
         const resolved = await Provider.getModel(ProviderID.openai, ModelID.make(model.id))
         const sessionID = SessionID.make("session-test-2")
@@ -636,6 +649,7 @@ describe("session.llm.stream", () => {
 
     await Instance.provide({
       directory: tmp.path,
+      init: allow,
       fn: async () => {
         const resolved = await Provider.getModel(ProviderID.make(providerID), ModelID.make(model.id))
         const sessionID = SessionID.make("session-test-3")
@@ -737,6 +751,7 @@ describe("session.llm.stream", () => {
 
     await Instance.provide({
       directory: tmp.path,
+      init: allow,
       fn: async () => {
         const resolved = await Provider.getModel(ProviderID.make(providerID), ModelID.make(model.id))
         const sessionID = SessionID.make("session-test-4")

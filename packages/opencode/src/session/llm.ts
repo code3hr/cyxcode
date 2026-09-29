@@ -230,7 +230,9 @@ export namespace LLM {
     )
 
     const maxOutputTokens =
-      isOpenaiOauth || provider.id.includes("github-copilot")
+      isOpenaiOauth ||
+      provider.id.includes("github-copilot") ||
+      (input.model.api.npm === "@ai-sdk/cerebras" && params.options.max_completion_tokens !== undefined)
         ? undefined
         : ProviderTransform.maxOutputTokens(input.model)
 

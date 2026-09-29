@@ -1,5 +1,4 @@
 import { expect, test } from "bun:test"
-import { Env } from "../../src/env"
 import { Instance } from "../../src/project/instance"
 import { Provider } from "../../src/provider/provider"
 import { ModelID, ProviderID } from "../../src/provider/schema"
@@ -27,9 +26,6 @@ test.each([
   })
   await Instance.provide({
     directory: tmp.path,
-    init: async () => {
-      if (sdk === "xai") Env.set("XAI_API_KEY", "test")
-    },
     fn: async () => {
       const bodies: Record<string, unknown>[] = []
       const provider = await Provider.getProvider(ProviderID.make(id))
