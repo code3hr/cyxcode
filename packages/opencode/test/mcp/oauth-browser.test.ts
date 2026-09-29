@@ -109,6 +109,42 @@ const { Bus } = await import("../../src/bus")
 const { McpOAuthCallback } = await import("../../src/mcp/oauth-callback")
 const { Instance } = await import("../../src/project/instance")
 const { tmpdir } = await import("../fixture/fixture")
+const { McpAuth } = await import("../../src/mcp/auth")
+const { McpOAuthProvider } = await import("../../src/mcp/oauth-provider")
+
+test("configured callback port reaches authentication and reconnect providers", async () => {
+  const server = Bun.serve({ hostname: "127.0.0.1", port: 0, fetch: () => new Response() })
+  const port = server.port!
+  server.stop(true)
+  await using tmp = await tmpdir({
+    config: {
+      mcp: { custom: { type: "remote", url: "https://example.com/mcp", oauth: { callbackPort: port } } },
+    },
+  })
+  await Instance.provide({
+    directory: tmp.path,
+    fn: async () => {
+      const auth = MCP.authenticate("custom")
+      try {
+        await launch.promise
+        const state = await McpAuth.getOAuthState("custom")
+        const response = await fetch(`http://127.0.0.1:${port}/mcp/oauth/callback?state=${state}&code=accepted`)
+        expect(response.status).toBe(200)
+        await auth
+        const providers = transportCalls.flatMap((call) =>
+          call.options.authProvider instanceof McpOAuthProvider ? [call.options.authProvider] : [],
+        )
+        expect(providers.length).toBeGreaterThanOrEqual(2)
+        for (const provider of providers) {
+          expect(provider.redirectUrl).toBe(`http://127.0.0.1:${port}/mcp/oauth/callback`)
+        }
+      } finally {
+        await McpOAuthCallback.stop()
+        await auth.catch(() => undefined)
+      }
+    },
+  })
+})
 
 test.each(["error", "completed"])("BrowserOpenFailed is published for launcher failure: %s", async (mode) => {
   await using tmp = await tmpdir({

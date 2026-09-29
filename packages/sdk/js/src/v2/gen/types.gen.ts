@@ -1638,6 +1638,10 @@ export type McpOAuthConfig = {
    * OAuth scopes to request during authorization
    */
   scope?: string
+  /**
+   * Local OAuth callback port (default: 19876)
+   */
+  callbackPort?: number
 }
 
 export type McpRemoteConfig = {

@@ -55,40 +55,40 @@ const HTML_ERROR = (error: string) => `<!DOCTYPE html>
 </html>`
 
 interface PendingAuth {
+  port: number
+  name?: string
   resolve: (code: string) => void
   reject: (error: Error) => void
   timeout: ReturnType<typeof setTimeout>
 }
 
 export namespace McpOAuthCallback {
-  let server: ReturnType<typeof Bun.serve> | undefined
+  const servers = new Map<number, ReturnType<typeof Bun.serve>>()
   const pendingAuths = new Map<string, PendingAuth>()
 
   const CALLBACK_TIMEOUT_MS = 5 * 60 * 1000 // 5 minutes
 
-  function stopIfIdle() {
-    if (pendingAuths.size > 0 || !server) return
-    const current = server
+  function stopIfIdle(port: number) {
+    const current = servers.get(port)
+    if (!current) return
     setTimeout(() => {
-      if (pendingAuths.size > 0 || server !== current) return
+      if (Array.from(pendingAuths.values()).some((pending) => pending.port === port) || servers.get(port) !== current)
+        return
       current.stop()
-      server = undefined
+      servers.delete(port)
       log.info("oauth callback server stopped")
     }, 0)
   }
 
-  export async function ensureRunning(): Promise<void> {
-    if (server) return
-
-    const running = await isPortInUse()
-    if (running) {
-      log.info("oauth callback server already running on another instance", { port: OAUTH_CALLBACK_PORT })
-      return
+  export async function ensureRunning(port = OAUTH_CALLBACK_PORT): Promise<void> {
+    if (!Number.isInteger(port) || port < 1 || port > 65535) {
+      throw new Error("OAuth callback port must be an integer between 1 and 65535")
     }
+    if (servers.has(port)) return
 
-    server = Bun.serve({
+    const server = Bun.serve({
       hostname: "127.0.0.1",
-      port: OAUTH_CALLBACK_PORT,
+      port,
       fetch(req) {
         const url = new URL(req.url)
 
@@ -115,12 +115,12 @@ export namespace McpOAuthCallback {
 
         if (error) {
           const errorMsg = errorDescription || error
-          if (pendingAuths.has(state)) {
+          if (pendingAuths.get(state)?.port === port) {
             const pending = pendingAuths.get(state)!
             clearTimeout(pending.timeout)
             pendingAuths.delete(state)
             pending.reject(new Error(errorMsg))
-            stopIfIdle()
+            stopIfIdle(port)
           }
           return new Response(HTML_ERROR(errorMsg), {
             headers: { "Content-Type": "text/html; charset=utf-8" },
@@ -135,7 +135,7 @@ export namespace McpOAuthCallback {
         }
 
         // Validate state parameter
-        if (!pendingAuths.has(state)) {
+        if (pendingAuths.get(state)?.port !== port) {
           const errorMsg = "Invalid or expired state parameter - potential CSRF attack"
           log.error("oauth callback with invalid state", { state, pendingStates: Array.from(pendingAuths.keys()) })
           return new Response(HTML_ERROR(errorMsg), {
@@ -149,7 +149,7 @@ export namespace McpOAuthCallback {
         clearTimeout(pending.timeout)
         pendingAuths.delete(state)
         pending.resolve(code)
-        stopIfIdle()
+        stopIfIdle(port)
 
         return new Response(HTML_SUCCESS, {
           headers: { "Content-Type": "text/html; charset=utf-8" },
@@ -157,36 +157,37 @@ export namespace McpOAuthCallback {
       },
     })
 
-    log.info("oauth callback server started", { port: OAUTH_CALLBACK_PORT })
+    servers.set(port, server)
+    log.info("oauth callback server started", { port })
   }
 
-  export function waitForCallback(oauthState: string): Promise<string> {
+  export function waitForCallback(oauthState: string, name?: string, port = OAUTH_CALLBACK_PORT): Promise<string> {
     return new Promise((resolve, reject) => {
       const timeout = setTimeout(() => {
         if (pendingAuths.has(oauthState)) {
           pendingAuths.delete(oauthState)
           reject(new Error("OAuth callback timeout - authorization took too long"))
-          stopIfIdle()
+          stopIfIdle(port)
         }
       }, CALLBACK_TIMEOUT_MS)
 
-      pendingAuths.set(oauthState, { resolve, reject, timeout })
+      pendingAuths.set(oauthState, { resolve, reject, timeout, port, name })
     })
   }
 
   export function cancelPending(mcpName: string): void {
-    const pending = pendingAuths.get(mcpName)
-    if (pending) {
+    for (const [state, pending] of pendingAuths) {
+      if (pending.name !== mcpName && state !== mcpName) continue
       clearTimeout(pending.timeout)
-      pendingAuths.delete(mcpName)
+      pendingAuths.delete(state)
       pending.reject(new Error("Authorization cancelled"))
-      stopIfIdle()
+      stopIfIdle(pending.port)
     }
   }
 
-  export async function isPortInUse(): Promise<boolean> {
+  export async function isPortInUse(port = OAUTH_CALLBACK_PORT): Promise<boolean> {
     return new Promise((resolve) => {
-      const socket = createConnection(OAUTH_CALLBACK_PORT, "127.0.0.1")
+      const socket = createConnection(port, "127.0.0.1")
       socket.on("connect", () => {
         socket.destroy()
         resolve(true)
@@ -198,11 +199,11 @@ export namespace McpOAuthCallback {
   }
 
   export async function stop(): Promise<void> {
-    if (server) {
+    for (const server of servers.values()) {
       server.stop()
-      server = undefined
       log.info("oauth callback server stopped")
     }
+    servers.clear()
 
     for (const [name, pending] of pendingAuths) {
       clearTimeout(pending.timeout)
@@ -212,6 +213,6 @@ export namespace McpOAuthCallback {
   }
 
   export function isRunning(): boolean {
-    return server !== undefined
+    return servers.size > 0
   }
 }

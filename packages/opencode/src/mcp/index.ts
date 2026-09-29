@@ -200,7 +200,10 @@ export namespace MCP {
 
   // Store transports for OAuth servers to allow finishing auth
   type TransportWithAuth = StreamableHTTPClientTransport | SSEClientTransport
-  const pendingOAuthTransports = new Map<string, { transport: TransportWithAuth; provider?: McpOAuthPendingProvider }>()
+  const pendingOAuthTransports = new Map<
+    string,
+    { transport: TransportWithAuth; provider?: McpOAuthPendingProvider; port?: number }
+  >()
 
   // Prompt cache types
   type PromptInfo = Awaited<ReturnType<MCPClient["listPrompts"]>>["prompts"][number]
@@ -428,6 +431,7 @@ export namespace MCP {
             clientId: oauthConfig?.clientId,
             clientSecret: oauthConfig?.clientSecret,
             scope: oauthConfig?.scope,
+            callbackPort: oauthConfig?.callbackPort,
           },
           {
             onRedirect: async (url) => {
@@ -902,7 +906,8 @@ export namespace MCP {
     }
 
     // Start the callback server
-    await McpOAuthCallback.ensureRunning()
+    const oauthConfig = typeof mcpConfig.oauth === "object" ? mcpConfig.oauth : undefined
+    await McpOAuthCallback.ensureRunning(oauthConfig?.callbackPort)
 
     // Generate and store a cryptographically secure state parameter BEFORE creating the provider
     // The SDK will call provider.state() to read this value
@@ -913,7 +918,6 @@ export namespace MCP {
 
     // Create a new auth provider for this flow
     // OAuth config is optional - if not provided, we'll use auto-discovery
-    const oauthConfig = typeof mcpConfig.oauth === "object" ? mcpConfig.oauth : undefined
     let capturedUrl: URL | undefined
     const authProvider = new McpOAuthPendingProvider(
       mcpName,
@@ -922,6 +926,7 @@ export namespace MCP {
         clientId: oauthConfig?.clientId,
         clientSecret: oauthConfig?.clientSecret,
         scope: oauthConfig?.scope,
+        callbackPort: oauthConfig?.callbackPort,
       },
       {
         onRedirect: async (url) => {
@@ -948,7 +953,7 @@ export namespace MCP {
     } catch (error) {
       if (error instanceof UnauthorizedError && capturedUrl) {
         // Store transport for finishAuth
-        pendingOAuthTransports.set(mcpName, { transport, provider: authProvider })
+        pendingOAuthTransports.set(mcpName, { transport, provider: authProvider, port: oauthConfig?.callbackPort })
         return { authorizationUrl: capturedUrl.toString() }
       }
       throw error
@@ -980,7 +985,11 @@ export namespace MCP {
 
     // Register the callback BEFORE opening the browser to avoid race condition
     // when the IdP has an active SSO session and redirects immediately
-    const callbackPromise = McpOAuthCallback.waitForCallback(oauthState)
+    const callbackPromise = McpOAuthCallback.waitForCallback(
+      oauthState,
+      mcpName,
+      pendingOAuthTransports.get(mcpName)?.port,
+    )
     onAuthorization?.(authorizationUrl)
 
     try {

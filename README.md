@@ -132,6 +132,28 @@ A catalog refresh can expose newly listed models; it does not grant account acce
 
 **Live Muse inference has not yet been verified in CyxCode.** Test a short response first; a successful listing or connection alone does not verify generation or multi-step tool use.
 
+### MCP OAuth Callback Ports
+
+For a remote MCP server, set `oauth.callbackPort` in your `opencode.json` when the default port **19876** is occupied or your OAuth application requires a different port:
+
+```json
+{
+  "mcp": {
+    "example": {
+      "type": "remote",
+      "url": "https://mcp.example.com/mcp",
+      "oauth": {
+        "callbackPort": 24567
+      }
+    }
+  }
+}
+```
+
+Run `cyxcode mcp auth example` to authorize, or `cyxcode mcp debug example` to inspect OAuth discovery. Both use the configured port. If you use a pre-registered OAuth client, register the matching redirect URL: `http://127.0.0.1:24567/mcp/oauth/callback`.
+
+Ports must be integers from **1 to 65535**. The listener binds only to `127.0.0.1`; different MCP servers can use different ports concurrently. If another process owns the port, stop that process or choose another port and update the registered redirect URL. Changing ports may require running `cyxcode mcp auth example` again to register a new OAuth client.
+
 ### Project Setup
 
 Run `/cyxinit` inside CyxCode to initialize your project:
