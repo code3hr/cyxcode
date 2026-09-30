@@ -2,10 +2,53 @@
 
 This file tracks selective upstream opencode updates for CyxCode. Use it to avoid broad merges that overwrite CyxCode-specific branding, commands, update flow, TUI behavior, skills, or security tooling.
 
-## Current Pickup (2026-09-29)
+## Paused for CyxCode Core Stabilization (2026-09-30)
+
+**User decision:** pause further upstream backports and return to them after fixing and stabilizing CyxCode's core ideas and behavior. This section is the current handoff; historical "take next" and review notes below are backlog, not instructions to continue syncing now.
+
+### Resume checkpoint
+
+- Last completed code batch: `235f2f3844` (`feat(provider): adapt reasoning metadata and rebuild Windows client`), pushed to `origin/sync/mcp-oauth-upstream-2026-06-28`.
+- Installed Windows build: `3.0.4-upstream.20260930.1`, including ACP configuration/persistence/reasoning boundaries, custom interleaved history fields, and the supported-adapter reasoning metadata foundation. Built, installed, and launched successfully; no rebuild is pending for that code checkpoint.
+- Executable SHA-256: `CE9A928DE6B4746EB8AFFB32DF3D5AF6D2225DB73E3C76AC248EF1F8C089A479`.
+- Last batch validation: 308 tests, core/SDK type checks, all 13 push-hook type checks, compiled version check, and isolated generation smoke test passed. Live provider inference and external editor integration are not established by these checks.
+- Pinned upstream baseline: `upstream-v1.18.32` at `545f51d26cc39a907d2867492d498d9607ea5fa4`; reviewed dev snapshot `b471c2b4495747353af768fbf2e0790c9d820ce2`. These are reviewed snapshots, not a claim about the newest release at the time of resuming.
+- The sync branch has not been merged into `dev`; no release was published. The full release audit remains incomplete.
+
+### Pending upstream work
+
+| Area | Remaining work | References / dependency |
+| --- | --- | --- |
+| Reasoning metadata adapters | Extend the completed foundation to OpenRouter, Gateway, Copilot, xAI, Cerebras, DeepInfra, TogetherAI, Mistral, Venice, Cloudflare, Merge Gateway, GitLab, and SAP after checking their pinned request serializers. Preserve explicit variants and existing fallback behavior. | `6f8e1dda15`, `a8062ea314`, `99668cfdce`, `49d2dd8a38`; Merge Gateway `8571a922db`; GitLab `7c2199d84a` |
+| Claude/Kimi thinking | Coordinate SDK support for `xhigh`, summarized adaptive thinking, and reasoning replay. Current Anthropic/Bedrock SDK restrictions remain. | `2b2aacc939`, `20a3a2138e`; review thinking binding and replay changes together |
+| Cloudflare gateway | Adapt native OpenAI/Anthropic routing, Anthropic slug normalization, and non-native REST fallback as one change. | `cba6b5f2f7`, `f8b4dd70ac`, `3ef72fe8f6` |
+| OpenAI pro modes and Codex filtering | Review mode metadata/request mapping and the broader integer-version/suffix allowlist against supported aliases and context limits. Preserve CyxCode's explicit GPT-6 Sol/Luna entries. | `e434ce01d3`, `02a167e048`, `500c46ec79` |
+| Prompt caching | Review remaining SDK namespaces, Mistral serialization, Venice routing, and Anthropic automatic caching. | Remaining scope of `542ba88602` |
+| Muse prompt | Review the upstream system-prompt rewrite against CyxCode's prompt selection and security instructions. No Meta effort-default removal is needed locally. | Remaining prompt scope of `5a8ee27254`; `b6478dcebf` was superseded |
+| Remaining release delta | Finish classifying unreviewed core/provider commits and relevant shipped surfaces. The original delta spans 195 core-touching commits and 743 files across audited paths; these are scope counts, not a completion estimate. | Previous baseline `c7f08b30383fb2de8baaebca91143f74bfeec447` to pinned `v1.18.32`; see re-audit checklist |
+| Integration verification | Verify authenticated provider generation, multi-step tool use, and an external ACP editor using available accounts. ACP in-protocol authentication remains unimplemented if that workflow becomes a requirement. Anonymous Zen rejection and unverified live Muse access are not resolved by catalog or fixture tests. | README connection guidance and ACP implementation guide |
+| Final integration | Reconcile stabilization changes with the sync branch, resolve conflicts, run relevant gates, and review before merging into `dev`. Decide release timing separately. | Preserve CyxCode branding, CyxWatch, memory/state behavior, commands, and installer/update identity |
+
+Broad upstream TUI/app rewrites, release renumbering, generated churn, and dependency upgrades without a demonstrated compatibility need remain intentional exclusions. They are not mandatory completion work.
+
+### Stabilization priority before resuming
+
+Use concrete CyxCode issues to define the next fixes and their acceptance checks. Core areas to protect and verify are provider connection/generation and error recovery; tool execution and CyxWatch permissions; memory and state restoration/versioning; session continuity; and CyxCode naming, commands, builds, and updates. Existing security/privacy ideas in `docs/tofix.md` need explicit requirements and tests before being described as protections that the product guarantees.
+
+This handoff does not mark those areas stable or prescribe unreviewed feature additions. Preserve the user's existing `docs/tofix.md`, `docs/plantofix.md`, and other local work while diagnosing actual failures. Record reproduced issues, fixes, and remaining limitations during stabilization.
+
+### When the user resumes upstream work
+
+1. Confirm which stabilization changes and branch form the new working baseline; inspect local changes before switching or merging.
+2. Read this checkpoint and the completed-batch history to avoid reapplying work. Reconcile the current branch with `235f2f3844` without discarding later fixes.
+3. Verify newer upstream releases/dev using the no-conflicting-tags procedure below. Keep the unfinished pinned-release review identifiable rather than replacing its backlog with a new snapshot.
+4. Choose the next small compatible batch. OpenRouter/Gateway reasoning mappings were the suggested next candidate before the pause; reassess that order against stabilization findings.
+5. Update this pending list after each completed or deliberately excluded item. Retest affected CyxCode behavior before final integration into `dev`.
+
+## Pickup History (started 2026-09-29)
 
 - CyxCode branch: `sync/mcp-oauth-upstream-2026-06-28` at `42676876b6` before this pickup.
-- Latest published upstream release: [`v1.18.32`](https://github.com/anomalyco/opencode/releases/tag/v1.18.32), published 2026-09-21, commit `545f51d26c`.
+- Published upstream release checked for this pickup: [`v1.18.32`](https://github.com/anomalyco/opencode/releases/tag/v1.18.32), published 2026-09-21, commit `545f51d26c`.
 - Upstream `dev` snapshot: `b471c2b4495747353af768fbf2e0790c9d820ce2` (2026-09-26).
 - The release delta since `v1.17.16` spans 195 commits touching `packages/opencode` and 743 files across the audited package paths. This pickup reviews selected core fixes; it is not a full release-by-release audit.
 - Local upstream release tag alias: `upstream-v1.18.32`. Fetch upstream tags under distinct names because CyxCode owns some of the same tag names.
@@ -221,7 +264,7 @@ Prefer the smallest backport that preserves CyxCode behavior. Do not wholesale m
 
 ## Take Next
 
-- The provider/MCP/Gemini and ACP follow-up is recorded above. Review the remaining release delta in small batches, starting with the provider/SDK compatibility candidates.
+- Paused at the user's request. Follow the stabilization priority and resume checkpoint at the top of this document before taking another upstream batch.
 
 ## Manual Adaptation Candidates
 
