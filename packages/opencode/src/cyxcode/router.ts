@@ -11,10 +11,11 @@
 import type { PatternSkill, PatternMatch, SkillContext, SkillResult, SkillRegistry } from "./types"
 import { Log } from "../util/log"
 import { CyxAudit } from "./audit"
+import { PendingCapture } from "./learned"
 
 const log = Log.create({ service: "cyxcode-router" })
 
-class SkillRouterImpl implements SkillRegistry {
+export class SkillRouterImpl implements SkillRegistry {
   private skills: Map<string, PatternSkill> = new Map()
 
   // Stats tracking
@@ -130,20 +131,7 @@ class SkillRouterImpl implements SkillRegistry {
   recordMiss(messageID?: string, errorOutput?: string, failedCommand?: string, exitCode?: number): void {
     this.missCount++
     if (messageID && errorOutput) {
-      // Use globalThis buffer directly to avoid module instance issues
-      const g = globalThis as any
-      if (!g.__cyxcode_capture_buffer) g.__cyxcode_capture_buffer = new Map()
-      if (!g.__cyxcode_capture_order) g.__cyxcode_capture_order = []
-      const buf: Map<string, any[]> = g.__cyxcode_capture_buffer
-      const order: string[] = g.__cyxcode_capture_order
-      if (!buf.has(messageID)) {
-        order.push(messageID)
-        while (order.length > 50) { buf.delete(order.shift()!) }
-      }
-      const entries = buf.get(messageID) || []
-      entries.push({ errorOutput: errorOutput.slice(0, 2000), failedCommand: failedCommand ?? "", exitCode: exitCode ?? 1 })
-      buf.set(messageID, entries)
-      log.debug("Captured miss for learning", { messageID, bufferSize: buf.size })
+      PendingCapture.record(messageID, errorOutput, failedCommand ?? "", exitCode ?? 1)
     }
     log.debug("Recorded miss", { total: this.missCount })
   }

@@ -1,4 +1,7 @@
 import { describe, expect, test, beforeEach } from "bun:test"
+import "../../src/project/instance"
+import { SkillRouterImpl } from "../../src/cyxcode/router"
+import { PendingCapture } from "../../src/cyxcode/learned"
 import type { PatternSkill, PatternMatch, SkillContext, SkillResult, Pattern } from "../../src/cyxcode/types"
 
 /**
@@ -46,85 +49,11 @@ class MockSkill implements PatternSkill {
   }
 }
 
-// Create a fresh router for each test (since the real one is a singleton)
-class TestableSkillRouter {
-  private skills: Map<string, PatternSkill> = new Map()
-  private matchCount = 0
-  private missCount = 0
-  private tokensSaved = 0
-
-  register(skill: PatternSkill): void {
-    this.skills.set(skill.name, skill)
-  }
-
-  all(): PatternSkill[] {
-    return Array.from(this.skills.values())
-  }
-
-  get(name: string): PatternSkill | undefined {
-    return this.skills.get(name)
-  }
-
-  findMatching(error: string): Array<{ skill: PatternSkill; match: PatternMatch }> {
-    const matches: Array<{ skill: PatternSkill; match: PatternMatch }> = []
-    for (const skill of this.skills.values()) {
-      const match = skill.match(error)
-      if (match) {
-        matches.push({ skill, match })
-      }
-    }
-    return matches
-  }
-
-  async route(ctx: SkillContext): Promise<SkillResult | null> {
-    const matches = this.findMatching(ctx.errorOutput)
-    if (matches.length === 0) {
-      this.missCount++
-      return null
-    }
-    this.matchCount++
-    const { skill, match } = matches[0]
-    const result = await skill.execute(ctx, match)
-    if (result.success && result.tokensSaved) {
-      this.tokensSaved += result.tokensSaved
-    }
-    return result
-  }
-
-  stats() {
-    let totalPatterns = 0
-    const byCategory: Record<string, number> = {}
-    for (const skill of this.skills.values()) {
-      for (const pattern of skill.patterns) {
-        totalPatterns++
-        byCategory[pattern.category] = (byCategory[pattern.category] || 0) + 1
-      }
-    }
-    return { totalSkills: this.skills.size, totalPatterns, byCategory }
-  }
-
-  routerStats() {
-    const total = this.matchCount + this.missCount
-    return {
-      matches: this.matchCount,
-      misses: this.missCount,
-      hitRate: total > 0 ? this.matchCount / total : 0,
-      tokensSaved: this.tokensSaved,
-    }
-  }
-
-  resetSessionStats() {
-    this.matchCount = 0
-    this.missCount = 0
-    this.tokensSaved = 0
-  }
-}
-
 describe("SkillRouter", () => {
-  let router: TestableSkillRouter
+  let router: SkillRouterImpl
 
   beforeEach(() => {
-    router = new TestableSkillRouter()
+    router = new SkillRouterImpl()
   })
 
   describe("register", () => {
@@ -307,6 +236,18 @@ describe("SkillRouter", () => {
   })
 
   describe("routerStats", () => {
+    test("shell misses enter the learning buffer without consuming other messages", () => {
+      router.recordMiss("router-first", "first error", "first command", 2)
+      router.recordMiss("router-second", "second error")
+      expect(PendingCapture.drain("router-first")).toEqual([
+        { errorOutput: "first error", failedCommand: "first command", exitCode: 2 },
+      ])
+      expect(PendingCapture.drain("router-second")).toEqual([
+        { errorOutput: "second error", failedCommand: "", exitCode: 1 },
+      ])
+      expect(router.routerStats().misses).toBe(2)
+    })
+
     test("should track matches and misses", async () => {
       const patterns: Pattern[] = [{
         id: "test-pattern",

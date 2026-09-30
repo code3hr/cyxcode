@@ -35,10 +35,25 @@ First completed source fix:
 
 Next checks, in order:
 
-1. Verify production pattern routing, unmatched-error fallback, learning, and reuse across sessions; replace coverage that only tests copied router logic. Check suggestion versus execution behavior and token-savings claims against the real paths.
-2. Reproduce or retire earlier CyxWatch shell-recording/risk failures and verify permission boundaries. Define concrete requirements for project privacy before claiming protection.
-3. Verify memory, recall, project isolation, and state restoration using persisted fixtures.
-4. Rebuild and smoke-test the stabilized core, then decide whether to resume the deferred upstream queue.
+1. Fix project-state path isolation: a directory without a local state marker can inherit a parent directory's `.cyxcode` state. Check instance ownership and root boundaries before further full-session tests.
+2. Continue learning/reuse checks: concurrent persistence, pattern generalization versus saved commands, startup loading across projects, and suggestion versus execution behavior/token-savings claims.
+3. Reproduce or retire earlier CyxWatch shell-recording/risk failures and verify permission boundaries. Define concrete requirements for project privacy before claiming protection.
+4. Verify memory, recall, and state restoration using persisted fixtures.
+5. Rebuild and smoke-test the stabilized core, then decide whether to resume the deferred upstream queue.
+
+Second source fix: learning now consumes only errors from the completing session's current user turn, including multiple assistant steps. Errors belonging to other sessions or earlier turns remain untouched. Router misses use the shared capture buffer, and router tests now exercise the production implementation instead of a copied router. A local streaming-provider regression covers turn isolation, pending-pattern approval, disk reload, and matching through a fresh learned skill. Full startup/restart and cross-project isolation remain pending.
+
+Validation: 75 focused tests passed across the capture, learning, router, shell, and session prompt suites; the core package typecheck passed.
+
+Full-session fixtures must create their own project and state markers and assert the resolved storage path before writing. Disable inherited external skills/prompts and model catalog refresh when running the learning regression:
+
+```powershell
+cd packages/opencode
+$env:CYXCODE_DISABLE_CLAUDE_CODE = 'true'
+$env:CYXCODE_DISABLE_EXTERNAL_SKILLS = 'true'
+$env:CYXCODE_DISABLE_MODELS_FETCH = 'true'
+bun test test/session/learning.test.ts test/cyxcode/router.test.ts test/cyxcode/learned.test.ts --timeout 30000
+```
 
 Focused capture regressions, from `packages/opencode`:
 

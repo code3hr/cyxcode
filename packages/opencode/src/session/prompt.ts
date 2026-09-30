@@ -899,15 +899,10 @@ export namespace SessionPrompt {
       // Only capture when the AI has finished responding (not mid-tool-call)
       if (processor.message.finish && processor.message.finish !== "tool-calls") {
         try {
-          const g = globalThis as any
-          const buf: Map<string, any[]> | undefined = g.__cyxcode_capture_buffer
-          const order: string[] | undefined = g.__cyxcode_capture_order
-          const captures: any[] = []
-          if (buf && buf.size > 0) {
-            for (const entries of buf.values()) captures.push(...entries)
-            buf.clear()
-            if (order) order.length = 0
-          }
+          const { PendingCapture, LearnedPatterns } = await import("@/cyxcode/learned")
+          const captures = [...msgs.map((msg) => msg.info), processor.message]
+            .filter((msg) => msg.role === "assistant" && msg.sessionID === sessionID && msg.parentID === lastUser.id)
+            .flatMap((msg) => PendingCapture.drain(msg.id))
           if (Flag.CYXCODE_DEBUG)
             log.info("cyxcode learning", { finish: processor.message.finish, captures: captures.length })
           if (captures.length > 0) {
@@ -917,7 +912,6 @@ export namespace SessionPrompt {
               .map((p) => p.text)
               .join("\n")
             if (aiText.trim().length > 20) {
-              const { LearnedPatterns } = await import("@/cyxcode/learned")
               for (const capture of captures) {
                 await LearnedPatterns.addPending({
                   errorOutput: capture.errorOutput,
