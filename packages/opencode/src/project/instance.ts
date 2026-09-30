@@ -3,7 +3,7 @@ import { disposeInstance } from "@/effect/instance-registry"
 import { Filesystem } from "@/util/filesystem"
 import { iife } from "@/util/iife"
 import { Log } from "@/util/log"
-import { Context } from "../util/context"
+import { context } from "./context"
 import { Project } from "./project"
 import { State } from "./state"
 
@@ -12,7 +12,6 @@ export interface Shape {
   worktree: string
   project: Project.Info
 }
-const context = Context.create<Shape>("instance")
 const cache = new Map<string, Promise<Shape>>()
 
 const disposal = {

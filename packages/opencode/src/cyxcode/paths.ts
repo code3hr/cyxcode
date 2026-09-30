@@ -13,84 +13,70 @@
 
 import path from "path"
 import os from "os"
+import fs from "fs"
+import { context } from "../project/context"
 
-type PathCache = {
-  mode?: "cyxcode" | "opencode"
-  projectRoot?: string
-  projectDir?: string
+type Root = {
+  root: string
+  mode: "cyxcode" | "opencode"
 }
 
-// Use globalThis to share cache across module instances (Bun --conditions=browser)
-const g = globalThis as any
-if (!g.__cyxcode_paths_cache) g.__cyxcode_paths_cache = {} as PathCache
-const cache: PathCache = g.__cyxcode_paths_cache
+// A single cached result is bounded and keyed by its complete resolution context.
+const state = globalThis as typeof globalThis & { __cyxcode_paths?: { key: string; value: Root } }
 
 // --- Walk-up directory resolution ---
 
-function findProjectRoot(): { root: string; mode: "cyxcode" | "opencode" } {
-  if (cache.projectRoot && cache.mode) {
-    return { root: cache.projectRoot, mode: cache.mode }
+function workspace(dir: string): boolean {
+  try {
+    const pkg: unknown = JSON.parse(fs.readFileSync(path.join(dir, "package.json"), "utf-8"))
+    return typeof pkg === "object" && pkg !== null && "workspaces" in pkg
+  } catch (err) {
+    if (err instanceof SyntaxError || (err instanceof Error && "code" in err && err.code === "ENOENT")) return false
+    throw err
   }
+}
 
-  let dir = process.cwd()
-  let foundOpencode: string | undefined
-  let foundCyxcode: string | undefined
-  let foundFirst: { root: string; mode: "cyxcode" | "opencode" } | undefined
-
-  for (let i = 0; i < 10; i++) {
-    // Check for .cyxcode/ first (higher priority)
-    if (!foundCyxcode) {
-      const cyxCandidate = path.join(dir, ".cyxcode")
-      try {
-        require("fs").accessSync(cyxCandidate)
-        foundCyxcode = dir
-        if (!foundFirst) foundFirst = { root: dir, mode: "cyxcode" }
-      } catch {}
+function resolve(start: string, limit: string | undefined, homes: string[]): Root {
+  let dir = start
+  let cyx: Root | undefined
+  let legacy: Root | undefined
+  let nearest: Root | undefined
+  while (true) {
+    // Home state is global unless the user explicitly opened home as the project.
+    if (dir !== start && homes.some((home) => path.relative(dir, home) === "")) break
+    if (!cyx && fs.statSync(path.join(dir, ".cyxcode"), { throwIfNoEntry: false })?.isDirectory()) {
+      cyx = { root: dir, mode: "cyxcode" }
+      nearest ??= cyx
     }
-
-    // Check for .opencode/ as fallback
-    if (!foundOpencode) {
-      const ocCandidate = path.join(dir, ".opencode")
-      try {
-        require("fs").accessSync(ocCandidate)
-        foundOpencode = dir
-        if (!foundFirst) foundFirst = { root: dir, mode: "opencode" }
-      } catch {}
+    if (!legacy && fs.statSync(path.join(dir, ".opencode"), { throwIfNoEntry: false })?.isDirectory()) {
+      legacy = { root: dir, mode: "opencode" }
+      nearest ??= legacy
     }
-
-    // Prefer root that has .git or workspace package.json
-    if (foundCyxcode || foundOpencode) {
-      const hasGit = (() => { try { require("fs").accessSync(path.join(dir, ".git")); return true } catch { return false } })()
-      const hasRootPkg = (() => { try { const p = JSON.parse(require("fs").readFileSync(path.join(dir, "package.json"), "utf-8")); return p.workspaces !== undefined } catch { return false } })()
-      if (hasGit || hasRootPkg) {
-        // Found a definitive project root — use whichever mode is available here
-        if (foundCyxcode) {
-          cache.projectRoot = foundCyxcode
-          cache.mode = "cyxcode"
-        } else {
-          cache.projectRoot = foundOpencode!
-          cache.mode = "opencode"
-        }
-        return { root: cache.projectRoot, mode: cache.mode }
-      }
+    // Repository/workspace boundaries apply even before a state directory exists.
+    if (
+      (limit !== undefined && path.relative(dir, limit) === "") ||
+      fs.existsSync(path.join(dir, ".git")) ||
+      workspace(dir)
+    ) {
+      return cyx ?? legacy ?? { root: dir, mode: "opencode" }
     }
-
     const parent = path.dirname(dir)
     if (parent === dir) break
     dir = parent
   }
+  return nearest ?? { root: start, mode: "opencode" }
+}
 
-  // No .git or workspace root found — use whatever we found
-  if (foundFirst) {
-    cache.projectRoot = foundFirst.root
-    cache.mode = foundFirst.mode
-  } else {
-    // Nothing found — default to cwd with opencode mode
-    cache.projectRoot = process.cwd()
-    cache.mode = "opencode"
-  }
-
-  return { root: cache.projectRoot, mode: cache.mode }
+function findProjectRoot(): Root {
+  const scope = context.get()
+  const start = path.resolve(scope?.directory ?? process.cwd())
+  const limit = scope?.worktree && scope.worktree !== path.parse(scope.worktree).root ? scope.worktree : undefined
+  const homes = [path.resolve(homeDir()), path.resolve(os.homedir())]
+  const key = JSON.stringify([start, limit, homes])
+  if (state.__cyxcode_paths?.key === key) return state.__cyxcode_paths.value
+  const value = resolve(start, limit, homes)
+  state.__cyxcode_paths = { key, value }
+  return value
 }
 
 // --- Global paths ---
@@ -115,10 +101,8 @@ export namespace CyxPaths {
 
   /** The project state directory (.cyxcode/ or .opencode/) */
   export function projectDir(): string {
-    if (cache.projectDir) return cache.projectDir
     const { root, mode } = findProjectRoot()
-    cache.projectDir = path.join(root, mode === "cyxcode" ? ".cyxcode" : ".opencode")
-    return cache.projectDir
+    return path.join(root, mode === "cyxcode" ? ".cyxcode" : ".opencode")
   }
 
   // --- Project-level paths ---
@@ -214,8 +198,6 @@ export namespace CyxPaths {
 
   /** Clear all cached paths (call after cyxcode init or migration) */
   export function invalidateCache(): void {
-    cache.mode = undefined
-    cache.projectRoot = undefined
-    cache.projectDir = undefined
+    delete state.__cyxcode_paths
   }
 }

@@ -60,7 +60,8 @@ describe("CyxPaths", () => {
       process.chdir(tmpDir)
       CyxPaths.invalidateCache()
 
-      expect(["opencode", "cyxcode"]).toContain(CyxPaths.detectMode())
+      expect(CyxPaths.detectMode()).toBe("opencode")
+      expect(CyxPaths.projectRoot()).toBe(tmpDir)
     })
   })
 
@@ -182,6 +183,51 @@ describe("CyxPaths", () => {
   })
 
   describe("walk-up resolution", () => {
+    test.each(["git", "worktree", "workspace"])("stops at a %s root without a state marker", async (kind) => {
+      const root = path.join(tmpDir, "project")
+      const dir = path.join(root, "src")
+      await fs.mkdir(dir, { recursive: true })
+      await fs.mkdir(path.join(tmpDir, ".cyxcode"))
+      if (kind === "git") await fs.mkdir(path.join(root, ".git"))
+      if (kind === "worktree") await fs.writeFile(path.join(root, ".git"), "gitdir: ../repository/.git/worktrees/test")
+      if (kind === "workspace") await fs.writeFile(path.join(root, "package.json"), '{"workspaces":["packages/*"]}')
+      process.chdir(dir)
+      expect(CyxPaths.projectDir()).toBe(path.join(root, ".opencode"))
+    })
+
+    test("switching directories cannot reuse another project's cache", async () => {
+      const first = path.join(tmpDir, "first")
+      const second = path.join(tmpDir, "second")
+      await fs.mkdir(path.join(first, ".cyxcode"), { recursive: true })
+      await fs.mkdir(path.join(first, ".git"))
+      await fs.mkdir(path.join(second, ".opencode"), { recursive: true })
+      await fs.mkdir(path.join(second, ".git"))
+      process.chdir(first)
+      expect(CyxPaths.projectDir()).toBe(path.join(first, ".cyxcode"))
+      process.chdir(second)
+      expect(CyxPaths.projectDir()).toBe(path.join(second, ".opencode"))
+    })
+
+    test.each(process.platform === "win32" ? [false, true] : [false])(
+      "home state is not inherited (case variation: %s)",
+      async (uppercase) => {
+        const prior = process.env.CYXWIZ_TEST_HOME
+        const dir = path.join(tmpDir, "unmarked")
+        await fs.mkdir(dir)
+        await fs.mkdir(path.join(tmpDir, ".cyxcode"))
+        process.env.CYXWIZ_TEST_HOME = uppercase ? tmpDir.toUpperCase() : tmpDir
+        process.chdir(dir)
+        try {
+          expect(CyxPaths.projectRoot()).toBe(dir)
+          expect(CyxPaths.projectDir()).toBe(path.join(dir, ".opencode"))
+          expect(path.relative(CyxPaths.globalDir(), path.join(tmpDir, ".cyxcode"))).toBe("")
+        } finally {
+          if (prior === undefined) delete process.env.CYXWIZ_TEST_HOME
+          if (prior !== undefined) process.env.CYXWIZ_TEST_HOME = prior
+        }
+      },
+    )
+
     test("finds .cyxcode/ in parent directory", async () => {
       const subDir = path.join(tmpDir, "src", "components")
       await fs.mkdir(subDir, { recursive: true })

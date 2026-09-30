@@ -10,6 +10,9 @@ export namespace Context {
   export function create<T>(name: string) {
     const storage = new AsyncLocalStorage<T>()
     return {
+      get() {
+        return storage.getStore()
+      },
       use() {
         const result = storage.getStore()
         if (!result) {

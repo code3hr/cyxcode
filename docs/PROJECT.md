@@ -22,7 +22,7 @@ CyxCode focuses on AI-assisted command-line work with local memory, learned erro
 - Prefer small, auditable cleanup commits over broad renames.
 - Validate from package directories, especially `packages/opencode`, because root-level tests are guarded.
 
-## Core Stabilization Checkpoint (2026-09-30)
+## Core Stabilization Checkpoint (2026-10-01)
 
 Upstream integration is paused while CyxCode's core behavior is stabilized. The deferred upstream queue and restart instructions remain in [UPSTREAM-AUDIT.md](UPSTREAM-AUDIT.md).
 
@@ -35,15 +35,18 @@ First completed source fix:
 
 Next checks, in order:
 
-1. Fix project-state path isolation: a directory without a local state marker can inherit a parent directory's `.cyxcode` state. Check instance ownership and root boundaries before further full-session tests.
+1. Audit shared in-memory state across projects, particularly the router's loaded patterns and recall/database handles. Correct path resolution alone does not establish isolation of every service.
 2. Continue learning/reuse checks: concurrent persistence, pattern generalization versus saved commands, startup loading across projects, and suggestion versus execution behavior/token-savings claims.
-3. Reproduce or retire earlier CyxWatch shell-recording/risk failures and verify permission boundaries. Define concrete requirements for project privacy before claiming protection.
-4. Verify memory, recall, and state restoration using persisted fixtures.
-5. Rebuild and smoke-test the stabilized core, then decide whether to resume the deferred upstream queue.
+3. Define concrete requirements for project privacy before claiming protection; verify memory, recall, and state restoration using persisted fixtures.
+4. Rebuild and smoke-test the stabilized core, then decide whether to resume the deferred upstream queue.
 
 Second source fix: learning now consumes only errors from the completing session's current user turn, including multiple assistant steps. Errors belonging to other sessions or earlier turns remain untouched. Router misses use the shared capture buffer, and router tests now exercise the production implementation instead of a copied router. A local streaming-provider regression covers turn isolation, pending-pattern approval, disk reload, and matching through a fresh learned skill. Full startup/restart and cross-project isolation remain pending.
 
 Validation: 75 focused tests passed across the capture, learning, router, shell, and session prompt suites; the core package typecheck passed.
+
+Third source fix (2026-10-01): project-state lookup now follows the active instance, stops at Git/worktree/workspace boundaries even without a state directory, and excludes home state when walking up from a child directory. Its bounded cache is keyed by the resolution context. Existing `.cyxcode` preference and `.opencode` compatibility paths remain supported; explicit global path APIs still resolve to home.
+
+Validation: 136 tests passed across path resolution, concurrent project policy writes, memory, wiki, instance lifecycle, learning, prompts, versioning, and CyxWatch. The core package typecheck passed. All 42 CyxWatch tests passed, including the previously reported shell-recording/risk case; that historical failure was not reproduced. The installed executable still predates these core fixes.
 
 Full-session fixtures must create their own project and state markers and assert the resolved storage path before writing. Disable inherited external skills/prompts and model catalog refresh when running the learning regression:
 
