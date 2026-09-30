@@ -888,7 +888,7 @@ export namespace Provider {
       variants: {},
     }
 
-    m.variants = mapValues(ProviderTransform.variants(m), (v) => v)
+    m.variants = mapValues(ProviderTransform.variants(m, model.reasoning_options), (v) => v)
 
     return m
   }
@@ -909,6 +909,14 @@ export namespace Provider {
     const config = await Config.get()
     const modelsDev = await ModelsDev.get()
     const database = mapValues(modelsDev, fromModelsDevProvider)
+    const variants = (model: Model, options?: ModelsDev.Model["reasoning_options"]) => {
+      const source = modelsDev[model.providerID]?.models[model.api.id]
+      const npm = source?.provider?.npm ?? modelsDev[model.providerID]?.npm ?? "@ai-sdk/openai-compatible"
+      return ProviderTransform.variants(
+        model,
+        options ?? (npm === model.api.npm ? source?.reasoning_options : undefined),
+      )
+    }
 
     const disabled = new Set(config.disabled_providers ?? [])
     const enabled = config.enabled_providers ? new Set(config.enabled_providers) : null
@@ -1025,7 +1033,7 @@ export namespace Provider {
           release_date: model.release_date ?? existingModel?.release_date ?? "",
           variants: {},
         }
-        const merged = mergeDeep(ProviderTransform.variants(parsedModel), model.variants ?? {})
+        const merged = mergeDeep(variants(parsedModel, model.reasoning_options), model.variants ?? {})
         parsedModel.variants = mapValues(
           pickBy(merged, (v) => !v.disabled),
           (v) => omit(v, ["disabled"]),
@@ -1140,7 +1148,7 @@ export namespace Provider {
         )
           delete provider.models[modelID]
 
-        model.variants = mapValues(ProviderTransform.variants(model), (v) => v)
+        model.variants = mapValues(variants(model, configProvider?.models?.[modelID]?.reasoning_options), (v) => v)
 
         // Filter out disabled variants from config
         const configVariants = configProvider?.models?.[modelID]?.variants

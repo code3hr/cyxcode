@@ -133,6 +133,20 @@ A catalog refresh can expose newly listed models; it does not grant account acce
 
 **Live Muse inference has not yet been verified in CyxCode.** Test a short response first; a successful listing or connection alone does not verify generation or multi-step tool use.
 
+### Reasoning Variant Metadata
+
+CyxCode can derive model variants from catalog `reasoning_options` metadata for supported adapters. A model configuration can also declare the controls explicitly, for example:
+
+```json
+{
+  "reasoning_options": [{ "type": "effort", "values": [null, "low", "high"] }]
+}
+```
+
+`null` represents the `none` effort. Supported adapters expose only values accepted by their installed SDK. An empty array disables automatically generated variants; explicit `variants` settings still apply, including `disabled: true`. Missing metadata keeps the existing model-specific defaults. Aliases inherit catalog metadata when they use the same adapter.
+
+Token-budget metadata uses `{ "type": "budget_tokens", "min": 2048, "max": 8192 }` and produces `high` and `max` choices within the model and CyxCode output limits. Cohere also supports `{ "type": "toggle" }`. Adapter coverage and remaining work are recorded in the [upstream audit](docs/UPSTREAM-AUDIT.md).
+
 ### Custom Provider Reasoning History
 
 For an OpenAI-compatible provider that expects reasoning history in a specific message field, set `interleaved` on the model in `opencode.json`. For example, under `provider.custom.models.my-model`:

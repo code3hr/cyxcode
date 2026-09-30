@@ -1523,6 +1523,20 @@ export type ProviderConfig = {
       release_date?: string
       attachment?: boolean
       reasoning?: boolean
+      reasoning_options?: Array<
+        | {
+            type: "effort"
+            values: Array<string | null>
+          }
+        | {
+            type: "toggle"
+          }
+        | {
+            type: "budget_tokens"
+            min?: number
+            max?: number
+          }
+      >
       temperature?: boolean
       tool_call?: boolean
       interleaved?:
@@ -5153,6 +5167,20 @@ export type ProviderListResponses = {
           release_date: string
           attachment: boolean
           reasoning: boolean
+          reasoning_options?: Array<
+            | {
+                type: "effort"
+                values: Array<string | null>
+              }
+            | {
+                type: "toggle"
+              }
+            | {
+                type: "budget_tokens"
+                min?: number
+                max?: number
+              }
+          >
           temperature: boolean
           tool_call: boolean
           interleaved?:

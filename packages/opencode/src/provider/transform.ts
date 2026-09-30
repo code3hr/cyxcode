@@ -6,6 +6,7 @@ import type { Provider } from "./provider"
 import type { ModelsDev } from "./models"
 import { iife } from "@/util/iife"
 import { Flag } from "@/flag/flag"
+import { Reasoning } from "./reasoning"
 
 type Modality = NonNullable<ModelsDev.Model["modalities"]>["input"][number]
 
@@ -386,7 +387,12 @@ export namespace ProviderTransform {
     )
   }
 
-  export function variants(model: Provider.Model): Record<string, Record<string, any>> {
+  export function variants(
+    model: Provider.Model,
+    options?: ModelsDev.Model["reasoning_options"],
+  ): Record<string, Record<string, any>> {
+    const variants = Reasoning.variants(options, model, OUTPUT_TOKEN_MAX)
+    if (variants !== undefined) return variants
     if (!model.capabilities.reasoning) return {}
 
     if (
