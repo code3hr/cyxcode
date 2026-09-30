@@ -171,10 +171,6 @@ describe("BaseSkill", () => {
   })
 
   describe("substituteCaptures", () => {
-    // NOTE: There's a known bug in the implementation where \$ in template literal
-    // doesn't properly escape the $ for regex. These tests document expected behavior.
-    // TODO: Fix base-skill.ts to use replaceAll("$" + (i+1), captures[i]) instead
-
     test("should return undefined for undefined template", () => {
       const skill = new TestSkill([])
 
@@ -191,7 +187,7 @@ describe("BaseSkill", () => {
       expect(result).toBe("echo hello")
     })
 
-    test.skip("should substitute $1, $2, etc. (BUG: regex escaping issue)", () => {
+    test("should substitute $1, $2, etc.", () => {
       const skill = new TestSkill([])
 
       const result = skill.testSubstituteCaptures(
@@ -202,7 +198,7 @@ describe("BaseSkill", () => {
       expect(result).toBe("npm install express@4.18.0")
     })
 
-    test.skip("should handle missing captures (BUG: regex escaping issue)", () => {
+    test("should handle missing captures", () => {
       const skill = new TestSkill([])
 
       const result = skill.testSubstituteCaptures(
@@ -213,7 +209,7 @@ describe("BaseSkill", () => {
       expect(result).toBe("npm install express $2 $3")
     })
 
-    test.skip("should handle multiple occurrences (BUG: regex escaping issue)", () => {
+    test("should handle multiple occurrences", () => {
       const skill = new TestSkill([])
 
       const result = skill.testSubstituteCaptures(

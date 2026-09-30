@@ -54,6 +54,7 @@ import { decodeDataUrl } from "@/util/data-url"
 import { Process } from "@/util/process"
 import { CyxWatch } from "@/cyxcode/watch"
 import { shouldSkipPatternMatch, shouldSkipPatternMatchFromMessages } from "@/cyxcode/pattern-match"
+import { Template } from "@/cyxcode/template"
 import { Config } from "@/config/config"
 
 // @ts-ignore
@@ -2053,14 +2054,9 @@ NOTE: At any point in time through this workflow you should feel free to ask the
         const best = matches[0]
         const fixes = best.match.pattern.fixes
         const captures = best.match.captures
-        const sub = (s: string) => {
-          let r = s
-          for (let j = 0; j < captures.length; j++) r = r.replace(new RegExp("\\$" + (j + 1), "g"), captures[j])
-          return r
-        }
         const fixLines = fixes
           .map((f, i) => {
-            const cmd = f.command ? "  " + sub(f.command) : "  (manual)"
+            const cmd = f.command ? "  " + Template.render(f.command, captures) : "  (manual)"
             return i + 1 + ". " + f.description + "\n" + cmd
           })
           .join("\n")

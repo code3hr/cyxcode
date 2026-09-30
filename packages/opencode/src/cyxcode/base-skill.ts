@@ -3,6 +3,7 @@
  */
 
 import type { Pattern, PatternMatch, PatternSkill, SkillContext, SkillResult, Fix } from "./types"
+import { Template } from "./template"
 
 export abstract class BaseSkill implements PatternSkill {
   abstract name: string
@@ -71,7 +72,8 @@ export abstract class BaseSkill implements PatternSkill {
       }
 
       // Ask for approval
-      const approved = await ctx.approve(fix)
+      const resolved = { ...fix, command }
+      const approved = await ctx.approve(resolved)
       if (!approved) {
         continue // Try next fix
       }
@@ -83,7 +85,7 @@ export abstract class BaseSkill implements PatternSkill {
         return {
           handled: true,
           success: true,
-          fixApplied: fix,
+          fixApplied: resolved,
           message: `Fix applied: ${fix.description}`,
           shouldRetry: true,
           tokensSaved: this.estimateTokensSaved(ctx.errorOutput),
@@ -108,11 +110,7 @@ export abstract class BaseSkill implements PatternSkill {
   protected substituteCaptures(template: string | undefined, captures: string[]): string | undefined {
     if (!template) return undefined
     
-    let result = template
-    for (let i = 0; i < captures.length; i++) {
-      result = result.replace(new RegExp(`\$${i + 1}`, "g"), captures[i])
-    }
-    return result
+    return Template.render(template, captures)
   }
 
   /**

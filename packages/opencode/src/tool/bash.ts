@@ -20,6 +20,7 @@ import { Plugin } from "@/plugin"
 import { getRouter, initCyxCode } from "@/cyxcode"
 import { CyxWatch } from "@/cyxcode/watch"
 import { shouldSkipPatternMatchFromMessages } from "@/cyxcode/pattern-match"
+import { Template } from "@/cyxcode/template"
 
 const MAX_METADATA_LENGTH = 30_000
 const DEFAULT_TIMEOUT = Flag.CYXCODE_EXPERIMENTAL_BASH_DEFAULT_TIMEOUT_MS || 2 * 60 * 1000
@@ -278,13 +279,8 @@ export const BashTool = Tool.define("bash", async () => {
           const best = matches[0]
           const fixes = best.match.pattern.fixes
           const captures = best.match.captures
-          const sub = (s: string) => {
-            let r = s
-            for (let j = 0; j < captures.length; j++) r = r.replace(new RegExp("\\$" + (j + 1), "g"), captures[j])
-            return r
-          }
           const fixLines = fixes.map((f, i) => {
-            const cmd = f.command ? "  " + sub(f.command) : "  (manual)"
+            const cmd = f.command ? "  " + Template.render(f.command, captures) : "  (manual)"
             return (i + 1) + ". " + f.description + "\n" + cmd
           }).join("\n")
 

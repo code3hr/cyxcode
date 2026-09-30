@@ -131,6 +131,10 @@ fixes: [
 ]
 ```
 
+Capture substitution is shared by shell suggestions and the skill executor. References are matched by their full number: `$10` means the tenth group. Missing groups keep their placeholder, empty groups become empty text, and dollar signs inside captured text are preserved without a second substitution pass.
+
+Shell paths display suggested commands. When the skill executor runs a command fix, its approval callback receives the expanded command, and a successful result records that same command. Substitution does not quote or escape shell arguments; patterns must constrain captures and use appropriate quoting for their commands.
+
 ## Tips
 
 - **Test your regex** on the actual error output. Copy the exact error string and test in a JS console: `yourRegex.exec(errorString)`
