@@ -34,61 +34,15 @@ export { recoverySkill } from "./skills/recovery"
 export { securitySkill } from "./skills/security"
 export { devopsSkill } from "./skills/devops"
 
-// Initialize: register all built-in skills
-import { SkillRouter } from "./router"
-import { recoverySkill } from "./skills/recovery"
-import { securitySkill } from "./skills/security"
-import { devopsSkill } from "./skills/devops"
+import { initialize } from "./patterns"
+export { getRouter } from "./router"
+
+let initialized = false
 
 export function initCyxCode() {
-  // Prevent double initialization
-  if ((globalThis as any).__cyxcode_router) return (globalThis as any).__cyxcode_router as typeof SkillRouter
-
-  SkillRouter.register(recoverySkill)
-  SkillRouter.register(securitySkill)
-  SkillRouter.register(devopsSkill)
-
-  // Store on globalThis to avoid module duplication issues with Bun conditions
-  ;(globalThis as any).__cyxcode_router = SkillRouter
-
-  // Load three-tier patterns — community > global > project (parallelized)
-  ;(globalThis as any).__cyxcode_learned_ready = (async () => {
-    try {
-      // Import modules first
-      const { CommunityPatterns } = await import("./community")
-      const { LearnedSkill, LearnedPatterns } = await import("./learned")
-      const { CyxPaths } = await import("./paths")
-
-      // Ensure bundled community packs are installed (must run before loadAll)
-      await CommunityPatterns.ensureBuiltinPacks()
-
-      // Load all three tiers in parallel
-      const [community, globalLearned, approved] = await Promise.all([
-        CommunityPatterns.loadAll(),
-        LearnedPatterns.loadApproved(CyxPaths.globalLearnedPath()),
-        LearnedPatterns.loadApproved(),
-      ])
-
-      // Register in priority order: community < global < project
-      if (community.length > 0) {
-        const skill = new LearnedSkill(community)
-        skill.name = "community"
-        skill.description = "Community-contributed patterns"
-        SkillRouter.register(skill)
-      }
-
-      if (globalLearned.length > 0) {
-        const skill = new LearnedSkill(globalLearned)
-        skill.name = "global-learned"
-        skill.description = "Global learned patterns"
-        SkillRouter.register(skill)
-      }
-
-      if (approved.length > 0) {
-        SkillRouter.register(new LearnedSkill(approved))
-      }
-    } catch {}
-  })().catch(() => {})
+  const router = initialize()
+  if (initialized) return router
+  initialized = true
 
   // Initialize memory capture system
   import("./memory").then(({ initMemoryCapture }) => {
@@ -105,10 +59,5 @@ export function initCyxCode() {
     Dream.initAutoDream()
   }).catch(() => {})
 
-  return SkillRouter
-}
-
-/** Get the initialized SkillRouter (safe across module boundaries) */
-export function getRouter() {
-  return ((globalThis as any).__cyxcode_router || SkillRouter) as typeof SkillRouter
+  return router
 }

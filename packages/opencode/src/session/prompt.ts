@@ -2041,7 +2041,7 @@ NOTE: At any point in time through this workflow you should feel free to ask the
     let cyxMatched = false
     if (!skipPattern && proc.exitCode !== 0 && proc.exitCode !== null && !aborted) {
       initCyxCode()
-      if ((globalThis as any).__cyxcode_learned_ready) await (globalThis as any).__cyxcode_learned_ready
+      await getRouter().ready
       const router = getRouter()
       const matches = router.findMatching(output)
       if (matches.length > 0) {

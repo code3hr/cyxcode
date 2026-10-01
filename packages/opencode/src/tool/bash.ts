@@ -271,9 +271,9 @@ export const BashTool = Tool.define("bash", async () => {
       if (!skipPatternMatch && proc.exitCode !== 0 && proc.exitCode !== null) {
         initCyxCode()
         // Ensure learned patterns are loaded before matching
-        if ((globalThis as any).__cyxcode_learned_ready) await (globalThis as any).__cyxcode_learned_ready
+        await getRouter().ready
         const router = getRouter()
-        if (Flag.CYXCODE_DEBUG) log.info("cyxcode router", { skills: router.all().length, globalThis: !!(globalThis as any).__cyxcode_router })
+        if (Flag.CYXCODE_DEBUG) log.info("cyxcode router", { skills: router.all().length })
         const matches = router.findMatching(output)
         if (matches.length > 0) {
           const best = matches[0]

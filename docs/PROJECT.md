@@ -35,8 +35,8 @@ First completed source fix:
 
 Next checks, in order:
 
-1. Audit shared in-memory state across projects, particularly the router's loaded patterns and recall/database handles. Correct path resolution alone does not establish isolation of every service.
-2. Continue learning/reuse checks: concurrent persistence, pattern generalization versus saved commands, startup loading across projects, and suggestion versus execution behavior/token-savings claims.
+1. Audit remaining shared in-memory state across projects: recall/database handles and memory/recall background initialization and subscriptions. Router isolation alone does not establish isolation of every service.
+2. Continue learning/reuse checks: coordination between separate CyxCode processes, pattern generalization versus saved commands, full application restarts, and suggestion versus execution behavior/token-savings claims.
 3. Define concrete requirements for project privacy before claiming protection; verify memory, recall, and state restoration using persisted fixtures.
 4. Rebuild and smoke-test the stabilized core, then decide whether to resume the deferred upstream queue.
 
@@ -47,6 +47,12 @@ Validation: 75 focused tests passed across the capture, learning, router, shell,
 Third source fix (2026-10-01): project-state lookup now follows the active instance, stops at Git/worktree/workspace boundaries even without a state directory, and excludes home state when walking up from a child directory. Its bounded cache is keyed by the resolution context. Existing `.cyxcode` preference and `.opencode` compatibility paths remain supported; explicit global path APIs still resolve to home.
 
 Validation: 136 tests passed across path resolution, concurrent project policy writes, memory, wiki, instance lifecycle, learning, prompts, versioning, and CyxWatch. The core package typecheck passed. All 42 CyxWatch tests passed, including the previously reported shell-recording/risk case; that historical failure was not reproduced. The installed executable still predates these core fixes.
+
+Fourth source fix (2026-10-01): routers, loaded project patterns, readiness, and counters now belong to the active project instance. Global/community tiers remain available to each project. Disposal waits for pattern loading, and the next instance loads patterns afresh. The existing `SkillRouter` facade resolves the caller's project.
+
+Learning additions, approvals, rejections, and Dream pattern maintenance now lock the entire read/modify/write operation per file within one process. Writes use a temporary file and rename; storage errors propagate instead of reporting success, and generated IDs use UUIDs to avoid same-millisecond collisions. Tests reproduce lost simultaneous additions and shared routers, then verify independent project stores, approvals, deduplication, maintenance, failure recovery, and reload. Cross-process locking and recall isolation remain pending.
+
+Validation: 92 tests passed across 11 files covering pattern storage and project isolation, routing, learning, templates, shell suggestions, session prompts, and instance lifecycle. The core package typecheck and source CLI version smoke check passed. The installed executable has not been rebuilt for these changes.
 
 Full-session fixtures must create their own project and state markers and assert the resolved storage path before writing. Disable inherited external skills/prompts and model catalog refresh when running the learning regression:
 

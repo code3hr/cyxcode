@@ -14,7 +14,7 @@ import { CyxPaths } from "./paths"
 import { Memory } from "./memory"
 import type { MemoryIndex } from "./memory"
 import { LearnedPatterns } from "./learned"
-import { SkillRouter } from "./router"
+import { SkillRouter, getRouter } from "./router"
 import { CyxAudit } from "./audit"
 
 const log = Log.create({ service: "cyxcode-dream" })
@@ -88,47 +88,45 @@ export namespace Dream {
    */
   export async function deduplicatePatterns(): Promise<{ removedApproved: number; removedPending: number }> {
     // Wait for learned patterns to finish loading
-    if ((globalThis as any).__cyxcode_learned_ready) {
-      await (globalThis as any).__cyxcode_learned_ready
-    }
+    await getRouter().ready
 
-    const data = await LearnedPatterns.read()
-    const seenApproved = new Set<string>()
-    const seenPending = new Set<string>()
-    let removedApproved = 0
-    let removedPending = 0
+    return LearnedPatterns.update((data) => {
+      const seenApproved = new Set<string>()
+      const seenPending = new Set<string>()
+      let removedApproved = 0
+      let removedPending = 0
 
-    // Deduplicate approved — extract regex from either format
-    const cleanApproved = data.approved.filter(entry => {
-      const sp = (entry as any).generatedPattern || entry
-      const regex = sp.regex
-      if (!regex || seenApproved.has(regex)) {
-        removedApproved++
-        return false
+      // Deduplicate approved — extract regex from either format
+      const cleanApproved = data.approved.filter(entry => {
+        const sp = (entry as any).generatedPattern || entry
+        const regex = sp.regex
+        if (!regex || seenApproved.has(regex)) {
+          removedApproved++
+          return false
+        }
+        seenApproved.add(regex)
+        return true
+      })
+
+      // Deduplicate pending
+      const cleanPending = data.pending.filter(entry => {
+        const regex = entry.generatedPattern.regex
+        if (!regex || seenPending.has(regex) || seenApproved.has(regex)) {
+          removedPending++
+          return false
+        }
+        seenPending.add(regex)
+        return true
+      })
+
+      if (removedApproved > 0 || removedPending > 0) {
+        data.approved = cleanApproved
+        data.pending = cleanPending
+        log.debug("Deduplicated patterns", { removedApproved, removedPending })
       }
-      seenApproved.add(regex)
-      return true
+
+      return { removedApproved, removedPending }
     })
-
-    // Deduplicate pending
-    const cleanPending = data.pending.filter(entry => {
-      const regex = entry.generatedPattern.regex
-      if (!regex || seenPending.has(regex) || seenApproved.has(regex)) {
-        removedPending++
-        return false
-      }
-      seenPending.add(regex)
-      return true
-    })
-
-    if (removedApproved > 0 || removedPending > 0) {
-      data.approved = cleanApproved
-      data.pending = cleanPending
-      await LearnedPatterns.write(data)
-      log.debug("Deduplicated patterns", { removedApproved, removedPending })
-    }
-
-    return { removedApproved, removedPending }
   }
 
   /**
@@ -207,21 +205,21 @@ export namespace Dream {
     }
 
     // Validate learned pattern regexes
-    const data = await LearnedPatterns.read()
-    const validApproved = data.approved.filter(entry => {
-      const sp = (entry as any).generatedPattern || entry
-      try {
-        new RegExp(sp.regex, "i")
-        return true
-      } catch {
-        removedPatterns++
-        return false
+    await LearnedPatterns.update((data) => {
+      const validApproved = data.approved.filter(entry => {
+        const sp = (entry as any).generatedPattern || entry
+        try {
+          new RegExp(sp.regex, "i")
+          return true
+        } catch {
+          removedPatterns++
+          return false
+        }
+      })
+      if (removedPatterns > 0) {
+        data.approved = validApproved
       }
     })
-    if (removedPatterns > 0) {
-      data.approved = validApproved
-      await LearnedPatterns.write(data)
-    }
 
     if (removedMemories > 0 || removedPatterns > 0) {
       log.debug("Validated", { removedMemories, removedPatterns })

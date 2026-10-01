@@ -9,6 +9,8 @@
 
 import fs from "fs/promises"
 import path from "path"
+import { randomUUID } from "node:crypto"
+import { Lock } from "../util/lock"
 import { BaseSkill } from "./base-skill"
 import type { Pattern, Fix } from "./types"
 import { Log } from "@/util/log"
@@ -99,7 +101,27 @@ type LearnedFile = {
 
 // --- File-based storage ---
 
-let writeLock: Promise<void> = Promise.resolve()
+async function load(file: string): Promise<LearnedFile> {
+  try {
+    return JSON.parse(await fs.readFile(file, "utf-8")) as LearnedFile
+  } catch (err) {
+    if (err instanceof Error && "code" in err && err.code === "ENOENT") {
+      return { version: 1, pending: [], approved: [] }
+    }
+    throw err
+  }
+}
+
+async function save(file: string, data: LearnedFile): Promise<void> {
+  await fs.mkdir(path.dirname(file), { recursive: true })
+  const tmp = `${file}.${randomUUID()}.tmp`
+  try {
+    await fs.writeFile(tmp, JSON.stringify(data, null, 2))
+    await fs.rename(tmp, file)
+  } finally {
+    await fs.rm(tmp, { force: true })
+  }
+}
 
 export namespace LearnedPatterns {
   export function filePath(): string {
@@ -107,23 +129,26 @@ export namespace LearnedPatterns {
   }
 
   export async function read(): Promise<LearnedFile> {
-    try {
-      const fp = filePath()
-      const content = await fs.readFile(fp, "utf-8")
-      return JSON.parse(content) as LearnedFile
-    } catch {
-      return { version: 1, pending: [], approved: [] }
-    }
+    const file = filePath()
+    using lock = await Lock.read(file)
+    return await load(file)
   }
 
   export async function write(data: LearnedFile): Promise<void> {
-    // Chain writes to prevent concurrent file corruption
-    writeLock = writeLock.then(async () => {
-      const dir = path.dirname(filePath())
-      await fs.mkdir(dir, { recursive: true })
-      await fs.writeFile(filePath(), JSON.stringify(data, null, 2))
-    }).catch(e => log.warn("Failed to write learned patterns", { error: e }))
-    await writeLock
+    const file = filePath()
+    using lock = await Lock.write(file)
+    await save(file, data)
+  }
+
+  /** Serialize the complete read/modify/write operation within this process. */
+  export async function update<T>(fn: (data: LearnedFile) => T | Promise<T>): Promise<T> {
+    const file = filePath()
+    using lock = await Lock.write(file)
+    const data = await load(file)
+    const before = JSON.stringify(data)
+    const result = await fn(data)
+    if (JSON.stringify(data) !== before) await save(file, data)
+    return result
   }
 
   export async function addPending(entry: {
@@ -135,30 +160,30 @@ export namespace LearnedPatterns {
     const pattern = generatePattern(entry.errorOutput, entry.aiFixText, entry.failedCommand)
     if (!pattern) return
 
-    const data = await read()
+    const added = await update((data) => {
+      // Deduplicate: skip if identical regex exists
+      const regexStr = pattern.regex
+      if (data.pending.some((p) => p.generatedPattern.regex === regexStr)) return
+      if (data.approved.some((p) => ((p as any).generatedPattern || p).regex === regexStr)) return
 
-    // Deduplicate: skip if identical regex exists
-    const regexStr = pattern.regex
-    if (data.pending.some(p => p.generatedPattern.regex === regexStr)) return
-    if (data.approved.some(p => ((p as any).generatedPattern || p).regex === regexStr)) return
+      const pending: PendingEntry = {
+        id: pattern.id,
+        errorOutput: entry.errorOutput.slice(0, 2000),
+        aiFixText: entry.aiFixText.slice(0, 2000),
+        failedCommand: entry.failedCommand,
+        exitCode: entry.exitCode,
+        timestamp: new Date().toISOString(),
+        generatedPattern: pattern,
+      }
 
-    const pending: PendingEntry = {
-      id: pattern.id,
-      errorOutput: entry.errorOutput.slice(0, 2000),
-      aiFixText: entry.aiFixText.slice(0, 2000),
-      failedCommand: entry.failedCommand,
-      exitCode: entry.exitCode,
-      timestamp: new Date().toISOString(),
-      generatedPattern: pattern,
-    }
+      data.pending.push(pending)
 
-    data.pending.push(pending)
+      // FIFO cap
+      while (data.pending.length > MAX_PENDING) data.pending.shift()
 
-    // FIFO cap
-    while (data.pending.length > MAX_PENDING) data.pending.shift()
-
-    await write(data)
-    log.info("Saved pending learned pattern", { id: pattern.id, regex: regexStr })
+      return true
+    })
+    if (added) log.info("Saved pending learned pattern", { id: pattern.id, regex: pattern.regex })
   }
 
   /** Load approved patterns. Optionally pass a custom file path (for global tier). */
@@ -197,36 +222,42 @@ export namespace LearnedPatterns {
   }
 
   export async function approve(id: string): Promise<boolean> {
-    const data = await read()
-    const idx = data.pending.findIndex(p => p.id === id)
-    if (idx < 0) return false
+    const approved = await update((data) => {
+      const idx = data.pending.findIndex((p) => p.id === id)
+      if (idx < 0) return false
 
-    const entry = data.pending.splice(idx, 1)[0]
-    data.approved.push(entry.generatedPattern)
+      const entry = data.pending.splice(idx, 1)[0]
+      data.approved.push(entry.generatedPattern)
 
-    while (data.approved.length > MAX_APPROVED) data.approved.shift()
+      while (data.approved.length > MAX_APPROVED) data.approved.shift()
 
-    await write(data)
+      return true
+    })
+    if (!approved) return false
     log.info("Approved learned pattern", { id })
 
     // Emit audit event
     import("./audit")
-      .then(({ CyxAudit }) => CyxAudit.record("cyxcode.pattern.learned", {
-        patternId: id,
-        message: "Pattern approved via /learn-patterns",
-      }))
+      .then(({ CyxAudit }) =>
+        CyxAudit.record("cyxcode.pattern.learned", {
+          patternId: id,
+          message: "Pattern approved via /learn-patterns",
+        }),
+      )
       .catch(() => {})
 
     return true
   }
 
   export async function reject(id: string): Promise<boolean> {
-    const data = await read()
-    const idx = data.pending.findIndex(p => p.id === id)
-    if (idx < 0) return false
+    const rejected = await update((data) => {
+      const idx = data.pending.findIndex((p) => p.id === id)
+      if (idx < 0) return false
 
-    data.pending.splice(idx, 1)
-    await write(data)
+      data.pending.splice(idx, 1)
+      return true
+    })
+    if (!rejected) return false
     log.info("Rejected learned pattern", { id })
     return true
   }
@@ -242,7 +273,7 @@ export namespace LearnedPatterns {
 const ERROR_SIGNALS = /error|err!|failed|not found|denied|cannot|unable|fatal|exception|traceback/i
 
 function findKeyLine(output: string): string | null {
-  const lines = output.split("\n").filter(l => l.trim().length > 0)
+  const lines = output.split("\n").filter((l) => l.trim().length > 0)
   for (const line of lines) {
     if (ERROR_SIGNALS.test(line)) return line.trim()
   }
@@ -296,7 +327,7 @@ function extractFix(aiText: string): { command?: string; description: string } {
   }
 
   // Fallback: use first meaningful line as description (no command)
-  const lines = aiText.split("\n").filter(l => l.trim().length > 10)
+  const lines = aiText.split("\n").filter((l) => l.trim().length > 10)
   const desc = lines.length > 0 ? lines[0].trim().slice(0, 100) : "Fix suggested by AI"
   return { description: desc }
 }
@@ -316,7 +347,7 @@ export function generatePattern(
   if (regex.length < MIN_PATTERN_LENGTH) return null
 
   const fix = extractFix(aiFixText)
-  const id = "learned-" + Date.now()
+  const id = "learned-" + randomUUID()
 
   return {
     id,

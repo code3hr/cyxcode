@@ -12,10 +12,14 @@ import type { PatternSkill, PatternMatch, SkillContext, SkillResult, SkillRegist
 import { Log } from "../util/log"
 import { CyxAudit } from "./audit"
 import { PendingCapture } from "./learned"
+import { State } from "../project/state"
+import { context } from "../project/context"
+import path from "node:path"
 
 const log = Log.create({ service: "cyxcode-router" })
 
 export class SkillRouterImpl implements SkillRegistry {
+  ready?: Promise<void>
   private skills: Map<string, PatternSkill> = new Map()
 
   // Stats tracking
@@ -190,5 +194,25 @@ export class SkillRouterImpl implements SkillRegistry {
   }
 }
 
-// Singleton instance
-export const SkillRouter = new SkillRouterImpl()
+export const getRouter = State.create(
+  () => context.get()?.directory ?? path.resolve(process.cwd()),
+  () => new SkillRouterImpl(),
+  async (router) => {
+    await router.ready
+  },
+)
+
+// Preserve the existing facade while resolving its state in the caller's project.
+export const SkillRouter = {
+  register: (skill: PatternSkill) => getRouter().register(skill),
+  all: () => getRouter().all(),
+  get: (name: string) => getRouter().get(name),
+  findMatching: (error: string) => getRouter().findMatching(error),
+  route: (ctx: SkillContext) => getRouter().route(ctx),
+  recordMatch: (name: string) => getRouter().recordMatch(name),
+  recordMiss: (id?: string, output?: string, command?: string, code?: number) =>
+    getRouter().recordMiss(id, output, command, code),
+  stats: () => getRouter().stats(),
+  routerStats: () => getRouter().routerStats(),
+  resetSessionStats: () => getRouter().resetSessionStats(),
+}
