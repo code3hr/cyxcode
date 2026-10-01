@@ -9,4 +9,5 @@ export const sponsor = "https://github.com/sponsors/CYXWIZ-Lab"
 export const opencode = "https://opencode.ai"
 export const opencodeDocs = "https://opencode.ai/docs/"
 export const doc = (path: string) => `${docs}/${path}`
-export const route = (path = "/") => path === "/" ? `${base}/` : `${base}${path}`
+export const route = (path = "/") => (path === "/" ? `${base}/` : `${base}${path}`)
+export const install = "curl -fsSL https://raw.githubusercontent.com/code3hr/cyxcode/HEAD/install | bash"

@@ -21,7 +21,7 @@ const pillars = [
   },
   {
     title: "Choice without lock-in",
-    body: "Use CyxCode Zen, your own provider keys, local models, GitHub Copilot, ChatGPT Plus/Pro, or other supported providers. The workflow stays yours.",
+    body: "Use your own provider credentials or a configured local model. Model availability and usage costs depend on the provider; your workflow stays yours.",
   },
 ]
 ---
@@ -35,7 +35,8 @@ const pillars = [
     <p class="eyebrow">About CyxCode</p>
     <h1>An AI coding agent that compounds project knowledge.</h1>
     <p class="lead">
-      CyxCode is an open source developer tool for teams and builders who want an agent that works inside real repositories, remembers useful context, and turns repeated debugging work into reusable behavior.
+      CyxCode is an open source developer tool for teams and builders who want an agent that works inside real
+      repositories, remembers useful context, and turns repeated debugging work into reusable behavior.
     </p>
   </section>
 
@@ -44,7 +45,9 @@ const pillars = [
       <p class="panel-title">What it is</p>
       <h2>Terminal-native, repo-aware, and model-flexible.</h2>
       <p>
-        CyxCode can inspect code, explain unfamiliar systems, plan changes, edit files, run commands, use language-server context, and keep multiple sessions moving. You can use it from terminal, desktop, IDE, and GitHub workflows.
+        CyxCode can inspect code, explain unfamiliar systems, plan changes, edit files, run commands, use
+        language-server context, and keep multiple sessions moving. You can use it from terminal, desktop, IDE, and
+        GitHub workflows.
       </p>
     </article>
 
@@ -52,7 +55,8 @@ const pillars = [
       <p class="panel-title">Why it exists</p>
       <h2>AI should not keep paying for the same discovery.</h2>
       <p>
-        Most coding agents are powerful, but they often repeat the same context gathering and error diagnosis. CyxCode adds memory, recall, learned recovery patterns, and auditability so solved work can keep paying forward.
+        Most coding agents are powerful, but they often repeat the same context gathering and error diagnosis. CyxCode
+        adds memory, recall, learned recovery patterns, and auditability so solved work can keep paying forward.
       </p>
     </article>
   </section>
@@ -60,10 +64,11 @@ const pillars = [
   <section class="content-band">
     <div class="upstream-note reveal">
       <p class="panel-title">Upstream lineage</p>
-      <h2>Forked from opencode, shaped for CyxCode workflows.</h2>
+      <h2>Forked from OpenCode, shaped for CyxCode workflows.</h2>
       <p>
-        CyxCode is a fork of <a class="text-link" href={opencode} target="_blank" rel="noreferrer noopener">opencode</a>.
-        CyxCode docs and releases cover the CyxCode-specific experience, while upstream settings and reference material can also be found in the
+        CyxCode is a fork of <a class="text-link" href={opencode} target="_blank" rel="noreferrer noopener">OpenCode</a
+        >. CyxCode docs and releases cover the CyxCode-specific experience, while upstream settings and reference
+        material can also be found in the
         <a class="text-link" href={opencodeDocs} target="_blank" rel="noreferrer noopener">opencode docs</a>.
       </p>
     </div>
@@ -77,12 +82,14 @@ const pillars = [
       align="center"
     />
     <div class="principle-grid">
-      {pillars.map((item) => (
-        <article class="principle reveal">
-          <h3>{item.title}</h3>
-          <p>{item.body}</p>
-        </article>
-      ))}
+      {
+        pillars.map((item) => (
+          <article class="principle reveal">
+            <h3>{item.title}</h3>
+            <p>{item.body}</p>
+          </article>
+        ))
+      }
     </div>
   </section>
 

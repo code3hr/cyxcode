@@ -1,55 +1,192 @@
 ---
 import Logo from "./cyxcode-logo.astro"
 import { docs, repo, route } from "../data/site"
-
 interface Props {
   path?: string
 }
 const { path = "/" } = Astro.props
-
 const links = [
   { href: "/features", label: "Features" },
   { href: "/knowledge", label: "Knowledge" },
   { href: "/cyxwatch", label: "CyxWatch" },
-  { href: "/install", label: "Install" },
 ]
 ---
 
 <header class="site-header">
-  <div class="wrap site-header__inner">
-    <a href={route()} class="site-brand" aria-label="CyxCode home">
-      <Logo class="site-logo" />
-    </a>
-
+  <div class="wrap header-inner">
+    <a href={route()} class="brand" aria-label="CyxCode home"><Logo /><span class="brand-tag">/ by CyxWiz Lab</span></a>
     <nav aria-label="Primary" class="desktop-nav">
-      {links.map((l) => <a href={route(l.href)} aria-current={l.href === path ? "page" : undefined}>{l.label}</a>)}
-      <a href={docs} target="_blank" rel="noreferrer noopener">Docs</a>
-      <a href={repo} target="_blank" rel="noreferrer noopener" class="nav-gh">GitHub ↗</a>
+      {
+        links.map((link) => (
+          <a href={route(link.href)} aria-current={link.href === path ? "page" : undefined}>
+            {link.label}
+          </a>
+        ))
+      }
+      <a href={docs} target="_blank" rel="noreferrer noopener">Docs <span aria-hidden="true">↗</span></a>
     </nav>
-
-    <a class="btn cta nav-cta" href={route("/install")}>Install</a>
-
+    <div class="header-actions">
+      <a href={repo} class="github-link" target="_blank" rel="noreferrer noopener" aria-label="CyxCode on GitHub"
+        ><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"
+          ><path
+            d="M12 .8a11.3 11.3 0 0 0-3.57 22c.57.1.77-.25.77-.55v-2.17c-3.14.68-3.8-1.34-3.8-1.34-.51-1.3-1.26-1.65-1.26-1.65-1.03-.7.08-.68.08-.68 1.14.08 1.73 1.16 1.73 1.16 1.01 1.72 2.65 1.22 3.3.93.1-.73.39-1.23.72-1.51-2.5-.29-5.13-1.25-5.13-5.57 0-1.23.44-2.24 1.16-3.03-.12-.28-.5-1.43.11-2.98 0 0 .95-.3 3.1 1.16a10.8 10.8 0 0 1 5.65 0c2.15-1.46 3.09-1.16 3.09-1.16.62 1.55.23 2.7.12 2.98.72.79 1.16 1.8 1.16 3.03 0 4.33-2.64 5.27-5.15 5.55.4.35.77 1.04.77 2.1v3.18c0 .3.2.66.78.55A11.3 11.3 0 0 0 12 .8Z"
+          ></path></svg
+        ></a
+      ><a class="btn cta nav-cta" href={route("/install")}>Get started <span aria-hidden="true">↗</span></a>
+    </div>
     <details class="mobile-nav">
-      <summary>Menu</summary>
+      <summary aria-label="Open navigation menu">Menu <span aria-hidden="true">☰</span></summary>
       <nav aria-label="Mobile">
-        {links.map((l) => <a href={route(l.href)}>{l.label}</a>)}
-        <a href={docs} target="_blank" rel="noreferrer noopener">Docs</a>
-        <a href={repo} target="_blank" rel="noreferrer noopener">GitHub ↗</a>
+        {
+          links.map((link) => (
+            <a href={route(link.href)} aria-current={link.href === path ? "page" : undefined}>
+              {link.label}
+            </a>
+          ))
+        }
+        <a href={route("/install")} aria-current={path === "/install" ? "page" : undefined}>Install CyxCode</a>
+        <a href={route("/about")}>About</a><a href={route("/faq")}>FAQ</a>
+        <a href={docs} target="_blank" rel="noreferrer noopener">Docs ↗</a><a
+          href={repo}
+          target="_blank"
+          rel="noreferrer noopener">GitHub ↗</a
+        >
       </nav>
     </details>
   </div>
 </header>
-
+<script>
+  const menu = document.querySelector<HTMLDetailsElement>(".mobile-nav")
+  menu?.addEventListener("click", (event) => {
+    if (event.target instanceof Element && event.target.closest("a")) menu.open = false
+  })
+  document.addEventListener("keydown", (event) => {
+    if (event.key !== "Escape" || !menu?.open) return
+    menu.open = false
+    menu.querySelector("summary")?.focus()
+  })
+</script>
 <style>
-  .nav-gh {
-    color: var(--muted) !important;
+  .site-header {
+    position: sticky;
+    top: 0;
+    z-index: 40;
+    border-bottom: 1px solid var(--line-soft);
+    background: #0c110ff2;
+    backdrop-filter: blur(16px);
+  }
+  .header-inner {
+    display: flex;
+    align-items: center;
+    min-height: 83px;
+    gap: 28px;
+  }
+  .brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 14px;
+    flex-shrink: 0;
+  }
+  .brand :global(.logo) {
+    width: 137px;
+    height: auto;
+  }
+  .brand-tag {
+    font: 9px var(--font-mono);
+    color: var(--faint);
+  }
+  .desktop-nav {
+    display: flex;
+    align-items: center;
+    gap: 27px;
+    margin-left: auto;
+    font-size: 12px;
+    color: var(--muted);
+  }
+  nav a:hover,
+  nav a[aria-current="page"] {
+    color: var(--mint);
+  }
+  .header-actions {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+  }
+  .github-link {
+    color: var(--muted);
+    padding: 10px;
+  }
+  .github-link:hover {
+    color: var(--text);
   }
   .nav-cta {
-    margin-left: 0.5rem;
+    min-height: 38px;
+    padding: 9px 13px;
+    font-size: 11px;
+    gap: 20px;
   }
-  @media (max-width: 768px) {
-    .nav-cta {
+  .mobile-nav {
+    display: none;
+    position: relative;
+    margin-left: auto;
+  }
+  summary {
+    cursor: pointer;
+    list-style: none;
+    padding: 10px 12px;
+    border: 1px solid var(--line);
+    border-radius: 5px;
+    color: var(--text);
+    font-size: 12px;
+  }
+  summary::-webkit-details-marker {
+    display: none;
+  }
+  summary span {
+    margin-left: 9px;
+    color: var(--mint);
+  }
+  .mobile-nav nav {
+    position: absolute;
+    right: 0;
+    top: calc(100% + 16px);
+    display: grid;
+    width: 245px;
+    max-width: calc(100vw - 36px);
+    padding: 10px;
+    background: #18221b;
+    border: 1px solid #405346;
+    border-radius: 10px;
+    box-shadow: 0 20px 40px #0008;
+  }
+  .mobile-nav nav a {
+    padding: 12px;
+    font-size: 14px;
+  }
+  @media (max-width: 1100px) {
+    .brand-tag {
       display: none;
+    }
+    .header-inner {
+      gap: 20px;
+    }
+    .desktop-nav {
+      gap: 20px;
+    }
+  }
+  @media (max-width: 800px) {
+    .desktop-nav,
+    .header-actions {
+      display: none;
+    }
+    .mobile-nav {
+      display: block;
+    }
+    .header-inner {
+      min-height: 70px;
+    }
+    .brand :global(.logo) {
+      width: 133px;
     }
   }
 </style>

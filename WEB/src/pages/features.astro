@@ -10,9 +10,18 @@ const groups = [
     title: "Work in the repo, not around it.",
     text: "CyxCode combines the agent loop with the project surfaces needed to inspect, change, and verify real code.",
     items: [
-      { title: "Terminal, desktop, and web", text: "Use the TUI, browser app, desktop app, headless server, or attach to an existing server." },
-      { title: "Files, review, and terminals", text: "Browse the file tree, inspect changes in the review view, and keep project terminals beside the session." },
-      { title: "Sessions with control", text: "Switch models and agents, attach context, track todos, and answer permission or tool questions without losing the thread." },
+      {
+        title: "Terminal, desktop, and web",
+        text: "Use the TUI, browser app, desktop app, headless server, or attach to an existing server.",
+      },
+      {
+        title: "Files, review, and terminals",
+        text: "Browse the file tree, inspect changes in the review view, and keep project terminals beside the session.",
+      },
+      {
+        title: "Sessions with control",
+        text: "Switch models and agents, attach context, track todos, and answer permission or tool questions without losing the thread.",
+      },
     ],
   },
   {
@@ -21,9 +30,18 @@ const groups = [
     title: "Solved work becomes project state.",
     text: "Deterministic patterns handle exact repeats while corrections, versioned state, and consolidation preserve broader lessons.",
     items: [
-      { title: "Pattern-first recovery", text: "Built-in and approved learned patterns can intercept familiar failures before another model turn is spent." },
-      { title: "Corrections and versioning", text: "Save behavioral corrections, reinforce repeated rules, and restore useful context after compaction or a new session." },
-      { title: "Dream consolidation", text: "Deduplicate memories and patterns, validate stored state, and promote durable corrections through one maintenance workflow." },
+      {
+        title: "Pattern-first recovery",
+        text: "Built-in and approved learned patterns can intercept familiar failures before another model turn is spent.",
+      },
+      {
+        title: "Corrections and versioning",
+        text: "Save behavioral corrections, reinforce repeated rules, and restore useful context after compaction or a new session.",
+      },
+      {
+        title: "Dream consolidation",
+        text: "Deduplicate memories and patterns, validate stored state, and promote durable corrections through one maintenance workflow.",
+      },
     ],
   },
   {
@@ -32,9 +50,18 @@ const groups = [
     title: "Context is connected, not dumped into one prompt.",
     text: "Memory, markdown notes, source relationships, and local semantic recall form a compact knowledge layer around the agent.",
     items: [
-      { title: "Memory and wiki", text: "Store small indexed memories and local markdown notes with wikilinks and backlinks." },
-      { title: "Code and knowledge graph", text: "Connect files, symbols, notes, memories, learned patterns, facts, and CyxWatch signals in one graph." },
-      { title: "Local semantic recall", text: "Retrieve similar prior errors and relevant project context with local embeddings and no retrieval API call." },
+      {
+        title: "Memory and wiki",
+        text: "Store small indexed memories and local markdown notes with wikilinks and backlinks.",
+      },
+      {
+        title: "Code and knowledge graph",
+        text: "Connect files, symbols, notes, memories, learned patterns, facts, and CyxWatch signals in one graph.",
+      },
+      {
+        title: "Local semantic recall",
+        text: "Retrieve similar prior errors and relevant project context with local embeddings and no retrieval API call.",
+      },
     ],
   },
   {
@@ -43,9 +70,18 @@ const groups = [
     title: "See and govern the core agent loop.",
     text: "CyxWatch, permissions, audit events, and the vulnerability dashboard make important runtime actions inspectable.",
     items: [
-      { title: "CyxWatch telemetry", text: "Record instrumented prompt, shell, file, network, memory, and secret events locally with policy outcomes." },
-      { title: "Audit and token reports", text: "Inspect pattern matches, misses, learned fixes, and estimated token savings from the CLI or dashboard." },
-      { title: "Project vulnerability scan", text: "Run the shipped dependency and code exposure scan, then review findings, artifacts, trends, and reports in the dashboard." },
+      {
+        title: "CyxWatch telemetry",
+        text: "Record instrumented prompt, shell, file, network, memory, and secret events locally with policy outcomes.",
+      },
+      {
+        title: "Audit and token reports",
+        text: "Inspect pattern matches, misses, learned fixes, and estimated token savings from the CLI or dashboard.",
+      },
+      {
+        title: "Project vulnerability scan",
+        text: "Run the shipped dependency and code exposure scan, then review findings, artifacts, trends, and reports in the dashboard.",
+      },
     ],
   },
   {
@@ -54,21 +90,72 @@ const groups = [
     title: "Bring the model and tools that fit the project.",
     text: "Provider choice and narrow extension points keep optional capabilities outside the core workflow until they are needed.",
     items: [
-      { title: "Models and providers", text: "Use CyxCode Zen, provider keys, local models, Copilot, or supported account connections." },
-      { title: "MCP, skills, and tools", text: "Connect MCP servers and add project-scoped skills or custom tools without widening the built-in agent core." },
-      { title: "GitHub, IDE, and automation", text: "Run non-interactive jobs, work through GitHub and pull requests, or connect through supported editor and agent protocols." },
+      {
+        title: "Models and providers",
+        text: "Connect supported providers with your own credentials, or configure a local model. Access depends on your provider and account.",
+      },
+      {
+        title: "MCP, skills, and tools",
+        text: "Connect MCP servers and add project-scoped skills or custom tools without widening the built-in agent core.",
+      },
+      {
+        title: "GitHub, IDE, and automation",
+        text: "Run non-interactive jobs, work through GitHub and pull requests, or connect through supported editor and agent protocols.",
+      },
     ],
   },
 ]
 
 const shots = [
-  { title: "Shell mode", text: "Run directly, then match known failures locally.", src: "/gallery/screenshot-cyxcode-shell.png", alt: "CyxCode shell mode catching a command failure", kind: "terminal" },
-  { title: "Pattern review", text: "Approve captured fixes before they become reusable guardrails.", src: "/gallery/screenshot-cyxcode-learn-review.png", alt: "CyxCode learned pattern review", kind: "terminal" },
-  { title: "Project memory", text: "Keep compact, indexed context with the project.", src: "/gallery/screenshot-cyxcode-memory.png", alt: "CyxCode project memory", kind: "terminal" },
-  { title: "Agent session", text: "Inspect, edit, run, and recover in one workflow.", src: "/gallery/screenshot-cyxcode.png", alt: "CyxCode agent session", kind: "terminal" },
-  { title: "Knowledge graph", text: "Explore connected wiki, memory, source, fact, and runtime nodes.", src: "/gallery/dashboard-graph.png", alt: "CyxCode dashboard knowledge graph", kind: "wide" },
-  { title: "CyxWatch dashboard", text: "Inspect runtime telemetry and launch the shipped vulnerability scan.", src: "/gallery/dashboard-security.png", alt: "CyxCode CyxWatch security dashboard", kind: "dashboard" },
-  { title: "Token efficiency", text: "Track savings, pattern health, corrections, misses, and audit activity.", src: "/gallery/dashboard-tokens.png", alt: "CyxCode token efficiency dashboard", kind: "dashboard" },
+  {
+    title: "Shell mode",
+    text: "Run directly, then match known failures locally.",
+    src: "/gallery/screenshot-cyxcode-shell.png",
+    alt: "CyxCode shell mode catching a command failure",
+    kind: "terminal",
+  },
+  {
+    title: "Pattern review",
+    text: "Approve captured fixes before they become reusable guardrails.",
+    src: "/gallery/screenshot-cyxcode-learn-review.png",
+    alt: "CyxCode learned pattern review",
+    kind: "terminal",
+  },
+  {
+    title: "Project memory",
+    text: "Keep compact, indexed context with the project.",
+    src: "/gallery/screenshot-cyxcode-memory.png",
+    alt: "CyxCode project memory",
+    kind: "terminal",
+  },
+  {
+    title: "Agent session",
+    text: "Inspect, edit, run, and recover in one workflow.",
+    src: "/gallery/screenshot-cyxcode.png",
+    alt: "CyxCode agent session",
+    kind: "terminal",
+  },
+  {
+    title: "Knowledge graph",
+    text: "Explore connected wiki, memory, source, fact, and runtime nodes.",
+    src: "/gallery/dashboard-graph.png",
+    alt: "CyxCode dashboard knowledge graph",
+    kind: "wide",
+  },
+  {
+    title: "CyxWatch dashboard",
+    text: "Inspect runtime telemetry and launch the shipped vulnerability scan.",
+    src: "/gallery/dashboard-security.png",
+    alt: "CyxCode CyxWatch security dashboard",
+    kind: "dashboard",
+  },
+  {
+    title: "Token efficiency",
+    text: "Track savings, pattern health, corrections, misses, and audit activity.",
+    src: "/gallery/dashboard-tokens.png",
+    alt: "CyxCode token efficiency dashboard",
+    kind: "dashboard",
+  },
 ]
 
 const cmds = [
@@ -95,8 +182,8 @@ const cmds = [
     <p class="eyebrow">Capabilities</p>
     <h1>One agent loop, five practical systems.</h1>
     <p class="lead">
-      CyxCode is more than a terminal prompt. It combines a coding workspace with reusable learning,
-      connected project knowledge, governed automation, and open integrations.
+      CyxCode is more than a terminal prompt. It combines a coding workspace with reusable learning, connected project
+      knowledge, governed automation, and open integrations.
     </p>
   </section>
 
@@ -104,41 +191,80 @@ const cmds = [
     {groups.map((group) => <a href={`#${group.id}`}>{group.kicker}</a>)}
   </nav>
 
-  {groups.map((group) => (
-    <section id={group.id} class="content-band group">
-      <SectionHeading kicker={group.kicker} title={group.title} subtitle={group.text} />
-      <div class="feature-grid">
-        {group.items.map((item) => (
-          <article class="feature reveal">
-            <h3>{item.title}</h3>
-            <p>{item.text}</p>
-          </article>
-        ))}
-      </div>
-      {group.id === "knowledge" && <a class="text-link reveal" href={route("/knowledge")}>Explore the knowledge system -&gt;</a>}
-      {group.id === "security" && <a class="text-link reveal" href={route("/cyxwatch")}>See current CyxWatch coverage -&gt;</a>}
-    </section>
-  ))}
+  {
+    groups.map((group) => (
+      <section id={group.id} class="content-band group">
+        <SectionHeading kicker={group.kicker} title={group.title} subtitle={group.text} />
+        <div class="feature-grid">
+          {group.items.map((item) => (
+            <article class="feature reveal">
+              <h3>{item.title}</h3>
+              <p>{item.text}</p>
+            </article>
+          ))}
+        </div>
+        {group.id === "knowledge" && (
+          <a class="text-link reveal" href={route("/knowledge")}>
+            Explore the knowledge system -&gt;
+          </a>
+        )}
+        {group.id === "security" && (
+          <a class="text-link reveal" href={route("/cyxwatch")}>
+            See current CyxWatch coverage -&gt;
+          </a>
+        )}
+      </section>
+    ))
+  }
 
   <section class="content-band showcase">
-    <SectionHeading kicker="Product views" title="The workflow, shown for real" subtitle="These are CyxCode terminal and application captures from the repository." />
+    <SectionHeading
+      kicker="Product views"
+      title="The workflow, shown for real"
+      subtitle="These are CyxCode terminal and application captures from the repository."
+    />
     <div class="gallery">
-      {shots.map((shot) => (
-        <figure class:list={["reveal", `shot-${shot.kind}`]}>
-          <a class="shot-link" href={route(shot.src)} target="_blank" rel="noreferrer noopener"><img src={route(shot.src)} alt={shot.alt} loading="lazy" /></a>
-          <figcaption><strong>{shot.title}</strong><span>{shot.text}</span></figcaption>
-        </figure>
-      ))}
+      {
+        shots.map((shot) => (
+          <figure class:list={["reveal", `shot-${shot.kind}`]}>
+            <a class="shot-link" href={route(shot.src)} target="_blank" rel="noreferrer noopener">
+              <img src={route(shot.src)} alt={shot.alt} loading="lazy" />
+            </a>
+            <figcaption>
+              <>
+                <strong>{shot.title}</strong>
+                <span>{shot.text}</span>
+              </>
+            </figcaption>
+          </figure>
+        ))
+      }
     </div>
   </section>
 
   <section class="content-band">
-    <SectionHeading kicker="Commands" title="Common entry points" subtitle="A focused list of shipped workflows, not every internal command." align="center" />
-    <div class="table-wrap reveal commands">
+    <SectionHeading
+      kicker="Commands"
+      title="Common entry points"
+      subtitle="A focused list of shipped workflows, not every internal command."
+      align="center"
+    />
+    <div class="table-wrap reveal commands" role="region" aria-label="Commands" tabindex="0">
       <table>
         <thead><tr><th>Command</th><th>What it does</th></tr></thead>
         <tbody>
-          {cmds.map((cmd) => <tr><td><code>{cmd[0]}</code></td><td>{cmd[1]}</td></tr>)}
+          {
+            cmds.map((cmd) => (
+              <tr>
+                <>
+                  <td>
+                    <code>{cmd[0]}</code>
+                  </td>
+                  <td>{cmd[1]}</td>
+                </>
+              </tr>
+            ))
+          }
         </tbody>
       </table>
     </div>
@@ -146,42 +272,138 @@ const cmds = [
 
   <section class="content-band">
     <div class="panel panel--accent closing-cta reveal">
-      <div><h2>Put solved work back into the project.</h2><p>Install CyxCode, initialize the repo, and let useful context compound.</p></div>
+      <div>
+        <h2>Put solved work back into the project.</h2><p>
+          Install CyxCode, initialize the repo, and let useful context compound.
+        </p>
+      </div>
       <a class="btn cta" href={route("/install")}>Install CyxCode -&gt;</a>
     </div>
   </section>
 </BaseLayout>
 
 <style>
-  .page-hero { max-width: 64ch; margin-bottom: 1rem; }
-  .page-hero .lead { font-size: 1.125rem; line-height: 1.7; color: var(--muted); }
-  .feature-nav { display: flex; flex-wrap: wrap; gap: 0.65rem; }
-  .feature-nav a { border: 1px solid var(--line); border-radius: 999px; padding: 0.55rem 0.85rem; color: var(--muted); font-size: 0.85rem; transition: 0.2s ease; }
-  .feature-nav a:hover { border-color: var(--mint); color: var(--mint); background: var(--mint-soft); }
-  .group { padding-top: 1rem; }
-  .showcase { width: min(96vw, 100rem); margin-left: 50%; transform: translateX(-50%); }
-  .showcase > :not(.gallery) { width: min(calc(100% - 2rem), 80rem); margin-inline: auto; }
-  .showcase .gallery { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 1.25rem; }
-  .showcase figure { grid-column: span 6; min-width: 0; }
-  .showcase .shot-wide { grid-column: 1 / -1; }
-  .shot-link { display: grid; place-items: center; width: 100%; overflow: hidden; background: #050912; }
-  .shot-terminal .shot-link { aspect-ratio: 4 / 5; }
+  .page-hero {
+    max-width: 64ch;
+    margin-bottom: 1rem;
+  }
+  .page-hero .lead {
+    font-size: 1.125rem;
+    line-height: 1.7;
+    color: var(--muted);
+  }
+  .feature-nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.65rem;
+  }
+  .feature-nav a {
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    padding: 0.55rem 0.85rem;
+    color: var(--muted);
+    font-size: 0.85rem;
+    transition: 0.2s ease;
+  }
+  .feature-nav a:hover {
+    border-color: var(--mint);
+    color: var(--mint);
+    background: var(--mint-soft);
+  }
+  .group {
+    padding-top: 1rem;
+  }
+  .showcase {
+    width: min(96vw, 100rem);
+    margin-left: 50%;
+    transform: translateX(-50%);
+  }
+  .showcase > :not(.gallery) {
+    width: min(calc(100% - 2rem), 80rem);
+    margin-inline: auto;
+  }
+  .showcase .gallery {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    gap: 1.25rem;
+  }
+  .showcase figure {
+    grid-column: span 6;
+    min-width: 0;
+  }
+  .showcase .shot-wide {
+    grid-column: 1 / -1;
+  }
+  .shot-link {
+    display: grid;
+    place-items: center;
+    width: 100%;
+    overflow: hidden;
+    background: #050912;
+  }
+  .shot-terminal .shot-link {
+    aspect-ratio: 4 / 5;
+  }
   .shot-dashboard .shot-link,
-  .shot-wide .shot-link { aspect-ratio: 6 / 5; }
-  .showcase img { width: 100%; height: 100%; object-fit: contain; transform: none; }
-  .showcase figure:hover img { transform: none; }
-  .gallery figcaption { display: flex; flex-direction: column; gap: 0.25rem; }
-  .gallery figcaption strong { color: var(--text); }
-  .commands { max-width: 860px; margin-inline: auto; }
-  code { font-family: "JetBrains Mono", monospace; font-size: 0.88em; color: var(--mint); background: rgba(36, 209, 163, 0.1); padding: 0.1em 0.4em; border-radius: 4px; }
-  .closing-cta { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 1.5rem; padding: 2.5rem; }
-  .closing-cta p { color: var(--muted); }
+  .shot-wide .shot-link {
+    aspect-ratio: 6 / 5;
+  }
+  .showcase img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    transform: none;
+  }
+  .showcase figure:hover img {
+    transform: none;
+  }
+  .gallery figcaption {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+  .gallery figcaption strong {
+    color: var(--text);
+  }
+  .commands {
+    max-width: 860px;
+    margin-inline: auto;
+  }
+  code {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 0.88em;
+    color: var(--mint);
+    background: rgba(36, 209, 163, 0.1);
+    padding: 0.1em 0.4em;
+    border-radius: 4px;
+  }
+  .closing-cta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem;
+    padding: 2.5rem;
+  }
+  .closing-cta p {
+    color: var(--muted);
+  }
   @media (max-width: 768px) {
-    .showcase { width: calc(100vw - 1rem); }
-    .showcase > :not(.gallery) { width: calc(100% - 1rem); }
-    .showcase .gallery { gap: 0.85rem; }
+    .showcase {
+      width: calc(100vw - 1rem);
+    }
+    .showcase > :not(.gallery) {
+      width: calc(100% - 1rem);
+    }
+    .showcase .gallery {
+      gap: 0.85rem;
+    }
     .showcase figure,
-    .showcase .shot-wide { grid-column: 1 / -1; }
-    .closing-cta { padding: 1.75rem; }
+    .showcase .shot-wide {
+      grid-column: 1 / -1;
+    }
+    .closing-cta {
+      padding: 1.75rem;
+    }
   }
 </style>

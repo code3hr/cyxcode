@@ -7,6 +7,19 @@ const usageDoc = doc("USAGE.md")
 
 const groups = [
   {
+    title: "Models & access",
+    items: [
+      {
+        q: "Can I use free models in CyxCode?",
+        a: "You can use a configured provider that permits free access, subject to its limits, or a local model on your hardware. Run <code>/connect</code>, then <code>/models</code>. CyxCode does not provide a hosted free model tier of its own.",
+      },
+      {
+        q: "Why does OpenCode Zen reject anonymous requests?",
+        a: "OpenCode controls access to its hosted service. Our anonymous requests from CyxCode have been rejected. Connect with your own Zen API key to check your account's access; authenticated access to Zen's free models has not yet been verified in CyxCode. Being a fork does not grant service access.",
+      },
+    ],
+  },
+  {
     title: "Problem & value",
     items: [
       {
@@ -54,11 +67,11 @@ const groups = [
     items: [
       {
         q: "Where are the tests?",
-        a: "Under <code>packages/opencode/test/cyxcode/</code>. Run them with <code>cd packages/opencode && bun test test/cyxcode/</code>. The suite covers routing, pattern matching, capture extraction, learned-pattern generation, memory lookup, dream consolidation, and path handling. The pentest module alone has 232+ passing tests.",
+        a: "Under <code>packages/opencode/test/cyxcode/</code>. Run them with <code>cd packages/opencode && bun test test/cyxcode/</code>. The suite covers routing, pattern matching, capture extraction, learned-pattern generation, memory lookup, dream consolidation, and path handling. Run focused suites in an isolated test environment; see the project notes for the current validation checkpoint.",
       },
       {
         q: "Is it production quality?",
-        a: "Moving that direction. The core pattern matching and learning system is tested, and integration with OpenCode's bash tool is verified via debug mode (<code>CYXCODE_DEBUG=true</code>). A few regex-escaping edge cases remain skipped.",
+        a: "Moving that direction. The core pattern matching and learning system is tested, and integration with OpenCode's bash tool is verified via debug mode (<code>CYXCODE_DEBUG=true</code>). Core stabilization is ongoing, including checks of project isolation, learning persistence, and state restoration. Consult the project notes for tested behavior and remaining work.",
       },
     ],
   },
@@ -74,17 +87,26 @@ const groups = [
     <p class="eyebrow">FAQ</p>
     <h1>Honest answers.</h1>
     <p class="lead">
-      The real questions — why a fork, how it stays maintained, and whether it's tested — with the real answers.
-      Pulled from the community FAQ and kept up to date in the repo.
+      The real questions — why a fork, how it stays maintained, and whether it's tested — with the real answers. Pulled
+      from the community FAQ and kept up to date in the repo.
     </p>
   </section>
 
   <div class="faq-layout">
     <!-- TOC -->
     <aside class="faq-toc reveal">
-      {groups.map((g) => (
-        <a href={`#${g.title.toLowerCase().replace(/[& ]+/g, "-").replace(/[^a-z0-9-]/g, "")}`}>{g.title}</a>
-      ))}
+      {
+        groups.map((g) => (
+          <a
+            href={`#${g.title
+              .toLowerCase()
+              .replace(/[& ]+/g, "-")
+              .replace(/[^a-z0-9-]/g, "")}`}
+          >
+            {g.title}
+          </a>
+        ))
+      }
       <a href={faqDoc} target="_blank" rel="noreferrer noopener" class="toc-external">Full FAQ on GitHub ↗</a>
     </aside>
 
@@ -92,7 +114,13 @@ const groups = [
     <div class="faq-content">
       {
         groups.map((g) => (
-          <section id={g.title.toLowerCase().replace(/[& ]+/g, "-").replace(/[^a-z0-9-]/g, "")} class="faq-group reveal">
+          <section
+            id={g.title
+              .toLowerCase()
+              .replace(/[& ]+/g, "-")
+              .replace(/[^a-z0-9-]/g, "")}
+            class="faq-group reveal"
+          >
             <h2>{g.title}</h2>
             {g.items.map((item) => (
               <details class="faq-item">
@@ -121,8 +149,15 @@ const groups = [
 </BaseLayout>
 
 <style>
-  .page-hero { max-width: 56ch; margin-bottom: 2.5rem; }
-  .page-hero .lead { font-size: 1.125rem; line-height: 1.7; color: var(--muted); }
+  .page-hero {
+    max-width: 56ch;
+    margin-bottom: 2.5rem;
+  }
+  .page-hero .lead {
+    font-size: 1.125rem;
+    line-height: 1.7;
+    color: var(--muted);
+  }
 
   .faq-layout {
     display: grid;
@@ -142,11 +177,22 @@ const groups = [
     color: var(--muted);
     transition: color 0.2s;
   }
-  .faq-toc a:hover { color: var(--mint); }
-  .toc-external { margin-top: 0.5rem; color: var(--mint) !important; }
+  .faq-toc a:hover {
+    color: var(--mint);
+  }
+  .toc-external {
+    margin-top: 0.5rem;
+    color: var(--mint) !important;
+  }
 
-  .faq-content { display: flex; flex-direction: column; gap: 3rem; }
-  .faq-group h2 { margin-bottom: 1.25rem; }
+  .faq-content {
+    display: flex;
+    flex-direction: column;
+    gap: 3rem;
+  }
+  .faq-group h2 {
+    margin-bottom: 1.25rem;
+  }
 
   .faq-item {
     border: 1px solid var(--line);
@@ -156,7 +202,9 @@ const groups = [
     overflow: hidden;
     transition: border-color 0.2s;
   }
-  .faq-item[open] { border-color: rgba(36, 209, 163, 0.35); }
+  .faq-item[open] {
+    border-color: rgba(36, 209, 163, 0.35);
+  }
   .faq-item summary {
     padding: 1.1rem 1.4rem;
     font-weight: 600;
@@ -165,7 +213,9 @@ const groups = [
     position: relative;
     padding-right: 3rem;
   }
-  .faq-item summary::-webkit-details-marker { display: none; }
+  .faq-item summary::-webkit-details-marker {
+    display: none;
+  }
   .faq-item summary::after {
     content: "+";
     position: absolute;
@@ -175,13 +225,17 @@ const groups = [
     font-weight: 400;
     transition: transform 0.2s;
   }
-  .faq-item[open] summary::after { content: "−"; }
+  .faq-item[open] summary::after {
+    content: "−";
+  }
   .faq-item p {
     padding: 0 1.4rem 1.25rem;
     color: var(--muted);
     line-height: 1.75;
   }
-  .faq-item p strong { color: var(--text); }
+  .faq-item p strong {
+    color: var(--text);
+  }
   code {
     font-family: "JetBrains Mono", monospace;
     font-size: 0.88em;
@@ -191,14 +245,27 @@ const groups = [
     border-radius: 4px;
   }
   .closing-cta {
-    display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between;
-    gap: 1.5rem; padding: 2.5rem;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem;
+    padding: 2.5rem;
   }
-  .closing-cta p { color: var(--muted); }
-  .closing-actions { display: flex; gap: 0.75rem; flex-shrink: 0; }
+  .closing-cta p {
+    color: var(--muted);
+  }
+  .closing-actions {
+    display: flex;
+    gap: 0.75rem;
+    flex-shrink: 0;
+  }
 
   @media (max-width: 900px) {
-    .faq-layout { grid-template-columns: 1fr; gap: 1.5rem; }
+    .faq-layout {
+      grid-template-columns: 1fr;
+      gap: 1.5rem;
+    }
     .faq-toc {
       position: static;
       flex-direction: row;
@@ -207,7 +274,13 @@ const groups = [
       padding-bottom: 1rem;
       border-bottom: 1px solid var(--line-soft);
     }
-    .toc-external { margin: 0; }
+    .toc-external {
+      margin: 0;
+    }
   }
-  @media (max-width: 768px) { .closing-cta { padding: 1.75rem; } }
+  @media (max-width: 768px) {
+    .closing-cta {
+      padding: 1.75rem;
+    }
+  }
 </style>

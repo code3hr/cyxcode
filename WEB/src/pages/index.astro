@@ -2,443 +2,626 @@
 import BaseLayout from "../components/BaseLayout.astro"
 import Terminal from "../components/Terminal.astro"
 import InstallCommand from "../components/InstallCommand.astro"
-import { docs, route } from "../data/site"
+import { docs, repo, route, install } from "../data/site"
 import demo from "../../Cyxcode.mp4"
-
-const primary = "curl -fsSL https://raw.githubusercontent.com/code3hr/cyxcode/HEAD/install | bash"
-
-const proof = ["Terminal", "Desktop", "IDE", "GitHub", "Local models", "Provider keys"]
-
-const problems = [
-  {
-    title: "Context resets every session",
-    desc: "Most agents keep asking the same project questions because decisions, fixes, and conventions are not carried forward.",
-  },
-  {
-    title: "Failures burn model turns",
-    desc: "Known errors still get sent through expensive reasoning loops instead of being recognized locally with a reviewed fix.",
-  },
-  {
-    title: "Automation gets hard to trust",
-    desc: "When edits, commands, and permissions are not visible, teams slow the agent down to keep the repo safe.",
-  },
-]
-
-const features = [
-  { title: "Works inside your repo", desc: "Ask questions, edit files, run commands, and keep context close to the work.", href: "/features#workspace" },
-  { title: "Learns the project", desc: "Memory, wiki notes, graphs, and recall preserve useful context across sessions.", href: "/knowledge" },
-  { title: "Fast on repeated failures", desc: "Known errors can be diagnosed before a model call, with fixes ready in under a second.", href: "/features#learning" },
-  { title: "Choose your model", desc: "Use CyxCode Zen, your own provider keys, local models, Copilot, or ChatGPT accounts.", href: "/features#integrations" },
-  { title: "Guarded automation", desc: "Permissions, CyxWatch, and audit trails keep agent actions visible and controlled.", href: "/cyxwatch" },
-  { title: "Improves over time", desc: "Corrections, learned patterns, and behavior versioning make repeated work reusable.", href: "/features#learning" },
-]
-
-const stats = [
-  { value: "136+", label: "built-in recovery patterns" },
-  { value: "75+", label: "supported model providers" },
-  { value: "4", label: "ways to work: terminal, desktop, IDE, GitHub" },
-]
 ---
 
 <BaseLayout
   title="CyxCode"
-  description="CyxCode is a terminal-native AI coding agent for real project work: explore code, plan changes, run commands, remember context, and turn repeated failures into reusable fixes."
+  description="Your code. Your context. Your agent. CyxCode brings project memory, local error recovery, and governed tools to an open-source AI coding workflow."
 >
-  <section class="hero">
-    <div class="hero-inner">
-      <p class="kicker">Terminal-native AI coding agent</p>
-      <h1>AI coding work should compound inside your repo.</h1>
-      <p class="lead">
-        CyxCode helps you inspect code, plan changes, edit files, run commands, and remember what matters.
-        Solved failures become reusable workflow instead of repeated model spend.
+  <section class="landing-hero" aria-labelledby="hero-title">
+    <div class="hero-message">
+      <a class="announcement" href={route("/about")}
+        ><span class="status-dot"></span> Open source. Built to be yours. <span aria-hidden="true">↗</span></a
+      >
+      <h1 id="hero-title">Your code.<br />Your context.<br /><em>Your advantage.</em></h1>
+      <p class="hero-lead">
+        Meet the coding agent that keeps what you learn. Build with AI, remember project decisions, and turn familiar
+        errors into reusable fixes.
       </p>
-
-      <div class="hero-cta">
-        <a class="btn cta" href={route("/install")}>Install CyxCode</a>
-        <a class="btn ghost" href={route("/features")}>See features</a>
+      <div class="hero-actions">
+        <a class="btn cta" href={route("/install")}>Get started <span aria-hidden="true">↗</span></a><a
+          class="btn ghost"
+          href={repo}
+          target="_blank"
+          rel="noreferrer noopener">View on GitHub <span aria-hidden="true">↗</span></a
+        >
       </div>
-
-      <div class="hero-install">
-        <InstallCommand command={primary} />
-        <span class="hero-install-hint">Linux / macOS / Windows (WSL)</span>
-      </div>
+      <div class="hero-notes"><span>Terminal native</span><span>Model flexible</span><span>Open source</span></div>
+    </div>
+    <div class="hero-product">
+      <div class="product-label"><span>THE CYXCODE WORKFLOW</span><span>TRY THE TABS ↓</span></div><Terminal /><p
+        class="product-caption"
+      >
+        <span>Familiar failure. Local pattern. Reviewed fix.</span><a href="#demo"
+          >Watch a real session <span aria-hidden="true">↘</span></a
+        >
+      </p>
     </div>
   </section>
-
-  <section class="proof reveal" aria-label="CyxCode works across these surfaces">
-    <p>Works with</p>
+  <section class="principles" aria-label="Built for your workflow">
+    <p>Fits the way<br /><strong>you already build.</strong></p><div>
+      <span aria-hidden="true">&gt;_</span> Your terminal
+    </div><div><span aria-hidden="true">⌘</span> Your repository</div><div>
+      <span aria-hidden="true">◇</span> Your model
+    </div><div><span aria-hidden="true">⎇</span> Your rules</div>
+  </section>
+  <section class="capabilities" aria-labelledby="capabilities-title">
+    <div class="section-intro">
+      <div>
+        <p class="kicker">01 / Built around your project</p><h2 id="capabilities-title">
+          Good work shouldn't<br />start from zero.
+        </h2>
+      </div><p>
+        Code is only part of the context.<br />Keep the decisions, fixes, and guardrails<br />that make a project yours.
+      </p>
+    </div>
+    <div class="capability-grid">
+      <a class="capability memory-card" href={route("/knowledge")}
+        ><div class="card-heading"><span class="card-number">01</span><span aria-hidden="true">↗</span></div><h3>
+          A memory for your codebase.
+        </h3><p>
+          Save conventions and decisions as compact project knowledge. Bring useful context into the next session.
+        </p><div class="memory-preview" aria-hidden="true">
+          <div><span>project / memory</span><span>3 notes</span></div><p>
+            <span>↳</span> Use Bun for package scripts <small>convention</small>
+          </p><p><span>↳</span> Keep the API stateless <small>architecture</small></p><p>
+            <span>↳</span> Test from package directories <small>workflow</small>
+          </p>
+        </div><span class="card-link">Explore project knowledge <span aria-hidden="true">→</span></span></a
+      >
+      <a class="capability recovery-card" href={route("/features#learning")}
+        ><div class="card-heading"><span class="card-number">02</span><span aria-hidden="true">↗</span></div><h3>
+          Some errors need no introduction.
+        </h3><p>
+          Match familiar failures against built-in and approved patterns. Get a suggested fix without a model call for
+          diagnosis.
+        </p><div class="recovery-preview" aria-hidden="true">
+          <span>error</span><i>→</i><strong>local pattern</strong><i>→</i><span>suggested fix</span>
+        </div><span class="card-link">Meet pattern-first recovery <span aria-hidden="true">→</span></span></a
+      >
+      <a class="capability watch-card" href={route("/cyxwatch")}
+        ><div class="card-heading"><span class="card-number">03</span><span aria-hidden="true">↗</span></div><h3>
+          Visibility before autonomy.
+        </h3><p>
+          CyxWatch brings local audit trails and policy checks to covered commands, file operations, and runtime
+          activity.
+        </p><div class="watch-preview" aria-hidden="true">
+          <span>shell.execute</span><span class="policy">require approval</span>
+        </div><span class="card-link">Discover CyxWatch <span aria-hidden="true">→</span></span></a
+      >
+      <a class="capability model-card" href={route("/install#models")}
+        ><div class="card-heading"><span class="card-number">04</span><span aria-hidden="true">↗</span></div><h3>
+          Your model. Your call.
+        </h3><p>
+          Connect your provider or configure a local model. Choose the tools that fit your project and your budget.
+        </p><div class="model-preview" aria-hidden="true">
+          <code>/connect</code><span>→</span><code>/models</code>
+        </div><span class="card-link">Connect a model <span aria-hidden="true">→</span></span></a
+      >
+    </div>
+  </section>
+  <section class="workflow" aria-labelledby="workflow-title">
+    <div class="section-intro">
+      <div>
+        <p class="kicker">02 / A better feedback loop</p><h2 id="workflow-title">
+          Solve it. Review it.<br />Build on it.
+        </h2>
+      </div><a class="text-link" href={route("/features")}>Explore all features <span aria-hidden="true">↗</span></a>
+    </div><div class="workflow-grid">
+      <article>
+        <span>01 / WORK</span><h3>Stay close to the code.</h3><p>
+          Explore a repository, plan a change, edit files, and run commands in one agent workflow.
+        </p>
+      </article><article>
+        <span>02 / LEARN</span><h3>Keep the useful parts.</h3><p>
+          Save a decision. Review a captured error and fix. Approve the patterns worth reusing.
+        </p>
+      </article><article>
+        <span>03 / REUSE</span><h3>Bring context forward.</h3><p>
+          Retrieve relevant notes and match known failures as you work on the next task.
+        </p>
+      </article>
+    </div>
+  </section>
+  <section id="demo" class="demo-section" aria-labelledby="demo-title">
+    <div class="section-intro">
+      <div><p class="kicker">03 / Inside CyxCode</p><h2 id="demo-title">Less abstract.<br />More in action.</h2></div><p
+      >
+        A recorded CyxCode session.<br />See the terminal workflow for yourself.
+      </p>
+    </div><div class="demo-frame">
+      <div class="demo-bar"><span><i></i> CYXCODE / SESSION RECORDING</span><span>PLAY TO EXPLORE</span></div><video
+        controls
+        playsinline
+        preload="none"
+        poster={route("/gallery/demo-poster.jpg")}
+        ><source src={demo} type="video/mp4" /><a href={demo}>Download the CyxCode session recording</a></video
+      >
+    </div><p class="demo-note">
+      Recorded interface; available models and features depend on your version and connected provider.
+    </p>
+  </section>
+  <section class="start-section" aria-labelledby="start-title">
     <div>
-      {proof.map((item) => <span>{item}</span>)}
+      <p class="kicker">Your next session starts here</p><h2 id="start-title">
+        Make it your<br /><em>coding environment.</em>
+      </h2><p>Open source. Built on OpenCode. Shaped for CyxCode.</p><div class="hero-actions">
+        <a class="btn cta" href={route("/install")}>Install CyxCode <span aria-hidden="true">↗</span></a><a
+          class="text-link"
+          href={docs}
+          target="_blank"
+          rel="noreferrer noopener">Read the docs <span aria-hidden="true">↗</span></a
+        >
+      </div>
+    </div><div class="start-command">
+      <span class="command-label">ONE COMMAND TO GET STARTED</span><InstallCommand command={install} /><p>
+        macOS · Linux · Windows via WSL / Git Bash
+      </p><a href={route("/install")}>All installation options <span aria-hidden="true">→</span></a>
     </div>
-  </section>
-
-  <section class="demo reveal" aria-labelledby="demo-title">
-    <div class="demo-head">
-      <p class="kicker">See it in action</p>
-      <h2 id="demo-title">CyxCode working through a real session.</h2>
-    </div>
-    <video class="demo-video" src={demo} controls playsinline preload="metadata">
-      <a href={demo}>See it in action</a>
-    </video>
-  </section>
-
-  <section class="narrative reveal">
-    <div class="narrative-copy">
-      <p class="kicker">The problem</p>
-      <h2>Coding agents are powerful, but real projects expose the gaps.</h2>
-      <p>
-        The work is not just generating code. It is remembering decisions, recognizing repeated failures,
-        using the right tools, and making automation visible enough to trust.
-      </p>
-    </div>
-    <div class="problem-list">
-      {problems.map((item) => (
-        <article>
-          <h3>{item.title}</h3>
-          <p>{item.desc}</p>
-        </article>
-      ))}
-    </div>
-  </section>
-
-  <section class="stats reveal">
-    <div class="stats-head">
-      <p class="kicker">The CyxCode approach</p>
-      <h2>Make solved work reusable.</h2>
-    </div>
-    <div class="stat-grid">
-      {stats.map((s) => (
-        <div class="stat">
-          <span class="stat-value">{s.value}</span>
-          <span class="stat-label">{s.label}</span>
-        </div>
-      ))}
-    </div>
-  </section>
-
-  <section class="terminal-section reveal">
-    <div class="terminal-copy">
-      <p class="kicker">Workflow</p>
-      <h2>Inspect, edit, run, remember, repeat.</h2>
-      <p>
-        CyxCode stays close to your terminal and repository, with memory, permissions, and recovery patterns
-        designed for the loop engineers already use every day.
-      </p>
-    </div>
-    <div class="terminal-wrap">
-      <Terminal />
-    </div>
-  </section>
-
-  <section class="features">
-    <div class="features-head reveal">
-      <p class="kicker">Capabilities</p>
-      <h2>A practical agent for codebases that do not fit in one prompt.</h2>
-    </div>
-    <div class="feature-grid">
-      {
-        features.map((f) => (
-          <a class="feature-card reveal" href={route(f.href)}>
-            <h3>{f.title}</h3>
-            <p set:html={f.desc} />
-          </a>
-        ))
-      }
-    </div>
-  </section>
-
-  <section class="routes reveal">
-    <a href={route("/about")} class="route">About <span>-></span></a>
-    <a href={route("/features")} class="route">Features <span>-></span></a>
-    <a href={route("/knowledge")} class="route">Knowledge <span>-></span></a>
-    <a href={route("/cyxwatch")} class="route">CyxWatch <span>-></span></a>
-    <a href={route("/install")} class="route">Install <span>-></span></a>
-    <a href={docs} target="_blank" rel="noreferrer noopener" class="route">Docs -></a>
   </section>
 </BaseLayout>
-
 <style>
-  .hero {
-    display: flex;
-    justify-content: center;
-    padding: 4.5rem 0 1.5rem;
-  }
-  .hero-inner {
-    max-width: 58rem;
-    text-align: center;
-  }
-  .kicker {
-    font-size: 0.8125rem;
-    font-weight: 500;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    color: var(--mint);
-    margin-bottom: 1.5rem;
-  }
-  .hero h1 {
-    font-size: clamp(2.7rem, 1.45rem + 4.7vw, 5rem);
-    font-weight: 700;
-    letter-spacing: -0.03em;
-    line-height: 1.02;
-    margin-bottom: 1.5rem;
-  }
-  .lead {
-    font-size: 1.1875rem;
-    font-weight: 300;
-    line-height: 1.65;
-    color: var(--muted);
-    max-width: 46rem;
-    margin: 0 auto 2rem;
-  }
-  .hero-cta {
-    display: flex;
-    justify-content: center;
-    gap: 0.75rem;
-    margin-bottom: 2.5rem;
-  }
-  .hero-install {
-    max-width: 34rem;
-    margin: 0 auto;
-  }
-  .hero-install-hint {
-    display: block;
-    margin-top: 0.625rem;
-    font-size: 0.75rem;
-    color: var(--faint);
-  }
-
-  .proof {
+  .landing-hero {
     display: grid;
-    justify-items: center;
-    gap: 1rem;
-    text-align: center;
-    padding: 1.5rem 0;
-    border-top: 1px solid var(--line-soft);
-    border-bottom: 1px solid var(--line-soft);
+    grid-template-columns: 1fr 1.08fr;
+    gap: 64px;
+    align-items: center;
+    padding: 30px 0 70px;
   }
-  .proof p {
-    font-size: 0.75rem;
-    font-weight: 600;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    color: var(--faint);
+  .announcement {
+    display: inline-flex;
+    gap: 10px;
+    align-items: center;
+    color: #bdcbbf;
+    font-size: 11px;
+    border: 1px solid var(--line);
+    border-radius: 30px;
+    padding: 8px 12px;
+    margin-bottom: 30px;
   }
-  .proof div {
+  .status-dot {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--mint);
+  }
+  h1 {
+    font-size: clamp(3.1rem, 5.1vw, 4.65rem);
+    line-height: 1.04;
+    letter-spacing: -0.065em;
+    font-weight: 500;
+  }
+  em {
+    font-style: normal;
+    color: var(--mint);
+  }
+  .hero-lead {
+    font-size: 16px;
+    line-height: 1.85;
+    color: var(--muted);
+    max-width: 440px;
+    margin: 25px 0 29px;
+  }
+  .hero-actions {
+    align-items: center;
+    gap: 12px;
+  }
+  .hero-notes {
     display: flex;
     flex-wrap: wrap;
-    justify-content: center;
-    gap: 0.75rem 1.5rem;
+    gap: 19px;
+    margin-top: 23px;
+    color: var(--faint);
+    font-family: var(--font-mono);
+    font-size: 10px;
   }
-  .proof span {
-    font-size: 0.95rem;
+  .hero-notes span::before {
+    content: "✓";
+    color: var(--mint);
+    margin-right: 6px;
+  }
+  .hero-product {
+    min-width: 0;
+    position: relative;
+  }
+  .product-label,
+  .product-caption {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    color: var(--faint);
+    font-family: var(--font-mono);
+    font-size: 9px;
+  }
+  .product-label {
+    margin-bottom: 12px;
+    letter-spacing: 1px;
+  }
+  .product-caption {
+    margin-top: 15px;
+    line-height: 1.8;
+    flex-wrap: wrap;
+  }
+  .product-caption a {
+    color: #c1cfc3;
+  }
+  .principles {
+    display: grid;
+    grid-template-columns: 1.35fr repeat(4, 1fr);
+    align-items: center;
+    gap: 22px;
+    padding: 29px 0;
+    border-block: 1px solid var(--line);
+  }
+  .principles p {
+    color: var(--faint);
+    font-size: 12px;
+    line-height: 1.8;
+  }
+  .principles strong {
+    color: var(--muted);
+    font-weight: 400;
+  }
+  .principles div {
+    display: flex;
+    align-items: center;
+    gap: 13px;
+    font-size: 13px;
+    color: #c5cec7;
+  }
+  .principles div > span {
+    font-family: var(--font-mono);
+    font-size: 23px;
+    color: var(--faint);
+  }
+  .capabilities,
+  .workflow,
+  .demo-section {
+    padding-top: 105px;
+  }
+  .section-intro {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 30px;
+    margin-bottom: 38px;
+  }
+  .section-intro h2 {
+    font-size: clamp(2.1rem, 3.1vw, 3rem);
+    letter-spacing: -0.055em;
+    font-weight: 500;
+  }
+  .section-intro > p {
+    color: var(--muted);
+    font-size: 14px;
+    line-height: 1.9;
+  }
+  .capability-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+  .capability {
+    display: flex;
+    flex-direction: column;
+    background: var(--bg-1);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 30px;
+    min-width: 0;
+    transition: border-color 160ms;
+  }
+  .capability:hover {
+    border-color: #76927b;
+  }
+  .card-heading {
+    display: flex;
+    justify-content: space-between;
+    color: var(--faint);
+    font-family: var(--font-mono);
+    margin-bottom: 26px;
+    font-size: 13px;
+  }
+  .card-number {
+    font-size: 11px;
+  }
+  .capability h3 {
+    font-size: 22px;
+    font-weight: 500;
+    letter-spacing: -0.035em;
+  }
+  .capability > p {
+    color: var(--muted);
+    font-size: 14px;
+    line-height: 1.8;
+    margin-top: 11px;
+    max-width: 44ch;
+  }
+  .card-link {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 12px;
+    margin-top: auto;
+    padding-top: 28px;
+    color: #d4dfd6;
+  }
+  .memory-preview {
+    margin-top: 26px;
+    border: 1px solid var(--line);
+    border-radius: 7px;
+    font: 10px var(--font-mono);
+    background: var(--bg-0);
+  }
+  .memory-preview > div {
+    padding: 11px 14px;
+    display: flex;
+    justify-content: space-between;
+    color: var(--faint);
+    border-bottom: 1px solid var(--line);
+  }
+  .memory-preview p {
+    display: flex;
+    gap: 8px;
+    padding: 12px 14px;
+    color: #c8d5cb;
+  }
+  .memory-preview p + p {
+    border-top: 1px solid #ffffff06;
+  }
+  .memory-preview p > span {
+    color: var(--mint);
+  }
+  .memory-preview small {
+    margin-left: auto;
+    color: var(--faint);
+    font-size: 8px;
+  }
+  .recovery-preview {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 9px;
+    font: 10px var(--font-mono);
+    margin-block: auto;
+    padding: 48px 0 24px;
+  }
+  .recovery-preview span,
+  .recovery-preview strong {
+    padding: 13px 10px;
+    border: 1px solid var(--line);
+    border-radius: 5px;
+    color: var(--muted);
+    font-weight: 400;
+  }
+  .recovery-preview strong {
+    border-color: #b8f3bd45;
+    background: var(--mint-soft);
+    color: var(--mint);
+  }
+  .recovery-preview i {
+    font-style: normal;
+    color: var(--faint);
+  }
+  .watch-preview {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    margin-top: 28px;
+    border: 1px solid var(--line);
+    background: var(--bg-0);
+    border-radius: 7px;
+    padding: 16px;
+    font: 10px var(--font-mono);
     color: var(--muted);
   }
-
-  .demo {
-    max-width: 76rem;
-    margin: 0 auto;
+  .policy {
+    color: var(--amber);
+    background: var(--amber-soft);
+    padding: 5px 8px;
+    border-radius: 4px;
   }
-  .demo-head {
-    text-align: center;
-    max-width: 42rem;
-    margin: 0 auto 1.75rem;
+  .model-preview {
+    display: flex;
+    align-items: center;
+    gap: 17px;
+    margin-top: 28px;
+    font: 13px var(--font-mono);
+    color: var(--faint);
   }
-  .demo-head h2 {
-    font-size: clamp(1.75rem, 1.35rem + 1.8vw, 2.625rem);
-    font-weight: 600;
-    letter-spacing: -0.02em;
-    line-height: 1.12;
+  .model-preview code {
+    padding: 15px 20px;
+    border: 1px solid var(--line);
+    background: var(--bg-0);
+    border-radius: 7px;
+    color: var(--mint);
   }
-  .demo-video {
+  .workflow-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 35px;
+  }
+  .workflow-grid article {
+    border-top: 1px solid var(--line);
+    padding-top: 23px;
+  }
+  .workflow-grid article > span {
+    font: 10px var(--font-mono);
+    letter-spacing: 1px;
+    color: var(--mint);
+  }
+  .workflow-grid h3 {
+    font-size: 18px;
+    font-weight: 500;
+    margin: 20px 0 12px;
+  }
+  .workflow-grid p {
+    font-size: 14px;
+    color: var(--muted);
+    line-height: 1.85;
+  }
+  .demo-frame {
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    overflow: hidden;
+    background: var(--bg-1);
+  }
+  .demo-bar {
+    padding: 17px 23px;
+    display: flex;
+    justify-content: space-between;
+    gap: 15px;
+    color: var(--faint);
+    font: 9px var(--font-mono);
+    letter-spacing: 1px;
+  }
+  .demo-bar i {
+    display: inline-block;
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--mint);
+    margin-right: 8px;
+  }
+  video {
     display: block;
     width: 100%;
     aspect-ratio: 16 / 9;
-    border-radius: 14px;
-    background: rgba(5, 10, 20, 0.82);
-    box-shadow: 0 28px 90px rgba(0, 0, 0, 0.28);
     object-fit: contain;
+    background: #0c100e;
   }
-
-  .narrative,
-  .terminal-section {
+  .demo-note {
+    margin-top: 14px;
+    font-size: 11px;
+    color: var(--faint);
+  }
+  .start-section {
     display: grid;
-    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
-    gap: 4rem;
-    align-items: start;
-  }
-  .narrative-copy h2,
-  .stats-head h2,
-  .terminal-copy h2,
-  .features-head h2 {
-    font-size: clamp(2rem, 1.4rem + 2vw, 3rem);
-    font-weight: 600;
-    letter-spacing: -0.02em;
-    line-height: 1.1;
-  }
-  .narrative-copy p:not(.kicker),
-  .terminal-copy p:not(.kicker) {
-    margin-top: 1rem;
-    color: var(--muted);
-    line-height: 1.75;
-    font-size: 1.05rem;
-  }
-  .problem-list {
-    display: grid;
-    gap: 1.5rem;
-  }
-  .problem-list article {
-    padding-top: 1.25rem;
-    border-top: 1px solid var(--line-soft);
-  }
-  .problem-list h3 {
-    margin-bottom: 0.5rem;
-    font-size: 1.15rem;
-  }
-  .problem-list p {
-    color: var(--muted);
-    line-height: 1.7;
-  }
-
-  .stats {
-    display: grid;
-    grid-template-columns: minmax(0, 0.75fr) minmax(0, 1.25fr);
-    gap: 3rem;
+    grid-template-columns: 1.1fr 1fr;
+    gap: 70px;
     align-items: center;
-    padding: 4rem 0;
-    border-top: 1px solid var(--line-soft);
-    border-bottom: 1px solid var(--line-soft);
+    padding: 65px 0 20px;
+    border-top: 1px solid var(--line);
   }
-  .stats-head .kicker {
-    margin-bottom: 1rem;
+  .start-section h2 {
+    font-size: clamp(2rem, 3vw, 2.85rem);
+    font-weight: 500;
+    letter-spacing: -0.055em;
   }
-  .stat-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 2rem;
-  }
-  .stat {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-  }
-  .stat-value {
-    font-size: clamp(2.5rem, 2rem + 2vw, 3.5rem);
-    font-weight: 700;
-    letter-spacing: -0.03em;
-    color: var(--mint);
-    line-height: 1;
-  }
-  .stat-label {
-    font-size: 0.875rem;
+  .start-section p {
+    font-size: 13px;
     color: var(--muted);
-    font-weight: 300;
+    margin-top: 20px;
   }
-
-  .terminal-section {
-    grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
-    align-items: center;
+  .start-section .hero-actions {
+    margin-top: 25px;
   }
-  .terminal-wrap {
+  .start-command {
     min-width: 0;
   }
-
-  .features-head {
-    margin-bottom: 3rem;
-    max-width: 48rem;
+  .command-label {
+    display: block;
+    font: 9px var(--font-mono);
+    color: var(--faint);
+    letter-spacing: 1px;
+    margin-bottom: 14px;
   }
-  .feature-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 0;
-    border-top: 1px solid var(--line-soft);
+  .start-command p {
+    font-size: 10px;
+    margin-top: 12px;
   }
-  .feature-card {
-    display: flex;
-    flex-direction: column;
-    gap: 0.65rem;
-    padding: 1.5rem 1.5rem 1.5rem 0;
-    border-bottom: 1px solid var(--line-soft);
-    transition: transform 0.2s;
-  }
-  .feature-card:hover {
-    transform: translateX(4px);
-  }
-  .feature-card h3 {
-    font-size: 1.0625rem;
-    font-weight: 600;
-  }
-  .feature-card p {
-    font-size: 0.9375rem;
-    font-weight: 300;
-    color: var(--muted);
-    line-height: 1.55;
-  }
-
-  .routes {
-    display: flex;
-    justify-content: center;
-    flex-wrap: wrap;
-    gap: 2.5rem;
-    margin-top: 6rem;
-    padding-top: 3rem;
-    border-top: 1px solid var(--line-soft);
-  }
-  .route {
-    font-size: 1rem;
-    font-weight: 500;
-    color: var(--text);
-    transition: color 0.2s;
-  }
-  .route span {
-    color: var(--mint);
-    margin-left: 0.25rem;
-    transition: transform 0.2s;
+  .start-command > a {
     display: inline-block;
-  }
-  .route:hover {
+    font-size: 12px;
     color: var(--mint);
+    margin-top: 15px;
   }
-  .route:hover span {
-    transform: translateX(3px);
+  @media (max-width: 1050px) {
+    .landing-hero {
+      gap: 30px;
+    }
+    h1 {
+      font-size: 3.4rem;
+    }
+    .hero-notes {
+      gap: 11px;
+    }
   }
-
-  @media (max-width: 900px) {
-    .narrative,
-    .stats,
-    .terminal-section {
+  @media (max-width: 800px) {
+    .landing-hero {
       grid-template-columns: 1fr;
-      gap: 2rem;
+      padding-top: 5px;
+      gap: 45px;
     }
-    .feature-grid {
-      grid-template-columns: 1fr;
+    h1 {
+      font-size: clamp(3rem, 8vw, 4.5rem);
     }
-    .stat-grid {
-      gap: 1.5rem;
+    .hero-lead {
+      max-width: 520px;
     }
-  }
-  @media (max-width: 640px) {
-    .hero {
-      padding: 2.5rem 0 1rem;
+    .hero-product {
+      max-width: 620px;
+      width: 100%;
     }
-    .hero-cta {
+    .principles {
+      grid-template-columns: 1fr 1fr;
+      gap: 23px;
+    }
+    .principles > p {
+      grid-column: 1 / -1;
+    }
+    .principles br {
+      display: none;
+    }
+    .capabilities,
+    .workflow,
+    .demo-section {
+      padding-top: 70px;
+    }
+    .section-intro {
+      align-items: flex-start;
       flex-direction: column;
-      align-items: stretch;
+      gap: 20px;
     }
-    .proof {
+    .capability {
+      padding: 23px;
+    }
+    .start-section {
       grid-template-columns: 1fr;
-      gap: 0.75rem;
+      gap: 35px;
+      padding-top: 45px;
     }
-    .stat-grid {
+  }
+  @media (max-width: 600px) {
+    .capability-grid,
+    .workflow-grid {
       grid-template-columns: 1fr;
-      gap: 2rem;
     }
-    .routes {
-      flex-direction: column;
-      align-items: center;
-      gap: 1.25rem;
+    .memory-preview small {
+      display: none;
     }
-    .demo-video {
-      border-radius: 10px;
+    .capability h3 {
+      font-size: 21px;
+    }
+    .demo-bar {
+      font-size: 8px;
+      padding-inline: 14px;
+    }
+    .demo-bar > span:last-child {
+      display: none;
+    }
+    .hero-actions .btn {
+      flex: 1;
+    }
+    .announcement {
+      font-size: 10px;
+    }
+    .product-caption {
+      font-size: 8px;
     }
   }
 </style>

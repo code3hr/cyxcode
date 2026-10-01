@@ -74,7 +74,7 @@ const cmds = [
 
   <section class="content-band">
     <SectionHeading kicker="Commands" title="Start with plain files and a few entry points" align="center" />
-    <div class="table-wrap reveal commands">
+    <div class="table-wrap reveal commands" role="region" aria-label="Commands" tabindex="0">
       <table>
         <thead><tr><th>Command</th><th>What it does</th></tr></thead>
         <tbody>{cmds.map((cmd) => <tr><td><code>{cmd[0]}</code></td><td>{cmd[1]}</td></tr>)}</tbody>

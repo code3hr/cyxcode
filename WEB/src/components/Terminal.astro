@@ -1,176 +1,271 @@
 ---
-// Animated terminal: cycles the real CyxCode flow.
-// Scene 1: miss → AI handles → captured for learning
-// Scene 2: same error → pattern hit → 0 tokens
-// Plus a live "tokens saved" counter that ticks up.
+const scenes = [
+  { id: "recover", label: "01 Recover", title: "A familiar error. A local answer." },
+  { id: "remember", label: "02 Remember", title: "Keep the decisions worth keeping." },
+  { id: "review", label: "03 Review", title: "Your experience, ready to reuse." },
+]
 ---
 
-<article class="hero-terminal panel reveal">
-  <div class="terminal-bar">
-    <div class="terminal-dots" aria-hidden="true">
-      <span></span><span></span><span></span>
+<div class="workbench" data-terminal>
+  <div class="window-bar">
+    <span class="window-dots" aria-hidden="true"><i></i><i></i><i></i></span>
+    <span>cyxcode <span class="dim">/ my-project</span></span>
+    <span class="branch">⌥ main</span>
+  </div>
+  <div class="scene-tabs" aria-label="Example workflows">
+    {
+      scenes.map((scene, index) => (
+        <button type="button" data-scene={scene.id} aria-pressed={index === 0} aria-controls={`scene-${scene.id}`}>
+          {scene.label}
+        </button>
+      ))
+    }
+  </div>
+  <div class="session">
+    <div class="session-heading">
+      <span class="agent-mark" aria-hidden="true">C_</span><span>CyxCode <small>YOUR PROJECT, IN CONTEXT</small></span
+      ><span class="session-status">Ready</span>
     </div>
-    <span class="terminal-title">cyxcode — pattern runtime</span>
-    <span class="terminal-title" style="opacity:0.5">●</span>
+    <section id="scene-recover" class="scene" aria-label={scenes[0].title}>
+      <p class="prompt"><span aria-hidden="true">❯</span> !python3 -c 'import flask'</p>
+      <p class="output">ModuleNotFoundError:<br /><span class="error">No module named 'flask'</span></p>
+      <div class="match">
+        <div class="match-heading"><span>✓ Pattern matched</span><span class="tag">LOCAL</span></div><p>
+          python-module-not-found
+        </p><div class="suggestion"><span>Suggested fix</span><code>pip install flask</code></div>
+      </div>
+      <p class="annotation">Review the suggested command before running it.</p>
+    </section>
+    <section id="scene-remember" class="scene" aria-label={scenes[1].title} hidden>
+      <p class="prompt"><span aria-hidden="true">❯</span> /remember Use Bun for this project</p>
+      <p class="output">Keep the conventions that matter<br /><span class="dim">with the code they belong to.</span></p>
+      <div class="match">
+        <div class="match-heading"><span>↳ Project memory</span><span class="tag">LOCAL</span></div><p>
+          Small notes. Useful context.
+        </p><div class="suggestion"><span>Project convention</span><code>Use Bun for this project</code></div>
+      </div>
+      <p class="annotation">Relevant memories can inform a later session.</p>
+    </section>
+    <section id="scene-review" class="scene" aria-label={scenes[2].title} hidden>
+      <p class="prompt"><span aria-hidden="true">❯</span> /learn-patterns</p>
+      <p class="output">
+        An unfamiliar error, handled with AI.<br /><span class="dim">A candidate pattern, ready for your review.</span>
+      </p>
+      <div class="match">
+        <div class="match-heading"><span>◇ Review a learned fix</span><span class="tag">PENDING</span></div><p>
+          Inspect the error and proposed command.
+        </p><div class="suggestion"><span>Your decision</span><code>Approve or reject</code></div>
+      </div>
+      <p class="annotation">Approved patterns join the local pattern library.</p>
+    </section>
   </div>
-
-  <div class="terminal-body" id="term-body" aria-live="polite">
-    <span class="term-cursor"></span>
-  </div>
-
-  <div class="terminal-counter">
-    <span class="counter-pill">
-      <span class="num" id="pattern-count">136</span>
-      patterns active
-    </span>
-    <span class="counter-pill">
-      tokens saved
-      <span class="num" id="tokens-saved">0</span>
-    </span>
-  </div>
-</article>
-
-<script is:inline>
-  (() => {
-    const body = document.getElementById("term-body")
-    const savedEl = document.getElementById("tokens-saved")
-    if (!body || !savedEl) return
-
-    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches
-    const wait = (ms) => new Promise((r) => setTimeout(r, reduce ? ms / 4 : ms))
-
-    // Each frame: { t: text class, s: text, pause after, type? }
-    const scenes = [
-      [
-        { t: "prompt", s: "$ " },
-        { t: "cmd", s: "!python3 -c 'import flask'", type: true },
-        { t: "br", s: "" },
-        { t: "out", s: "ModuleNotFoundError: No module named 'flask'" },
-        { t: "br", s: "" },
-        { t: "miss", s: "→ pattern miss: captured for learning", pause: 700 },
-        { t: "ai", s: "→ AI handling once · ~1,200 tokens", pause: 700 },
-        { t: "hit", s: "✓ fix: pip install flask", pause: 900 },
-        { t: "ai", s: "→ pattern generated · pending review", pause: 600 },
-        { t: "br", s: "" },
-        { t: "out", s: "$ /learn-patterns  → approved", pause: 500 },
-      ],
-      [
-        { t: "prompt", s: "$ " },
-        { t: "cmd", s: "!python3 -c 'import flask'", type: true },
-        { t: "br", s: "" },
-        { t: "out", s: "ModuleNotFoundError: No module named 'flask'" },
-        { t: "br", s: "" },
-        { t: "hit", s: "✓ pattern hit: reused from learned registry", pause: 700 },
-        { t: "hit", s: "✓ fix applied in <1s · 0 tokens", pause: 900 },
-        { t: "br", s: "" },
-        { t: "out", s: "$ # that error never costs again", pause: 1200 },
-      ],
-    ]
-
-    const clear = () => {
-      body.innerHTML = ""
-      const cur = document.createElement("span")
-      cur.className = "term-cursor"
-      body.appendChild(cur)
-    }
-
-    const frame = (cls, text) => {
-      const el = document.createElement("span")
-      el.className = `term-line term-${cls}`
-      el.textContent = text
-      body.insertBefore(el, body.lastElementChild)
-    }
-
-    const br = () => {
-      const el = document.createElement("br")
-      body.insertBefore(el, body.lastElementChild)
-    }
-
-    const typeOut = (cls, text) =>
-      new Promise((resolve) => {
-        const el = document.createElement("span")
-        el.className = `term-line term-${cls}`
-        body.insertBefore(el, body.lastElementChild)
-        let i = 0
-        const tick = () => {
-          if (i <= text.length) {
-            el.textContent = text.slice(0, i)
-            i++
-            body.scrollTop = body.scrollHeight
-            setTimeout(tick, reduce ? 8 : 32)
-          } else {
-            resolve()
-          }
-        }
-        tick()
+  <div class="workbench-footer"><span><i></i> Local pattern matching</span><span>Illustrative workflow</span></div>
+</div>
+<script>
+  document.querySelectorAll<HTMLElement>("[data-terminal]").forEach((root) => {
+    root.querySelectorAll<HTMLButtonElement>("[data-scene]").forEach((button) => {
+      button.addEventListener("click", () => {
+        root
+          .querySelectorAll<HTMLButtonElement>("[data-scene]")
+          .forEach((item) => item.setAttribute("aria-pressed", String(item === button)))
+        root.querySelectorAll<HTMLElement>(".scene").forEach((scene) => {
+          scene.hidden = scene.id !== `scene-${button.dataset.scene}`
+        })
       })
-
-    // token counter eases up toward a target
-    let saved = 0
-    let target = 0
-    let raf
-    const animateSaved = (to) => {
-      target = to
-      cancelAnimationFrame(raf)
-      const step = () => {
-        const diff = target - saved
-        if (Math.abs(diff) < 1) {
-          saved = target
-          savedEl.textContent = saved.toLocaleString()
-          return
-        }
-        saved += diff * 0.12
-        savedEl.textContent = Math.round(saved).toLocaleString()
-        raf = requestAnimationFrame(step)
-      }
-      step()
-    }
-
-    let totalSaved = 0
-
-    const playScene = async (scene) => {
-      clear()
-      await wait(250)
-      for (const f of scene) {
-        if (f.s === "" && f.t === "br") {
-          br()
-          continue
-        }
-        if (f.type) {
-          // prompt is the previous frame; type the command portion
-          await typeOut(f.t, f.s)
-        } else {
-          frame(f.t, f.s)
-        }
-        body.scrollTop = body.scrollHeight
-        await wait(f.pause ?? 250)
-      }
-    }
-
-    const loop = async () => {
-      // eslint-disable-next-line no-constant-condition
-      while (true) {
-        await playScene(scenes[0])
-        await wait(800)
-        await playScene(scenes[1])
-        totalSaved += 1200
-        animateSaved(totalSaved)
-        await wait(2200)
-      }
-    }
-
-    // Only run when terminal is visible to save cycles
-    if (reduce) {
-      // Static fallback: render scene 2 result only
-      frame("prompt", "$ ")
-      frame("cmd", "!python3 -c 'import flask'")
-      br()
-      frame("hit", "✓ pattern hit: 0 tokens")
-      br()
-      frame("out", "$ # that error never costs again")
-      savedEl.textContent = "1,200"
-    } else {
-      loop()
-    }
-  })()
+    })
+  })
 </script>
+<style>
+  .workbench {
+    background: #101614;
+    border: 1px solid #35473e;
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: 0 30px 80px #0005;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    text-align: left;
+  }
+  .window-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 17px 20px;
+    border-bottom: 1px solid var(--line);
+    color: #bdc7c0;
+    font-size: 11px;
+  }
+  .window-dots {
+    display: flex;
+    gap: 6px;
+  }
+  .window-dots i {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #556258;
+  }
+  .window-dots i:first-child {
+    background: #aa7567;
+  }
+  .window-dots i:nth-child(2) {
+    background: #b4a46b;
+  }
+  .window-dots i:nth-child(3) {
+    background: #7ba185;
+  }
+  .dim,
+  .branch {
+    color: var(--faint);
+  }
+  .scene-tabs {
+    display: flex;
+    border-bottom: 1px solid var(--line);
+    background: #141c18;
+  }
+  .scene-tabs button {
+    flex: 1;
+    padding: 15px 6px;
+    border-bottom: 2px solid transparent;
+    color: var(--muted);
+    font-size: 11px;
+    cursor: pointer;
+  }
+  .scene-tabs button[aria-pressed="true"] {
+    border-color: var(--mint);
+    color: var(--mint);
+    background: #b8f3bd08;
+  }
+  .scene-tabs button:hover {
+    color: var(--text);
+  }
+  .session {
+    padding: 25px;
+  }
+  .session-heading {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    margin-bottom: 27px;
+    font-weight: 600;
+  }
+  .session-heading small {
+    display: block;
+    color: var(--faint);
+    font-size: 8px;
+    letter-spacing: 1.3px;
+    margin-top: 4px;
+    font-weight: 400;
+  }
+  .agent-mark {
+    display: grid;
+    place-items: center;
+    width: 33px;
+    height: 33px;
+    color: var(--mint);
+    background: #b8f3bd0d;
+    border: 1px solid #b8f3bd29;
+    border-radius: 7px;
+  }
+  .session-status {
+    margin-left: auto;
+    color: var(--faint);
+    font-size: 10px;
+    font-weight: 400;
+  }
+  .prompt {
+    color: #e1e8e2;
+    overflow-wrap: anywhere;
+  }
+  .prompt > span {
+    color: var(--mint);
+    padding-right: 8px;
+  }
+  .output {
+    line-height: 1.9;
+    margin: 18px 0;
+    color: var(--muted);
+  }
+  .error {
+    color: #e4a594;
+  }
+  .match {
+    padding: 17px;
+    background: #b8f3bd06;
+    border: 1px solid #b8f3bd29;
+    border-radius: 7px;
+  }
+  .match-heading {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+    color: var(--mint);
+  }
+  .tag {
+    font-size: 8px;
+    letter-spacing: 1px;
+    padding: 3px 5px;
+    background: #b8f3bd10;
+    border-radius: 3px;
+  }
+  .match > p {
+    color: var(--muted);
+    margin-top: 7px;
+    font-size: 10px;
+  }
+  .suggestion {
+    margin-top: 16px;
+    padding-top: 13px;
+    border-top: 1px solid #b8f3bd19;
+    display: grid;
+    gap: 6px;
+  }
+  .suggestion > span {
+    color: var(--faint);
+    font-size: 10px;
+  }
+  .suggestion code {
+    color: #e7eee7;
+    font-size: 12px;
+  }
+  .annotation {
+    color: var(--faint);
+    margin-top: 15px;
+    font-size: 10px;
+    line-height: 1.7;
+  }
+  .workbench-footer {
+    border-top: 1px solid var(--line);
+    padding: 13px 20px;
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    font-size: 9px;
+    color: var(--faint);
+  }
+  .workbench-footer i {
+    display: inline-block;
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--mint);
+    margin-right: 5px;
+  }
+  @media (max-width: 480px) {
+    .session {
+      padding: 18px;
+    }
+    .branch {
+      display: none;
+    }
+    .window-bar {
+      justify-content: flex-start;
+    }
+    .workbench-footer {
+      padding-inline: 14px;
+      font-size: 8px;
+    }
+  }
+</style>

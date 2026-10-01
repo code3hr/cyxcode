@@ -6,7 +6,34 @@ interface Props {
 const { command, label = "Copy" } = Astro.props
 ---
 
-<div class="command-line">
-  <code>{command}</code>
-  <button type="button" class="copy-btn" data-copy={command}>{label}</button>
+<div data-command>
+  <div class="command-line">
+    <code>{command}</code><button type="button" class="copy-btn" data-copy={command} aria-label="Copy command"
+      >{label}</button>
+  </div>
+  <span class="copy-status" role="status"></span>
 </div>
+<script>
+  document.querySelectorAll<HTMLElement>("[data-command]").forEach((root) => {
+    const button = root.querySelector<HTMLButtonElement>("[data-copy]")
+    const status = root.querySelector<HTMLElement>('[role="status"]')
+    if (!button || !status) return
+    button.addEventListener("click", async () => {
+      const value = button.dataset.copy
+      if (!value) return
+      if (!navigator.clipboard) {
+        status.textContent = "Select the command and copy it manually."
+        return
+      }
+      const copied = await navigator.clipboard.writeText(value).then(
+        () => true,
+        () => false,
+      )
+      status.textContent = copied
+        ? "Command copied."
+        : "Clipboard access was blocked. Select the command and copy it manually."
+      button.classList.toggle("copied", copied)
+      button.textContent = copied ? "Copied" : "Copy"
+    })
+  })
+</script>
